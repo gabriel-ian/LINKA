@@ -1,0 +1,152 @@
+<div class="escola-container">
+
+  <div class="cabecalho">
+    <div>
+      <h1>Módulo Escola</h1>
+      <p>Gerencie as escolas cadastradas na plataforma</p>
+    </div>
+  </div>
+
+  <section class="cadastro-card">
+
+    <h2>Cadastrar nova escola</h2>
+
+    <div class="formulario">
+
+      <input
+        type="text"
+        placeholder="Nome da escola"
+        [(ngModel)]="nome"
+      />
+
+      <button
+        type="button"
+        class="btn-cadastrar"
+        (click)="cadastrar()"
+      >
+        Cadastrar
+      </button>
+
+    </div>
+
+  </section>
+
+  <section class="lista-card">
+
+    <div class="lista-cabecalho">
+      <div>
+        <h2>Escolas cadastradas</h2>
+        <p>Visualize e gerencie as escolas da plataforma</p>
+      </div>
+    </div>
+
+    <div class="tabela">
+
+      <div class="tabela-header">
+        <span>ID</span>
+        <span>Escola</span>
+        <span>Status</span>
+        <span>Ações</span>
+      </div>
+
+      @for (escola of escolas; track escola.id) {
+
+        <div class="tabela-linha">
+
+          <span class="id">
+            {{ escola.id }}
+          </span>
+
+          <span class="nome-escola">
+
+            @if (editandoId === escola.id) {
+
+              <input
+                type="text"
+                [(ngModel)]="nomeEdicao"
+              />
+
+            } @else {
+
+              {{ escola.nome }}
+
+            }
+
+          </span>
+
+          <span>
+
+            @if (escola.ativo) {
+
+              <span class="status ativa">
+                ● Ativa
+              </span>
+
+            } @else {
+
+              <span class="status inativa">
+                ● Inativa
+              </span>
+
+            }
+
+          </span>
+
+          <span class="acoes">
+
+            @if (editandoId === escola.id) {
+
+              <button
+                type="button"
+                class="btn-salvar"
+                (click)="salvarEdicao()"
+              >
+                Salvar
+              </button>
+
+            } @else {
+
+              <button
+                type="button"
+                class="btn-editar"
+                (click)="editar(escola)"
+                [disabled]="!escola.ativo"
+              >
+                Editar
+              </button>
+
+              @if (escola.ativo) {
+
+                <button
+                  type="button"
+                  class="btn-desativar"
+                  (click)="desativar(escola)"
+                >
+                  Desativar
+                </button>
+
+              } @else {
+
+                <button
+                  type="button"
+                  class="btn-reativar"
+                  (click)="ativar(escola)"
+                >
+                  Reativar
+                </button>
+
+              }
+
+            }
+
+          </span>
+
+        </div>
+
+      }
+
+    </div>
+
+  </section>
+
+</div>

@@ -1,0 +1,82 @@
+<div class="login-container">
+
+  <!-- LADO ESQUERDO -->
+  <div class="login-left">
+
+    <!-- LOGO -->
+    <div class="logo">
+      <img src="assets/linka.png" alt="Linka">
+    </div>
+
+    <!-- TÍTULO -->
+    <h1>Bem-vindo de volta</h1>
+
+    <!-- PERFIS -->
+    <p class="subtitulo">Entrar como</p>
+
+    <div class="perfis">
+      <button type="button" (click)="perfil='aluno'" [class.ativo]="perfil==='aluno'">
+        🎓<br>Aluno
+      </button>
+
+      <button type="button" (click)="perfil='familia'" [class.ativo]="perfil==='familia'">
+        🏠<br>Família
+      </button>
+
+      <button type="button" (click)="perfil='professor'" [class.ativo]="perfil==='professor'">
+        👨‍🏫<br>Professor
+      </button>
+
+      <button type="button" (click)="perfil='escola'" [class.ativo]="perfil==='escola'">
+        🏫<br>Escola
+      </button>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-box">
+
+      <label>E-mail</label>
+      <input 
+        type="email" 
+        [(ngModel)]="email" 
+        placeholder="seu@email.com"
+      >
+
+      <label>Senha</label>
+      <div class="input-senha">
+        <input 
+          type="password" 
+          [(ngModel)]="senha"
+        >
+        <span class="eye">👁</span>
+      </div>
+
+      <div class="acoes">
+        <a href="#">Esqueci minha senha</a>
+      </div>
+
+      <!-- 🔥 BOTÃO LOGIN CORRETO -->
+      <button 
+        type="button"
+        class="btn-login" 
+        (click)="login()"
+      >
+        Entrar na Plataforma
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- LADO DIREITO -->
+  <div class="login-right">
+    <div class="overlay">
+      <h2>
+        Transformando<br>
+        Pequenas Conquistas<br>
+        em Grandes Mudanças
+      </h2>
+    </div>
+  </div>
+
+</div>

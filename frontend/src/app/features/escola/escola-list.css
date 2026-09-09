@@ -1,0 +1,239 @@
+.escola-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 30px;
+  font-family: 'Montserrat', sans-serif; /* 🔥 AQUI */
+}
+
+.cabecalho {
+  margin-bottom: 30px;
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  color: #3c3c3c;
+  letter-spacing: -0.5px;
+}
+
+.cabecalho p {
+  margin-top: 8px;
+  color: #777;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.cadastro-card,
+.lista-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  margin-top: 0;
+  color: #555;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.formulario {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.formulario input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  box-sizing: border-box;
+  transition: 0.2s;
+}
+
+.formulario input::placeholder {
+  color: #aaa;
+}
+
+.formulario input:focus,
+.nome-escola input:focus {
+  outline: none;
+  border-color: #287be5;
+  box-shadow: 0 0 0 2px rgba(40, 123, 229, 0.15);
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 17px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-cadastrar {
+  background: linear-gradient(135deg, #287be5, #4a8df0);
+  color: white;
+  min-width: 120px;
+}
+
+.btn-cadastrar:hover {
+  background: linear-gradient(135deg, #1769d0, #3b7ee0);
+  transform: translateY(-1px);
+}
+
+.lista-cabecalho {
+  margin-bottom: 20px;
+}
+
+.lista-cabecalho h2 {
+  margin-bottom: 5px;
+}
+
+.lista-cabecalho p {
+  margin: 0;
+  color: #888;
+  font-size: 13px;
+}
+
+.tabela {
+  width: 100%;
+}
+
+.tabela-header,
+.tabela-linha {
+  display: grid;
+  grid-template-columns: 70px 1fr 150px 250px;
+  align-items: center;
+  gap: 15px;
+}
+
+.tabela-header {
+  padding: 14px 15px;
+  background: #f1f5fa;
+  border-radius: 8px;
+  color: #666;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.tabela-linha {
+  padding: 16px 15px;
+  border-bottom: 1px solid #e8e8e8;
+  color: #555;
+  font-size: 14px;
+}
+
+.tabela-linha:last-child {
+  border-bottom: none;
+}
+
+.id {
+  color: #888;
+  font-weight: 600;
+}
+
+.nome-escola {
+  font-weight: 500;
+}
+
+.nome-escola input {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+.status {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status.ativa {
+  color: #159447;
+}
+
+.status.inativa {
+  color: #d47700;
+}
+
+.acoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-editar {
+  background: #e8f1ff;
+  color: #1769d0;
+}
+
+.btn-editar:hover:not(:disabled) {
+  background: #d5e6ff;
+}
+
+.btn-desativar {
+  background: #fff0ed;
+  color: #d64c36;
+}
+
+.btn-desativar:hover {
+  background: #ffe1dc;
+}
+
+.btn-reativar {
+  background: #e8f8ef;
+  color: #158347;
+}
+
+.btn-reativar:hover {
+  background: #d6f2e2;
+}
+
+.btn-salvar {
+  background: linear-gradient(135deg, #287be5, #4a8df0);
+  color: white;
+}
+
+.btn-salvar:hover {
+  background: linear-gradient(135deg, #1769d0, #3b7ee0);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+@media (max-width: 800px) {
+
+  .escola-container {
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  .formulario {
+    flex-direction: column;
+  }
+
+  .tabela {
+    overflow-x: auto;
+  }
+
+  .tabela-header,
+  .tabela-linha {
+    min-width: 750px;
+  }
+}

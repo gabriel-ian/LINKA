@@ -5,6 +5,5 @@ frontend/node_modules
 dist
 .env
 
-# Angular
 .angular
 frontend/.angular

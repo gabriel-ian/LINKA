@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Escola } from './escola.entity';
+import { CreateEscolaDto } from './dto/create-escola.dto';
+import { UpdateEscolaDto } from './dto/update-escola.dto';
 
 @Injectable()
 export class EscolaService {
@@ -11,59 +13,55 @@ export class EscolaService {
   ) {}
 
   async findAll() {
-    const resultado = await this.escolaRepository.find();
+    const resultado = await this.escolaRepository.find({
+      order: { nome: 'ASC' },
+    });
 
-    return {
-      data: resultado,
-    };
+    return { data: resultado };
   }
 
   async findOne(id: number) {
-    const resultado = await this.escolaRepository.findOne({
-      where: { id },
+    const resultado = await this.escolaRepository.findOne({ where: { id } });
+
+    if (!resultado) {
+      throw new NotFoundException('Escola nao encontrada');
+    }
+
+    return { data: resultado };
+  }
+
+  async create(data: CreateEscolaDto) {
+    const escola = this.escolaRepository.create({
+      nome: data.nome,
+      cnpj: data.cnpj ?? null,
     });
 
-    return {
-      data: resultado,
-    };
-  }
-
-  async create(data: Partial<Escola>) {
-    const escola = this.escolaRepository.create(data);
     const resultado = await this.escolaRepository.save(escola);
 
-    return {
-      data: resultado,
-    };
+    return { data: resultado };
   }
 
-  async update(id: number, data: Partial<Escola>) {
+  async update(id: number, data: UpdateEscolaDto) {
+    await this.findOne(id);
     await this.escolaRepository.update(id, data);
 
-    const resultado = await this.findOne(id);
-
-    return resultado;
+    return this.findOne(id);
   }
 
   async remove(id: number) {
+    await this.findOne(id);
     await this.escolaRepository.update(id, { ativo: false });
 
-    return {
-      data: true,
-    };
+    return { data: true };
   }
 
   async activate(id: number) {
+    await this.findOne(id);
     await this.escolaRepository.update(id, { ativo: true });
 
-    return {
-      data: true,
-    };
+    return { data: true };
   }
 
-  async findByEmail(email: string) {
-    return this.escolaRepository.findOne({
-      where: { email },
-    });
-  }
+  // findByEmail foi removido: a tabela `escola` nao tem coluna email.
+  // O login agora passa por UsuarioService.findByEmail.
 }

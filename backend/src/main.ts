@@ -1,13 +1,15 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const config = app.get(ConfigService);
 
   app.enableCors({
-    origin: 'http://localhost:4200',
+    origin: config.get<string>('FRONTEND_URL') ?? 'http://localhost:4200',
   });
 
   app.useGlobalPipes(
@@ -18,20 +20,19 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('Plataforma Educacional')
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Linka')
     .setDescription(
-      'API da plataforma educacional para apoio a alunos com neurodivergência',
+      'API da plataforma educacional para apoio a alunos com neurodivergencia',
     )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  await app.listen(Number(config.get<string>('PORT') ?? 3000));
 }
 
 bootstrap();

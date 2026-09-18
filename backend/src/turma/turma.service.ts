@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Turma } from './turma.entity';
-import { Escola } from '../escola/escola.entity';
+import { CreateTurmaDto } from './dto/create-turma.dto';
 
 @Injectable()
 export class TurmaService {
@@ -13,29 +13,21 @@ export class TurmaService {
 
   async findAllByEscola(escolaId: number) {
     const resultado = await this.turmaRepository.find({
-      where: {
-        escola: { id: escolaId },
-      },
-      relations: {
-        escola: true,
-      },
+      where: { escolaId },
+      order: { nome: 'ASC' },
     });
 
-    return {
-      data: resultado,
-    };
+    return { data: resultado };
   }
 
-  async create(data: Partial<Turma>, escolaId: number) {
+  async create(data: CreateTurmaDto, escolaId: number) {
     const turma = this.turmaRepository.create({
-      ...data,
-      escola: { id: escolaId } as Escola,
+      nome: data.nome,
+      escolaId,
     });
 
     const resultado = await this.turmaRepository.save(turma);
 
-    return {
-      data: resultado,
-    };
+    return { data: resultado };
   }
 }

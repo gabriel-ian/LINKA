@@ -55,13 +55,17 @@
         <a href="#">Esqueci minha senha</a>
       </div>
 
-      <!-- 🔥 BOTÃO LOGIN CORRETO -->
-      <button 
+      @if (erro) {
+        <p class="erro">{{ erro }}</p>
+      }
+
+      <button
         type="button"
-        class="btn-login" 
+        class="btn-login"
         (click)="login()"
+        [disabled]="carregando"
       >
-        Entrar na Plataforma
+        {{ carregando ? 'Entrando...' : 'Entrar na Plataforma' }}
       </button>
 
     </div>

@@ -7,18 +7,19 @@ import {
 } from 'typeorm';
 import { Escola } from '../escola/escola.entity';
 
+/** Tabela `turma`. Nao existe coluna `ativo` no banco. */
 @Entity('turma')
 export class Turma {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
-  nome!: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  nome!: string | null;
 
-  @Column({ default: true })
-  ativo!: boolean;
+  @Column({ name: 'escola_id', nullable: true })
+  escolaId!: number | null;
 
-  @ManyToOne(() => Escola)
+  @ManyToOne(() => Escola, { nullable: true })
   @JoinColumn({ name: 'escola_id' })
-  escola!: Escola;
+  escola!: Escola | null;
 }

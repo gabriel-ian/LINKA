@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Matricula } from './matricula.entity';
@@ -20,66 +20,48 @@ export class MatriculaService {
   ) {}
 
   async create(data: CreateMatriculaDto, escolaId: number) {
+    // Aluno e turma precisam ser da escola logada, senao uma escola
+    // conseguiria matricular aluno de outra.
     const aluno = await this.alunoRepository.findOne({
-      where: {
-        id: data.alunoId,
-        escola: { id: escolaId },
-      },
+      where: { id: data.alunoId, escolaId },
     });
 
     if (!aluno) {
-      throw new BadRequestException('Aluno não encontrado');
+      throw new BadRequestException('Aluno nao encontrado nesta escola');
     }
 
     const turma = await this.turmaRepository.findOne({
-      where: {
-        id: data.turmaId,
-        escola: { id: escolaId },
-      },
+      where: { id: data.turmaId, escolaId },
     });
 
     if (!turma) {
-      throw new BadRequestException('Turma não encontrada');
+      throw new BadRequestException('Turma nao encontrada nesta escola');
     }
 
     const existente = await this.matriculaRepository.findOne({
-      where: {
-        aluno: { id: aluno.id },
-        turma: { id: turma.id },
-      },
+      where: { alunoId: aluno.id, turmaId: turma.id },
     });
 
     if (existente) {
-      throw new BadRequestException('Aluno já matriculado');
+      throw new BadRequestException('Aluno ja matriculado nesta turma');
     }
 
     const matricula = this.matriculaRepository.create({
-      aluno,
-      turma,
+      alunoId: aluno.id,
+      turmaId: turma.id,
     });
 
     const resultado = await this.matriculaRepository.save(matricula);
 
-    return {
-      data: resultado,
-    };
+    return { data: resultado };
   }
 
   async findAllByEscola(escolaId: number) {
     const resultado = await this.matriculaRepository.find({
-      where: {
-        turma: {
-          escola: { id: escolaId },
-        },
-      },
-      relations: {
-        aluno: true,
-        turma: true,
-      },
+      where: { turma: { escolaId } },
+      relations: { aluno: true, turma: true },
     });
 
-    return {
-      data: resultado,
-    };
+    return { data: resultado };
   }
 }

@@ -6,10 +6,12 @@ import { TarefaController } from './tarefa.controller';
 import { Turma } from '../turma/turma.entity';
 import { Disciplina } from '../disciplina/disciplina.entity';
 import { Professor } from '../professor/professor.entity';
+import { TarefaStatusModule } from '../tarefa-status/tarefa-status.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Tarefa, Turma, Disciplina, Professor]),
+    TarefaStatusModule,
   ],
   providers: [TarefaService],
   controllers: [TarefaController],

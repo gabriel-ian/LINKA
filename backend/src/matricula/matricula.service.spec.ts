@@ -1,8 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { MatriculaService } from './matricula.service';
+import { TarefaStatusService } from '../tarefa-status/tarefa-status.service';
 import { Matricula } from './matricula.entity';
 import { Aluno } from '../aluno/aluno.entity';
 import { Turma } from '../turma/turma.entity';
@@ -12,11 +13,26 @@ describe('MatriculaService', () => {
   let matriculaRepo: jest.Mocked<Repository<Matricula>>;
   let alunoRepo: jest.Mocked<Repository<Aluno>>;
   let turmaRepo: jest.Mocked<Repository<Turma>>;
+  let tarefaStatusService: jest.Mocked<TarefaStatusService>;
+  // EntityManager da transacao: o save da matricula passa por ele.
+  let manager: { save: jest.Mock };
 
   beforeEach(async () => {
+    manager = { save: jest.fn() };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MatriculaService,
+        {
+          provide: DataSource,
+          useValue: {
+            transaction: jest.fn((cb: (m: unknown) => unknown) => cb(manager)),
+          },
+        },
+        {
+          provide: TarefaStatusService,
+          useValue: { seedParaAluno: jest.fn() },
+        },
         {
           provide: getRepositoryToken(Matricula),
           useValue: { find: jest.fn(), findOne: jest.fn(), create: jest.fn(), save: jest.fn() },
@@ -36,6 +52,7 @@ describe('MatriculaService', () => {
     matriculaRepo = module.get(getRepositoryToken(Matricula));
     alunoRepo = module.get(getRepositoryToken(Aluno));
     turmaRepo = module.get(getRepositoryToken(Turma));
+    tarefaStatusService = module.get(TarefaStatusService);
   });
 
   it('should be defined', () => {
@@ -85,7 +102,7 @@ describe('MatriculaService', () => {
       matriculaRepo.findOne.mockResolvedValue(null);
       const criada = { alunoId: 1, turmaId: 2 } as Matricula;
       matriculaRepo.create.mockReturnValue(criada);
-      matriculaRepo.save.mockResolvedValue(criada);
+      manager.save.mockResolvedValue(criada);
 
       const resultado = await service.create(dto, 1);
 
@@ -94,6 +111,35 @@ describe('MatriculaService', () => {
         turmaId: 2,
       });
       expect(resultado).toEqual({ data: criada });
+    });
+
+    it('semeia status pendente das tarefas que a turma ja tinha', async () => {
+      alunoRepo.findOne.mockResolvedValue({ id: 1 } as Aluno);
+      turmaRepo.findOne.mockResolvedValue({ id: 2 } as Turma);
+      matriculaRepo.findOne.mockResolvedValue(null);
+      const criada = { alunoId: 1, turmaId: 2 } as Matricula;
+      matriculaRepo.create.mockReturnValue(criada);
+      manager.save.mockResolvedValue(criada);
+
+      await service.create(dto, 1);
+
+      expect(tarefaStatusService.seedParaAluno).toHaveBeenCalledWith(
+        1,
+        2,
+        manager,
+      );
+    });
+
+    it('nao devolve a matricula se o seed dos status falhar (transacao)', async () => {
+      alunoRepo.findOne.mockResolvedValue({ id: 1 } as Aluno);
+      turmaRepo.findOne.mockResolvedValue({ id: 2 } as Turma);
+      matriculaRepo.findOne.mockResolvedValue(null);
+      const criada = { alunoId: 1, turmaId: 2 } as Matricula;
+      matriculaRepo.create.mockReturnValue(criada);
+      manager.save.mockResolvedValue(criada);
+      tarefaStatusService.seedParaAluno.mockRejectedValue(new Error('falhou'));
+
+      await expect(service.create(dto, 1)).rejects.toThrow('falhou');
     });
   });
 

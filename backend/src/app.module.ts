@@ -19,6 +19,7 @@ import { ResponsavelModule } from './responsavel/responsavel.module';
 import { AlunoResponsavelModule } from './aluno-responsavel/aluno-responsavel.module';
 import { TarefaModule } from './tarefa/tarefa.module';
 import { TarefaAdaptadaModule } from './tarefa-adaptada/tarefa-adaptada.module';
+import { TarefaStatusModule } from './tarefa-status/tarefa-status.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { TarefaAdaptadaModule } from './tarefa-adaptada/tarefa-adaptada.module';
     AlunoResponsavelModule,
     TarefaModule,
     TarefaAdaptadaModule,
+    TarefaStatusModule,
   ],
   controllers: [AdminController],
   providers: [],

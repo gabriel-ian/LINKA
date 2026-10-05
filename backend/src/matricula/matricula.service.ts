@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Matricula } from './matricula.entity';
 import { Aluno } from '../aluno/aluno.entity';
 import { Turma } from '../turma/turma.entity';
+import { TarefaStatusService } from '../tarefa-status/tarefa-status.service';
 import { CreateMatriculaDto } from './dto/create-matricula.dto';
 
 @Injectable()
@@ -17,6 +18,10 @@ export class MatriculaService {
 
     @InjectRepository(Turma)
     private readonly turmaRepository: Repository<Turma>,
+
+    private readonly tarefaStatusService: TarefaStatusService,
+
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(data: CreateMatriculaDto, escolaId: number) {
@@ -51,7 +56,17 @@ export class MatriculaService {
       turmaId: turma.id,
     });
 
-    const resultado = await this.matriculaRepository.save(matricula);
+    // Matricula e status pendentes das tarefas que a turma ja tinha na
+    // mesma transacao, senao o aluno nao veria essas tarefas.
+    const resultado = await this.dataSource.transaction(async (manager) => {
+      const salva = await manager.save(matricula);
+      await this.tarefaStatusService.seedParaAluno(
+        salva.alunoId,
+        salva.turmaId,
+        manager,
+      );
+      return salva;
+    });
 
     return { data: resultado };
   }

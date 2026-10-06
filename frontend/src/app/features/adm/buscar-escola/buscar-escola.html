@@ -1,0 +1,92 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Buscar escola</h1>
+    <p>Pesquise por nome, cidade ou e-mail institucional</p>
+  </header>
+
+  <form class="cartao filtros" (ngSubmit)="buscar()">
+    <div class="linha">
+      <label class="campo-p termo">
+        Nome, cidade ou e-mail
+        <input name="texto" [(ngModel)]="texto" placeholder="Ex.: Leonardo" />
+      </label>
+      <button type="submit" class="bt bt-primario">Buscar</button>
+    </div>
+
+    <div class="grade-campos" style="--colunas: 3; gap: 16px">
+      <label class="campo-p">
+        Cidade
+        <select name="cidade" [(ngModel)]="cidade">
+          <option value="">Todas</option>
+          @for (c of cidades(); track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </label>
+      <label class="campo-p">
+        Plano
+        <select name="plano" [(ngModel)]="plano">
+          <option value="">Todos</option>
+          <option value="basico">Básico</option>
+          <option value="institucional">Institucional</option>
+        </select>
+      </label>
+      <label class="campo-p">
+        Status
+        <select name="situacao" [(ngModel)]="situacao">
+          <option value="">Todos</option>
+          <option value="ativa">Ativa</option>
+          <option value="pendente">Pendente</option>
+          <option value="inativa">Inativa</option>
+        </select>
+      </label>
+    </div>
+  </form>
+
+  @if (buscado() !== null) {
+    @if (resultados().length) {
+      <p class="contagem">
+        {{ resultados().length }} {{ resultados().length === 1 ? 'resultado' : 'resultados' }}
+        @if (buscado()) {
+          para "{{ buscado() }}"
+        }
+      </p>
+
+      @for (e of resultados(); track e.id) {
+        <article class="cartao resultado">
+          <span class="avatar" [class.apagado]="!e.ativo" style="--tam: 52px; --raio-avatar: 12px; --fonte-avatar: 22px">
+            {{ iniciais(e.nome) }}
+          </span>
+          <div class="info">
+            <div class="titulo">
+              <h2>{{ e.nome }}</h2>
+              <span class="pilula" [class]="status(e)">{{ rotuloStatus[status(e)] }}</span>
+            </div>
+            <p>#{{ e.id }}{{ cidadeUf(e) ? ' - ' + cidadeUf(e) : '' }}</p>
+            <small>{{ detalhe(e) }}</small>
+          </div>
+          <a class="bt bt-secundario bt-p" routerLink="/adm/escolas/id" [queryParams]="{ id: e.id }">
+            Ver detalhes
+          </a>
+        </article>
+      }
+    } @else {
+      <section class="cartao nada">
+        <span class="interrogacao">?</span>
+        <h2>Nenhuma escola encontrada</h2>
+        <p>
+          @if (buscado()) {
+            Não há resultados para "{{ buscado() }}".
+          } @else {
+            Não há escolas com esses filtros.
+          }
+          Confira a grafia, busque pela cidade ou pelo ID da escola.
+        </p>
+        <div class="acoes centro">
+          <button type="button" class="bt bt-secundario" (click)="limpar()">Limpar busca</button>
+          <a class="bt bt-primario" routerLink="/adm/escolas/cadastrar">Cadastrar nova escola</a>
+        </div>
+      </section>
+    }
+  }
+</div>

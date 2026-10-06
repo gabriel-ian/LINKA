@@ -1,0 +1,85 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Desativar escola</h1>
+    @if (concluido() && escola(); as e) {
+      <p>{{ e.nome }} - ID #{{ e.id }}</p>
+    } @else {
+      <p>Suspende o acesso da escola sem apagar os dados</p>
+    }
+  </header>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (concluido()) {
+    <app-adm-resultado
+      tipo="alerta"
+      titulo="Escola desativada"
+      texto="Os acessos foram suspensos. Os dados continuam guardados e a escola pode ser reativada a qualquer momento."
+    >
+      <a class="bt bt-secundario" routerLink="/adm">Voltar à visão geral</a>
+      <a class="bt bt-primario" routerLink="/adm/escolas/reativar">Ver escolas inativas</a>
+    </app-adm-resultado>
+  } @else if (semId()) {
+    <app-escolher-escola [escolas]="store.ativas()" />
+  } @else if (escola(); as e) {
+    <form class="cartao" (ngSubmit)="desativar()">
+      <div class="topo">
+        <span class="avatar" style="--tam: 56px; --raio-avatar: 12px; --fonte-avatar: 22px">{{ iniciais(e.nome) }}</span>
+        <div class="nome">
+          <h2>{{ e.nome }}</h2>
+          <p>ID #{{ e.id }}{{ cidadeUf(e) ? ' - ' + cidadeUf(e) : '' }}</p>
+        </div>
+        <span class="pilula" [class]="status(e)">{{ rotuloStatus[status(e)] }}</span>
+      </div>
+
+      @if (!e.ativo) {
+        <p class="aviso-caixa cinza">
+          <strong>Esta escola já está desativada.</strong>
+          Para liberar o acesso de novo, use "Reativar escola".
+        </p>
+      } @else {
+        <div class="aviso-caixa vermelho">
+          <strong>Atenção: essa ação afeta toda a escola</strong>
+          {{ e.totalAlunosNee }} alunos, {{ e.totalProfessores }} professores e as famílias vinculadas perdem o
+          acesso imediatamente. Os dados ficam guardados e a escola pode ser reativada depois.
+        </div>
+
+        <div class="grade-campos">
+          <label class="campo-p">
+            Motivo
+            <select name="motivo" [(ngModel)]="motivo">
+              @for (m of motivos; track m) {
+                <option [value]="m">{{ m }}</option>
+              }
+            </select>
+          </label>
+          <label class="campo-p">
+            Data de desativação
+            <input name="data" type="date" required [(ngModel)]="data" />
+          </label>
+        </div>
+
+        <label class="campo-p">
+          Observações (opcional)
+          <textarea name="observacao" maxlength="1000" [(ngModel)]="observacao" placeholder="Descreva o motivo para o histórico da escola..."></textarea>
+        </label>
+
+        <label class="marcar">
+          <input type="checkbox" name="confirmado" [(ngModel)]="confirmado" />
+          Confirmo que a coordenação da escola foi avisada
+        </label>
+
+        <hr class="divisor" />
+
+        <div class="acoes">
+          <button type="button" class="bt bt-secundario" (click)="cancelar()">Cancelar</button>
+          <button type="submit" class="bt bt-perigo-cheio" [disabled]="!confirmado || !data || enviando()">
+            {{ enviando() ? 'Desativando...' : 'Desativar escola' }}
+          </button>
+        </div>
+      }
+    </form>
+  }
+</div>

@@ -22,6 +22,11 @@ export class AuthService {
     });
   }
 
+  /** Pede o link de nova senha. Depende da rota POST /auth/recuperar-senha no backend. */
+  recuperarSenha(email: string): Observable<void> {
+    return this.http.post<void>(`${this.api}/recuperar-senha`, { email });
+  }
+
   guardarSessao(res: LoginResponse): void {
     localStorage.setItem('token', res.access_token);
     localStorage.setItem('perfil', res.perfil);
@@ -35,6 +40,17 @@ export class AuthService {
 
   get perfil(): PerfilUsuario | null {
     return localStorage.getItem('perfil') as PerfilUsuario | null;
+  }
+
+  /** E-mail lido do payload do token (so para exibir; nao e verificado aqui). */
+  get email(): string | null {
+    const token = localStorage.getItem('token');
+
+    try {
+      return token ? JSON.parse(atob(token.split('.')[1])).email ?? null : null;
+    } catch {
+      return null;
+    }
   }
 
   logout(): void {

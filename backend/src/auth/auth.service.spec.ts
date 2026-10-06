@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
@@ -16,7 +16,7 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: UsuarioService,
-          useValue: { findByEmail: jest.fn() },
+          useValue: { findByEmail: jest.fn(), registrarLogin: jest.fn() },
         },
         {
           provide: JwtService,
@@ -104,6 +104,39 @@ describe('AuthService', () => {
       const resultado = await service.login('admin@linka.com', 'linka123');
 
       expect(resultado.escolaId).toBeNull();
+    });
+
+    it('registra o horario do login quando as credenciais conferem', async () => {
+      usuarioService.findByEmail.mockResolvedValue({
+        id: 7,
+        email: 'escola@linka.com',
+        senha: 'hash-correto',
+        perfil: 'escola',
+        escolaId: 5,
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await service.login('escola@linka.com', 'linka123');
+
+      expect(usuarioService.registrarLogin).toHaveBeenCalledWith(7);
+    });
+
+    it('lanca 403 quando a escola do usuario esta desativada', async () => {
+      usuarioService.findByEmail.mockResolvedValue({
+        id: 7,
+        email: 'escola@linka.com',
+        senha: 'hash-correto',
+        perfil: 'escola',
+        escolaId: 5,
+        escola: { id: 5, ativo: false },
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await expect(
+        service.login('escola@linka.com', 'linka123'),
+      ).rejects.toThrow(ForbiddenException);
+      expect(usuarioService.registrarLogin).not.toHaveBeenCalled();
+      expect(jwtService.sign).not.toHaveBeenCalled();
     });
   });
 });

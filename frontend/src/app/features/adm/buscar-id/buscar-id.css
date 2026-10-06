@@ -1,0 +1,66 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.busca {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.busca .campo-p {
+  width: 300px;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nome {
+  flex: 1;
+}
+
+.nome h2 {
+  margin: 0 0 2px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cor-titulo);
+}
+
+.nome p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 20px;
+  margin: 0;
+}
+
+.dados dt {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-borda);
+}
+
+.dados dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+  overflow-wrap: anywhere;
+}
+
+.alerta-erro,
+.vazio {
+  margin: 0;
+}

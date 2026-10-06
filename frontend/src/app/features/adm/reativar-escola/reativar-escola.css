@@ -1,0 +1,24 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.tabela-cartao {
+  padding: 14px 20px;
+  overflow-x: auto;
+}
+
+.alerta-erro,
+.aviso-caixa {
+  margin: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

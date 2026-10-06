@@ -1,5 +1,570 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tokens extraidos do Figma (arquivo Linka). */
+:root {
+  --cor-primaria: #2277e5;
+  --cor-primaria-escura: #0046a0;
+  --cor-primaria-clara: #e8effe;
+  --cor-texto: #6e6e6e;
+  --cor-borda: #7e7f80;
+  --cor-fundo: #effaff;
+  --cor-painel: #dceef8;
+  --cor-erro: #dc2626;
+  --cor-erro-fundo: #fee7e7;
+  --cor-erro-texto: #991a1a;
+  --cor-sucesso: #0e996b;
+  --cor-sucesso-fundo: #e6f7f2;
+  --cor-titulo: #333;
+  --cor-linha: #ebebeb;
+  --cor-fundo-painel: #f1f5f9;
+  --cor-azul-forte: #1558d6;
+  --cor-alerta: #b8420a;
+  --cor-alerta-fundo: #fef0e8;
+  --sombra-cartao: 0 4px 4px rgba(0, 0, 0, 0.25);
+
+  --raio: 10px;
+  --altura-campo: 53px;
+
+  --fonte-base: 'Montserrat', sans-serif;
+  --fonte-destaque: 'Inria Serif', serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--fonte-base);
+  color: var(--cor-texto);
   margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* ---------- Campos de formulario ---------- */
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo-rotulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--cor-texto);
+}
+
+.campo {
+  width: 100%;
+  height: var(--altura-campo);
+  padding: 0 15px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: #fff;
+  font-size: 16px;
+  color: var(--cor-texto);
+  outline: none;
+}
+
+.campo::placeholder {
+  color: var(--cor-borda);
+}
+
+.campo:focus {
+  border-color: var(--cor-primaria);
+}
+
+.campo--erro,
+.campo--erro:focus {
+  border: 1.5px solid var(--cor-erro);
+}
+
+/* ---------- Botoes e links ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--altura-campo);
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--raio);
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.btn-primario {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+.btn-primario:hover:not(:disabled) {
+  background: var(--cor-primaria-escura);
+}
+
+.btn-bloco {
+  width: 100%;
+}
+
+.link-acao {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-primaria);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link-acao:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Alertas ---------- */
+
+.alerta-erro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--cor-erro);
+  border-radius: 12px;
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.alerta-erro::before {
+  content: '!';
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--cor-erro);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* Botao azul do canto superior esquerdo (cadeado / voltar). */
+.botao-canto {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 55px;
+  border: none;
+  border-bottom-right-radius: 20px;
+  background: var(--cor-primaria);
+  cursor: pointer;
+}
+
+/* ======================================================================
+   Paineis (ADM, Escola, Professor...): blocos reutilizados entre telas.
+   ====================================================================== */
+
+.painel-cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.painel-cabecalho h1 {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.painel-cabecalho p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.cartao-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cor-titulo);
+}
+
+.divisor {
+  width: 100%;
+  height: 1px;
+  border: none;
+  margin: 0;
+  background: var(--cor-linha);
+}
+
+/* ---------- Campos menores (45px) ---------- */
+
+.grade-campos {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas, 2), minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.campo-p {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.campo-p > input,
+.campo-p > select,
+.campo-p > textarea,
+.campo-p .caixa > input {
+  width: 100%;
+  height: 45px;
+  padding: 0 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--cor-titulo);
+  outline: none;
+}
+
+.campo-p > textarea {
+  height: 100px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.campo-p > select {
+  appearance: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%237e7f80' stroke-width='1.6'/%3E%3C/svg%3E") right 14px center no-repeat;
+  padding-right: 34px;
+}
+
+.campo-p ::placeholder {
+  color: var(--cor-borda);
+  font-weight: 400;
+}
+
+.campo-p :is(input, select, textarea):focus {
+  border-color: var(--cor-primaria);
+}
+
+.campo-p.invalido {
+  color: var(--cor-erro);
+}
+
+.campo-p.invalido :is(input, select, textarea) {
+  border: 1.5px solid var(--cor-erro);
+}
+
+.campo-p .msg-erro {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-erro);
+}
+
+.campo-p .caixa {
+  position: relative;
+}
+
+.campo-p .caixa > input {
+  padding-right: 80px;
+}
+
+.campo-p .caixa > button {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  translate: 0 -50%;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-primaria);
+  cursor: pointer;
+}
+
+.marcar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+  cursor: pointer;
+}
+
+.marcar input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--cor-primaria);
+}
+
+/* ---------- Botoes do painel (padding 12/22, 16px) ---------- */
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.acoes.centro {
+  justify-content: center;
+}
+
+.bt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px;
+  border: 1px solid transparent;
+  border-radius: var(--raio);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: normal;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bt:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.bt-p {
+  padding: 7px 14px;
+  font-size: 14px;
+}
+
+.bt-primario {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+.bt-primario:hover:not(:disabled) {
+  background: var(--cor-primaria-escura);
+}
+
+.bt-secundario {
+  border-color: var(--cor-borda);
+  background: #fff;
+  color: var(--cor-texto);
+}
+
+.bt-secundario:hover:not(:disabled) {
+  background: var(--cor-fundo-painel);
+}
+
+.bt-perigo {
+  border-color: var(--cor-erro);
+  background: #fff;
+  color: var(--cor-erro);
+}
+
+.bt-perigo-cheio {
+  background: var(--cor-erro);
+  color: #fff;
+}
+
+.bt-sucesso {
+  background: var(--cor-sucesso);
+  color: #fff;
+}
+
+/* ---------- Pilulas de status / filtro ---------- */
+
+.pilula {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border: 1px solid transparent;
+  border-radius: 59px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pilula.ativa {
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso);
+}
+
+.pilula.inativa {
+  background: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+}
+
+.pilula.pendente {
+  background: var(--cor-alerta-fundo);
+  color: var(--cor-alerta);
+}
+
+button.pilula {
+  border-color: var(--cor-linha);
+  background: #fff;
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+
+button.pilula.selecionada {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+/* ---------- Avatar de iniciais ---------- */
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--tam, 40px);
+  height: var(--tam, 40px);
+  border-radius: var(--raio-avatar, 50%);
+  background: var(--cor-primaria-clara);
+  color: var(--cor-azul-forte);
+  font-size: var(--fonte-avatar, 13px);
+  font-weight: 800;
+}
+
+.avatar.apagado {
+  background: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+}
+
+/* ---------- Avisos coloridos ---------- */
+
+.aviso-caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.aviso-caixa strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.aviso-caixa.azul {
+  background: var(--cor-primaria-clara);
+  color: var(--cor-azul-forte);
+}
+
+.aviso-caixa.laranja {
+  background: var(--cor-alerta-fundo);
+  color: var(--cor-alerta);
+}
+
+.aviso-caixa.cinza {
+  background: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+}
+
+.aviso-caixa.verde {
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso);
+}
+
+.aviso-caixa.vermelho {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+}
+
+/* ---------- Tabela ---------- */
+
+.tabela {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.tabela th {
+  padding: 12px;
+  background: var(--cor-fundo-painel);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tabela th:first-child {
+  border-radius: var(--raio) 0 0 var(--raio);
+}
+
+.tabela th:last-child {
+  border-radius: 0 var(--raio) var(--raio) 0;
+}
+
+.tabela td {
+  padding: 12px;
+  border-bottom: 1px solid var(--cor-linha);
+  white-space: nowrap;
+}
+
+.tabela tr:last-child td {
+  border-bottom: none;
+}
+
+.tabela .nome {
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.tabela .link-acao {
+  font-size: 14px;
+}
+
+/* ---------- Estado vazio / resultado ---------- */
+
+.vazio {
+  padding: 24px;
+  text-align: center;
+  font-size: 15px;
 }

@@ -1,14 +1,28 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { PerfilUsuario } from '../../core/model/escola.model';
+import { EntradaLayout } from '../../shared/entrada-layout/entrada-layout';
+import {
+  PerfilEntrada,
+  ROTULO_PERFIL,
+  SeletorPerfil,
+} from '../../shared/seletor-perfil/seletor-perfil';
+
+/** Perfil do backend que corresponde a cada botao. Aluno ainda nao existe no backend. */
+const PERFIL_BACKEND: Record<PerfilEntrada, PerfilUsuario | null> = {
+  aluno: null,
+  familia: 'responsavel',
+  professor: 'professor',
+  escola: 'escola',
+};
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink, EntradaLayout, SeletorPerfil],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -16,26 +30,39 @@ export class LoginComponent {
   private router = inject(Router);
   private auth = inject(AuthService);
 
+  readonly perfis: PerfilEntrada[] = ['aluno', 'familia', 'professor', 'escola'];
+
   email = '';
   senha = '';
 
   /**
-   * Continua existindo so como destaque visual dos botoes de perfil.
+   * Usado so para conferir, depois do login, se a conta e do perfil escolhido.
    * NAO e enviado ao backend: o perfil real vem da tabela usuario.
    */
-  perfil = '';
+  perfil: PerfilEntrada | null = null;
 
+  mostrarSenha = false;
+  avisoPerfil = false;
   erro = '';
+  /** Credenciais recusadas: os campos ficam com borda vermelha. */
+  erroCredenciais = false;
   carregando = false;
 
   login(): void {
     this.erro = '';
+    this.erroCredenciais = false;
 
-    if (!this.email || !this.senha) {
-      this.erro = 'Preencha email e senha.';
+    if (!this.perfil) {
+      this.avisoPerfil = true;
       return;
     }
 
+    if (!this.email || !this.senha) {
+      this.erro = 'Preencha e-mail e senha.';
+      return;
+    }
+
+    const perfilEscolhido = this.perfil;
     this.carregando = true;
 
     this.auth.login(this.email, this.senha).subscribe({
@@ -43,7 +70,12 @@ export class LoginComponent {
         this.carregando = false;
 
         if (!res?.access_token) {
-          this.erro = 'Nao foi possivel entrar. Tente novamente.';
+          this.erro = 'Não foi possível entrar. Tente novamente.';
+          return;
+        }
+
+        if (res.perfil !== PERFIL_BACKEND[perfilEscolhido]) {
+          this.erro = `Esta conta não é de ${ROTULO_PERFIL[perfilEscolhido]}. Selecione o perfil correto.`;
           return;
         }
 
@@ -53,10 +85,15 @@ export class LoginComponent {
 
       error: (e: HttpErrorResponse) => {
         this.carregando = false;
-        this.erro =
-          e.status === 401
-            ? 'Email ou senha invalidos.'
-            : 'Erro ao conectar com o servidor.';
+
+        if (e.status === 401) {
+          this.erroCredenciais = true;
+          this.erro = 'E-mail ou senha incorretos. Confira os dados e tente de novo.';
+        } else if (e.status === 403) {
+          this.erro = 'O acesso desta escola está suspenso. Fale com a equipe Linka.';
+        } else {
+          this.erro = 'Erro ao conectar com o servidor.';
+        }
       },
     });
   }
@@ -64,6 +101,9 @@ export class LoginComponent {
   private redirecionar(perfil: PerfilUsuario): void {
     switch (perfil) {
       case 'admin':
+        this.router.navigate(['/adm']);
+        break;
+
       case 'escola':
         this.router.navigate(['/escolas']);
         break;

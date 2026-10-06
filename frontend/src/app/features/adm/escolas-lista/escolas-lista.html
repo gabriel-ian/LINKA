@@ -1,0 +1,82 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Escolas cadastradas</h1>
+    <p>
+      {{ store.escolas().length }} escolas - {{ store.ativas().length }} ativas,
+      {{ store.inativas().length }} inativas
+    </p>
+  </header>
+
+  <div class="filtros">
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'todas'" (click)="filtrar('todas')">
+      Todas ({{ store.escolas().length }})
+    </button>
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'ativas'" (click)="filtrar('ativas')">
+      Ativas ({{ store.ativas().length }})
+    </button>
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'inativas'" (click)="filtrar('inativas')">
+      Inativas ({{ store.inativas().length }})
+    </button>
+
+    <label class="campo-p cidade">
+      <select aria-label="Cidade" [value]="cidade()" (change)="escolherCidade($any($event.target).value)">
+        <option value="">Cidade: Todas</option>
+        @for (c of cidades(); track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
+    </label>
+
+    <a class="bt bt-primario" routerLink="/adm/escolas/cadastrar">+ Cadastrar escola</a>
+  </div>
+
+  @if (store.erro()) {
+    <p class="alerta-erro" role="alert">{{ store.erro() }}</p>
+  }
+
+  <section class="cartao tabela-cartao">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th style="width: 75px">ID</th>
+          <th>Escola</th>
+          <th style="width: 150px">Cidade</th>
+          <th style="width: 120px">Plano</th>
+          <th style="width: 70px">NEE</th>
+          <th style="width: 110px">Status</th>
+          <th style="width: 80px"><span class="sr-only">Ações</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of visiveis(); track e.id) {
+          <tr>
+            <td>#{{ e.id }}</td>
+            <td class="nome">{{ e.nome }}</td>
+            <td>{{ e.cidade || '—' }}</td>
+            <td>{{ rotuloPlano[e.plano] }}</td>
+            <td>{{ e.totalAlunosNee }}</td>
+            <td><span class="pilula" [class]="status(e)">{{ rotuloStatus[status(e)] }}</span></td>
+            <td>
+              <a class="link-acao" routerLink="/adm/escolas/atualizar" [queryParams]="{ id: e.id }">Editar</a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="vazio">
+              {{ store.carregando() ? 'Carregando...' : 'Nenhuma escola neste filtro.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <div class="rodape-lista">
+    <span>Mostrando {{ mostrando() }} de {{ filtradas().length }} escolas</span>
+    @if (totalPaginas() > 1) {
+      <button type="button" class="bt bt-secundario" (click)="proximaPagina()">
+        {{ pagina() + 1 < totalPaginas() ? 'Próxima página' : 'Voltar ao início' }}
+      </button>
+    }
+  </div>
+</div>

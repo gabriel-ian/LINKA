@@ -1,0 +1,290 @@
+.adm {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--cor-fundo-painel);
+}
+
+.topo,
+.rodape {
+  flex: none;
+  height: 111px;
+  /* As imagens ja vem recortadas do Figma para preencher a faixa inteira. */
+  background: url('/assets/adm/topo.png') 0 0 / 100% 100% no-repeat;
+}
+
+.rodape {
+  background-image: url('/assets/adm/rodape.png');
+}
+
+.topo a {
+  display: inline-block;
+  margin: 35px 0 0 32px;
+}
+
+.topo img {
+  display: block;
+}
+
+/* ---------- Barra "Painel administrativo" ---------- */
+
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 62px;
+  padding: 0 24px 0 32px;
+  border-bottom: 1px solid var(--cor-linha);
+  background: #fff;
+}
+
+.barra-titulo {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.barra-icones {
+  display: flex;
+  gap: 13px;
+}
+
+.icone-botao {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.contador {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--cor-erro);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+/* ---------- Menu lateral ---------- */
+
+.corpo {
+  display: flex;
+  flex: 1;
+}
+
+.menu {
+  flex: none;
+  width: 349px;
+  padding: 27px 0 40px 34px;
+  border-right: 1px solid var(--cor-linha);
+  background: #fff;
+}
+
+.menu-titulo {
+  margin: 0 0 6px;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 40px;
+}
+
+/* As posicoes dos icones vem do Figma (borda externa); --b desconta a borda. */
+.menu-item {
+  --b: 1px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 280px;
+  height: 45px;
+  margin-bottom: 16px;
+  padding-left: calc(44px - var(--b));
+  border: var(--b) solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: #fff;
+  color: var(--cor-texto);
+  font-size: 24px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.menu-item.ativo {
+  --b: 2px;
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.icone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.icone > * {
+  position: absolute;
+  translate: calc(-1 * var(--b)) calc(-1 * var(--b));
+}
+
+.icone-cadastrar img { left: 17px; top: 14px; }
+.icone-listar img { left: 17px; top: 15px; }
+.icone-buscar img { left: 17px; top: 12px; }
+.icone-id img { left: 17px; top: 13px; }
+.icone-id .id { left: 23.75px; top: 19.75px; }
+.icone-atualizar img,
+.icone-reativar img { left: 18.5px; top: 14.5px; }
+.icone-desativar img { left: 18px; top: 13px; }
+
+.icone-reativar .traco {
+  left: 20.27px;
+  top: 20.72px;
+  rotate: -33.69deg;
+}
+
+/* "Visao geral": quatro retangulos desenhados como no Figma. */
+.icone-visao i {
+  width: 5.625px;
+  border: 2px solid currentColor;
+}
+
+.icone-visao i:nth-child(1) { left: 18px; top: 27.19px; height: 2.813px; }
+.icone-visao i:nth-child(2) { left: 18px; top: 15px; height: 9.375px; }
+.icone-visao i:nth-child(3) { left: 27.38px; top: 15px; height: 2.813px; }
+.icone-visao i:nth-child(4) { left: 27.38px; top: 20.63px; height: 9.375px; }
+
+.conteudo {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 30px 40px;
+}
+
+/* ---------- Overlays (conta e notificacoes) ---------- */
+
+.sobreposicao {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.flutuante {
+  position: absolute;
+  top: 168px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.conta {
+  right: 20px;
+  width: 270px;
+}
+
+.conta-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.conta-topo strong,
+.notif strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cor-titulo);
+}
+
+.conta-topo small {
+  font-size: 13px;
+}
+
+.conta a,
+.conta .sair {
+  display: block;
+  width: 100%;
+  padding: 12px 18px;
+  border: none;
+  background: none;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--cor-titulo);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.conta .sair {
+  margin-top: 4px;
+  padding-bottom: 20px;
+  border-top: 1px solid var(--cor-linha);
+  color: var(--cor-erro);
+}
+
+.notificacoes {
+  right: 30px;
+  width: 410px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.notif-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.notif-topo strong {
+  font-size: 18px;
+  color: var(--cor-titulo);
+}
+
+.notif {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.notif.nova {
+  background: var(--cor-primaria-clara);
+}
+
+.notif p {
+  margin: 3px 0;
+  font-size: 13px;
+}
+
+.notif small {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ponto {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+
+.ponto.laranja { background: #ea6819; }
+.ponto.cinza { background: var(--cor-texto); }
+
+@media (max-width: 1000px) {
+  .menu {
+    display: none;
+  }
+}

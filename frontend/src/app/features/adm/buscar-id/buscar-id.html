@@ -1,0 +1,67 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Buscar por ID</h1>
+    <p>Digite o código da escola para ver todos os dados</p>
+  </header>
+
+  <form class="busca" (ngSubmit)="buscar()">
+    <label class="campo-p">
+      ID da escola
+      <input name="id" inputmode="numeric" [(ngModel)]="idDigitado" placeholder="Ex.: 1042" />
+    </label>
+    <button type="submit" class="bt bt-primario">Buscar</button>
+  </form>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (carregando()) {
+    <p class="vazio">Carregando...</p>
+  } @else if (escola(); as e) {
+    <section class="cartao">
+      <div class="topo">
+        <span class="avatar" [class.apagado]="!e.ativo" style="--tam: 56px; --raio-avatar: 12px; --fonte-avatar: 22px">
+          {{ iniciais(e.nome) }}
+        </span>
+        <div class="nome">
+          <h2>{{ e.nome }}</h2>
+          <p>ID #{{ e.id }} - cadastrada em {{ dataBr(e.criado_em) }}</p>
+        </div>
+        <span class="pilula" [class]="status(e)">{{ rotuloStatus[status(e)] }}</span>
+      </div>
+
+      <hr class="divisor" />
+
+      <dl class="dados">
+        <div><dt>Código INEP</dt><dd>{{ e.inep || '—' }}</dd></div>
+        <div><dt>Cidade / UF</dt><dd>{{ cidadeUf(e) || '—' }}</dd></div>
+        <div><dt>Plano</dt><dd>{{ rotuloPlano[e.plano] }}</dd></div>
+        <div><dt>Endereço</dt><dd>{{ e.endereco || '—' }}</dd></div>
+        <div><dt>E-mail institucional</dt><dd>{{ e.email || '—' }}</dd></div>
+        <div><dt>Responsável</dt><dd>{{ e.responsavel ? e.responsavel + ' (coordenação)' : '—' }}</dd></div>
+        <div>
+          <dt>Alunos NEE</dt>
+          <dd>{{ e.totalAlunosNee }} ativos{{ e.limiteAlunosNee != null ? ' de ' + e.limiteAlunosNee : '' }}</dd>
+        </div>
+        <div><dt>Professores</dt><dd>{{ professores(e) }}</dd></div>
+        <div><dt>Turmas</dt><dd>{{ e.totalTurmas }}</dd></div>
+        @if (!e.ativo) {
+          <div><dt>Desativada em</dt><dd>{{ dataBr(e.desativadaEm) || '—' }}</dd></div>
+          <div><dt>Motivo</dt><dd>{{ e.motivoDesativacao || '—' }}</dd></div>
+        }
+      </dl>
+
+      <hr class="divisor" />
+
+      <div class="acoes">
+        @if (e.ativo) {
+          <a class="bt bt-perigo" routerLink="/adm/escolas/desativar" [queryParams]="{ id: e.id }">Desativar escola</a>
+        } @else {
+          <a class="bt bt-secundario" routerLink="/adm/escolas/reativar">Reativar escola</a>
+        }
+        <a class="bt bt-primario" routerLink="/adm/escolas/atualizar" [queryParams]="{ id: e.id }">Atualizar dados</a>
+      </div>
+    </section>
+  }
+</div>

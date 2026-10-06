@@ -1,0 +1,110 @@
+<div class="adm">
+  <header class="topo">
+    <a routerLink="/adm" aria-label="Linka - visão geral">
+      <img src="assets/adm/logo.svg" alt="Linka" />
+    </a>
+  </header>
+
+  <div class="barra">
+    <p class="barra-titulo">Painel administrativo</p>
+    <div class="barra-icones">
+      <button
+        type="button"
+        class="icone-botao"
+        aria-label="Notificações"
+        (click)="alternar('notificacoes')"
+      >
+        <img src="assets/adm/icone-sino.svg" alt="" />
+        @if (naoLidas()) {
+          <span class="contador">{{ naoLidas() }}</span>
+        }
+      </button>
+      <button type="button" class="icone-botao" aria-label="Conta" (click)="alternar('conta')">
+        <img src="assets/adm/icone-config.svg" alt="" />
+      </button>
+    </div>
+  </div>
+
+  <div class="corpo">
+    <nav class="menu" aria-label="Menu do administrador">
+      <p class="menu-titulo">MENU</p>
+      @for (item of menu; track item.rota) {
+        <a
+          class="menu-item"
+          [routerLink]="item.rota"
+          routerLinkActive="ativo"
+          [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored' }"
+          #rla="routerLinkActive"
+        >
+          <span class="icone" [class]="'icone-' + item.icone">
+            @switch (item.icone) {
+              @case ('visao') {
+                <i></i><i></i><i></i><i></i>
+              }
+              @case ('id') {
+                <img [src]="'assets/adm/menu-buscar' + (rla.isActive ? '-ativo' : '') + '.svg'" alt="" />
+                <img class="id" [src]="'assets/adm/menu-id' + (rla.isActive ? '-ativo' : '') + '.svg'" alt="" />
+              }
+              @case ('reativar') {
+                <img [src]="'assets/adm/menu-atualizar' + (rla.isActive ? '-ativo' : '') + '.svg'" alt="" />
+                <img class="traco" [src]="'assets/adm/menu-reativar-traco' + (rla.isActive ? '-ativo' : '') + '.svg'" alt="" />
+              }
+              @default {
+                <img [src]="'assets/adm/menu-' + item.icone + (rla.isActive ? '-ativo' : '') + '.svg'" alt="" />
+              }
+            }
+          </span>
+          {{ item.rotulo }}
+        </a>
+      }
+    </nav>
+
+    <main class="conteudo">
+      <router-outlet />
+    </main>
+  </div>
+
+  <footer class="rodape"></footer>
+</div>
+
+@if (painel()) {
+  <div class="sobreposicao" (click)="painel.set(null)">
+    @if (painel() === 'conta') {
+      <div class="flutuante conta" role="menu" (click)="$event.stopPropagation()">
+        <div class="conta-topo">
+          <span class="avatar" style="--tam: 44px; --fonte-avatar: 15px">AD</span>
+          <div>
+            <strong>Administrador Linka</strong>
+            <small>{{ email }}</small>
+          </div>
+        </div>
+        <a routerLink="/adm" role="menuitem" (click)="painel.set(null)">Visão geral</a>
+        <a routerLink="/adm/escolas" role="menuitem" (click)="painel.set(null)">Escolas cadastradas</a>
+        <button type="button" class="sair" role="menuitem" (click)="sair()">Sair da conta</button>
+      </div>
+    } @else {
+      <div class="flutuante notificacoes" (click)="$event.stopPropagation()">
+        <div class="notif-topo">
+          <strong>Notificações</strong>
+          @if (naoLidas()) {
+            <button type="button" class="link-acao" (click)="marcarTodasComoLidas()">
+              Marcar todas como lidas
+            </button>
+          }
+        </div>
+        @for (n of notificacoes(); track n.chave) {
+          <div class="notif" [class.nova]="!ehLida(n)">
+            <span class="ponto" [class]="n.cor"></span>
+            <div>
+              <strong>{{ n.titulo }}</strong>
+              <p>{{ n.texto }}</p>
+              <small>{{ n.quando }}</small>
+            </div>
+          </div>
+        } @empty {
+          <p class="vazio">Nenhuma notificação por enquanto.</p>
+        }
+      </div>
+    }
+  </div>
+}

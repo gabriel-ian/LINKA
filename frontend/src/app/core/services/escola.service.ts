@@ -1,7 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiResponse, Escola } from '../model/escola.model';
+import {
+  ApiResponse,
+  Desativacao,
+  Escola,
+  EscolaDados,
+  NovaEscola,
+} from '../model/escola.model';
 
 @Injectable({
   providedIn: 'root',
@@ -18,32 +24,29 @@ export class EscolaService {
     return this.http.get<ApiResponse<Escola[]>>(this.adminUrl);
   }
 
+  buscarPorId(id: number): Observable<ApiResponse<Escola>> {
+    return this.http.get<ApiResponse<Escola>>(`${this.adminUrl}/${id}`);
+  }
+
   /** Escola do usuario logado (perfil escola ou professor). */
   minhaEscola(): Observable<ApiResponse<Escola>> {
     return this.http.get<ApiResponse<Escola>>(`${this.api}/escolas/me`);
   }
 
-  cadastrar(nome: string, cnpj?: string): Observable<ApiResponse<Escola>> {
-    return this.http.post<ApiResponse<Escola>>(this.adminUrl, {
-      nome,
-      ...(cnpj ? { cnpj } : {}),
-    });
+  /** Cria a escola e o login da coordenacao (e-mail + senha). */
+  cadastrar(dados: NovaEscola): Observable<ApiResponse<Escola>> {
+    return this.http.post<ApiResponse<Escola>>(this.adminUrl, dados);
   }
 
-  atualizar(id: number, nome: string): Observable<ApiResponse<Escola>> {
-    return this.http.patch<ApiResponse<Escola>>(`${this.adminUrl}/${id}`, {
-      nome,
-    });
+  atualizar(id: number, dados: Partial<EscolaDados>): Observable<ApiResponse<Escola>> {
+    return this.http.patch<ApiResponse<Escola>>(`${this.adminUrl}/${id}`, dados);
   }
 
-  desativar(id: number): Observable<ApiResponse<boolean>> {
-    return this.http.delete<ApiResponse<boolean>>(`${this.adminUrl}/${id}`);
+  desativar(id: number, dados: Desativacao): Observable<ApiResponse<Escola>> {
+    return this.http.patch<ApiResponse<Escola>>(`${this.adminUrl}/${id}/desativar`, dados);
   }
 
   ativar(id: number): Observable<ApiResponse<boolean>> {
-    return this.http.patch<ApiResponse<boolean>>(
-      `${this.adminUrl}/${id}/ativar`,
-      {},
-    );
+    return this.http.patch<ApiResponse<boolean>>(`${this.adminUrl}/${id}/ativar`, {});
   }
 }

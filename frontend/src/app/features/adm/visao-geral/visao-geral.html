@@ -1,0 +1,73 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Visão geral</h1>
+    <p>Linka - todas as escolas - {{ mesAtual }}</p>
+  </header>
+
+  @if (store.erro()) {
+    <p class="alerta-erro" role="alert">{{ store.erro() }}</p>
+  }
+
+  <div class="numeros">
+    <div class="numero">
+      <span>Escolas ativas</span>
+      <strong class="azul">{{ totais().ativas }}</strong>
+      <small>de {{ totais().cadastradas }} cadastradas</small>
+    </div>
+    <div class="numero">
+      <span>Alunos NEE</span>
+      <strong class="verde">{{ totais().alunosNee.toLocaleString('pt-BR') }}</strong>
+      <small>na plataforma</small>
+    </div>
+    <div class="numero">
+      <span>Professores</span>
+      <strong class="laranja">{{ totais().professores.toLocaleString('pt-BR') }}</strong>
+      <small>nas escolas ativas</small>
+    </div>
+    <div class="numero">
+      <span>Escolas inativas</span>
+      <strong class="roxo">{{ totais().inativas }}</strong>
+      <small>podem ser reativadas</small>
+    </div>
+  </div>
+
+  <div class="blocos">
+    <section class="cartao bloco recentes">
+      <div class="bloco-topo">
+        <h2>Cadastradas recentemente</h2>
+        <a class="link-acao" routerLink="/adm/escolas">Ver todas</a>
+      </div>
+
+      @for (e of recentes(); track e.id; let ultimo = $last) {
+        <a class="escola" [routerLink]="['/adm/escolas/id']" [queryParams]="{ id: e.id }">
+          <span class="avatar">{{ iniciais(e.nome) }}</span>
+          <span class="escola-nome">
+            <strong>{{ e.nome }}</strong>
+            <small>#{{ e.id }}{{ e.cidade ? ' - ' + e.cidade : '' }}</small>
+          </span>
+          <span class="pilula" [class]="status(e)">{{ rotuloStatus[status(e)] }}</span>
+        </a>
+        @if (!ultimo) {
+          <hr class="divisor" />
+        }
+      } @empty {
+        <p class="vazio">{{ store.carregando() ? 'Carregando...' : 'Nenhuma escola cadastrada ainda.' }}</p>
+      }
+    </section>
+
+    <section class="cartao bloco atencao">
+      <h2>Precisa de atenção</h2>
+      @for (a of atencao(); track $index) {
+        <div class="aviso-caixa" [class]="a.cor">
+          <strong>{{ a.titulo }}</strong>
+          {{ a.texto }}
+        </div>
+      } @empty {
+        <div class="aviso-caixa cinza">
+          <strong>Tudo em ordem</strong>
+          Nenhuma escola pendente ou desativada.
+        </div>
+      }
+    </section>
+  </div>
+</div>

@@ -14,9 +14,11 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { EscolaService } from '../escola/escola.service';
 import { CreateEscolaDto } from '../escola/dto/create-escola.dto';
 import { UpdateEscolaDto } from '../escola/dto/update-escola.dto';
+import { DesativarEscolaDto } from '../escola/dto/desativar-escola.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { UsuarioEmail } from '../auth/usuario-email.decorator';
 
 /**
  * CRUD de escolas — exclusivo do administrador Linka.
@@ -44,7 +46,7 @@ export class AdminController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Cadastrar nova escola' })
+  @ApiOperation({ summary: 'Cadastrar nova escola (cria tambem o login da escola)' })
   create(@Body() body: CreateEscolaDto) {
     return this.escolaService.create(body);
   }
@@ -54,8 +56,9 @@ export class AdminController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateEscolaDto,
+    @UsuarioEmail() adminEmail: string | null,
   ) {
-    return this.escolaService.update(id, body);
+    return this.escolaService.update(id, body, adminEmail);
   }
 
   @Delete(':id')
@@ -64,9 +67,22 @@ export class AdminController {
     return this.escolaService.remove(id);
   }
 
+  @Patch(':id/desativar')
+  @ApiOperation({ summary: 'Desativar escola com motivo e data' })
+  desativar(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: DesativarEscolaDto,
+    @UsuarioEmail() adminEmail: string | null,
+  ) {
+    return this.escolaService.desativar(id, body, adminEmail);
+  }
+
   @Patch(':id/ativar')
   @ApiOperation({ summary: 'Reativar escola' })
-  activate(@Param('id', ParseIntPipe) id: number) {
-    return this.escolaService.activate(id);
+  activate(
+    @Param('id', ParseIntPipe) id: number,
+    @UsuarioEmail() adminEmail: string | null,
+  ) {
+    return this.escolaService.activate(id, adminEmail);
   }
 }

@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateEscolaDto } from './create-escola.dto';
 
-export class UpdateEscolaDto extends PartialType(CreateEscolaDto) {}
+/** A senha nao e trocada por aqui; o e-mail atualiza o login da escola. */
+export class UpdateEscolaDto extends PartialType(
+  OmitType(CreateEscolaDto, ['senha'] as const),
+) {}

@@ -1,0 +1,36 @@
+/* Estilos compartilhados com a tela "E-mail enviado". */
+.etapa {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 77px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.descricao {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.campo-grupo {
+  gap: 10px;
+}
+
+.btn {
+  font-size: 16px;
+}
+
+.alerta-erro {
+  margin: 0;
+}
+
+.voltar {
+  align-self: center;
+}

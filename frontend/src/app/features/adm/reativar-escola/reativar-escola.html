@@ -1,0 +1,74 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Reativar escola</h1>
+    @if (reativada(); as e) {
+      <p>{{ e.nome }} - ID #{{ e.id }}</p>
+    } @else {
+      <p>
+        {{ store.inativas().length }}
+        {{ store.inativas().length === 1 ? 'escola inativa pode' : 'escolas inativas podem' }}
+        voltar a usar a Linka
+      </p>
+    }
+  </header>
+
+  @if (reativada(); as e) {
+    <app-adm-resultado
+      titulo="Escola reativada!"
+      [texto]="'Alunos, professores e famílias da ' + e.nome + ' já podem acessar a Linka de novo, com todos os dados anteriores.'"
+    >
+      <a class="bt bt-secundario" routerLink="/adm">Voltar à visão geral</a>
+      <a class="bt bt-primario" routerLink="/adm/escolas/id" [queryParams]="{ id: e.id }">Ver escola</a>
+    </app-adm-resultado>
+  } @else {
+    <p class="aviso-caixa verde">
+      Ao reativar, os acessos de alunos, professores e famílias voltam a funcionar e os dados anteriores são restaurados.
+    </p>
+
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    <section class="cartao tabela-cartao">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th style="width: 75px">ID</th>
+            <th>Escola</th>
+            <th>Cidade</th>
+            <th>Desativada em</th>
+            <th>Motivo</th>
+            <th style="width: 100px"><span class="sr-only">Ações</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of store.inativas(); track e.id) {
+            <tr>
+              <td>#{{ e.id }}</td>
+              <td class="nome">{{ e.nome }}</td>
+              <td>{{ e.cidade || '—' }}</td>
+              <td>{{ dataBr(e.desativadaEm) || '—' }}</td>
+              <td>{{ e.motivoDesativacao || '—' }}</td>
+              <td>
+                <button
+                  type="button"
+                  class="bt bt-sucesso bt-p"
+                  [disabled]="reativando() !== null"
+                  (click)="reativar(e)"
+                >
+                  {{ reativando() === e.id ? 'Reativando...' : 'Reativar' }}
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="vazio">
+                {{ store.carregando() ? 'Carregando...' : 'Nenhuma escola inativa.' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+</div>

@@ -41,4 +41,8 @@ export class Usuario {
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   criado_em!: Date;
+
+  /** Null ate o primeiro login: a escola aparece como "Pendente" no ADM. */
+  @Column({ name: 'ultimo_login', type: 'datetime', nullable: true })
+  ultimoLogin!: Date | null;
 }

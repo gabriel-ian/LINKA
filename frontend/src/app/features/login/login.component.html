@@ -1,86 +1,85 @@
-<div class="login-container">
+<app-entrada-layout>
+  <a canto class="botao-canto" routerLink="/adm/login" aria-label="Acesso restrito (ADM)">
+    <img src="assets/entrada/icone-cadeado.svg" alt="" />
+  </a>
 
-  <!-- LADO ESQUERDO -->
-  <div class="login-left">
+  <h1 class="titulo">Bem-vindo de volta</h1>
 
-    <!-- LOGO -->
-    <div class="logo">
-      <img src="assets/linka.png" alt="Linka">
-    </div>
-
-    <!-- TÍTULO -->
-    <h1>Bem-vindo de volta</h1>
-
-    <!-- PERFIS -->
-    <p class="subtitulo">Entrar como</p>
-
-    <div class="perfis">
-      <button type="button" (click)="perfil='aluno'" [class.ativo]="perfil==='aluno'">
-        🎓<br>Aluno
-      </button>
-
-      <button type="button" (click)="perfil='familia'" [class.ativo]="perfil==='familia'">
-        🏠<br>Família
-      </button>
-
-      <button type="button" (click)="perfil='professor'" [class.ativo]="perfil==='professor'">
-        👨‍🏫<br>Professor
-      </button>
-
-      <button type="button" (click)="perfil='escola'" [class.ativo]="perfil==='escola'">
-        🏫<br>Escola
-      </button>
-    </div>
-
-    <!-- FORM -->
-    <div class="form-box">
-
-      <label>E-mail</label>
-      <input 
-        type="email" 
-        [(ngModel)]="email" 
-        placeholder="seu@email.com"
-      >
-
-      <label>Senha</label>
-      <div class="input-senha">
-        <input 
-          type="password" 
-          [(ngModel)]="senha"
-        >
-        <span class="eye">👁</span>
-      </div>
-
-      <div class="acoes">
-        <a href="#">Esqueci minha senha</a>
-      </div>
-
-      @if (erro) {
-        <p class="erro">{{ erro }}</p>
-      }
-
+  <p class="campo-rotulo">Entrar como</p>
+  <div class="perfis" role="group" aria-label="Perfil de acesso">
+    @for (p of perfis; track p) {
       <button
         type="button"
-        class="btn-login"
-        (click)="login()"
-        [disabled]="carregando"
+        class="perfil"
+        [attr.aria-pressed]="perfil === p"
+        (click)="perfil = p"
       >
-        {{ carregando ? 'Entrando...' : 'Entrar na Plataforma' }}
+        <app-seletor-perfil [perfil]="p" [ativo]="perfil === p" />
       </button>
-
-    </div>
-
+    }
   </div>
 
-  <!-- LADO DIREITO -->
-  <div class="login-right">
-    <div class="overlay">
-      <h2>
-        Transformando<br>
-        Pequenas Conquistas<br>
-        em Grandes Mudanças
-      </h2>
+  <form class="formulario" (ngSubmit)="login()">
+    <label class="campo-grupo">
+      <span class="campo-rotulo">E-mail</span>
+      <input
+        class="campo"
+        [class.campo--erro]="erroCredenciais"
+        type="email"
+        name="email"
+        autocomplete="username"
+        placeholder="seu@email.com"
+        [(ngModel)]="email"
+      />
+    </label>
+
+    <label class="campo-grupo senha">
+      <span class="campo-rotulo">Senha</span>
+      <span class="senha-caixa">
+        <input
+          class="campo"
+          [class.campo--erro]="erroCredenciais"
+          [type]="mostrarSenha ? 'text' : 'password'"
+          name="senha"
+          autocomplete="current-password"
+          [(ngModel)]="senha"
+        />
+        <button
+          type="button"
+          class="olho"
+          [attr.aria-label]="mostrarSenha ? 'Esconder senha' : 'Mostrar senha'"
+          (click)="mostrarSenha = !mostrarSenha"
+        >
+          <img src="assets/entrada/icone-olho.svg" alt="" />
+        </button>
+      </span>
+    </label>
+
+    <div class="esqueci">
+      <a class="link-acao" routerLink="/recuperar-senha">Esqueci minha senha</a>
+    </div>
+
+    <button type="submit" class="btn btn-primario btn-bloco" [disabled]="carregando">
+      {{ carregando ? 'Entrando...' : 'Entrar na Plataforma' }}
+    </button>
+
+    @if (erro) {
+      <p class="alerta-erro" role="alert">{{ erro }}</p>
+    }
+  </form>
+</app-entrada-layout>
+
+@if (avisoPerfil) {
+  <div class="aviso-fundo" (click)="avisoPerfil = false">
+    <div class="aviso" role="alertdialog" aria-labelledby="aviso-texto" (click)="$event.stopPropagation()">
+      <img class="aviso-simbolo" src="assets/entrada/logo-simbolo.svg" alt="" />
+      <button type="button" class="aviso-fechar" aria-label="Fechar" (click)="avisoPerfil = false">
+        <img src="assets/entrada/icone-fechar.svg" alt="" />
+      </button>
+      <img class="aviso-icone" src="assets/entrada/icone-alerta.svg" alt="" />
+      <p id="aviso-texto" class="aviso-texto">
+        Você precisa selecionar em qual opção deseja conectar!
+      </p>
     </div>
   </div>
-
-</div>
+}

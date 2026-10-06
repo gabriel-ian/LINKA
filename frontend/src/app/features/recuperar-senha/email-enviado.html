@@ -1,0 +1,23 @@
+<app-entrada-layout>
+  <div class="etapa">
+    <span class="selo" aria-hidden="true">&#64;</span>
+    <h1 class="titulo">Verifique seu e-mail</h1>
+    <p class="descricao">
+      Enviamos um link para {{ email || 'seu e-mail' }}. Ele vale por 30 minutos - confira também a
+      caixa de spam.
+    </p>
+
+    <a class="btn btn-primario btn-bloco" routerLink="/login">Voltar para o login</a>
+
+    <p class="reenviar">
+      <span>Não recebeu?</span>
+      <button type="button" class="link-acao" [disabled]="reenviando" (click)="reenviar()">
+        Reenviar e-mail
+      </button>
+    </p>
+
+    @if (mensagem) {
+      <p class="mensagem" role="status">{{ mensagem }}</p>
+    }
+  </div>
+</app-entrada-layout>

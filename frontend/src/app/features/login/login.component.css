@@ -1,179 +1,117 @@
-.login-container {
-  display: flex;
-  height: 100vh;
-  font-family: 'Montserrat', sans-serif;
+.titulo {
+  margin: 90px 0 30px;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 59px;
 }
 
-/* LADO ESQUERDO */
-.login-left {
-  width: 50%;
-  padding: 60px 100px; /* 🔥 mais respiro lateral */
-  background: linear-gradient(180deg, #dfe7ec, #f4efe6);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* LOGO */
-.logo img {
-  width: 600px; /* 🔥 tamanho ideal */
-  margin-bottom: 20px;
-}
-
-/* TÍTULO */
-h1 {
-  font-size: 40px;
-  font-weight: 400; /* 🔥 mais leve */
-  color: #6b6b6b;
-  margin-bottom: 25px;
-}
-
-/* SUBTÍTULO */
-.subtitulo {
-  font-size: 18px;
-  color: #6b6b6b;
-  margin-bottom: 12px;
-}
-
-/* PERFIS */
 .perfis {
   display: flex;
-  gap: 12px;
-  margin-bottom: 25px;
+  gap: 13px;
+  margin-top: 7px;
 }
 
-.perfis button {
-  width: 118px;
-  height: 80px;          /* 🔥 altura do quadrado */
-  border-radius: 12px;
-
-  border: 1px solid #cfcfcf;
-  background: #f5f5f5;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 4px;              /* espaço entre ícone e texto */
-  font-size: 16px;
-
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.perfis button:hover {
-  background: #eaeaea;
-}
-
-.perfis button.ativo {
-  background: #2f73d9;
-  color: white;
+.perfil {
+  padding: 0;
   border: none;
+  background: none;
+  border-radius: var(--raio);
+  cursor: pointer;
 }
 
-/* FORM MAIS ESTREITO 🔥 */
-.form-box {
-  max-width: 480px;
+.formulario {
+  margin-top: 35px;
 }
 
-/* LABEL */
-label {
-  font-size: 18px;
-  color: #666;
+.senha {
+  margin-top: 13px;
 }
 
-/* INPUT */
-input {
-  width: 100%;
-  height: 44px;
-  margin-top: 6px;
-  margin-bottom: 14px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #cfcfcf;
-  font-size: 18px;
-}
-
-/* SENHA */
-.input-senha {
+.senha-caixa {
   position: relative;
 }
 
-.input-senha .eye {
+.senha-caixa .campo {
+  padding-right: 48px;
+}
+
+.olho {
   position: absolute;
-  right: 12px;
-  top: 12px;
-  font-size: 18px;
+  top: 50%;
+  right: 15px;
+  translate: 0 -50%;
+  display: flex;
+  padding: 0;
+  border: none;
+  background: none;
   cursor: pointer;
 }
 
-
-.acoes {
+.esqueci {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 20px;
+  margin: 13px 0 31px;
+  line-height: 18px;
 }
 
-.acoes a {
-  font-size: 16px;
-  color: #2f73d9;
-  text-decoration: none;
-  
+.alerta-erro {
+  margin: 21px 0 0;
 }
 
-.btn-login {
-  width: 510px;
-  max-width: 505px;
-  height: 50px;
-  background: #2f73d9;
-  color: white;
+/* ---------- Aviso "selecione o perfil" ---------- */
+
+.aviso-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.aviso {
+  position: relative;
+  width: 481px;
+  max-width: calc(100% - 32px);
+  height: 418px;
+  margin-top: 18px;
+  padding-top: 61px;
+  border: 2px solid var(--cor-primaria);
+  border-radius: 15px;
+  background: var(--cor-primaria-clara);
+  text-align: center;
+}
+
+.aviso-simbolo {
+  position: absolute;
+  top: 15px;
+  left: 18px;
+  transform: scaleY(-1);
+}
+
+.aviso-fechar {
+  position: absolute;
+  top: 23px;
+  right: 24px;
+  display: flex;
+  padding: 0;
   border: none;
-  border-radius: 12px;
-  font-size: 18px;
+  background: none;
   cursor: pointer;
 }
 
-.btn-login:hover {
-  background: #1f5fc0;
+.aviso-icone {
+  display: block;
+  margin: 0 auto;
 }
 
-/* LADO DIREITO */
-.login-right {
-  width: 50%;
-  background: url('/assets/girassol.jpg') no-repeat center center;
-  background-size: cover;
-  position: relative;
-}
-
-/* TEXTO DA IMAGEM */
-.overlay {
-  position: absolute;
-  top: 400px; /* 🔥 posição correta */
-  right: 80px;
-  color: white;
-  text-align: right;
-}
-
-.overlay h2 {
-  font-size: 34px;
-  font-weight: 400;
-  line-height: 1.3;
-  max-width: 340px;
-}
-
-/* RESPONSIVO */
-@media (max-width: 900px) {
-  .login-container {
-    flex-direction: column;
-  }
-
-  .login-left,
-  .login-right {
-    width: 100%;
-  }
-
-  .login-right {
-    height: 250px;
-  }
+.aviso-texto {
+  max-width: 429px;
+  margin: 29px auto 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 34px;
+  letter-spacing: 1.28px;
+  color: var(--cor-primaria);
 }

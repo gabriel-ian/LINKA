@@ -1,0 +1,81 @@
+.entrada {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  background:
+    linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0.96%,
+        rgba(62, 82, 24, 0.15) 15.87%,
+        rgba(229, 162, 0, 0.15) 24.52%,
+        rgba(229, 162, 0, 0.15) 41.83%,
+        rgba(82, 151, 201, 0.15) 48.56%,
+        rgba(239, 250, 255, 0.15) 83.17%
+      )
+      bottom left / 58.125% 76.56% no-repeat,
+    var(--cor-fundo);
+}
+
+/* ---------- Coluna esquerda ---------- */
+
+.entrada-esquerda {
+  flex: 1;
+  padding: 79px 24px 60px 10.625%;
+}
+
+.logo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.conteudo {
+  width: 519px;
+  max-width: 100%;
+}
+
+/* ---------- Coluna direita (foto) ---------- */
+
+.entrada-direita {
+  position: relative;
+  flex: none;
+  width: 41.875%;
+  /* Foto de 683px alinhada a esquerda; o excesso sai pela direita, como no Figma. */
+  background: url('/assets/entrada/girassol.png') left bottom / cover no-repeat;
+}
+
+.faixa-azul {
+  position: absolute;
+  top: 33.98%;
+  left: 0;
+  right: 0;
+  height: 35.55%;
+  background: linear-gradient(
+    to top,
+    rgba(29, 89, 145, 0) 0%,
+    rgba(41, 122, 197, 0.7) 21.05%,
+    rgba(8, 28, 47, 0) 65.39%
+  );
+}
+
+.frase {
+  position: absolute;
+  top: 50.98%;
+  right: 24px;
+  margin: 0;
+  font-family: var(--fonte-destaque);
+  font-size: 40px;
+  line-height: 1.001;
+  text-align: right;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .entrada-esquerda {
+    padding: 79px 24px 40px;
+  }
+
+  .entrada-direita {
+    display: none;
+  }
+}

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../usuario/usuario.service';
 
@@ -30,6 +34,14 @@ export class AuthService {
     if (!senhaConfere) {
       throw new UnauthorizedException('Credenciais invalidas');
     }
+
+    // Escola desativada: todos os logins vinculados a ela ficam suspensos.
+    // So depois de conferir a senha, para nao revelar o status a terceiros.
+    if (usuario.escola && !usuario.escola.ativo) {
+      throw new ForbiddenException('Escola desativada');
+    }
+
+    await this.usuarioService.registrarLogin(usuario.id);
 
     const payload = {
       sub: usuario.id,

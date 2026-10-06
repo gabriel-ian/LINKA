@@ -13,9 +13,19 @@ export class UsuarioService {
     private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
-  /** Usado pelo login: precisa trazer a senha, entao nao seleciona campos parciais. */
+  /**
+   * Usado pelo login: precisa trazer a senha, entao nao seleciona campos parciais.
+   * Traz a escola junto para o login barrar escola desativada.
+   */
   async findByEmail(email: string): Promise<Usuario | null> {
-    return this.usuarioRepository.findOne({ where: { email } });
+    return this.usuarioRepository.findOne({
+      where: { email },
+      relations: { escola: true },
+    });
+  }
+
+  async registrarLogin(id: number): Promise<void> {
+    await this.usuarioRepository.update(id, { ultimoLogin: new Date() });
   }
 
   async findById(id: number): Promise<Usuario | null> {

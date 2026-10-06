@@ -1,0 +1,82 @@
+.adm {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 80px 16px;
+  background: #fff;
+  isolation: isolate;
+}
+
+/* Foto com 70% de opacidade sobre fundo branco. */
+.adm::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('/assets/entrada/girassol-adm.png') center 75% / cover no-repeat;
+  opacity: 0.7;
+}
+
+.cartao {
+  width: 711px;
+  max-width: 100%;
+  min-height: 652px;
+  padding: 62px 24px 82px;
+  border-radius: 25px;
+  background: var(--cor-painel);
+}
+
+.logo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.titulo {
+  margin: 42px 0 30px;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 59px;
+  text-align: center;
+}
+
+.formulario {
+  width: 519px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.senha {
+  margin-top: 13px;
+}
+
+.senha-caixa {
+  position: relative;
+}
+
+.senha-caixa .campo {
+  padding-right: 48px;
+}
+
+.olho {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  translate: 0 -50%;
+  display: flex;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.entrar {
+  margin-top: 37px;
+}
+
+.alerta-erro {
+  margin: 21px 0 0;
+}

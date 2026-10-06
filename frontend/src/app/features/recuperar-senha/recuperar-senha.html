@@ -1,0 +1,30 @@
+<app-entrada-layout>
+  <form class="etapa" (ngSubmit)="enviar()">
+    <h1 class="titulo">Recuperar senha</h1>
+    <p class="descricao">
+      Informe o e-mail cadastrado na Linka. Vamos enviar um link para você criar uma nova senha.
+    </p>
+
+    <label class="campo-grupo">
+      <span class="campo-rotulo">E-mail</span>
+      <input
+        class="campo"
+        type="email"
+        name="email"
+        autocomplete="email"
+        placeholder="seu@email.com"
+        [(ngModel)]="email"
+      />
+    </label>
+
+    <button type="submit" class="btn btn-primario btn-bloco" [disabled]="enviando">
+      {{ enviando ? 'Enviando...' : 'Enviar link de recuperação' }}
+    </button>
+
+    @if (erro) {
+      <p class="alerta-erro" role="alert">{{ erro }}</p>
+    }
+
+    <a class="link-acao voltar" routerLink="/login">Voltar para o login</a>
+  </form>
+</app-entrada-layout>

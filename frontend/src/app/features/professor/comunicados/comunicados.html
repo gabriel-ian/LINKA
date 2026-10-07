@@ -1,0 +1,124 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Comunicados</h1>
+    <p>
+      Envie avisos para alunos e famílias
+      @if (!enviado() && lista()?.enviadosSemana) {
+        - {{ lista()!.enviadosSemana }} {{ lista()!.enviadosSemana === 1 ? 'enviado' : 'enviados' }} esta semana
+      }
+    </p>
+  </header>
+
+  @if (enviado(); as e) {
+    <app-adm-resultado titulo="Comunicado enviado!" [texto]="textoEnviado(e)">
+      @if (e.avisoIa) {
+        <p extra class="aviso-caixa laranja">{{ e.avisoIa }}</p>
+      }
+      <button type="button" class="bt bt-secundario" (click)="novo()">Novo comunicado</button>
+      <a class="bt bt-primario" routerLink="/professor">Voltar para visão geral</a>
+    </app-adm-resultado>
+  } @else {
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    <div class="colunas">
+      <form class="cartao formulario" (ngSubmit)="salvar(false)" novalidate>
+        <h2 class="cartao-titulo">{{ rascunhoId ? 'Rascunho' : 'Novo comunicado' }}</h2>
+
+        <label class="campo-p">
+          Para
+          <select name="turma" [(ngModel)]="turmaId">
+            @for (t of contexto.dados()?.turmas ?? []; track t.id) {
+              <option [ngValue]="t.id">{{ t.nome }} - alunos e famílias</option>
+            }
+          </select>
+        </label>
+
+        <div class="campo-p">
+          Tipo
+          <div class="tipos" role="radiogroup" aria-label="Tipo de comunicado">
+            @for (t of tipos; track t) {
+              <button type="button" class="pilula" role="radio" [attr.aria-checked]="tipo === t" [class.selecionada]="tipo === t" (click)="tipo = t">
+                {{ rotuloTipo[t] }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <label class="campo-p" [class.invalido]="erros().titulo">
+          Título
+          <input name="titulo" maxlength="150" [(ngModel)]="titulo" placeholder="Ex.: Prova de Ciências na sexta-feira" />
+          @if (erros().titulo) { <span class="msg-erro">{{ erros().titulo }}</span> }
+        </label>
+
+        <label class="campo-p" [class.invalido]="erros().mensagem">
+          Mensagem
+          <textarea name="mensagem" maxlength="3000" [(ngModel)]="mensagem" placeholder="Escreva o aviso para as famílias."></textarea>
+          @if (erros().mensagem) { <span class="msg-erro">{{ erros().mensagem }}</span> }
+        </label>
+
+        <label class="simplificada" [class.desligada]="!contexto.dados()?.iaDisponivel">
+          <input type="checkbox" name="simplificada" [(ngModel)]="simplificada" [disabled]="!contexto.dados()?.iaDisponivel" />
+          <span>
+            <strong>Versão simplificada para alunos NEE</strong>
+            @if (contexto.dados()?.iaDisponivel) {
+              A Linka adapta a linguagem e o aluno pode ouvir o aviso em voz alta{{ neeTurma().length ? ' - ' + neeTurma().join(', ') : '' }}.
+            } @else {
+              Indisponível: a IA não está configurada neste servidor.
+            }
+          </span>
+        </label>
+
+        @if (avisoRascunho()) {
+          <p class="aviso-caixa verde">{{ avisoRascunho() }}</p>
+        }
+
+        <div class="acoes">
+          <button type="button" class="bt bt-secundario" [disabled]="salvando()" (click)="salvar(true)">Salvar rascunho</button>
+          <button type="submit" class="bt bt-primario" [disabled]="salvando()">
+            {{ salvando() ? 'Enviando...' : 'Enviar comunicado' }}
+          </button>
+        </div>
+      </form>
+
+      <div class="lateral">
+        <section class="cartao lista">
+          <div class="lista-topo">
+            <h2 class="cartao-titulo">Enviados</h2>
+            @if ((lista()?.enviados?.length ?? 0) > 3) {
+              <button type="button" class="link-acao" (click)="todos.set(!todos())">{{ todos() ? 'Ver menos' : 'Ver todos' }}</button>
+            }
+          </div>
+          @for (c of enviados(); track c.id) {
+            <article class="item">
+              <strong>{{ c.titulo }}</strong>
+              <span class="meta">
+                <span class="pilula-cor" [class]="'c-' + corTipo[c.tipo]">{{ rotuloTipo[c.tipo] }}</span>
+                {{ quando(c.enviadoEm) }} - {{ c.turma }}
+              </span>
+              <span class="lido">Lido por {{ c.leituras }} de {{ c.familias }} {{ c.familias === 1 ? 'família' : 'famílias' }}</span>
+              <span class="progresso" [class.c-verde]="c.familias && c.leituras === c.familias">
+                <span [style.width.%]="c.familias ? (c.leituras / c.familias) * 100 : 0"></span>
+              </span>
+            </article>
+          } @empty {
+            <p class="vazio">Nenhum comunicado enviado ainda.</p>
+          }
+        </section>
+
+        @if (lista()?.rascunhos?.length) {
+          <section class="cartao lista">
+            <h2 class="cartao-titulo">Rascunhos</h2>
+            @for (r of lista()!.rascunhos; track r.id) {
+              <button type="button" class="rascunho" (click)="abrirRascunho(r)">
+                <strong>{{ r.titulo }}</strong>
+                <span>{{ r.turma }} - {{ quando(r.criadoEm) }}</span>
+              </button>
+            }
+          </section>
+        }
+      </div>
+    </div>
+  }
+</div>

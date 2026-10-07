@@ -1,0 +1,105 @@
+<div class="pagina">
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (tarefa(); as t) {
+    <header class="painel-cabecalho">
+      <h1>{{ nova() ? 'Tarefa criada!' : t.titulo }}</h1>
+      <p>{{ t.titulo }}{{ t.disciplina ? ' - ' + t.disciplina : '' }} - {{ t.turma }} - {{ prazo() }}</p>
+    </header>
+
+    @if (gerando()) {
+      <p class="aviso-caixa roxo" role="status">
+        <span class="girando" aria-hidden="true">✦</span>
+        A Linka está adaptando a tarefa para {{ t.adaptacoes.length }} {{ t.adaptacoes.length === 1 ? 'aluno NEE' : 'alunos NEE' }}...
+      </p>
+    } @else {
+      <p class="aviso-caixa verde forte">
+        Tarefa enviada para os {{ t.totalAlunos }} alunos.
+        @if (t.adaptacoes.length) {
+          {{ geradas() === t.adaptacoes.length
+            ? 'Todas as ' + geradas() + ' versões adaptadas para os alunos NEE estão prontas.'
+            : geradas() + ' de ' + t.adaptacoes.length + ' versões adaptadas prontas.' }}
+        }
+      </p>
+    }
+
+    @if (erroIa()) {
+      <p class="alerta-erro" role="alert">{{ erroIa() }}</p>
+    }
+
+    @if (t.adaptacoes.length) {
+      <div class="escolha">
+        <span>Ver versão de:</span>
+        @for (a of t.adaptacoes; track a.alunoId) {
+          <button type="button" class="pilula" [class.selecionada]="adaptacao()?.alunoId === a.alunoId" (click)="escolher(a.alunoId)">
+            {{ primeiroNome(a.nome) }}{{ a.diagnostico ? ' - ' + a.diagnostico : '' }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="versoes">
+      <section class="cartao original">
+        <span class="pilula inativa">Versão original</span>
+        <p>{{ t.descricao || t.titulo }}</p>
+      </section>
+
+      @if (adaptacao(); as a) {
+        <section class="cartao adaptada">
+          <div class="topo">
+            <span class="pilula roxa">Versão adaptada - {{ primeiroNome(a.nome) }}</span>
+            <small>{{ a.passos?.length ? (a.geradoPorIa ? 'gerada pela IA' : 'escrita pelo professor') : 'ainda não criada' }}</small>
+          </div>
+
+          @if (editando()) {
+            <label class="campo-p">
+              Um passo por linha
+              <textarea name="passos" rows="7" [(ngModel)]="textoEdicao"></textarea>
+            </label>
+            <div class="acoes">
+              <button type="button" class="bt bt-secundario bt-p" (click)="editando.set(false)">Cancelar</button>
+              <button type="button" class="bt bt-primario bt-p" [disabled]="salvando()" (click)="salvarEdicao()">
+                {{ salvando() ? 'Salvando...' : 'Salvar passos' }}
+              </button>
+            </div>
+          } @else if (a.passos?.length) {
+            @if (a.recursos.length) {
+              <div class="recursos">
+                @for (r of a.recursos; track r) {
+                  <span class="recurso">{{ r }}</span>
+                }
+              </div>
+            }
+            <ol class="passos">
+              @for (p of a.passos; track $index) {
+                <li><span class="num">{{ $index + 1 }}</span>{{ p }}</li>
+              }
+            </ol>
+          } @else {
+            <p class="vazio">
+              {{ t.iaDisponivel ? 'A versão de ' + primeiroNome(a.nome) + ' ainda não foi gerada.' : 'Escreva os passos de ' + primeiroNome(a.nome) + ' em "Editar adaptação".' }}
+            </p>
+          }
+        </section>
+      } @else {
+        <section class="cartao adaptada">
+          <p class="vazio">Esta turma não tem alunos NEE: todos recebem a versão original.</p>
+        </section>
+      }
+    </div>
+
+    <div class="acoes">
+      @if (adaptacao() && !editando()) {
+        @if (t.iaDisponivel) {
+          <button type="button" class="bt bt-secundario" [disabled]="gerando()" (click)="gerar(adaptacao()!.alunoId)">
+            {{ adaptacao()!.passos?.length ? 'Gerar de novo' : 'Gerar com IA' }}
+          </button>
+        }
+        <button type="button" class="bt bt-secundario" [disabled]="gerando()" (click)="editar()">Editar adaptação</button>
+      }
+      <a class="bt bt-primario" routerLink="/professor">Voltar para visão geral</a>
+    </div>
+  }
+</div>

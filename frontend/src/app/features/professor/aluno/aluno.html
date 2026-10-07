@@ -1,0 +1,88 @@
+<div class="pagina">
+  <button type="button" class="voltar-botao" (click)="voltar()">&lt; Voltar</button>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (aluno(); as a) {
+    <header class="cabecalho" [class]="'c-' + corSituacao(situacao(a.desempenhoMes))">
+      <span class="selo-cor" style="--tam: 76px; --raio-selo: 10px; --fonte-selo: 32px">{{ iniciais(a.nome) }}</span>
+      <div class="painel-cabecalho">
+        <h1>{{ a.nome }}</h1>
+        <p>{{ subtitulo(a) }}</p>
+      </div>
+    </header>
+
+    <div class="indicadores tres">
+      <div class="indicador" [class]="'c-' + corSituacao(situacao(a.desempenhoMes))">
+        <span>Desempenho no mês</span>
+        <strong>{{ a.desempenhoMes ?? '—' }}@if (a.desempenhoMes !== null) {<small>%</small>}</strong>
+        <span class="progresso"><span [style.width.%]="a.desempenhoMes ?? 0"></span></span>
+      </div>
+      <div class="indicador c-azul">
+        <span>Tarefas concluídas</span>
+        <strong>{{ a.tarefasMes.concluidas }}/{{ a.tarefasMes.total }}</strong>
+        <small>este mês</small>
+      </div>
+      <div class="indicador c-roxo">
+        <span>Tarefas adaptadas</span>
+        <strong>{{ a.tarefasAdaptadasNoMes }}</strong>
+        <small>versões em passos no mês</small>
+      </div>
+    </div>
+
+    <div class="blocos">
+      <section class="cartao bloco">
+        <h2>Perfil de aprendizado</h2>
+        <div class="linha-diag">
+          <span>Diagnóstico</span>
+          @for (d of a.diagnosticos; track d) {
+            <span class="pilula pendente">{{ d }}</span>
+          } @empty {
+            <span class="pilula inativa">{{ a.neurodivergente ? 'Não informado' : 'Sem NEE' }}</span>
+          }
+        </div>
+        <h3>Maiores dificuldades</h3>
+        <p>{{ a.dificuldades || 'A coordenação ainda não preencheu.' }}</p>
+        <h3>Pontos fortes</h3>
+        <p>{{ a.pontosFortes || 'A coordenação ainda não preencheu.' }}</p>
+        @if (a.interesses.length) {
+          <h3>Interesses</h3>
+          <div class="interesses">
+            @for (i of a.interesses; track i) {
+              <span class="pilula-cor c-azul">{{ i }}</span>
+            }
+          </div>
+        }
+      </section>
+
+      <div class="coluna">
+        <section class="cartao bloco">
+          <h2>Progresso por matéria</h2>
+          <div class="materias">
+            @for (m of a.progressoPorMateria; track m.disciplina; let i = $index) {
+              <div class="materia" [class]="'c-' + cor(i + 1)">
+                <span class="rotulo">{{ m.disciplina }} <b>{{ pct(m.taxa) }}</b></span>
+                <span class="progresso"><span [style.width.%]="m.taxa ?? 0"></span></span>
+              </div>
+            } @empty {
+              <p class="vazio">Sem tarefas neste mês.</p>
+            }
+          </div>
+        </section>
+
+        <section class="cartao bloco">
+          <h2>Sugestões pedagógicas</h2>
+          <div class="sugestoes">
+            @for (s of a.sugestoes; track s.texto; let i = $index) {
+              <p class="aviso-caixa" [class]="i % 2 ? 'aviso-caixa verde' : 'aviso-caixa azul'">{{ s.texto }}</p>
+            } @empty {
+              <p class="vazio">As sugestões aparecem quando houver algumas semanas de tarefas concluídas.</p>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  }
+</div>

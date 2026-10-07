@@ -1,0 +1,91 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>{{ saudacao() }}</h1>
+    @if (contexto.visao(); as v) {
+      <p>{{ v.turma.nome }} - {{ v.turma.totalAlunos }} alunos - {{ hoje }}</p>
+    }
+  </header>
+
+  @if (contexto.dados() && !contexto.dados()!.turmas.length) {
+    <p class="aviso-caixa cinza">
+      <strong>Você ainda não está em nenhuma turma.</strong>
+      Peça à coordenação da escola para vincular você às suas turmas.
+    </p>
+  }
+
+  @if (contexto.visao(); as v) {
+    @if (v.alunosComAtraso.length) {
+      <p class="faixa alerta" role="status">
+        <img src="assets/professor/icone-alerta.svg" alt="" />
+        <span>
+          <b>{{ v.alunosComAtraso.length }} {{ v.alunosComAtraso.length === 1 ? 'aluno' : 'alunos' }}</b>
+          com tarefas em atraso. {{ destaqueAtraso() }}
+        </span>
+      </p>
+    } @else {
+      <p class="faixa ok" role="status">Todos os alunos estão em dia com as suas tarefas.</p>
+    }
+
+    <div class="indicadores grandes">
+      <div class="indicador">
+        <span>Alunos em dia</span>
+        <strong>{{ v.alunosEmDia }}<small>/{{ v.turma.totalAlunos }}</small></strong>
+        <small>{{ v.alunosComAtraso.length }} com atraso</small>
+      </div>
+      <div class="indicador">
+        <span>Alunos com atenção</span>
+        <strong>{{ v.alunosComAtraso.length }}</strong>
+        <small>tarefas em atraso</small>
+      </div>
+      <div class="indicador">
+        <span>Avisos enviados</span>
+        <strong>{{ v.avisosSemana }}</strong>
+        <small>esta semana</small>
+      </div>
+      <div class="indicador destaque">
+        <span>Entregas essa semana</span>
+        <strong>{{ v.entregasSemana ?? '—' }}@if (v.entregasSemana !== null) {<small>%</small>}</strong>
+        <span class="progresso branco"><span [style.width.%]="v.entregasSemana ?? 0"></span></span>
+      </div>
+    </div>
+
+    <div class="blocos">
+      <section class="cartao bloco">
+        <h2><img src="assets/professor/icone-alunos.svg" alt="" /> Alunos NEE - {{ v.alunosNee.length }}<br />acompanhamento individual</h2>
+        @for (a of v.alunosNee; track a.id) {
+          <a class="linha" [class]="'c-' + corSituacao(a.situacao)" [routerLink]="['/professor/alunos', a.id]">
+            <span class="selo-cor">{{ iniciais(a.nome) }}</span>
+            <span class="texto">
+              <strong>{{ a.nome }}{{ a.diagnostico ? ' - ' + a.diagnostico : '' }}</strong>
+              <br />{{ a.resumo }}
+              <span class="barra-linha">
+                <span class="progresso"><span [style.width.%]="a.desempenhoSemana ?? 0"></span></span>
+                <span class="pilula-cor">{{ pct(a.desempenhoSemana) }}</span>
+              </span>
+            </span>
+          </a>
+        } @empty {
+          <p class="vazio">Nenhum aluno NEE nesta turma.</p>
+        }
+      </section>
+
+      <section class="cartao bloco">
+        <h2><img src="assets/professor/icone-tarefas.svg" alt="" /> Tarefas recentes</h2>
+        @for (t of v.tarefasRecentes; track t.id) {
+          <a class="tarefa" [class]="'c-' + corStatus[t.status]" [routerLink]="['/professor/tarefas', t.id]">
+            <span class="topo">
+              <strong>{{ t.titulo }}{{ t.disciplina ? ' - ' + t.disciplina : '' }}</strong>
+              <span class="pilula-cor">{{ rotuloStatus(t) }}</span>
+            </span>
+            <span>{{ t.entregues }} de {{ t.total }} alunos entregaram</span>
+            <span class="progresso"><span [style.width.%]="t.total ? (t.entregues / t.total) * 100 : 0"></span></span>
+          </a>
+        } @empty {
+          <p class="vazio">
+            Nenhuma tarefa ainda. <a class="link-acao" routerLink="/professor/tarefas/nova">Criar a primeira</a>
+          </p>
+        }
+      </section>
+    </div>
+  }
+</div>

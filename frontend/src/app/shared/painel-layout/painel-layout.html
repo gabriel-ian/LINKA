@@ -33,9 +33,10 @@
           <a
             class="menu-item"
             [routerLink]="item.rota"
-            routerLinkActive="ativo"
+            routerLinkActive=""
             [routerLinkActiveOptions]="opcoesAtivo(item)"
             #rla="routerLinkActive"
+            [class.ativo]="item.selecionado || rla.isActive"
           >
             <span class="icone">
               @if (item.icone === 'visao') {
@@ -43,7 +44,7 @@
               }
               @for (c of camadas(item); track c.src + c.left) {
                 <img
-                  [src]="c.src + (rla.isActive ? '-ativo' : '') + '.svg'"
+                  [src]="c.src + (rla.isActive || item.selecionado ? '-ativo' : '') + '.svg'"
                   alt=""
                   [style.left.px]="c.left"
                   [style.top.px]="c.top"

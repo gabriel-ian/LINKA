@@ -140,6 +140,45 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'professor',
+    canActivate: [authGuard, perfilGuard('professor')],
+    loadComponent: () =>
+      import('./features/professor/professor-layout').then((m) => m.ProfessorLayout),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/professor/visao/visao').then((m) => m.ProfessorVisao),
+      },
+      {
+        path: 'tarefas/nova',
+        loadComponent: () =>
+          import('./features/professor/tarefa-nova/tarefa-nova').then((m) => m.ProfessorTarefaNova),
+      },
+      {
+        path: 'tarefas/:id',
+        loadComponent: () => import('./features/professor/tarefa/tarefa').then((m) => m.ProfessorTarefa),
+      },
+      {
+        path: 'turmas/:id',
+        loadComponent: () => import('./features/professor/turma/turma').then((m) => m.ProfessorTurma),
+      },
+      {
+        path: 'alunos/:id',
+        loadComponent: () => import('./features/professor/aluno/aluno').then((m) => m.ProfessorAluno),
+      },
+      {
+        path: 'comunicados',
+        loadComponent: () =>
+          import('./features/professor/comunicados/comunicados').then((m) => m.ProfessorComunicados),
+      },
+      {
+        path: 'relatorios',
+        loadComponent: () =>
+          import('./features/professor/relatorios/relatorios').then((m) => m.ProfessorRelatorios),
+      },
+    ],
+  },
   // Endereco antigo do painel provisorio da escola.
   { path: 'escolas', redirectTo: 'escola', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },

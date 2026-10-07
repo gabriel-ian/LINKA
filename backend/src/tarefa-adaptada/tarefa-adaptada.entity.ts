@@ -24,6 +24,14 @@ export class TarefaAdaptada {
   @Column({ type: 'text', nullable: true })
   descricao_adaptada!: string | null;
 
+  /** Passos curtos da versao adaptada, em ordem. */
+  @Column({ type: 'json', nullable: true })
+  passos!: string[] | null;
+
+  /** Recursos usados na adaptacao, exibidos como etiquetas ("5 passos curtos"...). */
+  @Column({ type: 'json', nullable: true })
+  recursos!: string[] | null;
+
   @Column({ type: 'tinyint', default: 1 })
   gerado_por_ia!: boolean;
 
@@ -37,4 +45,7 @@ export class TarefaAdaptada {
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   criado_em!: Date;
+
+  @Column({ name: 'atualizado_em', type: 'datetime', nullable: true })
+  atualizadoEm!: Date | null;
 }

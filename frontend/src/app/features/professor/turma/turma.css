@@ -1,0 +1,59 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.alerta-erro {
+  margin: 0;
+}
+
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.busca {
+  flex: 1;
+  margin-left: 2px;
+}
+
+.tabela-cartao {
+  padding: 14px 20px;
+  overflow-x: auto;
+}
+
+.pilula.roxa {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.entregas {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.entregas b {
+  min-width: 40px;
+  color: var(--c-texto);
+  font-weight: 600;
+}
+
+.rodape-lista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

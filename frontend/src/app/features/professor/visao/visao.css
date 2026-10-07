@@ -1,0 +1,150 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.faixa {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 22px;
+  border-radius: 16px;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.faixa.alerta {
+  border: 1px solid #f3742a;
+  background: var(--cor-alerta-fundo);
+  box-shadow: 0 4px 3.8px -1px rgba(242, 98, 15, 0.36);
+  color: var(--cor-alerta);
+}
+
+.faixa.ok {
+  background: var(--cor-sucesso-fundo);
+  color: #065f5c;
+  font-weight: 600;
+}
+
+.faixa b {
+  font-weight: 600;
+}
+
+.grandes strong {
+  align-self: flex-end;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.grandes strong small {
+  font-size: 24px;
+  font-weight: 700;
+  color: inherit;
+}
+
+.indicador.destaque {
+  background: #d8e9ff;
+}
+
+.indicador.destaque strong {
+  align-self: flex-start;
+  font-size: 48px;
+}
+
+.indicador.destaque strong small {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.progresso.branco {
+  flex: none;
+  background: #fff;
+}
+
+.progresso.branco > span {
+  background: var(--cor-primaria);
+}
+
+.blocos {
+  display: grid;
+  grid-template-columns: 368px 1fr;
+  align-items: start;
+  gap: 19px;
+}
+
+.bloco {
+  gap: 0;
+  padding: 16px 19px 24px;
+}
+
+.bloco h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.linha {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cor-linha);
+  color: var(--cor-texto);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.texto {
+  flex: 1;
+}
+
+.texto strong {
+  font-weight: 700;
+}
+
+.barra-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tarefa {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0 22px;
+  border-bottom: 1px solid var(--cor-linha);
+  color: var(--cor-texto);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.tarefa .topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tarefa strong {
+  font-weight: 600;
+}
+
+.tarefa .progresso {
+  flex: none;
+}
+
+.aviso-caixa {
+  margin: 0;
+}

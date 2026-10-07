@@ -19,6 +19,8 @@ export interface ItemMenu {
   icone: CamadaIcone[] | 'visao';
   /** false: fica ativo tambem nas sub-rotas (ex.: Turmas no detalhe da turma). */
   exato?: boolean;
+  /** Destaca o item mesmo fora da rota dele (ex.: turma selecionada do professor). */
+  selecionado?: boolean;
 }
 
 export interface ConfigPainel {

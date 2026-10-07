@@ -1,0 +1,152 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.alerta-erro,
+.aviso-caixa {
+  margin: 0;
+}
+
+.forte {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.aviso-caixa.roxo {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  background: #f3e8ff;
+  color: #5b21b6;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.girando {
+  display: inline-block;
+  animation: girar 1.4s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .girando {
+    animation: none;
+  }
+}
+
+.escolha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.versoes {
+  display: grid;
+  grid-template-columns: 378px 1fr;
+  align-items: start;
+  gap: 20px;
+}
+
+.original {
+  gap: 14px;
+  padding: 18px 20px;
+}
+
+.original p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--cor-titulo);
+  white-space: pre-line;
+}
+
+.original .pilula {
+  align-self: flex-start;
+}
+
+.adaptada {
+  gap: 14px;
+  padding: 18px 20px;
+  border: 1px solid #7c3aed;
+  background: #fbf8ff;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topo small {
+  font-size: 13px;
+  font-weight: 500;
+  color: #7c3aed;
+}
+
+.pilula.roxa {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.recursos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recurso {
+  padding: 4px 12px;
+  border: 1px solid var(--cor-texto);
+  border-radius: 59px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.passos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passos li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--cor-titulo);
+}
+
+.num {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vazio {
+  padding: 8px 0;
+  text-align: left;
+}

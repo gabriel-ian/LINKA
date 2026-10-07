@@ -108,8 +108,12 @@ export class LoginComponent {
         this.router.navigate(['/escola']);
         break;
 
+      case 'professor':
+        this.router.navigate(['/professor']);
+        break;
+
       default:
-        // professor, responsavel e aluno ainda nao tem tela propria.
+        // responsavel e aluno ainda nao tem tela propria.
         this.router.navigate(['/dashboard']);
     }
   }

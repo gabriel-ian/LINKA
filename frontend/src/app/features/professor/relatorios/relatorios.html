@@ -1,0 +1,93 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Relatórios</h1>
+    <p>{{ relatorio()?.turma?.nome }}{{ disciplinas() ? ' - ' + disciplinas() : '' }} - {{ nomeMes(mes()) }}</p>
+  </header>
+
+  <div class="filtros">
+    <label class="campo-p">
+      Turma
+      <select [value]="turmaId()" (change)="turmaId.set(+$any($event.target).value)">
+        @for (t of contexto.dados()?.turmas ?? []; track t.id) {
+          <option [value]="t.id" [selected]="t.id === turmaId()">{{ t.nome }}</option>
+        }
+      </select>
+    </label>
+    <label class="campo-p">
+      Período
+      <select [value]="mes()" (change)="mes.set($any($event.target).value)">
+        @for (m of meses; track m) {
+          <option [value]="m">{{ nomeMes(m) }}</option>
+        }
+      </select>
+    </label>
+    <label class="campo-p">
+      Alunos
+      <select [value]="alunos()" (change)="alunos.set($any($event.target).value)">
+        <option value="todos">Todos</option>
+        <option value="nee">Só alunos NEE</option>
+      </select>
+    </label>
+    <button type="button" class="bt bt-secundario exportar" (click)="exportar()">Exportar PDF</button>
+  </div>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (relatorio(); as r) {
+    <div class="indicadores">
+      <div class="indicador c-azul">
+        <span>Entregas no prazo</span>
+        <strong>{{ pct(r.entregasNoPrazo) }}</strong>
+        <small>média da turma</small>
+      </div>
+      <div class="indicador c-verde">
+        <span>Alunos NEE em dia</span>
+        <strong>{{ pct(r.neeEmDia) }}</strong>
+        <small>70% ou mais de entregas</small>
+      </div>
+      <div class="indicador c-laranja">
+        <span>Tarefas criadas</span>
+        <strong>{{ r.tarefasCriadas }}</strong>
+        <small>neste mês</small>
+      </div>
+      <div class="indicador c-roxo">
+        <span>Adaptações pela IA</span>
+        <strong>{{ r.adaptacoesIa }}</strong>
+        <small>versões em passos</small>
+      </div>
+    </div>
+
+    <div class="blocos">
+      <section class="cartao bloco">
+        <h2>Evolução dos alunos NEE</h2>
+        @for (a of r.evolucaoNee; track a.id) {
+          <div class="aluno" [class]="'c-' + corSituacao(situacao(a.taxa))">
+            <span class="rotulo">{{ a.nome }}{{ a.diagnostico ? ' - ' + a.diagnostico : '' }} <b>{{ pct(a.taxa) }}</b></span>
+            <span class="progresso"><span [style.width.%]="a.taxa ?? 0"></span></span>
+            <small>{{ variacao(a.variacao) }}</small>
+          </div>
+        } @empty {
+          <p class="vazio">Nenhum aluno NEE nesta turma.</p>
+        }
+      </section>
+
+      <section class="cartao bloco">
+        <h2>Entregas por semana</h2>
+        <div class="grafico" role="img" aria-label="Porcentagem de entregas em cada semana do mês">
+          @for (s of r.entregasPorSemana; track s.rotulo; let i = $index) {
+            <div class="coluna" [class.atual]="i === semanaDestaque(r.entregasPorSemana.length)">
+              <span class="valor">{{ pct(s.taxa) }}</span>
+              <span class="barra" [style.height.%]="s.taxa ?? 0"></span>
+              <span class="mes">{{ s.rotulo }}</span>
+            </div>
+          }
+        </div>
+        <p class="sugestao">
+          {{ r.sugestao ? 'Sugestão: ' + r.sugestao : 'As sugestões aparecem quando houver tarefas com prazos em horários diferentes.' }}
+        </p>
+      </section>
+    </div>
+  }
+</div>

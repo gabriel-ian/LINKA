@@ -6,6 +6,16 @@
   </header>
 
   <div class="barra">
+    <button
+      type="button"
+      class="abrir-menu"
+      aria-label="Abrir menu"
+      [attr.aria-expanded]="menuAberto()"
+      aria-controls="menu-painel"
+      (click)="menuAberto.set(!menuAberto())"
+    >
+      <span></span><span></span><span></span>
+    </button>
     <p class="barra-titulo" [class.pequeno]="config().tituloPequeno">
       {{ config().titulo }}
       @if (config().detalhe) {
@@ -26,7 +36,10 @@
   </div>
 
   <div class="corpo">
-    <nav class="menu" aria-label="Menu">
+    @if (menuAberto()) {
+      <div class="fundo-menu" (click)="menuAberto.set(false)"></div>
+    }
+    <nav id="menu-painel" class="menu" [class.aberto]="menuAberto()" aria-label="Menu" (click)="fecharMenuSeLink($event)">
       @for (secao of config().secoes; track secao.titulo; let primeira = $first) {
         <p class="menu-titulo" [class.seguinte]="!primeira">{{ secao.titulo }}</p>
         @for (item of secao.itens; track item.rota) {

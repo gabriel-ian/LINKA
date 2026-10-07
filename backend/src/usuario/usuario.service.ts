@@ -24,6 +24,19 @@ export class UsuarioService {
     });
   }
 
+  /**
+   * Conta existe, esta ativa e (se tiver escola) a escola esta ativa.
+   * Conferido a cada requisicao: desativar alguem corta o acesso na hora,
+   * sem esperar o token expirar.
+   */
+  async acessoLiberado(id: number): Promise<boolean> {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { id },
+      relations: { escola: true },
+    });
+    return !!usuario && usuario.ativo !== false && (!usuario.escola || usuario.escola.ativo);
+  }
+
   async registrarLogin(id: number): Promise<void> {
     await this.usuarioRepository.update(id, { ultimoLogin: new Date() });
   }

@@ -5,6 +5,10 @@
   line-height: 59px;
 }
 
+.sessao {
+  margin: -14px 0 18px;
+}
+
 .perfis {
   display: flex;
   gap: 13px;
@@ -114,4 +118,21 @@
   line-height: 34px;
   letter-spacing: 1.28px;
   color: var(--cor-primaria);
+}
+
+@media (max-width: 600px) {
+  .titulo {
+    margin: 32px 0 20px;
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .perfis {
+    flex-wrap: wrap;
+  }
+
+  .aviso-texto {
+    font-size: 24px;
+    line-height: 28px;
+  }
 }

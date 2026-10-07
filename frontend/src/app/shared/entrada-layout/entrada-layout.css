@@ -20,6 +20,7 @@
 
 .entrada-esquerda {
   flex: 1;
+  min-width: 0;
   padding: 79px 24px 60px 10.625%;
 }
 

@@ -5,6 +5,10 @@
 
   <h1 class="titulo">Bem-vindo de volta</h1>
 
+  @if (sessaoEncerrada) {
+    <p class="aviso-caixa azul sessao" role="status">Sua sessão terminou. Entre de novo para continuar.</p>
+  }
+
   <p class="campo-rotulo">Entrar como</p>
   <div class="perfis" role="group" aria-label="Perfil de acesso">
     @for (p of perfis; track p) {

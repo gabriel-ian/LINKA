@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import {
   ApiResponse,
   Desativacao,
@@ -15,7 +16,7 @@ import {
 export class EscolaService {
   private http = inject(HttpClient);
 
-  private readonly api = 'http://localhost:3000';
+  private readonly api = `${environment.apiUrl}`;
 
   /** CRUD de escolas: exclusivo do admin. */
   private readonly adminUrl = `${this.api}/admin/escolas`;

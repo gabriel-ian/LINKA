@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { LoginResponse, PerfilUsuario } from '../model/escola.model';
 
 @Injectable({
@@ -9,7 +10,7 @@ import { LoginResponse, PerfilUsuario } from '../model/escola.model';
 export class AuthService {
   private http = inject(HttpClient);
 
-  private readonly api = 'http://localhost:3000/auth';
+  private readonly api = `${environment.apiUrl}/auth`;
 
   /**
    * O perfil nao e mais enviado: quem define o perfil e o backend,
@@ -35,6 +36,18 @@ export class AuthService {
       localStorage.setItem('escolaId', String(res.escolaId));
     } else {
       localStorage.removeItem('escolaId');
+    }
+  }
+
+  /** Ha token salvo e ele ainda nao expirou (a validade real e do backend). */
+  get logado(): boolean {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    try {
+      const { exp } = JSON.parse(atob(token.split('.')[1]));
+      return !exp || exp * 1000 > Date.now();
+    } catch {
+      return false;
     }
   }
 

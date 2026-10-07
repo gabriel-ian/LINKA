@@ -73,6 +73,8 @@ export class PainelLayout {
   notificacoes = input<Notificacao[]>([]);
 
   readonly painel = signal<'conta' | 'notificacoes' | null>(null);
+  /** Gaveta do menu em telas estreitas (abaixo de 1000px). */
+  readonly menuAberto = signal(false);
   private readonly lidas = signal<Set<string>>(new Set());
 
   readonly naoLidas = computed(
@@ -94,6 +96,11 @@ export class PainelLayout {
 
   camadas(item: ItemMenu): CamadaIcone[] {
     return item.icone === 'visao' ? [] : item.icone;
+  }
+
+  /** Na gaveta, escolher um item ja fecha o menu. */
+  fecharMenuSeLink(evento: Event): void {
+    if ((evento.target as HTMLElement).closest('a')) this.menuAberto.set(false);
   }
 
   ehLida(n: Notificacao): boolean {

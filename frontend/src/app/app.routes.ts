@@ -1,21 +1,25 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { perfilGuard } from './core/guards/perfil-guard';
+import { visitanteGuard } from './core/guards/visitante-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'login',
+    canActivate: [visitanteGuard],
     loadComponent: () =>
       import('./features/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'adm/login',
+    canActivate: [visitanteGuard],
     loadComponent: () =>
       import('./features/adm-login/adm-login').then((m) => m.AdmLogin),
   },
   {
     path: 'recuperar-senha',
+    canActivate: [visitanteGuard],
     loadComponent: () =>
       import('./features/recuperar-senha/recuperar-senha').then((m) => m.RecuperarSenha),
   },
@@ -79,11 +83,11 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'dashboard',
-    loadComponent: () =>
-      import('./features/dashboard/dashboard').then((m) => m.Dashboard),
-    canActivate: [authGuard],
+    path: 'inicio',
+    canActivate: [authGuard, perfilGuard('aluno', 'responsavel')],
+    loadComponent: () => import('./features/inicio/inicio').then((m) => m.Inicio),
   },
+  { path: 'dashboard', redirectTo: 'inicio', pathMatch: 'full' },
   {
     path: 'escola',
     canActivate: [authGuard, perfilGuard('escola')],

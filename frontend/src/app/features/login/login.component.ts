@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
+import { rotaInicial } from '../../core/services/rota-inicial';
 import { PerfilUsuario } from '../../core/model/escola.model';
 import { EntradaLayout } from '../../shared/entrada-layout/entrada-layout';
 import {
@@ -43,6 +44,10 @@ export class LoginComponent {
 
   mostrarSenha = false;
   avisoPerfil = false;
+  /** Aviso quando a sessao caiu (token expirado ou acesso encerrado). */
+  readonly sessaoEncerrada =
+    inject(ActivatedRoute).snapshot.queryParamMap.get('sessao') === 'encerrada';
+
   erro = '';
   /** Credenciais recusadas: os campos ficam com borda vermelha. */
   erroCredenciais = false;
@@ -99,22 +104,6 @@ export class LoginComponent {
   }
 
   private redirecionar(perfil: PerfilUsuario): void {
-    switch (perfil) {
-      case 'admin':
-        this.router.navigate(['/adm']);
-        break;
-
-      case 'escola':
-        this.router.navigate(['/escola']);
-        break;
-
-      case 'professor':
-        this.router.navigate(['/professor']);
-        break;
-
-      default:
-        // responsavel e aluno ainda nao tem tela propria.
-        this.router.navigate(['/dashboard']);
-    }
+    this.router.navigateByUrl(rotaInicial(perfil));
   }
 }

@@ -518,6 +518,12 @@ button.pilula.selecionada {
 
 /* ---------- Tabela ---------- */
 
+/* Cartao que rola a tabela: position relative prende os rotulos
+   so para leitor de tela (.sr-only) dentro da area de rolagem. */
+.tabela-cartao {
+  position: relative;
+}
+
 .tabela {
   width: 100%;
   border-collapse: separate;
@@ -787,4 +793,89 @@ button.pilula.selecionada {
   border-color: var(--cor-primaria);
   background: var(--cor-primaria);
   color: #fff;
+}
+
+/* ======================================================================
+   Telas estreitas (tablet e celular). As paginas dos paineis reusam os
+   mesmos nomes de bloco; aqui eles empilham. O !important vence o estilo
+   encapsulado de cada componente so nesta faixa de largura.
+   ====================================================================== */
+
+@media (max-width: 1000px) {
+  .blocos,
+  .colunas,
+  .versoes,
+  .dados-grade {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .filtros,
+  .pilulas {
+    flex-wrap: wrap;
+  }
+
+  /* Algumas telas montam os blocos com flex em vez de grade. */
+  .blocos {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .blocos > * {
+    flex: none !important;
+  }
+
+  .filtros .busca {
+    flex: 1 1 100% !important;
+  }
+
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .painel-cabecalho h1 {
+    font-size: 32px;
+  }
+
+  .painel-cabecalho p {
+    font-size: 16px;
+  }
+
+  .indicadores,
+  .numeros {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .indicador strong {
+    font-size: 32px !important;
+  }
+
+  .grade-campos,
+  .grade,
+  .filtros:is(div) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .acoes {
+    justify-content: stretch;
+  }
+
+  .acoes > .bt {
+    flex: 1 1 auto;
+  }
+
+  .tabela-cartao {
+    padding: 8px 12px !important;
+  }
+
+  .etapas {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .etapas li + li::before {
+    width: 12px;
+  }
 }

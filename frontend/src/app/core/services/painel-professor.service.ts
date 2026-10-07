@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../model/escola.model';
 import {
   AlunoProfessor,
@@ -20,7 +21,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class PainelProfessorService {
   private http = inject(HttpClient);
-  private readonly api = 'http://localhost:3000/painel-professor';
+  private readonly api = `${environment.apiUrl}/painel-professor`;
 
   contexto(): Observable<ApiResponse<ContextoProfessor>> {
     return this.http.get<ApiResponse<ContextoProfessor>>(`${this.api}/contexto`);

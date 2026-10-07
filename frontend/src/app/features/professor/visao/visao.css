@@ -90,6 +90,12 @@
   line-height: 16px;
 }
 
+.bloco-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .linha {
   display: flex;
   align-items: flex-start;

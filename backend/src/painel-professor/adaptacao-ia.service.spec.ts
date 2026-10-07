@@ -13,7 +13,9 @@ const perfil = (alunoId: number): PerfilParaIa => ({
 });
 
 function servico(chave: string | undefined, parse?: jest.Mock) {
-  const s = new AdaptacaoIaService({ get: () => chave } as unknown as ConfigService);
+  const s = new AdaptacaoIaService({
+    get: () => chave,
+  } as unknown as ConfigService);
   if (parse) (s as any).cliente = { beta: { messages: { parse } } };
   return s;
 }
@@ -23,14 +25,21 @@ describe('AdaptacaoIaService', () => {
     const s = servico(undefined);
     expect(s.disponivel).toBe(false);
     await expect(
-      s.adaptarTarefa({ titulo: 't', disciplina: null, enunciado: 'e' }, [perfil(1)]),
+      s.adaptarTarefa({ titulo: 't', disciplina: null, enunciado: 'e' }, [
+        perfil(1),
+      ]),
     ).rejects.toThrow(ServiceUnavailableException);
   });
 
   it('nao chama a API quando nao ha alunos NEE', async () => {
     const parse = jest.fn();
     const s = servico('chave', parse);
-    expect(await s.adaptarTarefa({ titulo: 't', disciplina: null, enunciado: 'e' }, [])).toEqual([]);
+    expect(
+      await s.adaptarTarefa(
+        { titulo: 't', disciplina: null, enunciado: 'e' },
+        [],
+      ),
+    ).toEqual([]);
     expect(parse).not.toHaveBeenCalled();
   });
 
@@ -39,7 +48,11 @@ describe('AdaptacaoIaService', () => {
       stop_reason: 'end_turn',
       parsed_output: {
         adaptacoes: [
-          { alunoId: 1, passos: ['Separe o caderno.'], recursos: ['1 passo curto'] },
+          {
+            alunoId: 1,
+            passos: ['Separe o caderno.'],
+            recursos: ['1 passo curto'],
+          },
           { alunoId: 99, passos: ['Inventado.'], recursos: [] },
           { alunoId: 2, passos: [], recursos: [] },
         ],
@@ -47,12 +60,22 @@ describe('AdaptacaoIaService', () => {
     });
     const s = servico('chave', parse);
 
-    const r = await s.adaptarTarefa({ titulo: 'Exercicios', disciplina: 'Matemática', enunciado: 'Resolva 5 a 10' }, [
-      perfil(1),
-      perfil(2),
-    ]);
+    const r = await s.adaptarTarefa(
+      {
+        titulo: 'Exercicios',
+        disciplina: 'Matemática',
+        enunciado: 'Resolva 5 a 10',
+      },
+      [perfil(1), perfil(2)],
+    );
 
-    expect(r).toEqual([{ alunoId: 1, passos: ['Separe o caderno.'], recursos: ['1 passo curto'] }]);
+    expect(r).toEqual([
+      {
+        alunoId: 1,
+        passos: ['Separe o caderno.'],
+        recursos: ['1 passo curto'],
+      },
+    ]);
     const pedido = parse.mock.calls[0][0];
     expect(pedido.model).toBe('claude-opus-5-5');
     expect(pedido.fallbacks).toBe('default');
@@ -60,9 +83,13 @@ describe('AdaptacaoIaService', () => {
   });
 
   it('trata recusa como indisponibilidade, sem quebrar a tarefa', async () => {
-    const parse = jest.fn().mockResolvedValue({ stop_reason: 'refusal', parsed_output: null });
+    const parse = jest
+      .fn()
+      .mockResolvedValue({ stop_reason: 'refusal', parsed_output: null });
     const s = servico('chave', parse);
-    await expect(s.simplificarComunicado('Prova', 'Estudar cap. 4')).rejects.toThrow(ServiceUnavailableException);
+    await expect(
+      s.simplificarComunicado('Prova', 'Estudar cap. 4'),
+    ).rejects.toThrow(ServiceUnavailableException);
   });
 });
 

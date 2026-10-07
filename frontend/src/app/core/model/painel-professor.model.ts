@@ -29,6 +29,14 @@ export interface TarefaRecente {
   status: StatusTarefa;
 }
 
+/** Linha da tela "Tarefas": tarefa recente + turma e adaptacoes. */
+export interface TarefaListada extends TarefaRecente {
+  turmaId: number;
+  turma: string;
+  totalNee: number;
+  adaptadas: number;
+}
+
 export interface VisaoTurma {
   turma: TurmaProfessor & { totalAlunos: number; totalNee: number };
   alunosEmDia: number;

@@ -1,4 +1,8 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Anthropic from '@anthropic-ai/sdk';
 import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod';
@@ -73,10 +77,15 @@ export class AdaptacaoIaService {
     );
 
     const ids = new Set(perfis.map((p) => p.alunoId));
-    return resposta.adaptacoes.filter((a) => ids.has(a.alunoId) && a.passos.length > 0);
+    return resposta.adaptacoes.filter(
+      (a) => ids.has(a.alunoId) && a.passos.length > 0,
+    );
   }
 
-  async simplificarComunicado(titulo: string, mensagem: string): Promise<string> {
+  async simplificarComunicado(
+    titulo: string,
+    mensagem: string,
+  ): Promise<string> {
     const resposta = await this.chamar(
       INSTRUCOES_COMUNICADO,
       JSON.stringify({ titulo, mensagem }, null, 2),
@@ -85,9 +94,15 @@ export class AdaptacaoIaService {
     return resposta.texto;
   }
 
-  private async chamar<T extends z.ZodType>(sistema: string, conteudo: string, schema: T): Promise<z.infer<T>> {
+  private async chamar<T extends z.ZodType>(
+    sistema: string,
+    conteudo: string,
+    schema: T,
+  ): Promise<z.infer<T>> {
     if (!this.cliente) {
-      throw new ServiceUnavailableException('Adaptacao por IA nao configurada (ANTHROPIC_API_KEY)');
+      throw new ServiceUnavailableException(
+        'Adaptacao por IA nao configurada (ANTHROPIC_API_KEY)',
+      );
     }
 
     try {
@@ -105,8 +120,12 @@ export class AdaptacaoIaService {
       });
 
       if (resposta.stop_reason === 'refusal' || !resposta.parsed_output) {
-        this.logger.warn(`IA sem resultado utilizavel (stop_reason=${resposta.stop_reason})`);
-        throw new ServiceUnavailableException('A IA nao conseguiu gerar a adaptacao agora');
+        this.logger.warn(
+          `IA sem resultado utilizavel (stop_reason=${resposta.stop_reason})`,
+        );
+        throw new ServiceUnavailableException(
+          'A IA nao conseguiu gerar a adaptacao agora',
+        );
       }
 
       return resposta.parsed_output as z.infer<T>;
@@ -117,11 +136,17 @@ export class AdaptacaoIaService {
         throw new ServiceUnavailableException('Chave da IA invalida');
       }
       if (erro instanceof Anthropic.RateLimitError) {
-        throw new ServiceUnavailableException('IA ocupada no momento, tente de novo em instantes');
+        throw new ServiceUnavailableException(
+          'IA ocupada no momento, tente de novo em instantes',
+        );
       }
       if (erro instanceof Anthropic.APIError) {
-        this.logger.error(`Erro da API Anthropic ${erro.status}: ${erro.message}`);
-        throw new ServiceUnavailableException('Nao foi possivel falar com a IA agora');
+        this.logger.error(
+          `Erro da API Anthropic ${erro.status}: ${erro.message}`,
+        );
+        throw new ServiceUnavailableException(
+          'Nao foi possivel falar com a IA agora',
+        );
       }
       throw erro;
     }

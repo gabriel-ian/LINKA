@@ -1,0 +1,99 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Tarefas</h1>
+    <p>
+      {{ contagem().todas }} {{ contagem().todas === 1 ? 'tarefa criada' : 'tarefas criadas' }} -
+      {{ contagem().abertas }} em andamento
+    </p>
+  </header>
+
+  <div class="filtros">
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'todas'" (click)="filtrar('todas')">Todas ({{ contagem().todas }})</button>
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'abertas'" (click)="filtrar('abertas')">Em andamento ({{ contagem().abertas }})</button>
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'encerradas'" (click)="filtrar('encerradas')">Encerradas ({{ contagem().encerradas }})</button>
+    <label class="campo-p busca">
+      <input aria-label="Buscar tarefa" placeholder="Buscar tarefa..." [value]="busca()" (input)="busca.set($any($event.target).value); pagina.set(0)" />
+    </label>
+    @if ((contexto.dados()?.turmas?.length ?? 0) > 1) {
+      <label class="campo-p turma">
+        <select aria-label="Turma" (change)="escolherTurma($any($event.target).value)">
+          <option value="">Turma: Todas</option>
+          @for (t of contexto.dados()!.turmas; track t.id) {
+            <option [value]="t.id">{{ t.nome }}</option>
+          }
+        </select>
+      </label>
+    }
+    <a class="bt bt-primario" routerLink="/professor/tarefas/nova">+ Nova tarefa</a>
+  </div>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  <section class="cartao tabela-cartao">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Tarefa</th>
+          <th style="width: 90px">Turma</th>
+          <th style="width: 130px">Entrega</th>
+          <th style="width: 190px">Entregues</th>
+          <th style="width: 120px">Adaptadas</th>
+          <th style="width: 70px"><span class="sr-only">Ações</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of visiveis(); track t.id) {
+          <tr [class]="'c-' + corStatus[t.status]">
+            <td>
+              <a class="titulo" [routerLink]="['/professor/tarefas', t.id]">
+                <strong>{{ t.titulo }}</strong>
+                <small>{{ t.disciplina || 'Sem disciplina' }}</small>
+              </a>
+            </td>
+            <td>{{ t.turma }}</td>
+            <td><span class="pilula-cor">{{ rotuloStatus(t) }}</span></td>
+            <td>
+              <span class="entregas">
+                <span class="progresso"><span [style.width.%]="pctEntregas(t)"></span></span>
+                <b>{{ t.entregues }}/{{ t.total }}</b>
+              </span>
+            </td>
+            <td>
+              @if (t.totalNee) {
+                <span class="pilula" [class]="t.adaptadas >= t.totalNee ? 'ativa' : 'pendente'">
+                  {{ t.adaptadas }} de {{ t.totalNee }} NEE
+                </span>
+              } @else {
+                <span class="sem-nee">Sem NEE</span>
+              }
+            </td>
+            <td><a class="link-acao" [routerLink]="['/professor/tarefas', t.id]">Abrir</a></td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="vazio">
+              @if (carregando()) {
+                Carregando...
+              } @else if (contagem().todas) {
+                Nenhuma tarefa neste filtro.
+              } @else {
+                Você ainda não criou tarefas. <a class="link-acao" routerLink="/professor/tarefas/nova">Criar a primeira</a>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <div class="rodape-lista">
+    <span>Mostrando {{ visiveis().length }} de {{ filtradas().length }} tarefas - mais recentes primeiro</span>
+    @if (totalPaginas() > 1) {
+      <button type="button" class="bt bt-secundario" (click)="proximaPagina()">
+        {{ pagina() + 1 < totalPaginas() ? 'Próxima página' : 'Voltar ao início' }}
+      </button>
+    }
+  </div>
+</div>

@@ -1,5 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, map, startWith } from 'rxjs';
 import {
   ConfigPainel,
   Notificacao,
@@ -27,10 +29,22 @@ const PROF = 'assets/professor/menu-';
 })
 export class ProfessorLayout {
   readonly contexto = inject(ProfessorContexto);
+  private router = inject(Router);
+
+  /** URL atual, para destacar "Tarefas" tambem no detalhe de uma tarefa. */
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => this.router.url),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
 
   readonly config = computed<ConfigPainel>(() => {
     const dados = this.contexto.dados();
     const turmaAtual = this.contexto.turmaId();
+    const naTarefa = /^\/professor\/tarefas\/\d+/.test(this.url());
     const disciplinas = juntar(dados?.disciplinas.map((d) => d.nome) ?? []);
 
     return {
@@ -44,6 +58,12 @@ export class ProfessorLayout {
           itens: [
             { rota: '/professor', rotulo: 'Visão geral', icone: 'visao' },
             { rota: '/professor/tarefas/nova', rotulo: 'Nova tarefa', icone: [{ src: PROF + 'nova-tarefa', left: 12, top: 12 }] },
+            {
+              rota: '/professor/tarefas',
+              rotulo: 'Tarefas',
+              selecionado: naTarefa,
+              icone: [{ src: PROF + 'tarefas', left: 12.7, top: 13.2 }],
+            },
             {
               rota: turmaAtual ? `/professor/turmas/${turmaAtual}` : '/professor',
               rotulo: 'Turma',

@@ -62,7 +62,9 @@ export function semanasDoMes(mes: string): [string, string][] {
   const limites = ['01', '08', '15', '22'];
   return limites.map((dia, i) => [
     `${mes}-${dia}`,
-    i < 3 ? `${mes}-${String(Number(limites[i + 1]) - 1).padStart(2, '0')}` : fim,
+    i < 3
+      ? `${mes}-${String(Number(limites[i + 1]) - 1).padStart(2, '0')}`
+      : fim,
   ]) as [string, string][];
 }
 
@@ -108,11 +110,19 @@ export class PainelProfessorService {
 
     const [alunos, linhas, [{ avisos }]] = await Promise.all([
       this.alunosDaTurma(turmaId),
-      this.linhas(turmaId, professor.id, [iso(somarDias(hoje, -JANELA_PASSADO)), iso(somarDias(hoje, 30))]),
+      this.linhas(turmaId, professor.id, [
+        iso(somarDias(hoje, -JANELA_PASSADO)),
+        iso(somarDias(hoje, 30)),
+      ]),
       this.dataSource.query(
         `SELECT COUNT(*) avisos FROM comunicado
           WHERE professor_id = ? AND turma_id = ? AND rascunho = 0 AND enviado_em BETWEEN ? AND ?`,
-        [professor.id, turmaId, `${semana[0]} 00:00:00`, `${semana[1]} 23:59:59`],
+        [
+          professor.id,
+          turmaId,
+          `${semana[0]} 00:00:00`,
+          `${semana[1]} 23:59:59`,
+        ],
       ),
     ]);
 
@@ -121,15 +131,29 @@ export class PainelProfessorService {
 
     return {
       data: {
-        turma: { ...turma, totalAlunos: alunos.length, totalNee: alunos.filter((a) => a.neurodivergente).length },
+        turma: {
+          ...turma,
+          totalAlunos: alunos.length,
+          totalNee: alunos.filter((a) => a.neurodivergente).length,
+        },
         alunosEmDia: alunos.length - comAtraso.length,
-        alunosComAtraso: comAtraso.map((a) => ({ id: a.id, nome: a.nome, neurodivergente: a.neurodivergente })),
+        alunosComAtraso: comAtraso.map((a) => ({
+          id: a.id,
+          nome: a.nome,
+          neurodivergente: a.neurodivergente,
+        })),
         avisosSemana: Number(avisos),
-        entregasSemana: taxaConclusao(linhas.filter((l) => noIntervalo(l.dataEntrega, semana))),
+        entregasSemana: taxaConclusao(
+          linhas.filter((l) => noIntervalo(l.dataEntrega, semana)),
+        ),
         alunosNee: alunos
           .filter((a) => a.neurodivergente)
           .map((a) => {
-            const taxa = taxaConclusao(linhas.filter((l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, semana)));
+            const taxa = taxaConclusao(
+              linhas.filter(
+                (l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, semana),
+              ),
+            );
             const atrasadas = atrasos.get(a.id) ?? 0;
             const s = situacao(taxa);
             return {
@@ -140,11 +164,25 @@ export class PainelProfessorService {
               situacao: atrasadas ? 'atencao' : s,
               resumo: atrasadas
                 ? `${atrasadas} ${atrasadas === 1 ? 'tarefa atrasada' : 'tarefas atrasadas'}`
-                : { atencao: 'abaixo de 50% na semana', melhorando: 'melhorando', 'em-dia': 'em dia com as tarefas', 'sem-dados': 'sem tarefas na semana' }[s],
+                : {
+                    atencao: 'abaixo de 50% na semana',
+                    melhorando: 'melhorando',
+                    'em-dia': 'em dia com as tarefas',
+                    'sem-dados': 'sem tarefas na semana',
+                  }[s],
             };
           })
-          .sort((a, b) => (a.situacao === 'atencao' ? 0 : 1) - (b.situacao === 'atencao' ? 0 : 1)),
-        tarefasRecentes: await this.tarefasRecentes(professor.id, turmaId, alunos.length, hoje),
+          .sort(
+            (a, b) =>
+              (a.situacao === 'atencao' ? 0 : 1) -
+              (b.situacao === 'atencao' ? 0 : 1),
+          ),
+        tarefasRecentes: await this.tarefasRecentes(
+          professor.id,
+          turmaId,
+          alunos.length,
+          hoje,
+        ),
       },
     };
   }
@@ -160,7 +198,10 @@ export class PainelProfessorService {
 
     const [alunos, linhas, ultimas] = await Promise.all([
       this.alunosDaTurma(turmaId),
-      this.linhas(turmaId, professor.id, [iso(somarDias(hoje, -JANELA_PASSADO)), iso(somarDias(hoje, 30))]),
+      this.linhas(turmaId, professor.id, [
+        iso(somarDias(hoje, -JANELA_PASSADO)),
+        iso(somarDias(hoje, 30)),
+      ]),
       this.dataSource.query(
         `SELECT ts.aluno_id alunoId, MAX(ts.concluido_em) ultima FROM tarefa_status ts
            JOIN matricula m ON m.aluno_id = ts.aluno_id AND m.turma_id = ?
@@ -171,22 +212,36 @@ export class PainelProfessorService {
 
     const atrasos = this.atrasosPorAluno(linhas, hoje);
     const ultimaPorAluno = new Map<number, Date>(
-      ultimas.filter((u: any) => u.ultima).map((u: any) => [Number(u.alunoId), new Date(u.ultima)]),
+      ultimas
+        .filter((u: any) => u.ultima)
+        .map((u: any) => [Number(u.alunoId), new Date(u.ultima)]),
     );
 
     return {
       data: {
-        turma: { ...turma, disciplinas: await this.disciplinasDoProfessor(professor.id) },
+        turma: {
+          ...turma,
+          disciplinas: await this.disciplinasDoProfessor(professor.id),
+        },
         alunos: alunos.map((a) => {
-          const daSemana = linhas.filter((l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, semana));
-          const taxaMes = taxaConclusao(linhas.filter((l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, mes)));
+          const daSemana = linhas.filter(
+            (l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, semana),
+          );
+          const taxaMes = taxaConclusao(
+            linhas.filter(
+              (l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, mes),
+            ),
+          );
           return {
             id: a.id,
             nome: a.nome,
             idade: a.dataNascimento ? idade(a.dataNascimento) : null,
             neurodivergente: a.neurodivergente,
             diagnosticos: a.diagnosticos,
-            tarefasSemana: { concluidas: daSemana.filter((l) => l.concluida).length, total: daSemana.length },
+            tarefasSemana: {
+              concluidas: daSemana.filter((l) => l.concluida).length,
+              total: daSemana.length,
+            },
             entregasMes: taxaMes,
             situacao: atrasos.has(a.id) ? 'atencao' : situacao(taxaMes),
             atrasadas: atrasos.get(a.id) ?? 0,
@@ -205,19 +260,22 @@ export class PainelProfessorService {
         WHERE m.aluno_id = ? LIMIT 1`,
       [professor.id, alunoId],
     );
-    if (!matricula) throw new NotFoundException('Aluno nao encontrado nas suas turmas');
+    if (!matricula)
+      throw new NotFoundException('Aluno nao encontrado nas suas turmas');
 
     const turmaId = Number(matricula.turmaId);
     const turma = await this.turmaDoProfessor(professor.id, turmaId);
-    const aluno = (await this.alunosDaTurma(turmaId)).find((a) => a.id === alunoId);
+    const aluno = (await this.alunosDaTurma(turmaId)).find(
+      (a) => a.id === alunoId,
+    );
     if (!aluno) throw new NotFoundException('Aluno nao encontrado');
 
     const hoje = new Date();
     const mes = mesDe(mesAtual(hoje));
     // Todas as disciplinas da turma, para o progresso por materia.
-    const linhas = (await this.linhas(turmaId, null, [iso(somarDias(hoje, -90)), mes[1]])).filter(
-      (l) => l.alunoId === alunoId,
-    );
+    const linhas = (
+      await this.linhas(turmaId, null, [iso(somarDias(hoje, -90)), mes[1]])
+    ).filter((l) => l.alunoId === alunoId);
     const doMes = linhas.filter((l) => noIntervalo(l.dataEntrega, mes));
 
     const [{ adaptadas }] = await this.dataSource.query(
@@ -243,9 +301,15 @@ export class PainelProfessorService {
         pontosFortes: aluno.pontosFortes,
         interesses: aluno.interesses,
         desempenhoMes: taxaConclusao(doMes),
-        tarefasMes: { concluidas: doMes.filter((l) => l.concluida).length, total: doMes.length },
+        tarefasMes: {
+          concluidas: doMes.filter((l) => l.concluida).length,
+          total: doMes.length,
+        },
         tarefasAdaptadasNoMes: Number(adaptadas),
-        progressoPorMateria: [...porMateria].map(([disciplina, ls]) => ({ disciplina, taxa: taxaConclusao(ls) })),
+        progressoPorMateria: [...porMateria].map(([disciplina, ls]) => ({
+          disciplina,
+          taxa: taxaConclusao(ls),
+        })),
         sugestoes: await this.sugestoes(aluno, linhas),
       },
     };
@@ -253,7 +317,11 @@ export class PainelProfessorService {
 
   // ------------------------------------------------------------ tarefas
 
-  async criarTarefa(usuarioId: number, escolaId: number, dto: CriarTarefaProfessorDto) {
+  async criarTarefa(
+    usuarioId: number,
+    escolaId: number,
+    dto: CriarTarefaProfessorDto,
+  ) {
     const professor = await this.professor(usuarioId, escolaId);
     await this.turmaDoProfessor(professor.id, dto.turmaId);
 
@@ -271,6 +339,22 @@ export class PainelProfessorService {
     );
 
     return { data: { id: criada.data.id } };
+  }
+
+  /** Todas as tarefas do professor (opcionalmente de uma turma). */
+  async listarTarefas(usuarioId: number, escolaId: number, turmaId?: number) {
+    const professor = await this.professor(usuarioId, escolaId);
+    const turmas = turmaId
+      ? [await this.turmaDoProfessor(professor.id, turmaId)]
+      : await this.turmasDoProfessor(professor.id);
+
+    return {
+      data: await this.consultarTarefas(
+        professor.id,
+        turmas.map((t: { id: number }) => t.id),
+        new Date(),
+      ),
+    };
   }
 
   async tarefa(usuarioId: number, escolaId: number, tarefaId: number) {
@@ -304,7 +388,12 @@ export class PainelProfessorService {
   }
 
   /** Gera (ou refaz, para um aluno) as versoes adaptadas com a IA. */
-  async adaptar(usuarioId: number, escolaId: number, tarefaId: number, refazerAlunoId?: number) {
+  async adaptar(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    refazerAlunoId?: number,
+  ) {
     const professor = await this.professor(usuarioId, escolaId);
     const tarefa = await this.tarefaDoProfessor(professor.id, tarefaId);
     const repo = this.dataSource.getRepository(TarefaAdaptada);
@@ -313,7 +402,9 @@ export class PainelProfessorService {
     const alvos = (await this.alunosDaTurma(tarefa.turmaId)).filter(
       (a) =>
         a.neurodivergente &&
-        (refazerAlunoId ? a.id === refazerAlunoId : !existentes.some((e) => e.alunoId === a.id && e.passos?.length)),
+        (refazerAlunoId
+          ? a.id === refazerAlunoId
+          : !existentes.some((e) => e.alunoId === a.id && e.passos?.length)),
     );
 
     if (alvos.length) {
@@ -327,7 +418,11 @@ export class PainelProfessorService {
       }));
 
       const geradas = await this.ia.adaptarTarefa(
-        { titulo: tarefa.titulo, disciplina: tarefa.disciplina, enunciado: tarefa.descricao ?? tarefa.titulo },
+        {
+          titulo: tarefa.titulo,
+          disciplina: tarefa.disciplina,
+          enunciado: tarefa.descricao ?? tarefa.titulo,
+        },
         perfis,
       );
 
@@ -337,7 +432,9 @@ export class PainelProfessorService {
           ...(atual ?? { tarefaId, alunoId: g.alunoId }),
           passos: g.passos,
           recursos: g.recursos,
-          descricao_adaptada: g.passos.map((p, i) => `${i + 1}. ${p}`).join('\n'),
+          descricao_adaptada: g.passos
+            .map((p, i) => `${i + 1}. ${p}`)
+            .join('\n'),
           gerado_por_ia: true,
           atualizadoEm: atual ? new Date() : null,
         });
@@ -347,10 +444,18 @@ export class PainelProfessorService {
     return this.tarefa(usuarioId, escolaId, tarefaId);
   }
 
-  async editarAdaptacao(usuarioId: number, escolaId: number, tarefaId: number, alunoId: number, dto: EditarAdaptacaoDto) {
+  async editarAdaptacao(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    alunoId: number,
+    dto: EditarAdaptacaoDto,
+  ) {
     const professor = await this.professor(usuarioId, escolaId);
     const tarefa = await this.tarefaDoProfessor(professor.id, tarefaId);
-    const aluno = (await this.alunosDaTurma(tarefa.turmaId)).find((a) => a.id === alunoId);
+    const aluno = (await this.alunosDaTurma(tarefa.turmaId)).find(
+      (a) => a.id === alunoId,
+    );
     if (!aluno) throw new NotFoundException('Aluno nao esta nesta turma');
 
     const repo = this.dataSource.getRepository(TarefaAdaptada);
@@ -408,13 +513,20 @@ export class PainelProfessorService {
         enviados: formatados.filter((c) => !c.rascunho),
         rascunhos: formatados.filter((c) => c.rascunho),
         enviadosSemana: formatados.filter(
-          (c) => !c.rascunho && c.enviadoEm && noIntervalo(iso(new Date(c.enviadoEm)), semana),
+          (c) =>
+            !c.rascunho &&
+            c.enviadoEm &&
+            noIntervalo(iso(new Date(c.enviadoEm)), semana),
         ).length,
       },
     };
   }
 
-  async salvarComunicado(usuarioId: number, escolaId: number, dto: SalvarComunicadoDto) {
+  async salvarComunicado(
+    usuarioId: number,
+    escolaId: number,
+    dto: SalvarComunicadoDto,
+  ) {
     const professor = await this.professor(usuarioId, escolaId);
     const turma = await this.turmaDoProfessor(professor.id, dto.turmaId);
 
@@ -431,12 +543,17 @@ export class PainelProfessorService {
     if (dto.simplificada && !dto.rascunho) {
       if (this.ia.disponivel) {
         try {
-          versaoSimplificada = await this.ia.simplificarComunicado(dto.titulo, dto.mensagem);
+          versaoSimplificada = await this.ia.simplificarComunicado(
+            dto.titulo,
+            dto.mensagem,
+          );
         } catch {
-          avisoIa = 'A versão simplificada não pôde ser gerada agora; o aviso foi enviado no formato original.';
+          avisoIa =
+            'A versão simplificada não pôde ser gerada agora; o aviso foi enviado no formato original.';
         }
       } else {
-        avisoIa = 'A IA não está configurada; o aviso foi enviado no formato original.';
+        avisoIa =
+          'A IA não está configurada; o aviso foi enviado no formato original.';
       }
     }
 
@@ -501,7 +618,9 @@ export class PainelProfessorService {
 
     const alunos = await this.alunosDaTurma(filtros.turmaId);
     const nee = alunos.filter((a) => a.neurodivergente);
-    const idsFiltro = new Set((filtros.apenasNee ? nee : alunos).map((a) => a.id));
+    const idsFiltro = new Set(
+      (filtros.apenasNee ? nee : alunos).map((a) => a.id),
+    );
 
     const todas = await this.linhas(filtros.turmaId, professor.id, intervalo);
     const linhas = todas.filter((l) => idsFiltro.has(l.alunoId));
@@ -510,37 +629,66 @@ export class PainelProfessorService {
     const [[{ criadas }], [{ adaptacoes }]] = await Promise.all([
       this.dataSource.query(
         'SELECT COUNT(*) criadas FROM tarefa WHERE professor_id = ? AND turma_id = ? AND criado_em BETWEEN ? AND ?',
-        [professor.id, filtros.turmaId, `${intervalo[0]} 00:00:00`, `${intervalo[1]} 23:59:59`],
+        [
+          professor.id,
+          filtros.turmaId,
+          `${intervalo[0]} 00:00:00`,
+          `${intervalo[1]} 23:59:59`,
+        ],
       ),
       this.dataSource.query(
         `SELECT COUNT(*) adaptacoes FROM tarefa_adaptada ta JOIN tarefa t ON t.id = ta.tarefa_id
           WHERE t.professor_id = ? AND t.turma_id = ? AND ta.gerado_por_ia = 1 AND ta.criado_em BETWEEN ? AND ?`,
-        [professor.id, filtros.turmaId, `${intervalo[0]} 00:00:00`, `${intervalo[1]} 23:59:59`],
+        [
+          professor.id,
+          filtros.turmaId,
+          `${intervalo[0]} 00:00:00`,
+          `${intervalo[1]} 23:59:59`,
+        ],
       ),
     ]);
 
     const evolucaoNee = nee.map((a) => {
       const doAluno = todas.filter((l) => l.alunoId === a.id);
       const porSemana = semanas
-        .map((s) => taxaConclusao(doAluno.filter((l) => noIntervalo(l.dataEntrega, s))))
+        .map((s) =>
+          taxaConclusao(doAluno.filter((l) => noIntervalo(l.dataEntrega, s))),
+        )
         .filter((t): t is number => t !== null);
       return {
         id: a.id,
         nome: a.nome,
         diagnostico: a.diagnosticos[0] ?? null,
         taxa: taxaConclusao(doAluno),
-        variacao: porSemana.length >= 2 ? porSemana[porSemana.length - 1] - porSemana[porSemana.length - 2] : null,
+        variacao:
+          porSemana.length >= 2
+            ? porSemana[porSemana.length - 1] - porSemana[porSemana.length - 2]
+            : null,
       };
     });
 
     const neeLinhas = todas.filter((l) => nee.some((a) => a.id === l.alunoId));
-    const tarde = neeLinhas.filter((l) => l.horaLimite && l.horaLimite >= '12:00');
-    const manha = neeLinhas.filter((l) => l.horaLimite && l.horaLimite < '12:00');
-    const taxaTarde = new Set(tarde.map((l) => l.tarefaId)).size >= 2 ? taxaConclusao(tarde) : null;
-    const taxaManha = new Set(manha.map((l) => l.tarefaId)).size >= 2 ? taxaConclusao(manha) : null;
+    const tarde = neeLinhas.filter(
+      (l) => l.horaLimite && l.horaLimite >= '12:00',
+    );
+    const manha = neeLinhas.filter(
+      (l) => l.horaLimite && l.horaLimite < '12:00',
+    );
+    const taxaTarde =
+      new Set(tarde.map((l) => l.tarefaId)).size >= 2
+        ? taxaConclusao(tarde)
+        : null;
+    const taxaManha =
+      new Set(manha.map((l) => l.tarefaId)).size >= 2
+        ? taxaConclusao(manha)
+        : null;
 
     let sugestao: string | null = null;
-    if (taxaTarde !== null && taxaManha !== null && Math.abs(taxaTarde - taxaManha) >= 10) {
+    if (
+      taxaTarde !== null &&
+      taxaManha !== null &&
+      Math.abs(taxaTarde - taxaManha) >= 10
+    ) {
       const melhor = taxaTarde > taxaManha ? 'à tarde' : 'pela manhã';
       sugestao = `Tarefas com prazo ${melhor} têm ${Math.abs(taxaTarde - taxaManha)} pontos a mais de entregas entre os alunos NEE.`;
     }
@@ -551,14 +699,20 @@ export class PainelProfessorService {
         mes,
         entregasNoPrazo: taxaNoPrazo(linhas),
         neeEmDia: nee.length
-          ? Math.round((evolucaoNee.filter((e) => situacao(e.taxa) === 'em-dia').length / nee.length) * 100)
+          ? Math.round(
+              (evolucaoNee.filter((e) => situacao(e.taxa) === 'em-dia').length /
+                nee.length) *
+                100,
+            )
           : null,
         tarefasCriadas: Number(criadas),
         adaptacoesIa: Number(adaptacoes),
         evolucaoNee,
         entregasPorSemana: semanas.map((s, i) => ({
           rotulo: `Sem ${i + 1}`,
-          taxa: taxaConclusao(linhas.filter((l) => noIntervalo(l.dataEntrega, s))),
+          taxa: taxaConclusao(
+            linhas.filter((l) => noIntervalo(l.dataEntrega, s)),
+          ),
         })),
         sugestao,
       },
@@ -567,14 +721,20 @@ export class PainelProfessorService {
 
   // ------------------------------------------------------------ internos
 
-  private async professor(usuarioId: number, escolaId: number): Promise<Professor> {
+  private async professor(
+    usuarioId: number,
+    escolaId: number,
+  ): Promise<Professor> {
     const [p] = await this.dataSource.query(
       `SELECT p.id, p.nome_completo nome, e.nome escola FROM professor p
          JOIN escola e ON e.id = p.escola_id
         WHERE p.usuario_id = ? AND p.escola_id = ?`,
       [usuarioId, escolaId],
     );
-    if (!p) throw new ForbiddenException('Usuario nao esta vinculado a um professor desta escola');
+    if (!p)
+      throw new ForbiddenException(
+        'Usuario nao esta vinculado a um professor desta escola',
+      );
     return { id: Number(p.id), nome: p.nome ?? 'Professor', escola: p.escola };
   }
 
@@ -584,7 +744,10 @@ export class PainelProfessorService {
         WHERE pd.professor_id = ? ORDER BY d.nome`,
       [professorId],
     );
-    return linhas.map((d: any) => ({ id: Number(d.id), nome: d.nome as string }));
+    return linhas.map((d: any) => ({
+      id: Number(d.id),
+      nome: d.nome as string,
+    }));
   }
 
   private async turmasDoProfessor(professorId: number) {
@@ -602,8 +765,11 @@ export class PainelProfessorService {
   }
 
   private async turmaDoProfessor(professorId: number, turmaId: number) {
-    const turma = (await this.turmasDoProfessor(professorId)).find((t: { id: number }) => t.id === turmaId);
-    if (!turma) throw new NotFoundException('Turma nao encontrada entre as suas');
+    const turma = (await this.turmasDoProfessor(professorId)).find(
+      (t: { id: number }) => t.id === turmaId,
+    );
+    if (!turma)
+      throw new NotFoundException('Turma nao encontrada entre as suas');
     return turma as { id: number; nome: string; codigo: string };
   }
 
@@ -652,15 +818,24 @@ export class PainelProfessorService {
       nome: a.nome,
       neurodivergente: !!Number(a.neurodivergente),
       dataNascimento: a.dataNascimento ? paraIso(a.dataNascimento) : null,
-      diagnosticos: diagnosticos.filter((d: any) => Number(d.alunoId) === Number(a.id)).map((d: any) => d.nome),
-      interesses: (a.interesses ?? '').split(',').map((i: string) => i.trim()).filter(Boolean),
+      diagnosticos: diagnosticos
+        .filter((d: any) => Number(d.alunoId) === Number(a.id))
+        .map((d: any) => d.nome),
+      interesses: (a.interesses ?? '')
+        .split(',')
+        .map((i: string) => i.trim())
+        .filter(Boolean),
       dificuldades: a.dificuldades,
       pontosFortes: a.pontosFortes,
     }));
   }
 
   /** Tarefa x aluno da turma; professorId null = todas as disciplinas. */
-  private async linhas(turmaId: number, professorId: number | null, intervalo: [string, string]): Promise<LinhaComDisciplina[]> {
+  private async linhas(
+    turmaId: number,
+    professorId: number | null,
+    intervalo: [string, string],
+  ): Promise<LinhaComDisciplina[]> {
     const linhas = await this.dataSource.query(
       `SELECT m.aluno_id alunoId, t.id tarefaId, t.turma_id turmaId, t.data_entrega dataEntrega,
               t.hora_limite horaLimite, d.nome disciplina, ts.status, ts.concluido_em concluidoEm
@@ -686,24 +861,70 @@ export class PainelProfessorService {
   }
 
   /** Tarefas com prazo vencido e nao concluidas, por aluno. */
-  private atrasosPorAluno(linhas: LinhaTarefa[], hoje: Date): Map<number, number> {
+  private atrasosPorAluno(
+    linhas: LinhaTarefa[],
+    hoje: Date,
+  ): Map<number, number> {
     const agora = hoje.getTime();
     const atrasos = new Map<number, number>();
     for (const l of linhas) {
-      const prazo = new Date(`${l.dataEntrega}T${l.horaLimite ?? '23:59'}:00`).getTime();
-      if (!l.concluida && prazo < agora) atrasos.set(l.alunoId, (atrasos.get(l.alunoId) ?? 0) + 1);
+      const prazo = new Date(
+        `${l.dataEntrega}T${l.horaLimite ?? '23:59'}:00`,
+      ).getTime();
+      if (!l.concluida && prazo < agora)
+        atrasos.set(l.alunoId, (atrasos.get(l.alunoId) ?? 0) + 1);
     }
     return atrasos;
   }
 
-  private async tarefasRecentes(professorId: number, turmaId: number, totalAlunos: number, hoje: Date) {
+  private async tarefasRecentes(
+    professorId: number,
+    turmaId: number,
+    _totalAlunos: number,
+    hoje: Date,
+  ) {
+    return (await this.consultarTarefas(professorId, [turmaId], hoje, 4)).map(
+      ({ turmaId: _t, turma: _n, adaptadas: _a, totalNee: _e, ...t }) => t,
+    );
+  }
+
+  /**
+   * Tarefas do professor com entregas e status. Total de alunos e NEE sao
+   * contados por turma (a mesma tarefa so existe em uma turma).
+   */
+  private async consultarTarefas(
+    professorId: number,
+    turmaIds: number[],
+    hoje: Date,
+    limite?: number,
+  ) {
+    if (!turmaIds.length) return [];
+
     const tarefas = await this.dataSource.query(
-      `SELECT t.id, t.titulo, t.data_entrega dataEntrega, t.hora_limite horaLimite, d.nome disciplina,
-              (SELECT COUNT(*) FROM tarefa_status ts WHERE ts.tarefa_id = t.id AND ts.status = 'concluida') entregues
-         FROM tarefa t LEFT JOIN disciplina d ON d.id = t.disciplina_id
-        WHERE t.professor_id = ? AND t.turma_id = ?
-        ORDER BY t.data_entrega DESC, t.id DESC LIMIT 4`,
-      [professorId, turmaId],
+      `SELECT t.id, t.titulo, t.data_entrega dataEntrega, t.hora_limite horaLimite, t.turma_id turmaId,
+              tu.nome turma, d.nome disciplina,
+              (SELECT COUNT(*) FROM tarefa_status ts WHERE ts.tarefa_id = t.id AND ts.status = 'concluida') entregues,
+              (SELECT COUNT(*) FROM tarefa_adaptada ta
+                WHERE ta.tarefa_id = t.id AND JSON_LENGTH(COALESCE(ta.passos, JSON_ARRAY())) > 0) adaptadas
+         FROM tarefa t JOIN turma tu ON tu.id = t.turma_id
+         LEFT JOIN disciplina d ON d.id = t.disciplina_id
+        WHERE t.professor_id = ? AND t.turma_id IN (?)
+        ORDER BY t.data_entrega DESC, t.id DESC ${limite ? 'LIMIT ' + Number(limite) : ''}`,
+      [professorId, turmaIds],
+    );
+
+    const totais: { turmaId: number; total: string; nee: string }[] =
+      await this.dataSource.query(
+        `SELECT m.turma_id turmaId, COUNT(*) total, SUM(a.neurodivergente = 1) nee
+         FROM matricula m JOIN aluno a ON a.id = m.aluno_id AND a.ativo = 1
+        WHERE m.turma_id IN (?) GROUP BY m.turma_id`,
+        [turmaIds],
+      );
+    const porTurma = new Map(
+      totais.map((x) => [
+        Number(x.turmaId),
+        { total: Number(x.total), nee: Number(x.nee ?? 0) },
+      ]),
     );
 
     const hojeIso = iso(hoje);
@@ -712,8 +933,12 @@ export class PainelProfessorService {
     return tarefas.map((t: any) => {
       const data = t.dataEntrega ? paraIso(t.dataEntrega) : null;
       const entregues = Number(t.entregues);
+      const { total, nee } = porTurma.get(Number(t.turmaId)) ?? {
+        total: 0,
+        nee: 0,
+      };
       const status =
-        totalAlunos > 0 && entregues >= totalAlunos
+        total > 0 && entregues >= total
           ? 'concluida'
           : data === hojeIso
             ? 'hoje'
@@ -724,12 +949,16 @@ export class PainelProfessorService {
                 : 'futura';
       return {
         id: Number(t.id),
-        titulo: t.titulo,
-        disciplina: t.disciplina,
+        titulo: t.titulo as string,
+        disciplina: t.disciplina as string | null,
+        turmaId: Number(t.turmaId),
+        turma: t.turma as string,
         dataEntrega: data,
         horaLimite: t.horaLimite ? String(t.horaLimite).slice(0, 5) : null,
         entregues,
-        total: totalAlunos,
+        total,
+        totalNee: nee,
+        adaptadas: Number(t.adaptadas),
         status,
       };
     });
@@ -737,18 +966,35 @@ export class PainelProfessorService {
 
   /** Sugestoes calculadas do historico do aluno (sem IA). */
   private async sugestoes(aluno: AlunoTurma, linhas: LinhaComDisciplina[]) {
-    const sugestoes: { tipo: 'horario' | 'adaptacao' | 'atraso' | 'materia'; texto: string }[] = [];
+    const sugestoes: {
+      tipo: 'horario' | 'adaptacao' | 'atraso' | 'materia';
+      texto: string;
+    }[] = [];
     const nome = aluno.nome.split(' ')[0];
 
-    const horas = linhas.filter((l) => l.concluidoEm).map((l) => (l.concluidoEm as Date).getHours());
+    const horas = linhas
+      .filter((l) => l.concluidoEm)
+      .map((l) => (l.concluidoEm as Date).getHours());
     if (horas.length >= 3) {
       const faixas = [
-        { nome: 'pela manhã (até 12 h)', n: horas.filter((h) => h < 12).length },
-        { nome: 'à tarde (12 h às 18 h)', n: horas.filter((h) => h >= 12 && h < 18).length },
-        { nome: 'à noite (depois das 18 h)', n: horas.filter((h) => h >= 18).length },
+        {
+          nome: 'pela manhã (até 12 h)',
+          n: horas.filter((h) => h < 12).length,
+        },
+        {
+          nome: 'à tarde (12 h às 18 h)',
+          n: horas.filter((h) => h >= 12 && h < 18).length,
+        },
+        {
+          nome: 'à noite (depois das 18 h)',
+          n: horas.filter((h) => h >= 18).length,
+        },
       ].sort((a, b) => b.n - a.n);
       if (faixas[0].n / horas.length >= 0.6) {
-        sugestoes.push({ tipo: 'horario', texto: `${nome} costuma concluir as tarefas ${faixas[0].nome}. Prazos nesse período tendem a funcionar melhor.` });
+        sugestoes.push({
+          tipo: 'horario',
+          texto: `${nome} costuma concluir as tarefas ${faixas[0].nome}. Prazos nesse período tendem a funcionar melhor.`,
+        });
       }
     }
 
@@ -764,18 +1010,28 @@ export class PainelProfessorService {
       const tCom = com.length >= 2 ? taxaConclusao(com) : null;
       const tSem = sem.length >= 2 ? taxaConclusao(sem) : null;
       if (tCom !== null && tSem !== null && tCom - tSem >= 15) {
-        sugestoes.push({ tipo: 'adaptacao', texto: `${nome} entrega ${tCom - tSem} pontos a mais quando a tarefa vem adaptada em passos.` });
+        sugestoes.push({
+          tipo: 'adaptacao',
+          texto: `${nome} entrega ${tCom - tSem} pontos a mais quando a tarefa vem adaptada em passos.`,
+        });
       }
     }
 
     const porMateria = new Map<string, LinhaComDisciplina[]>();
-    for (const l of linhas) porMateria.set(l.disciplina ?? '', [...(porMateria.get(l.disciplina ?? '') ?? []), l]);
+    for (const l of linhas)
+      porMateria.set(l.disciplina ?? '', [
+        ...(porMateria.get(l.disciplina ?? '') ?? []),
+        l,
+      ]);
     const fracas = [...porMateria]
       .filter(([d, ls]) => d && ls.length >= 3)
       .map(([d, ls]) => ({ d, t: taxaConclusao(ls) ?? 0 }))
       .filter((x) => x.t < 50);
     if (fracas.length) {
-      sugestoes.push({ tipo: 'materia', texto: `Em ${fracas.map((f) => f.d).join(' e ')} as entregas estão abaixo de 50%. Vale conversar com ${nome} sobre essas tarefas.` });
+      sugestoes.push({
+        tipo: 'materia',
+        texto: `Em ${fracas.map((f) => f.d).join(' e ')} as entregas estão abaixo de 50%. Vale conversar com ${nome} sobre essas tarefas.`,
+      });
     }
 
     return sugestoes;

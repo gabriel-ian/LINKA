@@ -70,7 +70,10 @@
       </section>
 
       <section class="cartao bloco">
-        <h2><img src="assets/professor/icone-tarefas.svg" alt="" /> Tarefas recentes</h2>
+        <div class="bloco-topo">
+          <h2><img src="assets/professor/icone-tarefas.svg" alt="" /> Tarefas recentes</h2>
+          <a class="link-acao" routerLink="/professor/tarefas">Ver todas</a>
+        </div>
         @for (t of v.tarefasRecentes; track t.id) {
           <a class="tarefa" [class]="'c-' + corStatus[t.status]" [routerLink]="['/professor/tarefas', t.id]">
             <span class="topo">

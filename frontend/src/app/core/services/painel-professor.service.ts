@@ -11,6 +11,7 @@ import {
   NovaTarefa,
   NovoComunicado,
   RelatorioProfessor,
+  TarefaListada,
   TarefaProfessor,
   VisaoTurma,
 } from '../model/painel-professor.model';
@@ -39,6 +40,11 @@ export class PainelProfessorService {
 
   criarTarefa(dados: NovaTarefa): Observable<ApiResponse<{ id: number }>> {
     return this.http.post<ApiResponse<{ id: number }>>(`${this.api}/tarefas`, dados);
+  }
+
+  tarefas(turmaId?: number): Observable<ApiResponse<TarefaListada[]>> {
+    const params = turmaId ? new HttpParams().set('turmaId', turmaId) : undefined;
+    return this.http.get<ApiResponse<TarefaListada[]>>(`${this.api}/tarefas`, { params });
   }
 
   tarefa(id: number): Observable<ApiResponse<TarefaProfessor>> {

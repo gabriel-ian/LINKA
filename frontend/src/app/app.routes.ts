@@ -151,6 +151,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/professor/visao/visao').then((m) => m.ProfessorVisao),
       },
       {
+        path: 'tarefas',
+        loadComponent: () => import('./features/professor/tarefas/tarefas').then((m) => m.ProfessorTarefas),
+      },
+      {
         path: 'tarefas/nova',
         loadComponent: () =>
           import('./features/professor/tarefa-nova/tarefa-nova').then((m) => m.ProfessorTarefaNova),

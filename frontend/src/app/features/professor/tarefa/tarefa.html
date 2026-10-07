@@ -6,7 +6,7 @@
   @if (tarefa(); as t) {
     <header class="painel-cabecalho">
       <h1>{{ nova() ? 'Tarefa criada!' : t.titulo }}</h1>
-      <p>{{ t.titulo }}{{ t.disciplina ? ' - ' + t.disciplina : '' }} - {{ t.turma }} - {{ prazo() }}</p>
+      <p>{{ nova() ? t.titulo + ' - ' : '' }}{{ t.disciplina ? t.disciplina + ' - ' : '' }}{{ t.turma }} - {{ prazo() }}</p>
     </header>
 
     @if (gerando()) {
@@ -99,7 +99,11 @@
         }
         <button type="button" class="bt bt-secundario" [disabled]="gerando()" (click)="editar()">Editar adaptação</button>
       }
-      <a class="bt bt-primario" routerLink="/professor">Voltar para visão geral</a>
+      @if (nova()) {
+        <a class="bt bt-primario" routerLink="/professor">Voltar para visão geral</a>
+      } @else {
+        <a class="bt bt-primario" routerLink="/professor/tarefas">Voltar para tarefas</a>
+      }
     </div>
   }
 </div>

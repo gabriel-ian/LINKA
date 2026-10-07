@@ -41,7 +41,9 @@ export class CriarTarefaProfessorDto {
 
   @ApiPropertyOptional({ example: '18:00' })
   @IsOptional()
-  @Matches(/^([01]\d|2[0-3]):[0-5]\d$/, { message: 'horaLimite deve ser HH:MM' })
+  @Matches(/^([01]\d|2[0-3]):[0-5]\d$/, {
+    message: 'horaLimite deve ser HH:MM',
+  })
   horaLimite?: string;
 }
 
@@ -56,7 +58,12 @@ export class EditarAdaptacaoDto {
   passos!: string[];
 }
 
-export const TIPOS_COMUNICADO = ['atividade', 'evento', 'material', 'aviso'] as const;
+export const TIPOS_COMUNICADO = [
+  'atividade',
+  'evento',
+  'material',
+  'aviso',
+] as const;
 export type TipoComunicado = (typeof TIPOS_COMUNICADO)[number];
 
 export class SalvarComunicadoDto {

@@ -121,6 +121,23 @@ describe('AuthService', () => {
       expect(usuarioService.registrarLogin).toHaveBeenCalledWith(7);
     });
 
+    it('lanca 403 quando a conta do usuario foi desativada', async () => {
+      usuarioService.findByEmail.mockResolvedValue({
+        id: 8,
+        email: 'prof@linka.com',
+        senha: 'hash-correto',
+        perfil: 'professor',
+        escolaId: 5,
+        ativo: false,
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await expect(service.login('prof@linka.com', 'linka123')).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(usuarioService.registrarLogin).not.toHaveBeenCalled();
+    });
+
     it('lanca 403 quando a escola do usuario esta desativada', async () => {
       usuarioService.findByEmail.mockResolvedValue({
         id: 7,

@@ -1,0 +1,108 @@
+<div class="painel">
+  <header class="topo">
+    <a [routerLink]="config().secoes[0].itens[0].rota" aria-label="Linka - início">
+      <img src="assets/adm/logo.svg" alt="Linka" />
+    </a>
+  </header>
+
+  <div class="barra">
+    <p class="barra-titulo" [class.pequeno]="config().tituloPequeno">
+      {{ config().titulo }}
+      @if (config().detalhe) {
+        <small>{{ config().detalhe }}</small>
+      }
+    </p>
+    <div class="barra-icones">
+      <button type="button" class="icone-botao" aria-label="Notificações" (click)="alternar('notificacoes')">
+        <img src="assets/adm/icone-sino.svg" alt="" />
+        @if (naoLidas()) {
+          <span class="contador">{{ naoLidas() }}</span>
+        }
+      </button>
+      <button type="button" class="icone-botao" aria-label="Conta" (click)="alternar('conta')">
+        <img src="assets/adm/icone-config.svg" alt="" />
+      </button>
+    </div>
+  </div>
+
+  <div class="corpo">
+    <nav class="menu" aria-label="Menu">
+      @for (secao of config().secoes; track secao.titulo; let primeira = $first) {
+        <p class="menu-titulo" [class.seguinte]="!primeira">{{ secao.titulo }}</p>
+        @for (item of secao.itens; track item.rota) {
+          <a
+            class="menu-item"
+            [routerLink]="item.rota"
+            routerLinkActive="ativo"
+            [routerLinkActiveOptions]="opcoesAtivo(item)"
+            #rla="routerLinkActive"
+          >
+            <span class="icone">
+              @if (item.icone === 'visao') {
+                <i class="v1"></i><i class="v2"></i><i class="v3"></i><i class="v4"></i>
+              }
+              @for (c of camadas(item); track c.src + c.left) {
+                <img
+                  [src]="c.src + (rla.isActive ? '-ativo' : '') + '.svg'"
+                  alt=""
+                  [style.left.px]="c.left"
+                  [style.top.px]="c.top"
+                  [style.scale]="c.espelhar ? '-1 1' : null"
+                  [style.rotate.deg]="c.girar ?? null"
+                />
+              }
+            </span>
+            {{ item.rotulo }}
+          </a>
+        }
+      }
+    </nav>
+
+    <main class="conteudo">
+      <ng-content />
+    </main>
+  </div>
+
+  <footer class="rodape"></footer>
+</div>
+
+@if (painel()) {
+  <div class="sobreposicao" (click)="painel.set(null)">
+    @if (painel() === 'conta') {
+      <div class="flutuante conta" role="menu" (click)="$event.stopPropagation()">
+        <div class="conta-topo">
+          <span class="avatar" style="--tam: 44px; --fonte-avatar: 15px">{{ config().conta.iniciais }}</span>
+          <div>
+            <strong>{{ config().conta.nome }}</strong>
+            <small>{{ config().conta.detalhe }}</small>
+          </div>
+        </div>
+        @for (l of config().conta.links; track l.rota) {
+          <a [routerLink]="l.rota" role="menuitem" (click)="painel.set(null)">{{ l.rotulo }}</a>
+        }
+        <button type="button" class="sair" role="menuitem" (click)="sair()">Sair da conta</button>
+      </div>
+    } @else {
+      <div class="flutuante notificacoes" (click)="$event.stopPropagation()">
+        <div class="notif-topo">
+          <strong>Notificações</strong>
+          @if (naoLidas()) {
+            <button type="button" class="link-acao" (click)="marcarTodasComoLidas()">Marcar todas como lidas</button>
+          }
+        </div>
+        @for (n of notificacoes(); track n.chave) {
+          <div class="notif" [class.nova]="!ehLida(n)">
+            <span class="ponto" [class]="n.cor"></span>
+            <div>
+              <strong>{{ n.titulo }}</strong>
+              <p>{{ n.texto }}</p>
+              <small>{{ n.quando }}</small>
+            </div>
+          </div>
+        } @empty {
+          <p class="vazio">Nenhuma notificação por enquanto.</p>
+        }
+      </div>
+    }
+  </div>
+}

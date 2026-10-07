@@ -7,11 +7,11 @@ import {
 } from 'typeorm';
 import { Escola } from '../escola/escola.entity';
 
-export type PerfilUsuario = 'admin' | 'escola' | 'professor' | 'responsavel';
+export type PerfilUsuario = 'admin' | 'escola' | 'professor' | 'responsavel' | 'aluno';
 
 /**
  * Tabela `usuario` — centraliza o login de todos os perfis.
- * Aluno NAO loga: o enum do banco so tem admin, escola, professor e responsavel.
+ * O aluno passou a ter login proprio (sql/painel-escola.sql).
  */
 @Entity('usuario')
 export class Usuario {
@@ -27,13 +27,17 @@ export class Usuario {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'escola', 'professor', 'responsavel'],
+    enum: ['admin', 'escola', 'professor', 'responsavel', 'aluno'],
   })
   perfil!: PerfilUsuario;
 
   /** Null para admin da Linka, que nao pertence a nenhuma escola. */
   @Column({ name: 'escola_id', nullable: true })
   escolaId!: number | null;
+
+  /** false bloqueia o login (ex.: professor desativado pela escola). */
+  @Column({ default: true })
+  ativo!: boolean;
 
   @ManyToOne(() => Escola, { nullable: true })
   @JoinColumn({ name: 'escola_id' })

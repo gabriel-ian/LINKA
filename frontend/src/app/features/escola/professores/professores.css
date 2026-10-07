@@ -1,0 +1,45 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.filtros {
+  display: flex;
+  gap: 16px;
+}
+
+.busca {
+  flex: 1;
+}
+
+.pilulas {
+  display: flex;
+  gap: 12px;
+}
+
+.tabela-cartao {
+  padding: 14px 20px;
+  overflow-x: auto;
+}
+
+.quebra {
+  white-space: normal;
+}
+
+.perigo {
+  color: var(--cor-erro);
+}
+
+.rodape-lista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.alerta-erro {
+  margin: 0;
+}

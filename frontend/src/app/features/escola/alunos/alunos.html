@@ -1,0 +1,100 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Alunos NEE</h1>
+    <p>{{ alunosNee().length }} alunos com necessidades educacionais especiais na plataforma</p>
+  </header>
+
+  <div class="indicadores">
+    @for (d of destaques; track d; let i = $index) {
+      <div class="indicador" [class]="'c-' + coresDestaque[i]">
+        <span>{{ d }}</span>
+        <strong>{{ porDiagnostico().destaques[i] }}</strong>
+        <small>alunos</small>
+      </div>
+    }
+    <div class="indicador c-roxo">
+      <span>Outros</span>
+      <strong>{{ porDiagnostico().outros }}</strong>
+      <small class="corta">{{ porDiagnostico().nomesOutros }}</small>
+    </div>
+  </div>
+
+  <div class="filtros">
+    <label class="campo-p busca">
+      <input
+        aria-label="Buscar aluno"
+        placeholder="Buscar aluno por nome ou CGM..."
+        [value]="busca()"
+        (input)="busca.set($any($event.target).value); pagina.set(0)"
+      />
+    </label>
+    <label class="campo-p seletor">
+      <select aria-label="Turma" [value]="turma()" (change)="turma.set($any($event.target).value); pagina.set(0)">
+        <option value="">Turma: Todas</option>
+        @for (t of turmas(); track t.id) {
+          <option [value]="t.id">{{ t.nome }}</option>
+        }
+      </select>
+    </label>
+    <label class="campo-p seletor">
+      <select aria-label="Diagnóstico" [value]="diagnostico()" (change)="diagnostico.set($any($event.target).value); pagina.set(0)">
+        <option value="">Diagnóstico: Todos</option>
+        @for (d of diagnosticos(); track d) {
+          <option [value]="d">{{ d }}</option>
+        }
+      </select>
+    </label>
+    <a class="bt bt-primario" routerLink="/escola/cadastro/aluno">+ Cadastrar aluno</a>
+  </div>
+
+  <section class="cartao tabela-cartao">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Aluno(a)</th>
+          <th style="width: 90px">Turma</th>
+          <th style="width: 140px">Diagnóstico</th>
+          <th style="width: 215px">Desempenho semana</th>
+          <th style="width: 130px">Situação</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of visiveis(); track a.id) {
+          <tr [class]="'c-' + corSituacao(a.situacao)">
+            <td>
+              <a class="pessoa" [routerLink]="['/escola/alunos', a.id]">
+                <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(a.nome) }}</span>
+                <div>
+                  <strong>{{ a.nome }}</strong>
+                  <small>{{ a.cgm ? 'CGM ' + a.cgm : 'Sem CGM' }}</small>
+                </div>
+              </a>
+            </td>
+            <td>{{ a.turma?.codigo ?? '—' }}</td>
+            <td><span class="pilula inativa">{{ a.diagnosticos[0] || 'Não informado' }}</span></td>
+            <td>
+              <span class="desempenho">
+                <span class="progresso"><span [style.width.%]="a.desempenhoSemana ?? 0"></span></span>
+                <b>{{ pct(a.desempenhoSemana) }}</b>
+              </span>
+            </td>
+            <td><span class="pilula-cor">{{ rotuloSituacao[a.situacao] }}</span></td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="vazio">Nenhum aluno NEE neste filtro.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <div class="rodape-lista">
+    <span>Mostrando {{ visiveis().length }} de {{ filtrados().length }} alunos - ordenados por prioridade de atenção</span>
+    @if (totalPaginas() > 1) {
+      <button type="button" class="bt bt-secundario" (click)="proximaPagina()">
+        {{ pagina() + 1 < totalPaginas() ? 'Próxima página' : 'Voltar ao início' }}
+      </button>
+    }
+  </div>
+</div>

@@ -1,0 +1,66 @@
+.diagnosticos {
+  display: grid;
+  grid-template-columns: repeat(3, 225px);
+  gap: 17px 16px;
+}
+
+.diagnostico {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--cor-texto);
+  border-radius: var(--raio);
+  background: #fff;
+  color: var(--cor-texto);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.diagnostico[aria-pressed='true'] {
+  border: 2px solid var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.laudo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border: 1.5px dashed var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-fundo-painel);
+}
+
+.laudo.arrastando {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria-clara);
+}
+
+.laudo.invalido {
+  border-color: var(--cor-erro);
+}
+
+.laudo div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.laudo strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.laudo .msg-erro {
+  color: var(--cor-erro);
+  font-weight: 600;
+}
+
+.centro {
+  text-align: center;
+}

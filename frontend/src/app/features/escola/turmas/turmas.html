@@ -1,0 +1,60 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Turmas</h1>
+    <p>{{ contexto.escola()?.nome }} - {{ turmas().length }} turmas cadastradas - ano letivo {{ ano }}</p>
+  </header>
+
+  <div class="filtros">
+    <label class="campo-p busca">
+      <input
+        aria-label="Buscar turma"
+        placeholder="Buscar turma, série ou professor..."
+        [value]="busca()"
+        (input)="busca.set($any($event.target).value)"
+      />
+    </label>
+    <label class="campo-p serie">
+      <select aria-label="Série" [value]="serie()" (change)="serie.set($any($event.target).value)">
+        <option value="">Série: Todas</option>
+        @for (s of series(); track s) {
+          <option [value]="s">{{ s }}</option>
+        }
+      </select>
+    </label>
+    <a class="bt bt-primario" routerLink="/escola/turmas/nova">+ Nova turma</a>
+  </div>
+
+  <div class="grade">
+    @for (t of visiveis(); track t.id; let i = $index) {
+      <article class="cartao turma" [class]="'c-' + cor(i)">
+        <div class="topo">
+          <span class="selo-cor">{{ t.codigo }}</span>
+          <div>
+            <h2>{{ t.nome }}</h2>
+            <p>{{ t.professores[0]?.nome ?? 'Sem professor vinculado' }}</p>
+          </div>
+        </div>
+        <p class="totais">{{ t.totalAlunos }} alunos · {{ t.totalNee }} NEE</p>
+        <div class="barra-linha">
+          <span class="progresso"><span [style.width.%]="t.desempenho ?? 0"></span></span>
+          <span class="pilula-cor">{{ pct(t.desempenho) }}</span>
+        </div>
+        <hr class="divisor" />
+        <a class="link-acao" [routerLink]="['/escola/turmas', t.id]">Ver turma</a>
+      </article>
+    } @empty {
+      <p class="vazio">
+        {{ carregando() ? 'Carregando...' : busca() || serie() ? 'Nenhuma turma com esse filtro.' : 'Nenhuma turma cadastrada ainda.' }}
+      </p>
+    }
+  </div>
+
+  @if (filtradas().length > 6) {
+    <div class="rodape-lista">
+      <span>Mostrando {{ visiveis().length }} de {{ filtradas().length }} turmas</span>
+      <button type="button" class="bt bt-secundario" (click)="todas.set(!todas())">
+        {{ todas() ? 'Mostrar menos' : 'Ver todas as turmas' }}
+      </button>
+    </div>
+  }
+</div>

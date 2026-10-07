@@ -1,0 +1,89 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Professores</h1>
+    <p>{{ contagem().ativo }} professores ativos de {{ contagem().todos }} cadastrados</p>
+  </header>
+
+  <div class="filtros">
+    <label class="campo-p busca">
+      <input
+        aria-label="Buscar professor"
+        placeholder="Buscar por nome, e-mail ou disciplina..."
+        [value]="busca()"
+        (input)="busca.set($any($event.target).value); pagina.set(0)"
+      />
+    </label>
+    <a class="bt bt-primario" routerLink="/escola/cadastro/professor">+ Cadastrar professor</a>
+  </div>
+
+  <div class="pilulas">
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'todos'" (click)="filtrar('todos')">Todos ({{ contagem().todos }})</button>
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'ativo'" (click)="filtrar('ativo')">Ativos ({{ contagem().ativo }})</button>
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'pendente'" (click)="filtrar('pendente')">Pendentes ({{ contagem().pendente }})</button>
+    <button type="button" class="pilula" [class.selecionada]="filtro() === 'inativo'" (click)="filtrar('inativo')">Inativos ({{ contagem().inativo }})</button>
+  </div>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  <section class="cartao tabela-cartao">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Professor(a)</th>
+          <th style="width: 150px">Disciplina</th>
+          <th style="width: 120px">Turmas</th>
+          <th style="width: 130px">Status</th>
+          <th style="width: 130px">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of visiveis(); track p.id; let i = $index) {
+          <tr>
+            <td>
+              <div class="pessoa" [class]="'c-' + (p.status === 'inativo' ? 'cinza' : cor(i))">
+                <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(p.nome) }}</span>
+                <div>
+                  <strong>{{ p.nome }}</strong>
+                  <small>{{ p.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="quebra">{{ juntar(p.disciplinas) || '—' }}</td>
+            <td>{{ p.turmas.length ? p.turmas.map(t => t.codigo).join(', ') : '—' }}</td>
+            <td>
+              <span class="pilula" [class]="p.status === 'ativo' ? 'ativa' : p.status === 'pendente' ? 'pendente' : 'inativa'">
+                {{ rotuloStatus[p.status] }}
+              </span>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="link-acao"
+                [class.perigo]="p.status !== 'inativo'"
+                [disabled]="alterando() === p.id"
+                (click)="alternarAtivo(p)"
+              >
+                {{ p.status === 'inativo' ? 'Reativar' : 'Desativar' }}
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="vazio">Nenhum professor neste filtro.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <div class="rodape-lista">
+    <span>Mostrando {{ visiveis().length }} de {{ filtrados().length }} professores</span>
+    @if (totalPaginas() > 1) {
+      <button type="button" class="bt bt-secundario" (click)="proximaPagina()">
+        {{ pagina() + 1 < totalPaginas() ? 'Próxima página' : 'Voltar ao início' }}
+      </button>
+    }
+  </div>
+</div>

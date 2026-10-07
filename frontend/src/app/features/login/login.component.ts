@@ -11,9 +11,9 @@ import {
   SeletorPerfil,
 } from '../../shared/seletor-perfil/seletor-perfil';
 
-/** Perfil do backend que corresponde a cada botao. Aluno ainda nao existe no backend. */
-const PERFIL_BACKEND: Record<PerfilEntrada, PerfilUsuario | null> = {
-  aluno: null,
+/** Perfil do backend que corresponde a cada botao. */
+const PERFIL_BACKEND: Record<PerfilEntrada, PerfilUsuario> = {
+  aluno: 'aluno',
   familia: 'responsavel',
   professor: 'professor',
   escola: 'escola',
@@ -105,11 +105,11 @@ export class LoginComponent {
         break;
 
       case 'escola':
-        this.router.navigate(['/escolas']);
+        this.router.navigate(['/escola']);
         break;
 
       default:
-        // professor e responsavel ainda nao tem tela propria.
+        // professor, responsavel e aluno ainda nao tem tela propria.
         this.router.navigate(['/dashboard']);
     }
   }

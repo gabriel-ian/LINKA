@@ -70,7 +70,7 @@ export interface Desativacao {
   observacao?: string;
 }
 
-export type PerfilUsuario = 'admin' | 'escola' | 'professor' | 'responsavel';
+export type PerfilUsuario = 'admin' | 'escola' | 'professor' | 'responsavel' | 'aluno';
 
 export interface LoginResponse {
   access_token: string;

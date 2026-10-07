@@ -1,0 +1,59 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.corta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filtros {
+  display: flex;
+  gap: 16px;
+}
+
+.busca {
+  flex: 1;
+}
+
+.seletor {
+  width: 180px;
+}
+
+.seletor:nth-of-type(3) {
+  width: 220px;
+}
+
+.tabela-cartao {
+  padding: 14px 20px;
+  overflow-x: auto;
+}
+
+.pessoa {
+  color: inherit;
+  text-decoration: none;
+}
+
+.desempenho {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.desempenho b {
+  min-width: 40px;
+  color: var(--c-texto);
+  font-weight: 600;
+}
+
+.rodape-lista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 500;
+}

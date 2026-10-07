@@ -1,0 +1,113 @@
+<div class="pagina">
+  <a class="voltar" routerLink="/escola/alunos">&lt; Voltar para alunos NEE</a>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (aluno(); as a) {
+    <header class="painel-cabecalho">
+      <h1>{{ a.nome }}</h1>
+      <p>{{ subtitulo(a) }}</p>
+    </header>
+
+    <div class="indicadores">
+      <div class="indicador" [class]="'c-' + corSituacao(a.situacao)">
+        <span>Desempenho semana</span>
+        <strong>{{ pct(a.desempenhoSemana) }}</strong>
+        <small>{{ a.situacao === 'sem-dados' ? 'sem tarefas na semana' : rotuloSituacao[a.situacao].toLowerCase() }}</small>
+      </div>
+      <div class="indicador c-azul">
+        <span>Tarefas no mês</span>
+        <strong>{{ a.tarefasMes.concluidas }}/{{ a.tarefasMes.total }}</strong>
+        <small>concluídas</small>
+      </div>
+      <div class="indicador c-verde">
+        <span>Tarefas adaptadas</span>
+        <strong>{{ a.tarefasAdaptadasNoMes }}</strong>
+        <small>pela IA no mês</small>
+      </div>
+      <div class="indicador c-roxo">
+        <span>Sequência</span>
+        <strong>{{ a.maiorSequencia }} {{ a.maiorSequencia === 1 ? 'dia' : 'dias' }}</strong>
+        <small>maior do mês</small>
+      </div>
+    </div>
+
+    <div class="blocos">
+      <section class="cartao bloco">
+        <h2>Perfil de aprendizagem</h2>
+        <dl>
+          <dt>Diagnóstico</dt>
+          <dd>
+            {{ a.diagnosticos.length ? juntar(a.diagnosticos) : 'Não informado' }}
+            @if (a.laudo) {
+              - laudo anexado em {{ dataBr(a.laudo.enviadoEm) }}
+              <button type="button" class="link-acao" [disabled]="baixando()" (click)="baixarLaudo(a)">
+                {{ baixando() ? 'Baixando...' : 'Baixar laudo' }}
+              </button>
+            }
+          </dd>
+          <dt>Maiores dificuldades</dt>
+          <dd>{{ a.dificuldades || 'Ainda não preenchido.' }}</dd>
+          <dt>Pontos fortes</dt>
+          <dd>{{ a.pontosFortes || 'Ainda não preenchido.' }}</dd>
+        </dl>
+        @if (a.interesses.length) {
+          <div class="interesses">
+            @for (i of a.interesses; track i; let n = $index) {
+              <span class="pilula-cor" [class]="'c-' + cor(n + 1)">{{ i }}</span>
+            }
+          </div>
+        }
+      </section>
+
+      <div class="coluna">
+        <section class="cartao bloco">
+          <h2>Professores</h2>
+          @for (p of a.professores; track p.id; let i = $index) {
+            <div class="pessoa" [class]="'c-' + cor(i)">
+              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(p.nome) }}</span>
+              <div>
+                <strong>{{ p.nome }}</strong>
+                <small>{{ juntar(p.disciplinas) || 'Sem disciplina' }}</small>
+              </div>
+            </div>
+          } @empty {
+            <p class="vazio">{{ a.turma ? 'A turma ainda não tem professores.' : 'Aluno sem turma.' }}</p>
+          }
+        </section>
+
+        <section class="cartao bloco">
+          <h2>Responsável</h2>
+          @for (r of a.responsaveis; track r.email) {
+            <div class="pessoa c-roxo">
+              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(r.nome ?? '?') }}</span>
+              <div>
+                <strong>{{ r.nome }}</strong>
+                <small>{{ r.parentesco ? r.parentesco + ' - ' : '' }}{{ r.email }}</small>
+              </div>
+            </div>
+            @if (r.telefone) {
+              <dl>
+                <dt>Telefone</dt>
+                <dd>{{ r.telefone }}</dd>
+              </dl>
+            }
+            <span class="pilula" [class]="r.acessou ? 'ativa' : 'pendente'">
+              {{ r.acessou ? 'Acompanha pela Linka' : 'Aguardando primeiro acesso' }}
+            </span>
+          } @empty {
+            <p class="vazio">Nenhum responsável vinculado.</p>
+          }
+        </section>
+      </div>
+    </div>
+
+    @if (a.turma) {
+      <div class="acoes">
+        <a class="bt bt-primario" routerLink="/escola/relatorios" [queryParams]="{ turmaId: a.turma.id }">Ver relatório da turma</a>
+      </div>
+    }
+  }
+</div>

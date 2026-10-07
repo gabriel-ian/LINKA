@@ -1,0 +1,87 @@
+<div class="pagina">
+  <a class="voltar" routerLink="/escola/turmas">&lt; Voltar para turmas</a>
+
+  <header class="painel-cabecalho">
+    <h1>Nova turma</h1>
+    <p>Cadastre a turma e vincule os professores</p>
+  </header>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  <form class="cartao" (ngSubmit)="salvar()" novalidate>
+    <div class="grade-campos" style="--colunas: 4">
+      <label class="campo-p">
+        Série
+        <select name="serie" [(ngModel)]="serie">
+          @for (s of series; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </label>
+      <label class="campo-p" [class.invalido]="erroLetra()">
+        Turma
+        <input name="letra" maxlength="5" [(ngModel)]="letra" placeholder="Ex.: C" />
+        @if (erroLetra()) {
+          <span class="msg-erro">Informe a letra da turma.</span>
+        }
+      </label>
+      <label class="campo-p">
+        Turno
+        <select name="turno" [(ngModel)]="turno">
+          <option value="manha">Manhã</option>
+          <option value="tarde">Tarde</option>
+          <option value="noite">Noite</option>
+          <option value="integral">Integral</option>
+        </select>
+      </label>
+      <label class="campo-p">
+        Ano letivo
+        <select name="anoLetivo" [(ngModel)]="anoLetivo">
+          @for (a of anos; track a) {
+            <option [ngValue]="a">{{ a }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="grade-campos">
+      <label class="campo-p">
+        Sala
+        <input name="sala" maxlength="50" [(ngModel)]="sala" placeholder="Ex.: Sala 12" />
+      </label>
+      <label class="campo-p">
+        Limite de alunos
+        <input name="limite" inputmode="numeric" [(ngModel)]="limiteAlunos" placeholder="30" />
+      </label>
+    </div>
+
+    <hr class="divisor" />
+
+    <div>
+      <h2 class="cartao-titulo">Professores</h2>
+      <p class="ajuda">Selecione quem vai lecionar nesta turma</p>
+      <div class="chips">
+        @for (p of opcoes()?.professores ?? []; track p.id) {
+          <button type="button" class="chip" [attr.aria-pressed]="selecionados().has(p.id)" (click)="alternar(p.id)">
+            {{ p.nome }}{{ p.disciplinas.length ? ' - ' + p.disciplinas.join('/') : '' }}
+          </button>
+        } @empty {
+          <p class="ajuda">
+            Nenhum professor ativo. <a class="link-acao" routerLink="/escola/cadastro/professor">Cadastrar professor</a>
+          </p>
+        }
+      </div>
+    </div>
+
+    <p class="aviso-caixa azul">Depois de salvar, você pode adicionar alunos pela tela de cadastro de aluno.</p>
+
+    <div class="acoes">
+      <a class="bt bt-secundario" routerLink="/escola/turmas">Cancelar</a>
+      <button type="submit" class="bt bt-primario" [disabled]="salvando()">
+        {{ salvando() ? 'Salvando...' : 'Salvar turma' }}
+      </button>
+    </div>
+  </form>
+</div>

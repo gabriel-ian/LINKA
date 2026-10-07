@@ -85,10 +85,62 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'escolas',
-    loadComponent: () =>
-      import('./features/escola/escola-list').then((m) => m.EscolaList),
-    canActivate: [authGuard],
+    path: 'escola',
+    canActivate: [authGuard, perfilGuard('escola')],
+    loadComponent: () => import('./features/escola/escola-layout').then((m) => m.EscolaLayout),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/escola/painel/painel').then((m) => m.EscolaPainel),
+      },
+      {
+        path: 'turmas',
+        loadComponent: () => import('./features/escola/turmas/turmas').then((m) => m.EscolaTurmas),
+      },
+      {
+        path: 'turmas/nova',
+        loadComponent: () =>
+          import('./features/escola/turma-nova/turma-nova').then((m) => m.EscolaTurmaNova),
+      },
+      {
+        path: 'turmas/:id',
+        loadComponent: () =>
+          import('./features/escola/turma-detalhe/turma-detalhe').then((m) => m.EscolaTurmaDetalhe),
+      },
+      {
+        path: 'professores',
+        loadComponent: () =>
+          import('./features/escola/professores/professores').then((m) => m.EscolaProfessores),
+      },
+      {
+        path: 'alunos',
+        loadComponent: () => import('./features/escola/alunos/alunos').then((m) => m.EscolaAlunos),
+      },
+      {
+        path: 'alunos/:id',
+        loadComponent: () =>
+          import('./features/escola/aluno-perfil/aluno-perfil').then((m) => m.EscolaAlunoPerfil),
+      },
+      {
+        path: 'relatorios',
+        loadComponent: () =>
+          import('./features/escola/relatorios/relatorios').then((m) => m.EscolaRelatorios),
+      },
+      {
+        path: 'cadastro/professor',
+        loadComponent: () =>
+          import('./features/escola/cadastro-professor/cadastro-professor').then(
+            (m) => m.EscolaCadastroProfessor,
+          ),
+      },
+      {
+        path: 'cadastro/aluno',
+        loadComponent: () =>
+          import('./features/escola/cadastro-aluno/cadastro-aluno').then((m) => m.EscolaCadastroAluno),
+      },
+    ],
   },
+  // Endereco antigo do painel provisorio da escola.
+  { path: 'escolas', redirectTo: 'escola', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
 ];

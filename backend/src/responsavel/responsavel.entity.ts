@@ -24,6 +24,10 @@ export class Responsavel {
   @Column({ type: 'varchar', length: 20, nullable: true })
   telefone!: string | null;
 
+  /** Ex.: "Mãe", "Pai", "Avó". */
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  parentesco!: string | null;
+
   @Column({ name: 'usuario_id', nullable: true })
   usuarioId!: number | null;
 

@@ -1,0 +1,99 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Relatórios</h1>
+    <p>Visão institucional do uso da Linka - {{ nomeMes(mes()) }}</p>
+  </header>
+
+  <div class="filtros">
+    <label class="campo-p">
+      Período
+      <select [value]="mes()" (change)="filtrar('mes', $any($event.target).value)">
+        @for (m of meses; track m) {
+          <option [value]="m">{{ nomeMes(m) }}</option>
+        }
+      </select>
+    </label>
+    <label class="campo-p">
+      Turma
+      <select [value]="turmaId()" (change)="filtrar('turmaId', $any($event.target).value)">
+        <option value="">Todas as turmas</option>
+        @for (t of opcoes()?.turmas ?? []; track t.id) {
+          <option [value]="t.id" [selected]="t.id + '' === turmaId()">{{ t.nome }}</option>
+        }
+      </select>
+    </label>
+    <label class="campo-p">
+      Diagnóstico
+      <select [value]="diagnosticoId()" (change)="filtrar('diagnosticoId', $any($event.target).value)">
+        <option value="">Todos</option>
+        @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
+          <option [value]="d.id">{{ d.nome }}</option>
+        }
+      </select>
+    </label>
+    <button type="button" class="bt bt-secundario exportar" (click)="exportar()">Exportar PDF</button>
+  </div>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (relatorio(); as r) {
+    <div class="indicadores">
+      <div class="indicador c-azul">
+        <span>Taxa de conclusão</span>
+        <strong>{{ pct(r.taxaConclusao) }}</strong>
+        <small>média da escola</small>
+      </div>
+      <div class="indicador c-verde">
+        <span>Entregas no prazo</span>
+        <strong>{{ pct(r.entregasNoPrazo) }}</strong>
+        <small>das tarefas vencidas</small>
+      </div>
+      <div class="indicador c-laranja">
+        <span>Tarefas criadas</span>
+        <strong>{{ r.tarefasCriadas }}</strong>
+        <small>este mês</small>
+      </div>
+      <div class="indicador c-roxo">
+        <span>Tarefas adaptadas</span>
+        <strong>{{ r.tarefasAdaptadas }}</strong>
+        <small>pela IA da Linka</small>
+      </div>
+    </div>
+
+    <div class="blocos">
+      <section class="cartao bloco">
+        <h2>Conclusão de tarefas por turma</h2>
+        @for (t of r.porTurma; track t.id; let i = $index) {
+          <div class="turma" [class]="'c-' + cor(i)">
+            <span class="rotulo">{{ t.nome }} <b>{{ pct(t.taxa) }}</b></span>
+            <span class="progresso"><span [style.width.%]="t.taxa ?? 0"></span></span>
+          </div>
+        } @empty {
+          <p class="vazio">Nenhuma turma cadastrada.</p>
+        }
+      </section>
+
+      <section class="cartao bloco">
+        <h2>Evolução da taxa de conclusão</h2>
+        <div class="grafico" role="img" [attr.aria-label]="'Taxa de conclusão nos últimos ' + r.evolucao.length + ' meses'">
+          @for (e of r.evolucao; track e.mes; let ultimo = $last) {
+            <div class="coluna" [class.atual]="ultimo">
+              <span class="valor">{{ pct(e.taxa) }}</span>
+              <span class="barra" [style.height.%]="e.taxa ?? 0"></span>
+              <span class="mes">{{ abreviar(e.mes) }}</span>
+            </div>
+          }
+        </div>
+        <p class="aviso-caixa verde">
+          @if (variacao(); as v) {
+            {{ v.pontos >= 0 ? '+' : '' }}{{ v.pontos }} pontos desde {{ v.desde }}.
+          } @else {
+            Ainda não há meses suficientes com tarefas para comparar a evolução.
+          }
+        </p>
+      </section>
+    </div>
+  }
+</div>

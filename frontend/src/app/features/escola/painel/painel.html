@@ -1,0 +1,74 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Painel da Escola</h1>
+    <p>{{ contexto.escola()?.nome }} - Coordenação - {{ mes }}</p>
+  </header>
+
+  <p class="status">
+    A plataforma está operando normalmente. {{ alunosNee().length }} alunos NEE ativos e
+    {{ contexto.professores().length }} professores cadastrados.
+  </p>
+
+  <div class="indicadores grandes">
+    <div class="indicador">
+      <span>Alunos NEE ativos</span>
+      <strong>{{ alunosNee().length }}</strong>
+      <small>na plataforma</small>
+    </div>
+    <div class="indicador">
+      <span>Professores ativos</span>
+      <strong>{{ professoresAtivos() }}</strong>
+      <small>de {{ contexto.professores().length }} cadastrados</small>
+    </div>
+    <div class="indicador">
+      <span>Turmas cadastradas</span>
+      <strong>{{ turmas().length }}</strong>
+      <small>ano letivo {{ ano }}</small>
+    </div>
+    <div class="indicador">
+      <span>Taxa de conclusão</span>
+      <strong>{{ pct(taxa()) }}</strong>
+      <small>média da escola</small>
+    </div>
+  </div>
+
+  <div class="blocos">
+    <section class="cartao bloco turmas">
+      <h2><img src="assets/escola/icone-grafico.svg" alt="" /> Desempenho por turma, alunos NEE</h2>
+      @for (t of turmas().slice(0, 4); track t.id; let i = $index) {
+        <a class="linha" [class]="'c-' + cor(i)" [routerLink]="['/escola/turmas', t.id]">
+          <span class="selo-cor">{{ t.codigo }}</span>
+          <span class="texto">
+            <strong>{{ t.nome }}</strong> - {{ t.totalNee }} alunos NEE
+            <br />{{ t.professores[0]?.nome ?? 'Sem professor vinculado' }}
+            <span class="barra-linha">
+              <span class="progresso"><span [style.width.%]="t.desempenho ?? 0"></span></span>
+              <span class="pilula-cor">{{ pct(t.desempenho) }}</span>
+            </span>
+          </span>
+        </a>
+      } @empty {
+        <p class="vazio">
+          Nenhuma turma cadastrada. <a class="link-acao" routerLink="/escola/turmas/nova">Criar turma</a>
+        </p>
+      }
+    </section>
+
+    <section class="cartao bloco atencao">
+      <h2><img src="assets/escola/icone-alerta.svg" alt="" /> Alunos que precisam de atenção</h2>
+      @for (a of atencao(); track a.id) {
+        <a class="linha c-laranja" [routerLink]="['/escola/alunos', a.id]">
+          <span class="selo-cor">{{ iniciais(a.nome) }}</span>
+          <span class="texto">
+            <strong>{{ a.nome }}</strong>
+            <br />{{ a.turma?.codigo ?? 'Sem turma' }} - {{ a.diagnosticos[0] || 'NEE' }} - {{ pct(a.desempenhoSemana) }}
+            <br />esta semana
+          </span>
+          <span class="pilula-cor">Atenção</span>
+        </a>
+      } @empty {
+        <p class="vazio">Nenhum aluno abaixo de 50% esta semana.</p>
+      }
+    </section>
+  </div>
+</div>

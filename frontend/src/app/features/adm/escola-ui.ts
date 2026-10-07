@@ -38,10 +38,14 @@ export function cidadeUf(e: Pick<Escola, 'cidade' | 'uf'>): string {
   return [e.cidade, e.uf].filter(Boolean).join(' - ');
 }
 
-/** "2026-06-02" ou ISO completo -> "02/06/2026". */
+/**
+ * "2026-06-02" -> "02/06/2026". Data com hora (ISO em UTC) e convertida
+ * para o fuso local antes: cortar a string mostraria o dia seguinte a noite.
+ */
 export function dataBr(valor: string | null | undefined): string {
   if (!valor) return '';
-  const [ano, mes, dia] = valor.slice(0, 10).split('-');
+  if (valor.length > 10) return new Date(valor).toLocaleDateString('pt-BR');
+  const [ano, mes, dia] = valor.split('-');
   return `${dia}/${mes}/${ano}`;
 }
 

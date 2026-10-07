@@ -1,0 +1,70 @@
+/* Compartilhado pelos cadastros de professor e aluno. */
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.alerta-erro,
+.aviso-caixa {
+  margin: 0;
+}
+
+.aviso-caixa {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ajuda {
+  margin: 4px 0 18px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.turmas {
+  margin-top: 16px;
+}
+
+.nova {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nova input {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--cor-primaria);
+  border-radius: 59px;
+  font-size: 14px;
+  outline: none;
+}
+
+.aviso-caixa.roxo {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.senha-provisoria {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 560px;
+  margin: 0 auto 18px;
+  padding: 16px 20px;
+  border: 1px dashed var(--cor-alerta);
+  border-radius: 14px;
+  background: var(--cor-alerta-fundo);
+  color: var(--cor-alerta);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.senha-provisoria code {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--cor-titulo);
+}

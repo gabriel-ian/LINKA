@@ -568,3 +568,223 @@ button.pilula.selecionada {
   text-align: center;
   font-size: 15px;
 }
+
+/* ---------- Cores por turma/situacao (paleta do Figma) ---------- */
+
+.c-azul { --c-fundo: var(--cor-primaria-clara); --c-texto: var(--cor-azul-forte); --c-barra: var(--cor-azul-forte); }
+.c-verde { --c-fundo: var(--cor-sucesso-fundo); --c-texto: #065f46; --c-barra: #059669; }
+.c-laranja { --c-fundo: var(--cor-alerta-fundo); --c-texto: var(--cor-alerta); --c-barra: #f2620f; }
+.c-roxo { --c-fundo: #f3e8ff; --c-texto: #7c3aed; --c-barra: #7c3aed; }
+.c-cinza { --c-fundo: var(--cor-fundo-painel); --c-texto: var(--cor-texto); --c-barra: #9aa1a9; }
+
+.selo-cor {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--tam, 45px);
+  height: var(--tam, 45px);
+  border-radius: var(--raio-selo, 10px);
+  background: var(--c-fundo);
+  color: var(--c-texto);
+  font-size: var(--fonte-selo, 20px);
+  font-weight: 800;
+}
+
+.pilula-cor {
+  display: inline-flex;
+  padding: 3px 12px;
+  border-radius: 59px;
+  background: var(--c-fundo);
+  color: var(--c-texto);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.progresso {
+  flex: 1;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--cor-fundo-painel);
+}
+
+.progresso > span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--c-barra, var(--cor-azul-forte));
+}
+
+/* ---------- Indicadores (cards de numero) ---------- */
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 118px;
+  padding: 14px 16px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.indicador span {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.indicador strong {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--c-texto, var(--cor-primaria));
+}
+
+.indicador small {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ---------- Navegacao e listas ---------- */
+
+.voltar {
+  align-self: flex-start;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-primaria);
+  text-decoration: none;
+}
+
+.voltar:hover {
+  text-decoration: underline;
+}
+
+.dados-grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 20px;
+  margin: 0;
+}
+
+.dados-grade dt {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-borda);
+}
+
+.dados-grade dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+  overflow-wrap: anywhere;
+}
+
+.pessoa {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pessoa strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.pessoa small {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---------- Chips selecionaveis (professores, disciplinas, turmas) ---------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  padding: 6px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 59px;
+  background: #fff;
+  color: var(--cor-texto);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+/* ---------- Etapas (1 Dados - 2 Confirmacao - 3 Concluido) ---------- */
+
+.etapas {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.etapas li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.etapas li + li::before {
+  content: '';
+  width: 40px;
+  height: 1px;
+  margin-right: 0;
+  background: var(--cor-linha);
+}
+
+.etapas .num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--cor-texto);
+  border-radius: 50%;
+  font-size: 13px;
+}
+
+.etapas li.feita,
+.etapas li.atual {
+  color: var(--cor-azul-forte);
+}
+
+.etapas li.feita::before,
+.etapas li.atual::before {
+  height: 2px;
+  background: var(--cor-primaria);
+}
+
+.etapas li.feita .num,
+.etapas li.atual .num {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria);
+  color: #fff;
+}

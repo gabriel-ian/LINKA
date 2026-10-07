@@ -1,0 +1,221 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Cadastrar aluno(a)</h1>
+    <p>
+      @switch (etapa()) {
+        @case (1) { Etapa 1 de 3 - dados do aluno e do responsável }
+        @case (2) { Etapa 2 de 3 - confira os dados antes de salvar }
+        @case (3) { Etapa 3 de 3 - concluído }
+      }
+    </p>
+  </header>
+
+  <app-etapas [atual]="etapa()" />
+
+  @if (etapa() === 1) {
+    @if (erroGeral()) {
+      <p class="alerta-erro" role="alert">{{ erroGeral() }}</p>
+    } @else if (erro('nome') || erro('email') || erro('senha') || erro('nascimento') || erro('respNome') || erro('respEmail')) {
+      <p class="alerta-erro" role="alert">Faltam algumas informações. Confira os campos em vermelho.</p>
+    }
+
+    <form class="cartao" (ngSubmit)="continuar()" novalidate>
+      <div>
+        <h2 class="cartao-titulo">Dados do aluno</h2>
+        <p class="ajuda">Preencha com calma - você pode editar depois.</p>
+      </div>
+
+      <div class="grade-campos">
+        <label class="campo-p" [class.invalido]="erro('nome')">
+          Nome completo do aluno(a)
+          <input name="nome" [(ngModel)]="nome" placeholder="Nome do aluno" />
+          @if (erro('nome')) { <span class="msg-erro">{{ erro('nome') }}</span> }
+        </label>
+        <label class="campo-p" [class.invalido]="erro('email')">
+          E-mail (opcional, para o aluno entrar na Linka)
+          <input name="email" type="email" autocomplete="off" [(ngModel)]="email" placeholder="aluno@email.com" />
+          @if (erro('email')) { <span class="msg-erro">{{ erro('email') }}</span> }
+        </label>
+        <label class="campo-p" [class.invalido]="erro('nascimento')">
+          Data de nascimento
+          <input name="nascimento" type="date" [(ngModel)]="nascimento" />
+          @if (erro('nascimento')) { <span class="msg-erro">{{ erro('nascimento') }}</span> }
+        </label>
+        <label class="campo-p">
+          CGM do aluno (ID)
+          <input name="cgm" maxlength="50" [(ngModel)]="cgm" placeholder="Ex.: 3517439" />
+        </label>
+        <label class="campo-p">
+          Turma
+          <select name="turma" [(ngModel)]="turmaId">
+            <option [ngValue]="null">Selecione a turma</option>
+            @for (t of opcoes()?.turmas ?? []; track t.id) {
+              <option [ngValue]="t.id">{{ t.nome }}</option>
+            }
+          </select>
+        </label>
+        <label class="campo-p" [class.invalido]="erro('senha')">
+          Senha
+          <span class="caixa">
+            <input
+              name="senha"
+              [type]="mostrarSenha ? 'text' : 'password'"
+              autocomplete="new-password"
+              [(ngModel)]="senha"
+              [disabled]="!email.trim()"
+              [placeholder]="email.trim() ? 'Mínimo 8 caracteres' : 'Informe o e-mail primeiro'"
+            />
+            <button type="button" (click)="mostrarSenha = !mostrarSenha">{{ mostrarSenha ? 'ocultar' : 'mostrar' }}</button>
+          </span>
+          @if (erro('senha')) { <span class="msg-erro">{{ erro('senha') }}</span> }
+        </label>
+      </div>
+
+      <hr class="divisor" />
+
+      <div>
+        <h2 class="cartao-titulo">Necessidades educacionais</h2>
+        <p class="ajuda">Selecione os diagnósticos que se aplicam - a Linka adapta as tarefas a partir deles</p>
+        <div class="diagnosticos">
+          @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
+            <button type="button" class="diagnostico" [attr.aria-pressed]="diagnosticos().has(d.id)" (click)="alternarDiagnostico(d.id)">
+              {{ d.nome }}
+            </button>
+          }
+          <button type="button" class="diagnostico" [attr.aria-pressed]="prefiroNaoInformar()" (click)="alternarPrefiro()">
+            Prefiro não informar
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="laudo"
+        [class.arrastando]="arrastando()"
+        [class.invalido]="erro('laudo')"
+        (dragover)="$event.preventDefault(); arrastando.set(true)"
+        (dragleave)="arrastando.set(false)"
+        (drop)="soltar($event)"
+      >
+        <div>
+          <strong>Laudo clínico (opcional)</strong>
+          @if (laudo(); as l) {
+            <span>{{ l.name }} - {{ (l.size / 1024 / 1024).toFixed(1) }} MB</span>
+          } @else {
+            <span>Arraste o arquivo aqui ou clique para anexar - PDF ou imagem, até 10 MB</span>
+          }
+          @if (erro('laudo')) { <span class="msg-erro">{{ erro('laudo') }}</span> }
+        </div>
+        @if (laudo()) {
+          <button type="button" class="bt bt-secundario" (click)="laudo.set(null)">Remover</button>
+        } @else {
+          <label class="bt bt-secundario">
+            Anexar laudo
+            <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" hidden (change)="escolherLaudo($any($event.target).files)" />
+          </label>
+        }
+      </div>
+
+      <hr class="divisor" />
+
+      <div>
+        <h2 class="cartao-titulo">Responsável</h2>
+        <p class="ajuda">A família recebe um acesso para acompanhar o aluno</p>
+      </div>
+
+      <div class="grade-campos">
+        <label class="campo-p" [class.invalido]="erro('respNome')">
+          Nome completo do responsável
+          <input name="respNome" [(ngModel)]="respNome" placeholder="Nome do responsável" />
+          @if (erro('respNome')) { <span class="msg-erro">{{ erro('respNome') }}</span> }
+        </label>
+        <label class="campo-p" [class.invalido]="erro('respEmail')">
+          E-mail
+          <input name="respEmail" type="email" autocomplete="off" [(ngModel)]="respEmail" placeholder="familiar@email.com" />
+          @if (erro('respEmail')) { <span class="msg-erro">{{ erro('respEmail') }}</span> }
+        </label>
+        <label class="campo-p">
+          Telefone
+          <input name="respTelefone" type="tel" maxlength="20" [(ngModel)]="respTelefone" placeholder="(00) 00000-0000" />
+        </label>
+        <label class="campo-p">
+          Parentesco
+          <select name="respParentesco" [(ngModel)]="respParentesco">
+            <option value="">Selecione</option>
+            @for (p of parentescos; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="acoes">
+        <a class="bt bt-secundario" routerLink="/escola/alunos">Cancelar</a>
+        <button type="submit" class="bt bt-primario">Continuar</button>
+      </div>
+    </form>
+  }
+
+  @if (etapa() === 2) {
+    <section class="cartao">
+      <h2 class="cartao-titulo">Aluno</h2>
+      <dl class="dados-grade">
+        <div><dt>Nome completo</dt><dd>{{ nome }}</dd></div>
+        <div><dt>Data de nascimento</dt><dd>{{ dataBr(nascimento) || '—' }}</dd></div>
+        <div><dt>CGM</dt><dd>{{ cgm || '—' }}</dd></div>
+        <div><dt>Turma</dt><dd>{{ nomeTurma() }}</dd></div>
+        <div>
+          <dt>Diagnóstico</dt>
+          <dd>{{ prefiroNaoInformar() ? 'Prefiro não informar' : juntar(nomesDiagnosticos()) || 'Nenhum' }}</dd>
+        </div>
+        <div><dt>Laudo clínico</dt><dd>{{ laudo()?.name ?? 'Não anexado' }}</dd></div>
+        <div><dt>Acesso do aluno</dt><dd>{{ email || 'Sem login próprio' }}</dd></div>
+      </dl>
+
+      @if (respNome) {
+        <hr class="divisor" />
+        <h2 class="cartao-titulo">Responsável</h2>
+        <dl class="dados-grade">
+          <div><dt>Nome completo</dt><dd>{{ respNome }}</dd></div>
+          <div><dt>E-mail</dt><dd>{{ respEmail }}</dd></div>
+          <div><dt>Parentesco</dt><dd>{{ respParentesco || '—' }}</dd></div>
+        </dl>
+      }
+
+      <p class="aviso-caixa roxo">
+        A Linka vai montar o perfil de aprendizagem de {{ nome.split(' ')[0] }} a partir do diagnóstico{{
+          respNome ? ', e ' + respNome + ' recebe um acesso para acompanhar a rotina.' : '.'
+        }}
+      </p>
+
+      <div class="acoes">
+        <button type="button" class="bt bt-secundario" (click)="etapa.set(1)">Voltar e editar</button>
+        <button type="button" class="bt bt-primario" [disabled]="salvando()" (click)="confirmarCadastro()">
+          {{ salvando() ? 'Salvando...' : 'Confirmar cadastro' }}
+        </button>
+      </div>
+    </section>
+  }
+
+  @if (etapa() === 3 && criado(); as c) {
+    <app-adm-resultado
+      titulo="Aluno(a) cadastrado(a) com sucesso!"
+      [texto]="c.nome + (c.turma ? ' foi adicionado(a) ao ' + c.turma.nome : ' foi cadastrado(a)') + (c.responsavel ? ' e ' + c.responsavel.nome + ' já pode acompanhar a rotina.' : '.')"
+    >
+      @if (c.responsavel?.senhaProvisoria) {
+        <div extra class="senha-provisoria" role="note">
+          <strong>Acesso da família - anote agora</strong>
+          E-mail: {{ c.responsavel!.email }}
+          <span>Senha provisória: <code>{{ c.responsavel!.senhaProvisoria }}</code></span>
+          Entregue ao responsável. Por segurança, esta senha não será mostrada de novo.
+        </div>
+      } @else if (c.responsavel) {
+        <p extra class="ajuda centro">{{ c.responsavel.nome }} já tinha acesso à Linka; o aluno foi vinculado à mesma conta.</p>
+      }
+      @if (avisoLaudo()) {
+        <p extra class="alerta-erro centro">{{ avisoLaudo() }}</p>
+      }
+      <button type="button" class="bt bt-secundario" (click)="cadastrarOutro()">Cadastrar outro</button>
+      <a class="bt bt-primario" routerLink="/escola/alunos">Ver alunos NEE</a>
+    </app-adm-resultado>
+  }
+</div>

@@ -35,6 +35,11 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais invalidas');
     }
 
+    // Conta desativada (ex.: professor desligado pela escola).
+    if (usuario.ativo === false) {
+      throw new ForbiddenException('Conta desativada');
+    }
+
     // Escola desativada: todos os logins vinculados a ela ficam suspensos.
     // So depois de conferir a senha, para nao revelar o status a terceiros.
     if (usuario.escola && !usuario.escola.ativo) {

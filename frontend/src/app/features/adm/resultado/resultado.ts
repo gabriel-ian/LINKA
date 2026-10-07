@@ -8,6 +8,7 @@ import { Component, input } from '@angular/core';
       <span class="selo" [class.alerta]="tipo() === 'alerta'">{{ tipo() === 'ok' ? 'ok' : '!' }}</span>
       <h2>{{ titulo() }}</h2>
       <p>{{ texto() }}</p>
+      <ng-content select="[extra]" />
       <div class="acoes centro"><ng-content /></div>
     </section>
   `,

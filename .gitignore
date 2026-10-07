@@ -7,3 +7,5 @@ dist
 
 .angular
 frontend/.angular
+# Arquivos enviados (laudos tem dados de saude)
+backend/uploads

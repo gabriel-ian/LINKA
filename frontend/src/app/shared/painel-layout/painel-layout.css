@@ -1,4 +1,4 @@
-.adm {
+.painel {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -39,9 +39,23 @@
 }
 
 .barra-titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
   margin: 0;
   font-size: 36px;
   font-weight: 600;
+}
+
+.barra-titulo.pequeno {
+  font-size: 32px;
+  text-transform: uppercase;
+}
+
+.barra-titulo small {
+  font-size: 15px;
+  font-weight: 400;
+  text-transform: none;
 }
 
 .barra-icones {
@@ -94,9 +108,14 @@
 
 .menu-titulo {
   margin: 0 0 6px;
-  font-size: 36px;
+  font-size: var(--secao-tam);
   font-weight: 600;
   line-height: 40px;
+}
+
+/* A margem do item anterior colapsa com esta: 55px = 15 do item + 40 do Figma. */
+.menu-titulo.seguinte {
+  margin-top: 55px;
 }
 
 /* As posicoes dos icones vem do Figma (borda externa); --b desconta a borda. */
@@ -107,8 +126,8 @@
   align-items: center;
   width: 280px;
   height: 45px;
-  margin-bottom: 16px;
-  padding-left: calc(44px - var(--b));
+  margin-bottom: var(--gap-itens);
+  padding-left: calc(var(--rotulo-x) - var(--b));
   border: var(--b) solid var(--cor-borda);
   border-radius: var(--raio);
   background: #fff;
@@ -135,31 +154,20 @@
   translate: calc(-1 * var(--b)) calc(-1 * var(--b));
 }
 
-.icone-cadastrar img { left: 17px; top: 14px; }
-.icone-listar img { left: 17px; top: 15px; }
-.icone-buscar img { left: 17px; top: 12px; }
-.icone-id img { left: 17px; top: 13px; }
-.icone-id .id { left: 23.75px; top: 19.75px; }
-.icone-atualizar img,
-.icone-reativar img { left: 18.5px; top: 14.5px; }
-.icone-desativar img { left: 18px; top: 13px; }
-
-.icone-reativar .traco {
-  left: 20.27px;
-  top: 20.72px;
-  rotate: -33.69deg;
+.icone img {
+  display: block;
 }
 
 /* "Visao geral": quatro retangulos desenhados como no Figma. */
-.icone-visao i {
+.icone i {
   width: 5.625px;
   border: 2px solid currentColor;
 }
 
-.icone-visao i:nth-child(1) { left: 18px; top: 27.19px; height: 2.813px; }
-.icone-visao i:nth-child(2) { left: 18px; top: 15px; height: 9.375px; }
-.icone-visao i:nth-child(3) { left: 27.38px; top: 15px; height: 2.813px; }
-.icone-visao i:nth-child(4) { left: 27.38px; top: 20.63px; height: 9.375px; }
+.icone .v1 { left: var(--visao-x); top: 27.19px; height: 2.813px; }
+.icone .v2 { left: var(--visao-x); top: 15px; height: 9.375px; }
+.icone .v3 { left: calc(var(--visao-x) + 9.38px); top: 15px; height: 2.813px; }
+.icone .v4 { left: calc(var(--visao-x) + 9.38px); top: 20.63px; height: 9.375px; }
 
 .conteudo {
   flex: 1;
@@ -282,6 +290,8 @@
 
 .ponto.laranja { background: #ea6819; }
 .ponto.cinza { background: var(--cor-texto); }
+.ponto.vermelho { background: var(--cor-erro); }
+.ponto.verde { background: var(--cor-sucesso); }
 
 @media (max-width: 1000px) {
   .menu {

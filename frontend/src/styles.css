@@ -279,7 +279,9 @@ textarea {
 
 .campo-p > select {
   appearance: none;
-  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%237e7f80' stroke-width='1.6'/%3E%3C/svg%3E") right 14px center no-repeat;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%237e7f80' stroke-width='1.6'/%3E%3C/svg%3E")
+    right 14px center no-repeat;
   padding-right: 34px;
 }
 
@@ -583,11 +585,31 @@ button.pilula.selecionada {
 
 /* ---------- Cores por turma/situacao (paleta do Figma) ---------- */
 
-.c-azul { --c-fundo: var(--cor-primaria-clara); --c-texto: var(--cor-azul-forte); --c-barra: var(--cor-azul-forte); }
-.c-verde { --c-fundo: var(--cor-sucesso-fundo); --c-texto: #065f46; --c-barra: #059669; }
-.c-laranja { --c-fundo: var(--cor-alerta-fundo); --c-texto: var(--cor-alerta); --c-barra: #f2620f; }
-.c-roxo { --c-fundo: #f3e8ff; --c-texto: #7c3aed; --c-barra: #7c3aed; }
-.c-cinza { --c-fundo: var(--cor-fundo-painel); --c-texto: var(--cor-texto); --c-barra: #9aa1a9; }
+.c-azul {
+  --c-fundo: var(--cor-primaria-clara);
+  --c-texto: var(--cor-azul-forte);
+  --c-barra: var(--cor-azul-forte);
+}
+.c-verde {
+  --c-fundo: var(--cor-sucesso-fundo);
+  --c-texto: #065f46;
+  --c-barra: #059669;
+}
+.c-laranja {
+  --c-fundo: var(--cor-alerta-fundo);
+  --c-texto: var(--cor-alerta);
+  --c-barra: #f2620f;
+}
+.c-roxo {
+  --c-fundo: #f3e8ff;
+  --c-texto: #7c3aed;
+  --c-barra: #7c3aed;
+}
+.c-cinza {
+  --c-fundo: var(--cor-fundo-painel);
+  --c-texto: var(--cor-texto);
+  --c-barra: #9aa1a9;
+}
 
 .selo-cor {
   display: flex;

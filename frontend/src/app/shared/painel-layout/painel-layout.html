@@ -23,7 +23,12 @@
       }
     </p>
     <div class="barra-icones">
-      <button type="button" class="icone-botao" aria-label="Notificações" (click)="alternar('notificacoes')">
+      <button
+        type="button"
+        class="icone-botao"
+        aria-label="Notificações"
+        (click)="alternar('notificacoes')"
+      >
         <img src="assets/adm/icone-sino.svg" alt="" />
         @if (naoLidas()) {
           <span class="contador">{{ naoLidas() }}</span>
@@ -39,7 +44,13 @@
     @if (menuAberto()) {
       <div class="fundo-menu" (click)="menuAberto.set(false)"></div>
     }
-    <nav id="menu-painel" class="menu" [class.aberto]="menuAberto()" aria-label="Menu" (click)="fecharMenuSeLink($event)">
+    <nav
+      id="menu-painel"
+      class="menu"
+      [class.aberto]="menuAberto()"
+      aria-label="Menu"
+      (click)="fecharMenuSeLink($event)"
+    >
       @for (secao of config().secoes; track secao.titulo; let primeira = $first) {
         <p class="menu-titulo" [class.seguinte]="!primeira">{{ secao.titulo }}</p>
         @for (item of secao.itens; track item.rota) {
@@ -85,7 +96,9 @@
     @if (painel() === 'conta') {
       <div class="flutuante conta" role="menu" (click)="$event.stopPropagation()">
         <div class="conta-topo">
-          <span class="avatar" style="--tam: 44px; --fonte-avatar: 15px">{{ config().conta.iniciais }}</span>
+          <span class="avatar" style="--tam: 44px; --fonte-avatar: 15px">{{
+            config().conta.iniciais
+          }}</span>
           <div>
             <strong>{{ config().conta.nome }}</strong>
             <small>{{ config().conta.detalhe }}</small>
@@ -94,7 +107,14 @@
         @for (l of config().conta.links; track l.rota) {
           <a [routerLink]="l.rota" role="menuitem" (click)="painel.set(null)">{{ l.rotulo }}</a>
         }
-        <button type="button" class="opcao" role="menuitem" (click)="painel.set(null); alterandoSenha.set(true)">Alterar minha senha</button>
+        <button
+          type="button"
+          class="opcao"
+          role="menuitem"
+          (click)="painel.set(null); alterandoSenha.set(true)"
+        >
+          Alterar minha senha
+        </button>
         <button type="button" class="sair" role="menuitem" (click)="sair()">Sair da conta</button>
       </div>
     } @else {
@@ -102,7 +122,9 @@
         <div class="notif-topo">
           <strong>Notificações</strong>
           @if (naoLidas()) {
-            <button type="button" class="link-acao" (click)="marcarTodasComoLidas()">Marcar todas como lidas</button>
+            <button type="button" class="link-acao" (click)="marcarTodasComoLidas()">
+              Marcar todas como lidas
+            </button>
           }
         </div>
         @for (n of notificacoes(); track n.chave) {

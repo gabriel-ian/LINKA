@@ -19,10 +19,21 @@ describe('AlunoNeurodivergenciaService', () => {
         AlunoNeurodivergenciaService,
         {
           provide: getRepositoryToken(AlunoNeurodivergencia),
-          useValue: { findOne: jest.fn(), create: jest.fn(), save: jest.fn(), find: jest.fn() },
+          useValue: {
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            find: jest.fn(),
+          },
         },
-        { provide: getRepositoryToken(Aluno), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Neurodivergencia), useValue: { findOne: jest.fn() } },
+        {
+          provide: getRepositoryToken(Aluno),
+          useValue: { findOne: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Neurodivergencia),
+          useValue: { findOne: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -51,14 +62,14 @@ describe('AlunoNeurodivergenciaService', () => {
       alunoRepo.findOne.mockResolvedValue({ id: 1 } as Aluno);
       neurodivergenciaRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.create(dto, 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto, 1)).rejects.toThrow(BadRequestException);
     });
 
     it('rejeita vinculo duplicado', async () => {
       alunoRepo.findOne.mockResolvedValue({ id: 1 } as Aluno);
-      neurodivergenciaRepo.findOne.mockResolvedValue({ id: 2 } as Neurodivergencia);
+      neurodivergenciaRepo.findOne.mockResolvedValue({
+        id: 2,
+      } as Neurodivergencia);
       vinculoRepo.findOne.mockResolvedValue({ id: 5 } as AlunoNeurodivergencia);
 
       await expect(service.create(dto, 1)).rejects.toThrow(
@@ -68,9 +79,15 @@ describe('AlunoNeurodivergenciaService', () => {
 
     it('cria o vinculo quando tudo e valido', async () => {
       alunoRepo.findOne.mockResolvedValue({ id: 1 } as Aluno);
-      neurodivergenciaRepo.findOne.mockResolvedValue({ id: 2 } as Neurodivergencia);
+      neurodivergenciaRepo.findOne.mockResolvedValue({
+        id: 2,
+      } as Neurodivergencia);
       vinculoRepo.findOne.mockResolvedValue(null);
-      const criado = { id: 5, alunoId: 1, neurodivergenciaId: 2 } as AlunoNeurodivergencia;
+      const criado = {
+        id: 5,
+        alunoId: 1,
+        neurodivergenciaId: 2,
+      } as AlunoNeurodivergencia;
       vinculoRepo.create.mockReturnValue(criado);
       vinculoRepo.save.mockResolvedValue(criado);
 

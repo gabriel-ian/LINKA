@@ -46,7 +46,9 @@ export class AdminController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Cadastrar nova escola (cria tambem o login da escola)' })
+  @ApiOperation({
+    summary: 'Cadastrar nova escola (cria tambem o login da escola)',
+  })
   create(@Body() body: CreateEscolaDto) {
     return this.escolaService.create(body);
   }

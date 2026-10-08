@@ -33,13 +33,15 @@ export function corDoIndice(indice: number): Cor {
 /** Cor do aluno segue a situacao (Figma: laranja atencao, verde em dia, azul melhorando). */
 export function corDaSituacao(s: Situacao): Cor | 'cinza' {
   return { atencao: 'laranja', melhorando: 'azul', 'em-dia': 'verde', 'sem-dados': 'cinza' }[s] as
-    | Cor
-    | 'cinza';
+    Cor | 'cinza';
 }
 
 /** "Lucas Oliveira" -> "LO". */
 export function iniciaisPessoa(nome: string): string {
-  const partes = nome.trim().split(/\s+/).filter((p) => p.length > 2 || /^[A-Z]/.test(p));
+  const partes = nome
+    .trim()
+    .split(/\s+/)
+    .filter((p) => p.length > 2 || /^[A-Z]/.test(p));
   const primeira = partes[0]?.[0] ?? '?';
   const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
   return (primeira + ultima).toUpperCase();

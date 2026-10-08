@@ -5,7 +5,9 @@ import { Component, input } from '@angular/core';
   selector: 'app-adm-resultado',
   template: `
     <section class="cartao resultado" role="status">
-      <span class="selo" [class.alerta]="tipo() === 'alerta'">{{ tipo() === 'ok' ? 'ok' : '!' }}</span>
+      <span class="selo" [class.alerta]="tipo() === 'alerta'">{{
+        tipo() === 'ok' ? 'ok' : '!'
+      }}</span>
       <h2>{{ titulo() }}</h2>
       <p>{{ texto() }}</p>
       <ng-content select="[extra]" />

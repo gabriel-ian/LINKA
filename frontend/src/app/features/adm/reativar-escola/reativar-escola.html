@@ -15,14 +15,21 @@
   @if (reativada(); as e) {
     <app-adm-resultado
       titulo="Escola reativada!"
-      [texto]="'Alunos, professores e famílias da ' + e.nome + ' já podem acessar a Linka de novo, com todos os dados anteriores.'"
+      [texto]="
+        'Alunos, professores e famílias da ' +
+        e.nome +
+        ' já podem acessar a Linka de novo, com todos os dados anteriores.'
+      "
     >
       <a class="bt bt-secundario" routerLink="/adm">Voltar à visão geral</a>
-      <a class="bt bt-primario" routerLink="/adm/escolas/id" [queryParams]="{ id: e.id }">Ver escola</a>
+      <a class="bt bt-primario" routerLink="/adm/escolas/id" [queryParams]="{ id: e.id }"
+        >Ver escola</a
+      >
     </app-adm-resultado>
   } @else {
     <p class="aviso-caixa verde">
-      Ao reativar, os acessos de alunos, professores e famílias voltam a funcionar e os dados anteriores são restaurados.
+      Ao reativar, os acessos de alunos, professores e famílias voltam a funcionar e os dados
+      anteriores são restaurados.
     </p>
 
     @if (erro()) {

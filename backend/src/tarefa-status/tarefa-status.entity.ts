@@ -18,7 +18,11 @@ export class TarefaStatusEntity {
   @PrimaryColumn({ name: 'tarefa_id' })
   tarefaId!: number;
 
-  @Column({ type: 'enum', enum: ['pendente', 'concluida'], default: 'pendente' })
+  @Column({
+    type: 'enum',
+    enum: ['pendente', 'concluida'],
+    default: 'pendente',
+  })
   status!: StatusTarefa;
 
   @Column({ type: 'datetime', nullable: true })

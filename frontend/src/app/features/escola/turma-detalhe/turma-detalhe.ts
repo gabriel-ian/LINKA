@@ -43,12 +43,16 @@ export class EscolaTurmaDetalhe {
       this.service.turma(Number(p.get('id'))).subscribe({
         next: (res) => this.turma.set(res.data),
         error: (e: HttpErrorResponse) =>
-          this.erro.set(e.status === 404 ? 'Turma não encontrada.' : 'Não foi possível carregar a turma.'),
+          this.erro.set(
+            e.status === 404 ? 'Turma não encontrada.' : 'Não foi possível carregar a turma.',
+          ),
       });
     });
   }
 
   nomesProfessores(t: TurmaDetalhe): string {
-    return t.professores.length ? juntar(t.professores.map((p) => p.nome)) : 'sem professores vinculados';
+    return t.professores.length
+      ? juntar(t.professores.map((p) => p.nome))
+      : 'sem professores vinculados';
   }
 }

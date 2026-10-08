@@ -45,18 +45,24 @@ export class ProfessorTurma {
 
   readonly filtrados = computed(() => {
     const termo = this.busca().trim().toLowerCase();
-    return (this.dados()?.alunos ?? [])
-      .filter(
-        (a) =>
-          (this.filtro() === 'todos' ||
-            (this.filtro() === 'nee' ? a.neurodivergente : a.atrasadas > 0)) &&
-          (!termo || a.nome.toLowerCase().includes(termo)),
-      )
-      // Quem precisa de atencao primeiro, como no Figma.
-      .sort((a, b) => b.atrasadas - a.atrasadas || (a.entregasMes ?? 101) - (b.entregasMes ?? 101));
+    return (
+      (this.dados()?.alunos ?? [])
+        .filter(
+          (a) =>
+            (this.filtro() === 'todos' ||
+              (this.filtro() === 'nee' ? a.neurodivergente : a.atrasadas > 0)) &&
+            (!termo || a.nome.toLowerCase().includes(termo)),
+        )
+        // Quem precisa de atencao primeiro, como no Figma.
+        .sort(
+          (a, b) => b.atrasadas - a.atrasadas || (a.entregasMes ?? 101) - (b.entregasMes ?? 101),
+        )
+    );
   });
 
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.filtrados().length / POR_PAGINA)));
+  readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.filtrados().length / POR_PAGINA)),
+  );
   readonly visiveis = computed(() =>
     this.filtrados().slice(this.pagina() * POR_PAGINA, (this.pagina() + 1) * POR_PAGINA),
   );
@@ -71,7 +77,11 @@ export class ProfessorTurma {
         this.service.alunos(id).subscribe({
           next: (res) => this.dados.set(res.data),
           error: (e: HttpErrorResponse) =>
-            this.erro.set(e.status === 404 ? 'Esta turma não está entre as suas.' : 'Não foi possível carregar a turma.'),
+            this.erro.set(
+              e.status === 404
+                ? 'Esta turma não está entre as suas.'
+                : 'Não foi possível carregar a turma.',
+            ),
         });
       });
   }

@@ -5,7 +5,12 @@ import { UsuarioService } from '../usuario/usuario.service';
 
 describe('JwtStrategy', () => {
   const config = { getOrThrow: () => 'segredo' } as unknown as ConfigService;
-  const payload = { sub: 7, email: 'a@b.com', perfil: 'professor', escolaId: 5 };
+  const payload = {
+    sub: 7,
+    email: 'a@b.com',
+    perfil: 'professor',
+    escolaId: 5,
+  };
 
   it('aceita token de conta ativa', async () => {
     const usuarios = { acessoLiberado: jest.fn().mockResolvedValue(true) };

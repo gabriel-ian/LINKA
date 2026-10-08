@@ -128,7 +128,7 @@ export class AdaptacaoIaService {
         );
       }
 
-      return resposta.parsed_output as z.infer<T>;
+      return resposta.parsed_output;
     } catch (erro) {
       if (erro instanceof ServiceUnavailableException) throw erro;
       if (erro instanceof Anthropic.AuthenticationError) {

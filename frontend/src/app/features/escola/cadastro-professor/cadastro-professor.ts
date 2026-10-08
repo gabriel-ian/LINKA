@@ -12,7 +12,6 @@ import { alternado, juntar } from '../escola-ui';
 type Campo = 'nome' | 'email' | 'senha' | 'confirmar';
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
 /** "Escola - Cadastro professor" (dados, confirmacao, sucesso, erros) do Figma. */
 @Component({
   selector: 'app-escola-cadastro-professor',

@@ -12,7 +12,5 @@ export const perfilGuard =
   () => {
     const perfil = inject(AuthService).perfil;
 
-    return perfil && perfis.includes(perfil)
-      ? true
-      : inject(Router).createUrlTree(['/login']);
+    return perfil && perfis.includes(perfil) ? true : inject(Router).createUrlTree(['/login']);
   };

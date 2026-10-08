@@ -18,7 +18,11 @@ const TIPOS_LAUDO = ['application/pdf', 'image/png', 'image/jpeg'];
   selector: 'app-escola-aluno-editar',
   imports: [FormsModule, RouterLink, PerfilAprendizagemForm],
   templateUrl: './aluno-editar.html',
-  styleUrls: ['../cadastro-professor/cadastro.css', '../cadastro-aluno/cadastro-aluno.css', './aluno-editar.css'],
+  styleUrls: [
+    '../cadastro-professor/cadastro.css',
+    '../cadastro-aluno/cadastro-aluno.css',
+    './aluno-editar.css',
+  ],
 })
 export class EscolaAlunoEditar {
   private service = inject(PainelEscolaService);
@@ -57,7 +61,9 @@ export class EscolaAlunoEditar {
         this.cgm = aluno.cgm ?? '';
         this.turmaId = aluno.turma?.id ?? null;
         this.diagnosticos.set(
-          new Set(o.data.diagnosticos.filter((d) => aluno.diagnosticos.includes(d.nome)).map((d) => d.id)),
+          new Set(
+            o.data.diagnosticos.filter((d) => aluno.diagnosticos.includes(d.nome)).map((d) => d.id),
+          ),
         );
         this.prefiroNaoInformar.set(aluno.neurodivergente && aluno.diagnosticos.length === 0);
         this.dificuldades.set(aluno.dificuldades ?? '');
@@ -65,7 +71,9 @@ export class EscolaAlunoEditar {
         this.interesses.set(aluno.interesses);
       },
       error: (e: HttpErrorResponse) =>
-        this.erro.set(e.status === 404 ? 'Aluno não encontrado.' : 'Não foi possível carregar o aluno.'),
+        this.erro.set(
+          e.status === 404 ? 'Aluno não encontrado.' : 'Não foi possível carregar o aluno.',
+        ),
     });
   }
 
@@ -124,7 +132,9 @@ export class EscolaAlunoEditar {
         },
         error: (e: HttpErrorResponse) => {
           this.salvando.set(false);
-          this.erro.set([e.error?.message].flat().join(' ') || 'Não foi possível salvar as alterações.');
+          this.erro.set(
+            [e.error?.message].flat().join(' ') || 'Não foi possível salvar as alterações.',
+          );
         },
       });
   }

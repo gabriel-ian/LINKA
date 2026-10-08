@@ -82,7 +82,11 @@ export class EscolaService {
     return this.findOne(id);
   }
 
-  async update(id: number, data: UpdateEscolaDto, adminEmail: string | null = null) {
+  async update(
+    id: number,
+    data: UpdateEscolaDto,
+    adminEmail: string | null = null,
+  ) {
     await this.buscarOuFalhar(id);
     const { email, ...dadosEscola } = data;
 
@@ -132,7 +136,11 @@ export class EscolaService {
     return { data: true };
   }
 
-  async desativar(id: number, data: DesativarEscolaDto, adminEmail: string | null = null) {
+  async desativar(
+    id: number,
+    data: DesativarEscolaDto,
+    adminEmail: string | null = null,
+  ) {
     const escola = await this.buscarOuFalhar(id);
 
     if (!escola.ativo) {
@@ -159,13 +167,15 @@ export class EscolaService {
       order: { id: 'ASC' },
     });
     if (!login) {
-      throw new BadRequestException('Esta escola nao tem login de acesso cadastrado');
+      throw new BadRequestException(
+        'Esta escola nao tem login de acesso cadastrado',
+      );
     }
 
     const senhaProvisoria = gerarSenhaProvisoria();
-    await this.dataSource
-      .getRepository(Usuario)
-      .update(login.id, { senha: await UsuarioService.hashSenha(senhaProvisoria) });
+    await this.dataSource.getRepository(Usuario).update(login.id, {
+      senha: await UsuarioService.hashSenha(senhaProvisoria),
+    });
 
     return { data: { email: login.email, senhaProvisoria } };
   }
@@ -241,7 +251,8 @@ export class EscolaService {
 
     if (filtro) consulta.andWhere(filtro);
 
-    const linhas: { escolaId: number; total: string }[] = await consulta.getRawMany();
+    const linhas: { escolaId: number; total: string }[] =
+      await consulta.getRawMany();
 
     return new Map(linhas.map((l) => [Number(l.escolaId), Number(l.total)]));
   }

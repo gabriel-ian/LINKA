@@ -39,10 +39,7 @@ describe('AuthController', () => {
         senha: 'linka123',
       });
 
-      expect(service.login).toHaveBeenCalledWith(
-        'admin@linka.com',
-        'linka123',
-      );
+      expect(service.login).toHaveBeenCalledWith('admin@linka.com', 'linka123');
       expect(resultado).toBe(resposta);
     });
   });

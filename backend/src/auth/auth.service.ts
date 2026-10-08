@@ -21,11 +21,16 @@ export class AuthService {
   /** Qualquer perfil troca a propria senha (ex.: depois de uma provisoria). */
   async alterarSenha(usuarioId: number, senhaAtual: string, novaSenha: string) {
     const usuario = await this.usuarioService.findById(usuarioId);
-    if (!usuario || !(await UsuarioService.conferirSenha(senhaAtual, usuario.senha))) {
+    if (
+      !usuario ||
+      !(await UsuarioService.conferirSenha(senhaAtual, usuario.senha))
+    ) {
       throw new BadRequestException('Senha atual incorreta');
     }
     if (senhaAtual === novaSenha) {
-      throw new BadRequestException('A nova senha precisa ser diferente da atual');
+      throw new BadRequestException(
+        'A nova senha precisa ser diferente da atual',
+      );
     }
 
     await this.usuarioService.definirSenha(usuario.id, novaSenha);

@@ -6,18 +6,15 @@
   <h1 class="titulo">Bem-vindo de volta</h1>
 
   @if (sessaoEncerrada) {
-    <p class="aviso-caixa azul sessao" role="status">Sua sessão terminou. Entre de novo para continuar.</p>
+    <p class="aviso-caixa azul sessao" role="status">
+      Sua sessão terminou. Entre de novo para continuar.
+    </p>
   }
 
   <p class="campo-rotulo">Entrar como</p>
   <div class="perfis" role="group" aria-label="Perfil de acesso">
     @for (p of perfis; track p) {
-      <button
-        type="button"
-        class="perfil"
-        [attr.aria-pressed]="perfil === p"
-        (click)="perfil = p"
-      >
+      <button type="button" class="perfil" [attr.aria-pressed]="perfil === p" (click)="perfil = p">
         <app-seletor-perfil [perfil]="p" [ativo]="perfil === p" />
       </button>
     }
@@ -75,7 +72,12 @@
 
 @if (avisoPerfil) {
   <div class="aviso-fundo" (click)="avisoPerfil = false">
-    <div class="aviso" role="alertdialog" aria-labelledby="aviso-texto" (click)="$event.stopPropagation()">
+    <div
+      class="aviso"
+      role="alertdialog"
+      aria-labelledby="aviso-texto"
+      (click)="$event.stopPropagation()"
+    >
       <img class="aviso-simbolo" src="assets/entrada/logo-simbolo.svg" alt="" />
       <button type="button" class="aviso-fechar" aria-label="Fechar" (click)="avisoPerfil = false">
         <img src="assets/entrada/icone-fechar.svg" alt="" />

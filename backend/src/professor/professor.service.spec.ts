@@ -163,9 +163,7 @@ describe('ProfessorService', () => {
     it('rejeita quando ja existe usuario com o mesmo email, sem gravar nada', async () => {
       usuarioRepoMock.findOne.mockResolvedValue({ id: 1, email: dto.email });
 
-      await expect(service.create(dto, 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto, 1)).rejects.toThrow(BadRequestException);
       expect(usuarioRepoMock.save).not.toHaveBeenCalled();
       expect(professorRepoMock.save).not.toHaveBeenCalled();
     });

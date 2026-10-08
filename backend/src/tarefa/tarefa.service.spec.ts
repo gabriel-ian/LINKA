@@ -35,9 +35,18 @@ describe('TarefaService', () => {
           provide: getRepositoryToken(Tarefa),
           useValue: { create: jest.fn(), save: jest.fn(), find: jest.fn() },
         },
-        { provide: getRepositoryToken(Turma), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Disciplina), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Professor), useValue: { findOne: jest.fn() } },
+        {
+          provide: getRepositoryToken(Turma),
+          useValue: { findOne: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Disciplina),
+          useValue: { findOne: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Professor),
+          useValue: { findOne: jest.fn() },
+        },
         {
           provide: TarefaStatusService,
           useValue: { seedParaTurma: jest.fn() },
@@ -101,7 +110,11 @@ describe('TarefaService', () => {
       const resultado = await service.create(dto, 10, 1);
 
       expect(tarefaRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ professorId: 5, turmaId: 1, disciplinaId: 2 }),
+        expect.objectContaining({
+          professorId: 5,
+          turmaId: 1,
+          disciplinaId: 2,
+        }),
       );
       expect(resultado).toEqual({ data: criada });
     });

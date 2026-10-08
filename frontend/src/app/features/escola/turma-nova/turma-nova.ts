@@ -7,8 +7,18 @@ import { NovaTurma, Opcoes, Turno } from '../../../core/model/painel-escola.mode
 import { EscolaContexto } from '../escola-contexto';
 
 const SERIES = [
-  '1º Ano', '2º Ano', '3º Ano', '4º Ano', '5º Ano', '6º Ano', '7º Ano', '8º Ano', '9º Ano',
-  '1ª Série', '2ª Série', '3ª Série',
+  '1º Ano',
+  '2º Ano',
+  '3º Ano',
+  '4º Ano',
+  '5º Ano',
+  '6º Ano',
+  '7º Ano',
+  '8º Ano',
+  '9º Ano',
+  '1ª Série',
+  '2ª Série',
+  '3ª Série',
 ];
 
 /** "Escola - Nova turma" do Figma; com :id na rota, edita a turma. */
@@ -104,15 +114,17 @@ export class EscolaTurmaNova {
       : this.service.criarTurma(dados);
 
     requisicao.subscribe({
-        next: (res) => {
-          this.contexto.recarregar();
-          const id = this.editandoId ?? (res as { data: { id: number } }).data.id;
-          this.router.navigate(['/escola/turmas', id], { queryParams: this.editandoId ? { salva: 1 } : { criada: 1 } });
-        },
-        error: (e: HttpErrorResponse) => {
-          this.salvando.set(false);
-          this.erro.set([e.error?.message].flat().join(' ') || 'Não foi possível salvar a turma.');
-        },
-      });
+      next: (res) => {
+        this.contexto.recarregar();
+        const id = this.editandoId ?? (res as { data: { id: number } }).data.id;
+        this.router.navigate(['/escola/turmas', id], {
+          queryParams: this.editandoId ? { salva: 1 } : { criada: 1 },
+        });
+      },
+      error: (e: HttpErrorResponse) => {
+        this.salvando.set(false);
+        this.erro.set([e.error?.message].flat().join(' ') || 'Não foi possível salvar a turma.');
+      },
+    });
   }
 }

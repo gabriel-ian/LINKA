@@ -35,7 +35,8 @@ export class ProfessorRelatorios {
 
   constructor() {
     effect(() => {
-      if (this.turmaId() === null && this.contexto.turmaId() !== null) this.turmaId.set(this.contexto.turmaId());
+      if (this.turmaId() === null && this.contexto.turmaId() !== null)
+        this.turmaId.set(this.contexto.turmaId());
     });
 
     effect(() => {

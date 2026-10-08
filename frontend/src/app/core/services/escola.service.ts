@@ -2,13 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import {
-  ApiResponse,
-  Desativacao,
-  Escola,
-  EscolaDados,
-  NovaEscola,
-} from '../model/escola.model';
+import { ApiResponse, Desativacao, Escola, EscolaDados, NovaEscola } from '../model/escola.model';
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +43,10 @@ export class EscolaService {
 
   /** Senha provisoria para o login da escola. */
   redefinirSenha(id: number): Observable<ApiResponse<{ email: string; senhaProvisoria: string }>> {
-    return this.http.post<ApiResponse<{ email: string; senhaProvisoria: string }>>(`${this.adminUrl}/${id}/senha`, {});
+    return this.http.post<ApiResponse<{ email: string; senhaProvisoria: string }>>(
+      `${this.adminUrl}/${id}/senha`,
+      {},
+    );
   }
 
   ativar(id: number): Observable<ApiResponse<boolean>> {

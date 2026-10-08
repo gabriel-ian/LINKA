@@ -1,7 +1,10 @@
 <div class="pagina">
   <header class="painel-cabecalho">
     <h1>Relatórios</h1>
-    <p>{{ relatorio()?.turma?.nome }}{{ disciplinas() ? ' - ' + disciplinas() : '' }} - {{ nomeMes(mes()) }}</p>
+    <p>
+      {{ relatorio()?.turma?.nome }}{{ disciplinas() ? ' - ' + disciplinas() : '' }} -
+      {{ nomeMes(mes()) }}
+    </p>
   </header>
 
   <div class="filtros">
@@ -28,7 +31,9 @@
         <option value="nee">Só alunos NEE</option>
       </select>
     </label>
-    <button type="button" class="bt bt-secundario exportar" (click)="exportar()">Exportar PDF</button>
+    <button type="button" class="bt bt-secundario exportar" (click)="exportar()">
+      Exportar PDF
+    </button>
   </div>
 
   @if (erro()) {
@@ -64,7 +69,10 @@
         <h2>Evolução dos alunos NEE</h2>
         @for (a of r.evolucaoNee; track a.id) {
           <div class="aluno" [class]="'c-' + corSituacao(situacao(a.taxa))">
-            <span class="rotulo">{{ a.nome }}{{ a.diagnostico ? ' - ' + a.diagnostico : '' }} <b>{{ pct(a.taxa) }}</b></span>
+            <span class="rotulo"
+              >{{ a.nome }}{{ a.diagnostico ? ' - ' + a.diagnostico : '' }}
+              <b>{{ pct(a.taxa) }}</b></span
+            >
             <span class="progresso"><span [style.width.%]="a.taxa ?? 0"></span></span>
             <small>{{ variacao(a.variacao) }}</small>
           </div>
@@ -85,7 +93,11 @@
           }
         </div>
         <p class="sugestao">
-          {{ r.sugestao ? 'Sugestão: ' + r.sugestao : 'As sugestões aparecem quando houver tarefas com prazos em horários diferentes.' }}
+          {{
+            r.sugestao
+              ? 'Sugestão: ' + r.sugestao
+              : 'As sugestões aparecem quando houver tarefas com prazos em horários diferentes.'
+          }}
         </p>
       </section>
     </div>

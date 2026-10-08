@@ -31,7 +31,7 @@ describe('ProfessorController', () => {
   describe('findAll', () => {
     it('usa o escolaId do token, nao um id de usuario', async () => {
       const resposta = { data: [] };
-      service.findAllByEscola.mockResolvedValue(resposta as never);
+      service.findAllByEscola.mockResolvedValue(resposta);
 
       const resultado = await controller.findAll(5);
 

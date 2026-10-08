@@ -54,7 +54,11 @@
 
       @for (e of resultados(); track e.id) {
         <article class="cartao resultado">
-          <span class="avatar" [class.apagado]="!e.ativo" style="--tam: 52px; --raio-avatar: 12px; --fonte-avatar: 22px">
+          <span
+            class="avatar"
+            [class.apagado]="!e.ativo"
+            style="--tam: 52px; --raio-avatar: 12px; --fonte-avatar: 22px"
+          >
             {{ iniciais(e.nome) }}
           </span>
           <div class="info">
@@ -65,7 +69,11 @@
             <p>#{{ e.id }}{{ cidadeUf(e) ? ' - ' + cidadeUf(e) : '' }}</p>
             <small>{{ detalhe(e) }}</small>
           </div>
-          <a class="bt bt-secundario bt-p" routerLink="/adm/escolas/id" [queryParams]="{ id: e.id }">
+          <a
+            class="bt bt-secundario bt-p"
+            routerLink="/adm/escolas/id"
+            [queryParams]="{ id: e.id }"
+          >
             Ver detalhes
           </a>
         </article>

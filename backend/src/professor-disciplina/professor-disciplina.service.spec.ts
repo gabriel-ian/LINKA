@@ -19,7 +19,13 @@ describe('ProfessorDisciplinaService', () => {
         ProfessorDisciplinaService,
         {
           provide: getRepositoryToken(ProfessorDisciplina),
-          useValue: { findOne: jest.fn(), create: jest.fn(), save: jest.fn(), find: jest.fn(), delete: jest.fn() },
+          useValue: {
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            find: jest.fn(),
+            delete: jest.fn(),
+          },
         },
         {
           provide: getRepositoryToken(Professor),
@@ -57,9 +63,7 @@ describe('ProfessorDisciplinaService', () => {
       professorRepo.findOne.mockResolvedValue({ id: 1 } as Professor);
       disciplinaRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.create(dto, 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto, 1)).rejects.toThrow(BadRequestException);
     });
 
     it('rejeita vinculo duplicado', async () => {
@@ -91,7 +95,9 @@ describe('ProfessorDisciplinaService', () => {
 
   describe('findAllByEscola', () => {
     it('busca vinculos filtrando pela escola do professor', async () => {
-      const vinculos = [{ professorId: 1, disciplinaId: 2 }] as ProfessorDisciplina[];
+      const vinculos = [
+        { professorId: 1, disciplinaId: 2 },
+      ] as ProfessorDisciplina[];
       vinculoRepo.find.mockResolvedValue(vinculos);
 
       const resultado = await service.findAllByEscola(1);

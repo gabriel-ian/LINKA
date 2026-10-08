@@ -3,9 +3,15 @@
     <h1>Cadastrar professor(a)</h1>
     <p>
       @switch (etapa()) {
-        @case (1) { Etapa 1 de 3 - dados do professor }
-        @case (2) { Etapa 2 de 3 - confira os dados antes de salvar }
-        @case (3) { Etapa 3 de 3 - concluído }
+        @case (1) {
+          Etapa 1 de 3 - dados do professor
+        }
+        @case (2) {
+          Etapa 2 de 3 - confira os dados antes de salvar
+        }
+        @case (3) {
+          Etapa 3 de 3 - concluído
+        }
       }
     </p>
   </header>
@@ -16,7 +22,9 @@
     @if (erroGeral()) {
       <p class="alerta-erro" role="alert">{{ erroGeral() }}</p>
     } @else if (erro('nome') || erro('email') || erro('senha') || erro('confirmar')) {
-      <p class="alerta-erro" role="alert">Faltam algumas informações. Confira os campos em vermelho.</p>
+      <p class="alerta-erro" role="alert">
+        Faltam algumas informações. Confira os campos em vermelho.
+      </p>
     }
 
     <form class="cartao" (ngSubmit)="continuar()" novalidate>
@@ -25,12 +33,22 @@
         <label class="campo-p" [class.invalido]="erro('nome')">
           Nome completo
           <input name="nome" [(ngModel)]="nome" placeholder="Nome do professor" />
-          @if (erro('nome')) { <span class="msg-erro">{{ erro('nome') }}</span> }
+          @if (erro('nome')) {
+            <span class="msg-erro">{{ erro('nome') }}</span>
+          }
         </label>
         <label class="campo-p" [class.invalido]="erro('email')">
           E-mail institucional
-          <input name="email" type="email" autocomplete="off" [(ngModel)]="email" placeholder="professor@escola.pr.gov.br" />
-          @if (erro('email')) { <span class="msg-erro">{{ erro('email') }}</span> }
+          <input
+            name="email"
+            type="email"
+            autocomplete="off"
+            [(ngModel)]="email"
+            placeholder="professor@escola.pr.gov.br"
+          />
+          @if (erro('email')) {
+            <span class="msg-erro">{{ erro('email') }}</span>
+          }
         </label>
       </div>
 
@@ -41,7 +59,14 @@
         <p class="ajuda">Selecione uma ou mais opções</p>
         <div class="chips">
           @for (d of todasDisciplinas(); track d) {
-            <button type="button" class="chip" [attr.aria-pressed]="disciplinas().has(d)" (click)="alternarDisciplina(d)">{{ d }}</button>
+            <button
+              type="button"
+              class="chip"
+              [attr.aria-pressed]="disciplinas().has(d)"
+              (click)="alternarDisciplina(d)"
+            >
+              {{ d }}
+            </button>
           }
           @if (adicionando()) {
             <span class="nova">
@@ -51,7 +76,9 @@
                 placeholder="Nome da disciplina"
                 (keydown.enter)="$event.preventDefault(); adicionarDisciplina()"
               />
-              <button type="button" class="link-acao" (click)="adicionarDisciplina()">Adicionar</button>
+              <button type="button" class="link-acao" (click)="adicionarDisciplina()">
+                Adicionar
+              </button>
             </span>
           } @else {
             <button type="button" class="chip" (click)="adicionando.set(true)">+ Outra</button>
@@ -59,9 +86,18 @@
         </div>
         <div class="chips turmas">
           @for (t of opcoes()?.turmas ?? []; track t.id) {
-            <button type="button" class="chip" [attr.aria-pressed]="turmas().has(t.id)" (click)="alternarTurma(t.id)">{{ t.nome }}</button>
+            <button
+              type="button"
+              class="chip"
+              [attr.aria-pressed]="turmas().has(t.id)"
+              (click)="alternarTurma(t.id)"
+            >
+              {{ t.nome }}
+            </button>
           } @empty {
-            <span class="ajuda">Nenhuma turma cadastrada ainda - o professor pode ser vinculado depois.</span>
+            <span class="ajuda"
+              >Nenhuma turma cadastrada ainda - o professor pode ser vinculado depois.</span
+            >
           }
         </div>
       </div>
@@ -73,18 +109,38 @@
         <label class="campo-p" [class.invalido]="erro('senha')">
           Senha
           <span class="caixa">
-            <input name="senha" [type]="mostrarSenha ? 'text' : 'password'" autocomplete="new-password" [(ngModel)]="senha" placeholder="Mínimo 8 caracteres" />
-            <button type="button" (click)="mostrarSenha = !mostrarSenha">{{ mostrarSenha ? 'ocultar' : 'mostrar' }}</button>
+            <input
+              name="senha"
+              [type]="mostrarSenha ? 'text' : 'password'"
+              autocomplete="new-password"
+              [(ngModel)]="senha"
+              placeholder="Mínimo 8 caracteres"
+            />
+            <button type="button" (click)="mostrarSenha = !mostrarSenha">
+              {{ mostrarSenha ? 'ocultar' : 'mostrar' }}
+            </button>
           </span>
-          @if (erro('senha')) { <span class="msg-erro">{{ erro('senha') }}</span> }
+          @if (erro('senha')) {
+            <span class="msg-erro">{{ erro('senha') }}</span>
+          }
         </label>
         <label class="campo-p" [class.invalido]="erro('confirmar')">
           Confirmar senha
           <span class="caixa">
-            <input name="confirmacao" [type]="mostrarConfirmar ? 'text' : 'password'" autocomplete="new-password" [(ngModel)]="confirmacao" placeholder="Repita a senha" />
-            <button type="button" (click)="mostrarConfirmar = !mostrarConfirmar">{{ mostrarConfirmar ? 'ocultar' : 'mostrar' }}</button>
+            <input
+              name="confirmacao"
+              [type]="mostrarConfirmar ? 'text' : 'password'"
+              autocomplete="new-password"
+              [(ngModel)]="confirmacao"
+              placeholder="Repita a senha"
+            />
+            <button type="button" (click)="mostrarConfirmar = !mostrarConfirmar">
+              {{ mostrarConfirmar ? 'ocultar' : 'mostrar' }}
+            </button>
           </span>
-          @if (erro('confirmar')) { <span class="msg-erro">{{ erro('confirmar') }}</span> }
+          @if (erro('confirmar')) {
+            <span class="msg-erro">{{ erro('confirmar') }}</span>
+          }
         </label>
       </div>
 
@@ -99,19 +155,45 @@
     <section class="cartao">
       <h2 class="cartao-titulo">Resumo do cadastro</h2>
       <dl class="dados-grade">
-        <div><dt>Nome completo</dt><dd>{{ nome }}</dd></div>
-        <div><dt>E-mail institucional</dt><dd>{{ email }}</dd></div>
-        <div><dt>Acesso</dt><dd>Senha definida</dd></div>
-        <div><dt>Disciplinas</dt><dd>{{ juntar(disciplinasEscolhidas()) || 'Nenhuma' }}</dd></div>
-        <div><dt>Turmas</dt><dd>{{ juntar(nomesTurmas()) || 'Nenhuma' }}</dd></div>
-        <div><dt>Alunos NEE nas turmas</dt><dd>{{ alunosNeeNasTurmas() }} {{ alunosNeeNasTurmas() === 1 ? 'aluno' : 'alunos' }}</dd></div>
+        <div>
+          <dt>Nome completo</dt>
+          <dd>{{ nome }}</dd>
+        </div>
+        <div>
+          <dt>E-mail institucional</dt>
+          <dd>{{ email }}</dd>
+        </div>
+        <div>
+          <dt>Acesso</dt>
+          <dd>Senha definida</dd>
+        </div>
+        <div>
+          <dt>Disciplinas</dt>
+          <dd>{{ juntar(disciplinasEscolhidas()) || 'Nenhuma' }}</dd>
+        </div>
+        <div>
+          <dt>Turmas</dt>
+          <dd>{{ juntar(nomesTurmas()) || 'Nenhuma' }}</dd>
+        </div>
+        <div>
+          <dt>Alunos NEE nas turmas</dt>
+          <dd>{{ alunosNeeNasTurmas() }} {{ alunosNeeNasTurmas() === 1 ? 'aluno' : 'alunos' }}</dd>
+        </div>
       </dl>
       <p class="aviso-caixa azul">
-        {{ nome.split(' ')[0] }} poderá entrar na Linka com o e-mail {{ email }} e a senha definida aqui.
+        {{ nome.split(' ')[0] }} poderá entrar na Linka com o e-mail {{ email }} e a senha definida
+        aqui.
       </p>
       <div class="acoes">
-        <button type="button" class="bt bt-secundario" (click)="etapa.set(1)">Voltar e editar</button>
-        <button type="button" class="bt bt-primario" [disabled]="salvando()" (click)="confirmarCadastro()">
+        <button type="button" class="bt bt-secundario" (click)="etapa.set(1)">
+          Voltar e editar
+        </button>
+        <button
+          type="button"
+          class="bt bt-primario"
+          [disabled]="salvando()"
+          (click)="confirmarCadastro()"
+        >
           {{ salvando() ? 'Salvando...' : 'Confirmar cadastro' }}
         </button>
       </div>
@@ -123,7 +205,9 @@
       titulo="Professor(a) cadastrado(a) com sucesso!"
       [texto]="nome + ' já pode acessar a Linka pelo e-mail ' + email + '.'"
     >
-      <button type="button" class="bt bt-secundario" (click)="cadastrarOutro()">Cadastrar outro</button>
+      <button type="button" class="bt bt-secundario" (click)="cadastrarOutro()">
+        Cadastrar outro
+      </button>
       <a class="bt bt-primario" routerLink="/escola/professores">Ver professores</a>
     </app-adm-resultado>
   }

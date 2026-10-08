@@ -8,11 +8,37 @@
   </header>
 
   <div class="filtros">
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'todas'" (click)="filtrar('todas')">Todas ({{ contagem().todas }})</button>
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'abertas'" (click)="filtrar('abertas')">Em andamento ({{ contagem().abertas }})</button>
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'encerradas'" (click)="filtrar('encerradas')">Encerradas ({{ contagem().encerradas }})</button>
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'todas'"
+      (click)="filtrar('todas')"
+    >
+      Todas ({{ contagem().todas }})
+    </button>
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'abertas'"
+      (click)="filtrar('abertas')"
+    >
+      Em andamento ({{ contagem().abertas }})
+    </button>
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'encerradas'"
+      (click)="filtrar('encerradas')"
+    >
+      Encerradas ({{ contagem().encerradas }})
+    </button>
     <label class="campo-p busca">
-      <input aria-label="Buscar tarefa" placeholder="Buscar tarefa..." [value]="busca()" (input)="busca.set($any($event.target).value); pagina.set(0)" />
+      <input
+        aria-label="Buscar tarefa"
+        placeholder="Buscar tarefa..."
+        [value]="busca()"
+        (input)="busca.set($any($event.target).value); pagina.set(0)"
+      />
     </label>
     @if ((contexto.dados()?.turmas?.length ?? 0) > 1) {
       <label class="campo-p turma">
@@ -53,7 +79,9 @@
               </a>
             </td>
             <td>{{ t.turma }}</td>
-            <td><span class="pilula-cor">{{ rotuloStatus(t) }}</span></td>
+            <td>
+              <span class="pilula-cor">{{ rotuloStatus(t) }}</span>
+            </td>
             <td>
               <span class="entregas">
                 <span class="progresso"><span [style.width.%]="pctEntregas(t)"></span></span>
@@ -79,7 +107,8 @@
               } @else if (contagem().todas) {
                 Nenhuma tarefa neste filtro.
               } @else {
-                Você ainda não criou tarefas. <a class="link-acao" routerLink="/professor/tarefas/nova">Criar a primeira</a>
+                Você ainda não criou tarefas.
+                <a class="link-acao" routerLink="/professor/tarefas/nova">Criar a primeira</a>
               }
             </td>
           </tr>
@@ -89,7 +118,10 @@
   </section>
 
   <div class="rodape-lista">
-    <span>Mostrando {{ visiveis().length }} de {{ filtradas().length }} tarefas - mais recentes primeiro</span>
+    <span
+      >Mostrando {{ visiveis().length }} de {{ filtradas().length }} tarefas - mais recentes
+      primeiro</span
+    >
     @if (totalPaginas() > 1) {
       <button type="button" class="bt bt-secundario" (click)="proximaPagina()">
         {{ pagina() + 1 < totalPaginas() ? 'Próxima página' : 'Voltar ao início' }}

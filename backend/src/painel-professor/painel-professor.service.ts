@@ -61,14 +61,14 @@ function somarDias(data: Date, dias: number): Date {
 
 /** Semanas do mes como no Figma: 1-7, 8-14, 15-21, 22-fim. */
 export function semanasDoMes(mes: string): [string, string][] {
-  const [inicio, fim] = mesDe(mes);
+  const [, fim] = mesDe(mes);
   const limites = ['01', '08', '15', '22'];
   return limites.map((dia, i) => [
     `${mes}-${dia}`,
     i < 3
       ? `${mes}-${String(Number(limites[i + 1]) - 1).padStart(2, '0')}`
       : fim,
-  ]) as [string, string][];
+  ]);
 }
 
 /**
@@ -269,7 +269,8 @@ export class PainelProfessorService {
         WHERE m.aluno_id = ? LIMIT 1`,
       [professor.id, alunoId],
     );
-    if (!matricula) throw new NotFoundException('Aluno nao encontrado nas suas turmas');
+    if (!matricula)
+      throw new NotFoundException('Aluno nao encontrado nas suas turmas');
 
     const colunas = perfilParaColunas(dto);
     if (Object.keys(colunas).length) {

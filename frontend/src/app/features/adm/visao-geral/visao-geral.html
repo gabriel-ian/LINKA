@@ -51,7 +51,9 @@
           <hr class="divisor" />
         }
       } @empty {
-        <p class="vazio">{{ store.carregando() ? 'Carregando...' : 'Nenhuma escola cadastrada ainda.' }}</p>
+        <p class="vazio">
+          {{ store.carregando() ? 'Carregando...' : 'Nenhuma escola cadastrada ainda.' }}
+        </p>
       }
     </section>
 

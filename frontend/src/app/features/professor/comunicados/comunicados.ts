@@ -51,12 +51,15 @@ export class ProfessorComunicados {
 
   /** Primeiros nomes dos alunos NEE da turma escolhida (texto do Figma). */
   readonly neeTurma = computed(() =>
-    this.contexto.turmaId() === this.turmaId ? (this.contexto.visao()?.alunosNee ?? []).map((a) => a.nome.split(' ')[0]) : [],
+    this.contexto.turmaId() === this.turmaId
+      ? (this.contexto.visao()?.alunosNee ?? []).map((a) => a.nome.split(' ')[0])
+      : [],
   );
 
   constructor() {
     effect(() => {
-      if (this.turmaId === null && this.contexto.turmaId() !== null) this.turmaId = this.contexto.turmaId();
+      if (this.turmaId === null && this.contexto.turmaId() !== null)
+        this.turmaId = this.contexto.turmaId();
       // Sem IA no servidor a opcao fica desmarcada (e desabilitada na tela).
       if (this.contexto.dados() && !this.contexto.dados()!.iaDisponivel) this.simplificada = false;
     });
@@ -109,7 +112,9 @@ export class ProfessorComunicados {
         },
         error: (err: HttpErrorResponse) => {
           this.salvando.set(false);
-          this.erro.set([err.error?.message].flat().join(' ') || 'Não foi possível salvar o comunicado.');
+          this.erro.set(
+            [err.error?.message].flat().join(' ') || 'Não foi possível salvar o comunicado.',
+          );
         },
       });
   }
@@ -125,9 +130,10 @@ export class ProfessorComunicados {
 
   textoEnviado(e: ComunicadoSalvo & { titulo: string }): string {
     const familias = e.familias === 1 ? '1 família' : `${e.familias} famílias`;
-    const nee = e.versaoSimplificada && e.alunosNee
-      ? ` ${e.alunosNee === 1 ? 'O aluno NEE recebe' : 'Os ' + e.alunosNee + ' alunos NEE recebem'} a versão simplificada, que pode ser ouvida em voz alta.`
-      : '';
+    const nee =
+      e.versaoSimplificada && e.alunosNee
+        ? ` ${e.alunosNee === 1 ? 'O aluno NEE recebe' : 'Os ' + e.alunosNee + ' alunos NEE recebem'} a versão simplificada, que pode ser ouvida em voz alta.`
+        : '';
     return `"${e.titulo}" foi enviado para ${familias} do ${e.turma}.${nee}`;
   }
 }

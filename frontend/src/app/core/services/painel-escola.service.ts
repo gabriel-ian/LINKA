@@ -50,7 +50,10 @@ export class PainelEscolaService {
   }
 
   /** Gera senha provisoria para professor, aluno ou responsavel. */
-  redefinirSenha(tipo: 'professores' | 'alunos' | 'responsaveis', id: number): Observable<ApiResponse<SenhaGerada>> {
+  redefinirSenha(
+    tipo: 'professores' | 'alunos' | 'responsaveis',
+    id: number,
+  ): Observable<ApiResponse<SenhaGerada>> {
     return this.http.post<ApiResponse<SenhaGerada>>(`${this.api}/${tipo}/${id}/senha`, {});
   }
 
@@ -58,8 +61,13 @@ export class PainelEscolaService {
     return this.http.get<ApiResponse<ProfessorResumo[]>>(`${this.api}/professores`);
   }
 
-  criarProfessor(dados: NovoProfessor): Observable<ApiResponse<{ id: number; nome: string; email: string }>> {
-    return this.http.post<ApiResponse<{ id: number; nome: string; email: string }>>(`${this.api}/professores`, dados);
+  criarProfessor(
+    dados: NovoProfessor,
+  ): Observable<ApiResponse<{ id: number; nome: string; email: string }>> {
+    return this.http.post<ApiResponse<{ id: number; nome: string; email: string }>>(
+      `${this.api}/professores`,
+      dados,
+    );
   }
 
   definirProfessorAtivo(id: number, ativo: boolean): Observable<unknown> {
@@ -89,10 +97,15 @@ export class PainelEscolaService {
     return this.http.get(`${this.api}/alunos/${alunoId}/laudo`, { responseType: 'blob' });
   }
 
-  relatorio(filtros: { mes?: string; turmaId?: number; diagnosticoId?: number }): Observable<ApiResponse<Relatorio>> {
+  relatorio(filtros: {
+    mes?: string;
+    turmaId?: number;
+    diagnosticoId?: number;
+  }): Observable<ApiResponse<Relatorio>> {
     let params = new HttpParams();
     for (const [chave, valor] of Object.entries(filtros)) {
-      if (valor !== undefined && valor !== null && valor !== '') params = params.set(chave, String(valor));
+      if (valor !== undefined && valor !== null && valor !== '')
+        params = params.set(chave, String(valor));
     }
     return this.http.get<ApiResponse<Relatorio>>(`${this.api}/relatorio`, { params });
   }

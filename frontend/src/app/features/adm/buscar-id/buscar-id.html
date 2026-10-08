@@ -21,7 +21,11 @@
   } @else if (escola(); as e) {
     <section class="cartao">
       <div class="topo">
-        <span class="avatar" [class.apagado]="!e.ativo" style="--tam: 56px; --raio-avatar: 12px; --fonte-avatar: 22px">
+        <span
+          class="avatar"
+          [class.apagado]="!e.ativo"
+          style="--tam: 56px; --raio-avatar: 12px; --fonte-avatar: 22px"
+        >
           {{ iniciais(e.nome) }}
         </span>
         <div class="nome">
@@ -34,41 +38,89 @@
       <hr class="divisor" />
 
       <dl class="dados">
-        <div><dt>Código INEP</dt><dd>{{ e.inep || '—' }}</dd></div>
-        <div><dt>Cidade / UF</dt><dd>{{ cidadeUf(e) || '—' }}</dd></div>
-        <div><dt>Plano</dt><dd>{{ rotuloPlano[e.plano] }}</dd></div>
-        <div><dt>Endereço</dt><dd>{{ e.endereco || '—' }}</dd></div>
-        <div><dt>E-mail institucional</dt><dd>{{ e.email || '—' }}</dd></div>
-        <div><dt>Responsável</dt><dd>{{ e.responsavel ? e.responsavel + ' (coordenação)' : '—' }}</dd></div>
+        <div>
+          <dt>Código INEP</dt>
+          <dd>{{ e.inep || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Cidade / UF</dt>
+          <dd>{{ cidadeUf(e) || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Plano</dt>
+          <dd>{{ rotuloPlano[e.plano] }}</dd>
+        </div>
+        <div>
+          <dt>Endereço</dt>
+          <dd>{{ e.endereco || '—' }}</dd>
+        </div>
+        <div>
+          <dt>E-mail institucional</dt>
+          <dd>{{ e.email || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Responsável</dt>
+          <dd>{{ e.responsavel ? e.responsavel + ' (coordenação)' : '—' }}</dd>
+        </div>
         <div>
           <dt>Alunos NEE</dt>
-          <dd>{{ e.totalAlunosNee }} ativos{{ e.limiteAlunosNee != null ? ' de ' + e.limiteAlunosNee : '' }}</dd>
+          <dd>
+            {{ e.totalAlunosNee }} ativos{{
+              e.limiteAlunosNee != null ? ' de ' + e.limiteAlunosNee : ''
+            }}
+          </dd>
         </div>
-        <div><dt>Professores</dt><dd>{{ professores(e) }}</dd></div>
-        <div><dt>Turmas</dt><dd>{{ e.totalTurmas }}</dd></div>
+        <div>
+          <dt>Professores</dt>
+          <dd>{{ professores(e) }}</dd>
+        </div>
+        <div>
+          <dt>Turmas</dt>
+          <dd>{{ e.totalTurmas }}</dd>
+        </div>
         @if (!e.ativo) {
-          <div><dt>Desativada em</dt><dd>{{ dataBr(e.desativadaEm) || '—' }}</dd></div>
-          <div><dt>Motivo</dt><dd>{{ e.motivoDesativacao || '—' }}</dd></div>
+          <div>
+            <dt>Desativada em</dt>
+            <dd>{{ dataBr(e.desativadaEm) || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Motivo</dt>
+            <dd>{{ e.motivoDesativacao || '—' }}</dd>
+          </div>
         }
       </dl>
 
       <hr class="divisor" />
 
       <div class="acoes">
-        <button type="button" class="bt bt-secundario" [disabled]="redefinindo()" (click)="redefinirSenha(e)">
+        <button
+          type="button"
+          class="bt bt-secundario"
+          [disabled]="redefinindo()"
+          (click)="redefinirSenha(e)"
+        >
           {{ redefinindo() ? 'Gerando...' : 'Redefinir senha de acesso' }}
         </button>
         @if (e.ativo) {
-          <a class="bt bt-perigo" routerLink="/adm/escolas/desativar" [queryParams]="{ id: e.id }">Desativar escola</a>
+          <a class="bt bt-perigo" routerLink="/adm/escolas/desativar" [queryParams]="{ id: e.id }"
+            >Desativar escola</a
+          >
         } @else {
           <a class="bt bt-secundario" routerLink="/adm/escolas/reativar">Reativar escola</a>
         }
-        <a class="bt bt-primario" routerLink="/adm/escolas/atualizar" [queryParams]="{ id: e.id }">Atualizar dados</a>
+        <a class="bt bt-primario" routerLink="/adm/escolas/atualizar" [queryParams]="{ id: e.id }"
+          >Atualizar dados</a
+        >
       </div>
     </section>
 
     @if (senhaGerada(); as s) {
-      <app-senha-provisoria [nome]="e.nome" [email]="s.email" [senha]="s.senhaProvisoria" (fechar)="senhaGerada.set(null)" />
+      <app-senha-provisoria
+        [nome]="e.nome"
+        [email]="s.email"
+        [senha]="s.senhaProvisoria"
+        (fechar)="senhaGerada.set(null)"
+      />
     }
   }
 </div>

@@ -30,7 +30,9 @@ export class CriarTurmaDto {
   serie!: string;
 
   @ApiProperty({ example: 'C' })
-  @Matches(/^[A-Za-z0-9]{1,5}$/, { message: 'letra deve ter de 1 a 5 letras ou numeros' })
+  @Matches(/^[A-Za-z0-9]{1,5}$/, {
+    message: 'letra deve ter de 1 a 5 letras ou numeros',
+  })
   letra!: string;
 
   @ApiProperty({ enum: ['manha', 'tarde', 'noite', 'integral'] })
@@ -55,7 +57,10 @@ export class CriarTurmaDto {
   @Min(1)
   limiteAlunos?: number;
 
-  @ApiPropertyOptional({ type: [Number], description: 'Professores que vao lecionar na turma' })
+  @ApiPropertyOptional({
+    type: [Number],
+    description: 'Professores que vao lecionar na turma',
+  })
   @IsOptional()
   @IsArray()
   @ArrayUnique()
@@ -159,7 +164,10 @@ export class CriarAlunoDto {
   @IsEmail()
   email?: string;
 
-  @ApiPropertyOptional({ minLength: 8, description: 'Obrigatoria quando ha e-mail' })
+  @ApiPropertyOptional({
+    minLength: 8,
+    description: 'Obrigatoria quando ha e-mail',
+  })
   @ValidateIf((o: CriarAlunoDto) => !!o.email)
   @IsString()
   @MinLength(8)
@@ -230,7 +238,9 @@ export class EditarAlunoDto extends PerfilAprendizagemDto {
   @MaxLength(50)
   cgm?: string | null;
 
-  @ApiPropertyOptional({ description: 'Troca de turma; null tira o aluno da turma' })
+  @ApiPropertyOptional({
+    description: 'Troca de turma; null tira o aluno da turma',
+  })
   @IsOptional()
   @IsInt()
   turmaId?: number | null;

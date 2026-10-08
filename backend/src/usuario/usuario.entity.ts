@@ -7,7 +7,8 @@ import {
 } from 'typeorm';
 import { Escola } from '../escola/escola.entity';
 
-export type PerfilUsuario = 'admin' | 'escola' | 'professor' | 'responsavel' | 'aluno';
+export type PerfilUsuario =
+  'admin' | 'escola' | 'professor' | 'responsavel' | 'aluno';
 
 /**
  * Tabela `usuario` — centraliza o login de todos os perfis.

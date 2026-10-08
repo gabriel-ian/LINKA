@@ -4,11 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EscolaService } from '../../../core/services/escola.service';
-import {
-  Escola,
-  MOTIVOS_DESATIVACAO,
-  MotivoDesativacao,
-} from '../../../core/model/escola.model';
+import { Escola, MOTIVOS_DESATIVACAO, MotivoDesativacao } from '../../../core/model/escola.model';
 import { EscolasStore } from '../escolas.store';
 import { AdmResultado } from '../resultado/resultado';
 import { EscolherEscola } from '../escolher-escola/escolher-escola';
@@ -60,7 +56,11 @@ export class DesativarEscola {
     this.service.buscarPorId(id).subscribe({
       next: (res) => this.escola.set(res.data),
       error: (e: HttpErrorResponse) =>
-        this.erro.set(e.status === 404 ? `Nenhuma escola com o ID #${id}.` : 'Não foi possível carregar a escola.'),
+        this.erro.set(
+          e.status === 404
+            ? `Nenhuma escola com o ID #${id}.`
+            : 'Não foi possível carregar a escola.',
+        ),
     });
   }
 

@@ -27,9 +27,7 @@ export class RolesGuard implements CanActivate {
     const usuario = request.user;
 
     if (!usuario || !perfisPermitidos.includes(usuario.perfil)) {
-      throw new ForbiddenException(
-        'Seu perfil nao tem acesso a este recurso',
-      );
+      throw new ForbiddenException('Seu perfil nao tem acesso a este recurso');
     }
 
     return true;

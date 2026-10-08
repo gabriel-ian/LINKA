@@ -173,9 +173,9 @@ describe('AuthService', () => {
       usuarioService.findById.mockResolvedValue(usuario);
       jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(false);
 
-      await expect(service.alterarSenha(3, 'errada', 'novaSenha1')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.alterarSenha(3, 'errada', 'novaSenha1'),
+      ).rejects.toThrow(BadRequestException);
       expect(usuarioService.definirSenha).not.toHaveBeenCalled();
     });
 

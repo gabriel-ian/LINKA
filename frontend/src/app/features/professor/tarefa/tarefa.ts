@@ -37,7 +37,9 @@ export class ProfessorTarefa {
     return t?.adaptacoes.find((a) => a.alunoId === this.selecionado()) ?? t?.adaptacoes[0] ?? null;
   });
 
-  readonly geradas = computed(() => this.tarefa()?.adaptacoes.filter((a) => a.passos?.length).length ?? 0);
+  readonly geradas = computed(
+    () => this.tarefa()?.adaptacoes.filter((a) => a.passos?.length).length ?? 0,
+  );
 
   readonly prazo = computed(() => {
     const t = this.tarefa();
@@ -63,13 +65,16 @@ export class ProfessorTarefa {
         if (this.nova() && faltam && res.data.iaDisponivel) this.gerar();
       },
       error: (e: HttpErrorResponse) =>
-        this.erro.set(e.status === 404 ? 'Tarefa não encontrada.' : 'Não foi possível carregar a tarefa.'),
+        this.erro.set(
+          e.status === 404 ? 'Tarefa não encontrada.' : 'Não foi possível carregar a tarefa.',
+        ),
     });
   }
 
   private aplicar(t: TarefaProfessor): void {
     this.tarefa.set(t);
-    if (this.selecionado() === null && t.adaptacoes.length) this.selecionado.set(t.adaptacoes[0].alunoId);
+    if (this.selecionado() === null && t.adaptacoes.length)
+      this.selecionado.set(t.adaptacoes[0].alunoId);
   }
 
   gerar(alunoId?: number): void {
@@ -105,7 +110,10 @@ export class ProfessorTarefa {
   salvarEdicao(): void {
     const t = this.tarefa();
     const a = this.adaptacao();
-    const passos = this.textoEdicao.split('\n').map((p) => p.replace(/^\s*\d+[.)-]\s*/, '').trim()).filter(Boolean);
+    const passos = this.textoEdicao
+      .split('\n')
+      .map((p) => p.replace(/^\s*\d+[.)-]\s*/, '').trim())
+      .filter(Boolean);
     if (!t || !a || !passos.length) return;
 
     this.salvando.set(true);

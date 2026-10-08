@@ -48,11 +48,14 @@ export class EscolaProfessores {
     return this.professores().filter(
       (p) =>
         (this.filtro() === 'todos' || p.status === this.filtro()) &&
-        (!termo || [p.nome, p.email ?? '', ...p.disciplinas].some((c) => c.toLowerCase().includes(termo))),
+        (!termo ||
+          [p.nome, p.email ?? '', ...p.disciplinas].some((c) => c.toLowerCase().includes(termo))),
     );
   });
 
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.filtrados().length / POR_PAGINA)));
+  readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.filtrados().length / POR_PAGINA)),
+  );
   readonly visiveis = computed(() =>
     this.filtrados().slice(this.pagina() * POR_PAGINA, (this.pagina() + 1) * POR_PAGINA),
   );

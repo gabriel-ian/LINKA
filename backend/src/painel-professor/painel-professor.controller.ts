@@ -72,7 +72,9 @@ export class PainelProfessorController {
   }
 
   @Patch('alunos/:id/perfil')
-  @ApiOperation({ summary: 'Editar o perfil de aprendizagem do aluno (usado pela IA)' })
+  @ApiOperation({
+    summary: 'Editar o perfil de aprendizagem do aluno (usado pela IA)',
+  })
   editarPerfil(
     @UsuarioId() usuarioId: number,
     @EscolaId() escolaId: number,

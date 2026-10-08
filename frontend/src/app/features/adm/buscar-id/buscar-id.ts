@@ -85,7 +85,10 @@ export class BuscarId {
   }
 
   redefinirSenha(e: Escola): void {
-    if (!confirm(`Gerar uma nova senha de acesso para ${e.nome}? A senha atual deixa de funcionar.`)) return;
+    if (
+      !confirm(`Gerar uma nova senha de acesso para ${e.nome}? A senha atual deixa de funcionar.`)
+    )
+      return;
     this.erro.set('');
     this.redefinindo.set(true);
     this.service.redefinirSenha(e.id).subscribe({

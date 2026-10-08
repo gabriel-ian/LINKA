@@ -31,7 +31,8 @@ export class ProfessorTarefas {
   readonly pagina = signal(0);
 
   /** Abertas = ainda dentro do prazo (hoje, amanha ou futuras) e nao concluidas. */
-  private aberta = (t: TarefaListada) => t.status === 'hoje' || t.status === 'amanha' || t.status === 'futura';
+  private aberta = (t: TarefaListada) =>
+    t.status === 'hoje' || t.status === 'amanha' || t.status === 'futura';
 
   readonly daTurma = computed(() =>
     this.tarefas().filter((t) => this.turmaId() === null || t.turmaId === this.turmaId()),
@@ -52,7 +53,9 @@ export class ProfessorTarefas {
     );
   });
 
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.filtradas().length / POR_PAGINA)));
+  readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.filtradas().length / POR_PAGINA)),
+  );
   readonly visiveis = computed(() =>
     this.filtradas().slice(this.pagina() * POR_PAGINA, (this.pagina() + 1) * POR_PAGINA),
   );

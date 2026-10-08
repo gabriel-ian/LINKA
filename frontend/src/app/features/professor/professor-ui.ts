@@ -1,4 +1,8 @@
-import { StatusTarefa, TarefaRecente, TipoComunicado } from '../../core/model/painel-professor.model';
+import {
+  StatusTarefa,
+  TarefaRecente,
+  TipoComunicado,
+} from '../../core/model/painel-professor.model';
 import { Cor } from '../escola/escola-ui';
 
 /** Helpers de exibicao do painel do professor. */
@@ -26,7 +30,9 @@ export const COR_STATUS: Record<StatusTarefa, Cor | 'cinza'> = {
 };
 
 export function rotuloStatus(t: TarefaRecente): string {
-  const hora = t.horaLimite ? ` - ${Number(t.horaLimite.slice(0, 2))}h${t.horaLimite.slice(3) === '00' ? '' : t.horaLimite.slice(3)}` : '';
+  const hora = t.horaLimite
+    ? ` - ${Number(t.horaLimite.slice(0, 2))}h${t.horaLimite.slice(3) === '00' ? '' : t.horaLimite.slice(3)}`
+    : '';
   switch (t.status) {
     case 'concluida':
       return 'Concluída';
@@ -49,7 +55,11 @@ export function dataCurta(valor: string): string {
 
 /** "Terça-feira, 7 de julho". */
 export function hojePorExtenso(): string {
-  const texto = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const texto = new Date().toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
   return texto[0].toUpperCase() + texto.slice(1);
 }
 
@@ -59,7 +69,8 @@ export function quandoRelativo(valor: string | null): string {
   const data = new Date(valor);
   const hoje = new Date();
   const dias = Math.round(
-    (new Date(hoje.toDateString()).getTime() - new Date(data.toDateString()).getTime()) / 86_400_000,
+    (new Date(hoje.toDateString()).getTime() - new Date(data.toDateString()).getTime()) /
+      86_400_000,
   );
   const hora = `${String(data.getHours()).padStart(2, '0')}h${String(data.getMinutes()).padStart(2, '0')}`;
   if (dias === 0) return `Hoje, ${hora}`;

@@ -94,7 +94,9 @@ export class EscolaForm {
       },
       error: (e: HttpErrorResponse) =>
         this.erroGeral.set(
-          e.status === 404 ? `Nenhuma escola com o ID #${id}.` : 'Não foi possível carregar a escola.',
+          e.status === 404
+            ? `Nenhuma escola com o ID #${id}.`
+            : 'Não foi possível carregar a escola.',
         ),
     });
   }
@@ -187,7 +189,9 @@ export class EscolaForm {
           this.erros.set({ email: 'Este e-mail já está em uso por outro usuário.' });
         } else {
           this.erroGeral.set(
-            e.status === 400 ? `Dados recusados pelo servidor: ${msg}` : 'Não foi possível salvar agora. Tente novamente.',
+            e.status === 400
+              ? `Dados recusados pelo servidor: ${msg}`
+              : 'Não foi possível salvar agora. Tente novamente.',
           );
         }
       },
@@ -195,7 +199,17 @@ export class EscolaForm {
   }
 
   cadastrarOutra(): void {
-    for (const campo of ['nome', 'inep', 'endereco', 'cidadeUf', 'responsavel', 'email', 'telefone', 'senha', 'confirmar'] as const) {
+    for (const campo of [
+      'nome',
+      'inep',
+      'endereco',
+      'cidadeUf',
+      'responsavel',
+      'email',
+      'telefone',
+      'senha',
+      'confirmar',
+    ] as const) {
       this[campo] = '';
     }
     this.plano = 'institucional';

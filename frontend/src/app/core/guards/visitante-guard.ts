@@ -6,5 +6,7 @@ import { rotaInicial } from '../services/rota-inicial';
 /** Telas de entrada: quem ja esta logado vai direto para o proprio painel. */
 export const visitanteGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
-  return auth.logado && auth.perfil ? inject(Router).createUrlTree([rotaInicial(auth.perfil)]) : true;
+  return auth.logado && auth.perfil
+    ? inject(Router).createUrlTree([rotaInicial(auth.perfil)])
+    : true;
 };

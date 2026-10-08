@@ -29,7 +29,11 @@
       />
     </label>
     <label class="campo-p seletor">
-      <select aria-label="Turma" [value]="turma()" (change)="turma.set($any($event.target).value); pagina.set(0)">
+      <select
+        aria-label="Turma"
+        [value]="turma()"
+        (change)="turma.set($any($event.target).value); pagina.set(0)"
+      >
         <option value="">Turma: Todas</option>
         @for (t of turmas(); track t.id) {
           <option [value]="t.id">{{ t.nome }}</option>
@@ -37,7 +41,11 @@
       </select>
     </label>
     <label class="campo-p seletor">
-      <select aria-label="Diagnóstico" [value]="diagnostico()" (change)="diagnostico.set($any($event.target).value); pagina.set(0)">
+      <select
+        aria-label="Diagnóstico"
+        [value]="diagnostico()"
+        (change)="diagnostico.set($any($event.target).value); pagina.set(0)"
+      >
         <option value="">Diagnóstico: Todos</option>
         @for (d of diagnosticos(); track d) {
           <option [value]="d">{{ d }}</option>
@@ -63,7 +71,9 @@
           <tr [class]="'c-' + corSituacao(a.situacao)">
             <td>
               <a class="pessoa" [routerLink]="['/escola/alunos', a.id]">
-                <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(a.nome) }}</span>
+                <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
+                  iniciais(a.nome)
+                }}</span>
                 <div>
                   <strong>{{ a.nome }}</strong>
                   <small>{{ a.cgm ? 'CGM ' + a.cgm : 'Sem CGM' }}</small>
@@ -71,14 +81,20 @@
               </a>
             </td>
             <td>{{ a.turma?.codigo ?? '—' }}</td>
-            <td><span class="pilula inativa">{{ a.diagnosticos[0] || 'Não informado' }}</span></td>
+            <td>
+              <span class="pilula inativa">{{ a.diagnosticos[0] || 'Não informado' }}</span>
+            </td>
             <td>
               <span class="desempenho">
-                <span class="progresso"><span [style.width.%]="a.desempenhoSemana ?? 0"></span></span>
+                <span class="progresso"
+                  ><span [style.width.%]="a.desempenhoSemana ?? 0"></span
+                ></span>
                 <b>{{ pct(a.desempenhoSemana) }}</b>
               </span>
             </td>
-            <td><span class="pilula-cor">{{ rotuloSituacao[a.situacao] }}</span></td>
+            <td>
+              <span class="pilula-cor">{{ rotuloSituacao[a.situacao] }}</span>
+            </td>
           </tr>
         } @empty {
           <tr>
@@ -90,7 +106,10 @@
   </section>
 
   <div class="rodape-lista">
-    <span>Mostrando {{ visiveis().length }} de {{ filtrados().length }} alunos - ordenados por prioridade de atenção</span>
+    <span
+      >Mostrando {{ visiveis().length }} de {{ filtrados().length }} alunos - ordenados por
+      prioridade de atenção</span
+    >
     @if (totalPaginas() > 1) {
       <button type="button" class="bt bt-secundario" (click)="proximaPagina()">
         {{ pagina() + 1 < totalPaginas() ? 'Próxima página' : 'Voltar ao início' }}

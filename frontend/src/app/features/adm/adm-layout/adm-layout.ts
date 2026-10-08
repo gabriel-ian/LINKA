@@ -33,9 +33,21 @@ export class AdmLayout {
         titulo: 'MENU',
         itens: [
           { rota: '/adm', rotulo: 'Visão geral', icone: 'visao' },
-          { rota: '/adm/escolas/cadastrar', rotulo: 'Cadastrar Escola', icone: [{ src: ICONE + 'cadastrar', left: 17, top: 14 }] },
-          { rota: '/adm/escolas', rotulo: 'Listar Escola', icone: [{ src: ICONE + 'listar', left: 17, top: 15 }] },
-          { rota: '/adm/escolas/buscar', rotulo: 'Buscar Escola', icone: [{ src: ICONE + 'buscar', left: 17, top: 12 }] },
+          {
+            rota: '/adm/escolas/cadastrar',
+            rotulo: 'Cadastrar Escola',
+            icone: [{ src: ICONE + 'cadastrar', left: 17, top: 14 }],
+          },
+          {
+            rota: '/adm/escolas',
+            rotulo: 'Listar Escola',
+            icone: [{ src: ICONE + 'listar', left: 17, top: 15 }],
+          },
+          {
+            rota: '/adm/escolas/buscar',
+            rotulo: 'Buscar Escola',
+            icone: [{ src: ICONE + 'buscar', left: 17, top: 12 }],
+          },
           {
             rota: '/adm/escolas/id',
             rotulo: 'Buscar ID Escola',
@@ -44,8 +56,16 @@ export class AdmLayout {
               { src: ICONE + 'id', left: 23.75, top: 19.75 },
             ],
           },
-          { rota: '/adm/escolas/atualizar', rotulo: 'Atualizar Escola', icone: [{ src: ICONE + 'atualizar', left: 18.5, top: 14.5 }] },
-          { rota: '/adm/escolas/desativar', rotulo: 'Desativar Escola', icone: [{ src: ICONE + 'desativar', left: 18, top: 13 }] },
+          {
+            rota: '/adm/escolas/atualizar',
+            rotulo: 'Atualizar Escola',
+            icone: [{ src: ICONE + 'atualizar', left: 18.5, top: 14.5 }],
+          },
+          {
+            rota: '/adm/escolas/desativar',
+            rotulo: 'Desativar Escola',
+            icone: [{ src: ICONE + 'desativar', left: 18, top: 13 }],
+          },
           {
             rota: '/adm/escolas/reativar',
             rotulo: 'Reativar Escola',

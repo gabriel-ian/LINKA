@@ -8,14 +8,12 @@ export const routes: Routes = [
   {
     path: 'login',
     canActivate: [visitanteGuard],
-    loadComponent: () =>
-      import('./features/login/login.component').then((m) => m.LoginComponent),
+    loadComponent: () => import('./features/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'adm/login',
     canActivate: [visitanteGuard],
-    loadComponent: () =>
-      import('./features/adm-login/adm-login').then((m) => m.AdmLogin),
+    loadComponent: () => import('./features/adm-login/adm-login').then((m) => m.AdmLogin),
   },
   {
     path: 'recuperar-senha',
@@ -26,8 +24,7 @@ export const routes: Routes = [
   {
     path: 'adm',
     canActivate: [authGuard, perfilGuard('admin')],
-    loadComponent: () =>
-      import('./features/adm/adm-layout/adm-layout').then((m) => m.AdmLayout),
+    loadComponent: () => import('./features/adm/adm-layout/adm-layout').then((m) => m.AdmLayout),
     children: [
       {
         path: '',
@@ -52,8 +49,7 @@ export const routes: Routes = [
       },
       {
         path: 'escolas/id',
-        loadComponent: () =>
-          import('./features/adm/buscar-id/buscar-id').then((m) => m.BuscarId),
+        loadComponent: () => import('./features/adm/buscar-id/buscar-id').then((m) => m.BuscarId),
       },
       {
         path: 'escolas/atualizar',
@@ -64,16 +60,12 @@ export const routes: Routes = [
       {
         path: 'escolas/desativar',
         loadComponent: () =>
-          import('./features/adm/desativar-escola/desativar-escola').then(
-            (m) => m.DesativarEscola,
-          ),
+          import('./features/adm/desativar-escola/desativar-escola').then((m) => m.DesativarEscola),
       },
       {
         path: 'escolas/reativar',
         loadComponent: () =>
-          import('./features/adm/reativar-escola/reativar-escola').then(
-            (m) => m.ReativarEscola,
-          ),
+          import('./features/adm/reativar-escola/reativar-escola').then((m) => m.ReativarEscola),
       },
     ],
   },
@@ -145,7 +137,9 @@ export const routes: Routes = [
       {
         path: 'cadastro/aluno',
         loadComponent: () =>
-          import('./features/escola/cadastro-aluno/cadastro-aluno').then((m) => m.EscolaCadastroAluno),
+          import('./features/escola/cadastro-aluno/cadastro-aluno').then(
+            (m) => m.EscolaCadastroAluno,
+          ),
       },
     ],
   },
@@ -157,11 +151,13 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/professor/visao/visao').then((m) => m.ProfessorVisao),
+        loadComponent: () =>
+          import('./features/professor/visao/visao').then((m) => m.ProfessorVisao),
       },
       {
         path: 'tarefas',
-        loadComponent: () => import('./features/professor/tarefas/tarefas').then((m) => m.ProfessorTarefas),
+        loadComponent: () =>
+          import('./features/professor/tarefas/tarefas').then((m) => m.ProfessorTarefas),
       },
       {
         path: 'tarefas/nova',
@@ -170,20 +166,25 @@ export const routes: Routes = [
       },
       {
         path: 'tarefas/:id',
-        loadComponent: () => import('./features/professor/tarefa/tarefa').then((m) => m.ProfessorTarefa),
+        loadComponent: () =>
+          import('./features/professor/tarefa/tarefa').then((m) => m.ProfessorTarefa),
       },
       {
         path: 'turmas/:id',
-        loadComponent: () => import('./features/professor/turma/turma').then((m) => m.ProfessorTurma),
+        loadComponent: () =>
+          import('./features/professor/turma/turma').then((m) => m.ProfessorTurma),
       },
       {
         path: 'alunos/:id',
-        loadComponent: () => import('./features/professor/aluno/aluno').then((m) => m.ProfessorAluno),
+        loadComponent: () =>
+          import('./features/professor/aluno/aluno').then((m) => m.ProfessorAluno),
       },
       {
         path: 'comunicados',
         loadComponent: () =>
-          import('./features/professor/comunicados/comunicados').then((m) => m.ProfessorComunicados),
+          import('./features/professor/comunicados/comunicados').then(
+            (m) => m.ProfessorComunicados,
+          ),
       },
       {
         path: 'relatorios',

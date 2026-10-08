@@ -49,7 +49,11 @@ export class ProfessorAluno {
         this.service.aluno(Number(p.get('id'))).subscribe({
           next: (res) => this.aluno.set(res.data),
           error: (e: HttpErrorResponse) =>
-            this.erro.set(e.status === 404 ? 'Aluno não encontrado nas suas turmas.' : 'Não foi possível carregar o aluno.'),
+            this.erro.set(
+              e.status === 404
+                ? 'Aluno não encontrado nas suas turmas.'
+                : 'Não foi possível carregar o aluno.',
+            ),
         }),
       );
   }
@@ -88,7 +92,11 @@ export class ProfessorAluno {
   }
 
   subtitulo(a: AlunoProfessor): string {
-    return [a.turma.nome, a.diagnosticos.length ? a.diagnosticos.join(', ') : null, a.idade !== null ? `${a.idade} anos` : null]
+    return [
+      a.turma.nome,
+      a.diagnosticos.length ? a.diagnosticos.join(', ') : null,
+      a.idade !== null ? `${a.idade} anos` : null,
+    ]
       .filter(Boolean)
       .join(' - ');
   }

@@ -25,7 +25,6 @@ export const authGuard: CanActivateFn = () => {
     }
 
     return true;
-
   } catch {
     localStorage.removeItem('token');
     return router.createUrlTree(['/login']);

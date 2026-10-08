@@ -43,14 +43,15 @@ export class EscolaAlunoPerfil {
   constructor() {
     const rota = inject(ActivatedRoute);
     this.salvo.set(rota.snapshot.queryParamMap.get('salvo'));
-    rota.paramMap.pipe(takeUntilDestroyed(inject(DestroyRef)))
-      .subscribe((p) =>
-        this.service.aluno(Number(p.get('id'))).subscribe({
-          next: (res) => this.aluno.set(res.data),
-          error: (e: HttpErrorResponse) =>
-            this.erro.set(e.status === 404 ? 'Aluno não encontrado.' : 'Não foi possível carregar o aluno.'),
-        }),
-      );
+    rota.paramMap.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe((p) =>
+      this.service.aluno(Number(p.get('id'))).subscribe({
+        next: (res) => this.aluno.set(res.data),
+        error: (e: HttpErrorResponse) =>
+          this.erro.set(
+            e.status === 404 ? 'Aluno não encontrado.' : 'Não foi possível carregar o aluno.',
+          ),
+      }),
+    );
   }
 
   subtitulo(a: AlunoDetalhe): string {

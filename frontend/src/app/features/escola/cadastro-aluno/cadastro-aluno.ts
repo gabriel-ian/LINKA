@@ -38,7 +38,8 @@ export class EscolaCadastroAluno {
   mostrarSenha = false;
   nascimento = '';
   cgm = '';
-  turmaId: number | null = Number(inject(ActivatedRoute).snapshot.queryParamMap.get('turmaId')) || null;
+  turmaId: number | null =
+    Number(inject(ActivatedRoute).snapshot.queryParamMap.get('turmaId')) || null;
   respNome = '';
   respEmail = '';
   respTelefone = '';
@@ -57,7 +58,9 @@ export class EscolaCadastroAluno {
   readonly avisoLaudo = signal('');
 
   readonly nomesDiagnosticos = computed(() =>
-    (this.opcoes()?.diagnosticos ?? []).filter((d) => this.diagnosticos().has(d.id)).map((d) => d.nome),
+    (this.opcoes()?.diagnosticos ?? [])
+      .filter((d) => this.diagnosticos().has(d.id))
+      .map((d) => d.nome),
   );
 
   readonly nomeTurma = computed(
@@ -106,12 +109,19 @@ export class EscolaCadastroAluno {
     const e: Partial<Record<Campo, string>> = {};
     if (!this.nome.trim()) e.nome = 'Informe o nome do aluno.';
     if (this.email.trim() && !EMAIL.test(this.email.trim())) e.email = 'E-mail inválido.';
-    if (this.email.trim() && this.senha.length < 8) e.senha = 'Com e-mail, a senha precisa de pelo menos 8 caracteres.';
-    if (this.nascimento && this.nascimento > hojeIso()) e.nascimento = 'A data não pode ser no futuro.';
+    if (this.email.trim() && this.senha.length < 8)
+      e.senha = 'Com e-mail, a senha precisa de pelo menos 8 caracteres.';
+    if (this.nascimento && this.nascimento > hojeIso())
+      e.nascimento = 'A data não pode ser no futuro.';
 
-    const temResponsavel = !!(this.respNome.trim() || this.respEmail.trim() || this.respTelefone.trim());
+    const temResponsavel = !!(
+      this.respNome.trim() ||
+      this.respEmail.trim() ||
+      this.respTelefone.trim()
+    );
     if (temResponsavel && !this.respNome.trim()) e.respNome = 'Informe o nome do responsável.';
-    if (temResponsavel && !EMAIL.test(this.respEmail.trim())) e.respEmail = 'Informe um e-mail válido para o responsável.';
+    if (temResponsavel && !EMAIL.test(this.respEmail.trim()))
+      e.respEmail = 'Informe um e-mail válido para o responsável.';
 
     this.erros.set({ ...e, laudo: this.erros().laudo });
     this.erroGeral.set('');
@@ -152,7 +162,9 @@ export class EscolaCadastroAluno {
         this.service.enviarLaudo(res.data.id, laudo).subscribe({
           next: () => this.concluir(),
           error: () => {
-            this.avisoLaudo.set('O aluno foi cadastrado, mas o laudo não foi enviado. Tente anexar de novo mais tarde.');
+            this.avisoLaudo.set(
+              'O aluno foi cadastrado, mas o laudo não foi enviado. Tente anexar de novo mais tarde.',
+            );
             this.concluir();
           },
         });
@@ -161,7 +173,8 @@ export class EscolaCadastroAluno {
         this.salvando.set(false);
         this.etapa.set(1);
         const msg = [err.error?.message].flat().join(' ');
-        if (/responsavel/i.test(msg)) this.erros.set({ respEmail: 'Este e-mail já é usado por outro tipo de conta.' });
+        if (/responsavel/i.test(msg))
+          this.erros.set({ respEmail: 'Este e-mail já é usado por outro tipo de conta.' });
         else if (/email/i.test(msg)) this.erros.set({ email: 'Este e-mail já está em uso.' });
         else this.erroGeral.set(msg || 'Não foi possível cadastrar o aluno.');
       },

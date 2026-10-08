@@ -5,18 +5,30 @@ import { Component, input, output, signal } from '@angular/core';
   selector: 'app-senha-provisoria',
   template: `
     <div class="fundo" (click)="fechar.emit()">
-      <div class="janela" role="dialog" aria-modal="true" aria-labelledby="titulo-senha" (click)="$event.stopPropagation()">
+      <div
+        class="janela"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-senha"
+        (click)="$event.stopPropagation()"
+      >
         <h2 id="titulo-senha">Nova senha de {{ nome() }}</h2>
-        <p>Entregue estes dados a {{ nome() }}. Por segurança, a senha não será mostrada de novo.</p>
+        <p>
+          Entregue estes dados a {{ nome() }}. Por segurança, a senha não será mostrada de novo.
+        </p>
         <dl>
           <dt>E-mail</dt>
           <dd>{{ email() }}</dd>
           <dt>Senha provisória</dt>
-          <dd><code>{{ senha() }}</code></dd>
+          <dd>
+            <code>{{ senha() }}</code>
+          </dd>
         </dl>
         <p class="dica">No primeiro acesso, peça para trocar a senha em "Alterar minha senha".</p>
         <div class="acoes">
-          <button type="button" class="bt bt-secundario" (click)="copiar()">{{ copiado() ? 'Copiado!' : 'Copiar' }}</button>
+          <button type="button" class="bt bt-secundario" (click)="copiar()">
+            {{ copiado() ? 'Copiado!' : 'Copiar' }}
+          </button>
           <button type="button" class="bt bt-primario" (click)="fechar.emit()">Pronto</button>
         </div>
       </div>

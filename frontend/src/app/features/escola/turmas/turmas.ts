@@ -28,9 +28,13 @@ export class EscolaTurmas {
   readonly serie = signal('');
   readonly todas = signal(false);
 
-  readonly series = computed(() =>
-    [...new Set(this.turmas().map((t) => t.serie).filter((s): s is string => !!s))],
-  );
+  readonly series = computed(() => [
+    ...new Set(
+      this.turmas()
+        .map((t) => t.serie)
+        .filter((s): s is string => !!s),
+    ),
+  ]);
 
   readonly filtradas = computed(() => {
     const termo = this.busca().trim().toLowerCase();

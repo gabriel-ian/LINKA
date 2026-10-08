@@ -60,7 +60,7 @@ export class AuthService {
     const token = localStorage.getItem('token');
 
     try {
-      return token ? JSON.parse(atob(token.split('.')[1])).email ?? null : null;
+      return token ? (JSON.parse(atob(token.split('.')[1])).email ?? null) : null;
     } catch {
       return null;
     }

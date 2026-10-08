@@ -40,7 +40,10 @@ export class PainelProfessorService {
     return this.http.get<ApiResponse<AlunoProfessor>>(`${this.api}/alunos/${id}`);
   }
 
-  editarPerfilAluno(id: number, perfil: PerfilAprendizagem): Observable<ApiResponse<AlunoProfessor>> {
+  editarPerfilAluno(
+    id: number,
+    perfil: PerfilAprendizagem,
+  ): Observable<ApiResponse<AlunoProfessor>> {
     return this.http.patch<ApiResponse<AlunoProfessor>>(`${this.api}/alunos/${id}/perfil`, perfil);
   }
 
@@ -60,11 +63,22 @@ export class PainelProfessorService {
   /** Gera com IA as versoes que faltam; com alunoId, refaz so a dele. */
   adaptar(id: number, alunoId?: number): Observable<ApiResponse<TarefaProfessor>> {
     const params = alunoId ? new HttpParams().set('alunoId', alunoId) : undefined;
-    return this.http.post<ApiResponse<TarefaProfessor>>(`${this.api}/tarefas/${id}/adaptar`, {}, { params });
+    return this.http.post<ApiResponse<TarefaProfessor>>(
+      `${this.api}/tarefas/${id}/adaptar`,
+      {},
+      { params },
+    );
   }
 
-  editarAdaptacao(id: number, alunoId: number, passos: string[]): Observable<ApiResponse<TarefaProfessor>> {
-    return this.http.put<ApiResponse<TarefaProfessor>>(`${this.api}/tarefas/${id}/adaptacoes/${alunoId}`, { passos });
+  editarAdaptacao(
+    id: number,
+    alunoId: number,
+    passos: string[],
+  ): Observable<ApiResponse<TarefaProfessor>> {
+    return this.http.put<ApiResponse<TarefaProfessor>>(
+      `${this.api}/tarefas/${id}/adaptacoes/${alunoId}`,
+      { passos },
+    );
   }
 
   comunicados(): Observable<ApiResponse<ListaComunicados>> {
@@ -75,7 +89,11 @@ export class PainelProfessorService {
     return this.http.post<ApiResponse<ComunicadoSalvo>>(`${this.api}/comunicados`, dados);
   }
 
-  relatorio(turmaId: number, mes: string, alunos: 'todos' | 'nee'): Observable<ApiResponse<RelatorioProfessor>> {
+  relatorio(
+    turmaId: number,
+    mes: string,
+    alunos: 'todos' | 'nee',
+  ): Observable<ApiResponse<RelatorioProfessor>> {
     const params = new HttpParams().set('turmaId', turmaId).set('mes', mes).set('alunos', alunos);
     return this.http.get<ApiResponse<RelatorioProfessor>>(`${this.api}/relatorio`, { params });
   }

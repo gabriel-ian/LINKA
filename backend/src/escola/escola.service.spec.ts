@@ -32,12 +32,12 @@ describe('EscolaService', () => {
       find: jest.fn().mockResolvedValue([]),
       findOne: jest.fn().mockResolvedValue(null),
       create: jest.fn((dados) => dados),
-      save: jest.fn(async (dados) => ({ id: 99, ...dados })),
+      save: jest.fn((dados) => Promise.resolve({ id: 99, ...dados })),
       update: jest.fn(),
     };
     escolaRepoTx = {
       create: jest.fn((dados) => dados),
-      save: jest.fn(async (dados) => ({ id: 2, ...dados })),
+      save: jest.fn((dados) => Promise.resolve({ id: 2, ...dados })),
       update: jest.fn(),
     };
     contagens = new Map<unknown, ReturnType<typeof queryBuilderCom>>([
@@ -54,7 +54,7 @@ describe('EscolaService', () => {
 
     const dataSource = {
       getRepository,
-      transaction: jest.fn(async (fn) => fn({ getRepository })),
+      transaction: jest.fn((fn) => Promise.resolve(fn({ getRepository }))),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -108,7 +108,11 @@ describe('EscolaService', () => {
         totalProfessores: 8,
         totalTurmas: 0,
       });
-      expect(data[1]).toMatchObject({ id: 2, pendente: true, totalAlunosNee: 0 });
+      expect(data[1]).toMatchObject({
+        id: 2,
+        pendente: true,
+        totalAlunosNee: 0,
+      });
     });
 
     it('nao consulta contagens quando nao ha escolas', async () => {
@@ -123,12 +127,20 @@ describe('EscolaService', () => {
 
   describe('findOne', () => {
     it('devolve a escola detalhada quando encontrada', async () => {
-      repository.findOne.mockResolvedValue({ id: 1, nome: 'Escola A', ativo: true } as Escola);
+      repository.findOne.mockResolvedValue({
+        id: 1,
+        nome: 'Escola A',
+        ativo: true,
+      } as Escola);
 
       const resultado = await service.findOne(1);
 
       expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(resultado.data).toMatchObject({ id: 1, nome: 'Escola A', email: null });
+      expect(resultado.data).toMatchObject({
+        id: 1,
+        nome: 'Escola A',
+        email: null,
+      });
     });
 
     it('lanca NotFoundException quando a escola nao existe', async () => {
@@ -149,7 +161,11 @@ describe('EscolaService', () => {
 
     it('cria a escola e o login (perfil escola) com a senha em hash', async () => {
       jest.spyOn(UsuarioService, 'hashSenha').mockResolvedValue('hash');
-      repository.findOne.mockResolvedValue({ id: 2, nome: 'Nova Escola', ativo: true } as Escola);
+      repository.findOne.mockResolvedValue({
+        id: 2,
+        nome: 'Nova Escola',
+        ativo: true,
+      } as Escola);
 
       const resultado = await service.create(dados);
 
@@ -178,7 +194,11 @@ describe('EscolaService', () => {
 
   describe('update', () => {
     it('atualiza os dados e registra quem alterou', async () => {
-      repository.findOne.mockResolvedValue({ id: 1, nome: 'Escola B', ativo: true } as Escola);
+      repository.findOne.mockResolvedValue({
+        id: 1,
+        nome: 'Escola B',
+        ativo: true,
+      } as Escola);
 
       await service.update(1, { nome: 'Escola B' }, 'admin@linka.com');
 
@@ -198,7 +218,9 @@ describe('EscolaService', () => {
 
       await service.update(1, { email: 'novo@escola.com' });
 
-      expect(usuarioRepo.update).toHaveBeenCalledWith(10, { email: 'novo@escola.com' });
+      expect(usuarioRepo.update).toHaveBeenCalledWith(10, {
+        email: 'novo@escola.com',
+      });
     });
 
     it('lanca NotFoundException se a escola nao existir', async () => {

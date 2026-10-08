@@ -45,21 +45,32 @@ export class BuscarEscola {
   readonly resultados = signal<Escola[]>([]);
 
   readonly cidades = computed(() =>
-    [...new Set(this.store.escolas().map((e) => e.cidade).filter((c): c is string => !!c))].sort(),
+    [
+      ...new Set(
+        this.store
+          .escolas()
+          .map((e) => e.cidade)
+          .filter((c): c is string => !!c),
+      ),
+    ].sort(),
   );
 
   buscar(): void {
     const termo = normalizar(this.texto.trim());
 
     this.resultados.set(
-      this.store.escolas().filter(
-        (e) =>
-          (!termo ||
-            [e.nome, e.cidade, e.email].some((campo) => campo && normalizar(campo).includes(termo))) &&
-          (!this.cidade || e.cidade === this.cidade) &&
-          (!this.plano || e.plano === this.plano) &&
-          (!this.situacao || statusEscola(e) === this.situacao),
-      ),
+      this.store
+        .escolas()
+        .filter(
+          (e) =>
+            (!termo ||
+              [e.nome, e.cidade, e.email].some(
+                (campo) => campo && normalizar(campo).includes(termo),
+              )) &&
+            (!this.cidade || e.cidade === this.cidade) &&
+            (!this.plano || e.plano === this.plano) &&
+            (!this.situacao || statusEscola(e) === this.situacao),
+        ),
     );
     this.buscado.set(this.texto.trim());
   }

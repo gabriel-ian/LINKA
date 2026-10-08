@@ -17,7 +17,9 @@
         <label class="campo-p" [class.invalido]="erroNome()">
           Nome completo
           <input name="nome" maxlength="255" [(ngModel)]="nome" />
-          @if (erroNome()) { <span class="msg-erro">Informe o nome do aluno.</span> }
+          @if (erroNome()) {
+            <span class="msg-erro">Informe o nome do aluno.</span>
+          }
         </label>
         <label class="campo-p">
           Turma
@@ -39,7 +41,11 @@
       </div>
       @if ((a.turma?.id ?? null) !== turmaId) {
         <p class="aviso-caixa laranja">
-          {{ turmaId ? 'O aluno passa para a nova turma e recebe as tarefas dela.' : 'O aluno sai da turma e deixa de receber tarefas.' }}
+          {{
+            turmaId
+              ? 'O aluno passa para a nova turma e recebe as tarefas dela.'
+              : 'O aluno sai da turma e deixa de receber tarefas.'
+          }}
           O histórico das tarefas anteriores continua guardado.
         </p>
       }
@@ -51,9 +57,23 @@
         <p class="ajuda">Selecione os diagnósticos que se aplicam</p>
         <div class="diagnosticos">
           @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
-            <button type="button" class="diagnostico" [attr.aria-pressed]="diagnosticos().has(d.id)" (click)="alternarDiagnostico(d.id)">{{ d.nome }}</button>
+            <button
+              type="button"
+              class="diagnostico"
+              [attr.aria-pressed]="diagnosticos().has(d.id)"
+              (click)="alternarDiagnostico(d.id)"
+            >
+              {{ d.nome }}
+            </button>
           }
-          <button type="button" class="diagnostico" [attr.aria-pressed]="prefiroNaoInformar()" (click)="alternarPrefiro()">Prefiro não informar</button>
+          <button
+            type="button"
+            class="diagnostico"
+            [attr.aria-pressed]="prefiroNaoInformar()"
+            (click)="alternarPrefiro()"
+          >
+            Prefiro não informar
+          </button>
         </div>
       </div>
 
@@ -67,14 +87,21 @@
           } @else {
             <span>Nenhum laudo anexado - PDF ou imagem, até 10 MB</span>
           }
-          @if (erroLaudo()) { <span class="msg-erro">{{ erroLaudo() }}</span> }
+          @if (erroLaudo()) {
+            <span class="msg-erro">{{ erroLaudo() }}</span>
+          }
         </div>
         @if (laudo()) {
           <button type="button" class="bt bt-secundario" (click)="laudo.set(null)">Remover</button>
         } @else {
           <label class="bt bt-secundario">
             {{ a.laudo ? 'Substituir laudo' : 'Anexar laudo' }}
-            <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" hidden (change)="escolherLaudo($any($event.target).files)" />
+            <input
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+              hidden
+              (change)="escolherLaudo($any($event.target).files)"
+            />
           </label>
         }
       </div>
@@ -82,11 +109,17 @@
       <hr class="divisor" />
 
       <h2 class="cartao-titulo">Perfil de aprendizagem</h2>
-      <app-perfil-aprendizagem [(dificuldades)]="dificuldades" [(pontosFortes)]="pontosFortes" [(interesses)]="interesses" />
+      <app-perfil-aprendizagem
+        [(dificuldades)]="dificuldades"
+        [(pontosFortes)]="pontosFortes"
+        [(interesses)]="interesses"
+      />
 
       <div class="acoes">
         <a class="bt bt-secundario" [routerLink]="['/escola/alunos', id]">Cancelar</a>
-        <button type="submit" class="bt bt-primario" [disabled]="salvando()">{{ salvando() ? 'Salvando...' : 'Salvar alterações' }}</button>
+        <button type="submit" class="bt bt-primario" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
+        </button>
       </div>
     </form>
   }

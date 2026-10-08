@@ -45,8 +45,10 @@ export class ProfessorTarefaNova {
     // Turma e disciplina vem pre-selecionadas do contexto.
     effect(() => {
       const dados = this.contexto.dados();
-      if (this.turmaId() === null && this.contexto.turmaId() !== null) this.turmaId.set(this.contexto.turmaId());
-      if (this.disciplinaId === null && dados?.disciplinas.length) this.disciplinaId = dados.disciplinas[0].id;
+      if (this.turmaId() === null && this.contexto.turmaId() !== null)
+        this.turmaId.set(this.contexto.turmaId());
+      if (this.disciplinaId === null && dados?.disciplinas.length)
+        this.disciplinaId = dados.disciplinas[0].id;
     });
 
     effect(() => {
@@ -63,7 +65,8 @@ export class ProfessorTarefaNova {
   criar(): void {
     const e: Partial<Record<Campo, string>> = {};
     if (!this.titulo.trim()) e.titulo = 'Dê um título para a tarefa.';
-    if (!this.descricao.trim()) e.descricao = 'Escreva o enunciado - é a partir dele que a Linka adapta.';
+    if (!this.descricao.trim())
+      e.descricao = 'Escreva o enunciado - é a partir dele que a Linka adapta.';
     if (!this.disciplinaId) e.disciplina = 'Escolha a disciplina.';
     if (!this.turmaId()) e.turma = 'Escolha a turma.';
     if (!this.dataEntrega) e.data = 'Informe a data de entrega.';
@@ -89,7 +92,9 @@ export class ProfessorTarefaNova {
         },
         error: (err: HttpErrorResponse) => {
           this.salvando.set(false);
-          this.erroGeral.set([err.error?.message].flat().join(' ') || 'Não foi possível criar a tarefa.');
+          this.erroGeral.set(
+            [err.error?.message].flat().join(' ') || 'Não foi possível criar a tarefa.',
+          );
         },
       });
   }

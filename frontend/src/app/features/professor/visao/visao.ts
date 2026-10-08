@@ -33,7 +33,9 @@ export class ProfessorVisao {
     const nee = visao.alunosComAtraso.filter((a) => a.neurodivergente).map((a) => a.nome);
     if (!nee.length) return '';
     const nomes = juntar(nee.slice(0, 2));
-    return nee.length === 1 ? `${nomes} precisa de atenção especial hoje.` : `${nomes} precisam de atenção especial hoje.`;
+    return nee.length === 1
+      ? `${nomes} precisa de atenção especial hoje.`
+      : `${nomes} precisam de atenção especial hoje.`;
   });
 
   constructor() {

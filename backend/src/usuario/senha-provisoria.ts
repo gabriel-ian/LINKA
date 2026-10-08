@@ -1,8 +1,7 @@
 import { randomInt } from 'crypto';
 
 /** Sem caracteres que se confundem ao ditar (0/O, 1/l/I). */
-const ALFABETO_SENHA =
-  'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const ALFABETO_SENHA = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 /** Senha aleatoria para a escola (ou o ADM) repassar ao usuario. */
 export function gerarSenhaProvisoria(tamanho = 10): string {

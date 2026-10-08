@@ -19,7 +19,8 @@ export class VisaoGeral {
   readonly cidadeUf = cidadeUf;
   readonly dataBr = dataBr;
 
-  readonly mesAtual = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  readonly mesAtual = new Date()
+    .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
     .replace(/^./, (c) => c.toUpperCase())
     .replace(' de ', ' ');
 
@@ -37,9 +38,7 @@ export class VisaoGeral {
   });
 
   readonly recentes = computed(() =>
-    [...this.store.escolas()]
-      .sort((a, b) => b.criado_em.localeCompare(a.criado_em))
-      .slice(0, 4),
+    [...this.store.escolas()].sort((a, b) => b.criado_em.localeCompare(a.criado_em)).slice(0, 4),
   );
 
   /** Pendentes primeiro, depois as desativadas mais recentes. */

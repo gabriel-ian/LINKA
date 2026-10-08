@@ -2,7 +2,11 @@
   <header class="painel-cabecalho">
     @if (modo === 'cadastrar') {
       <h1>Cadastrar escola</h1>
-      <p>{{ concluido() ? 'Concluído' : 'Preencha os dados da instituição - você pode editar depois' }}</p>
+      <p>
+        {{
+          concluido() ? 'Concluído' : 'Preencha os dados da instituição - você pode editar depois'
+        }}
+      </p>
     } @else {
       <h1>Atualizar escola</h1>
       @if (escola(); as e) {
@@ -17,18 +21,30 @@
     @if (modo === 'cadastrar') {
       <app-adm-resultado
         titulo="Escola cadastrada com sucesso!"
-        [texto]="'O acesso da coordenação foi criado com o e-mail ' + c.email + '. A escola já aparece na lista como pendente até o primeiro login.'"
+        [texto]="
+          'O acesso da coordenação foi criado com o e-mail ' +
+          c.email +
+          '. A escola já aparece na lista como pendente até o primeiro login.'
+        "
       >
-        <button type="button" class="bt bt-secundario" (click)="cadastrarOutra()">Cadastrar outra</button>
+        <button type="button" class="bt bt-secundario" (click)="cadastrarOutra()">
+          Cadastrar outra
+        </button>
         <a class="bt bt-primario" routerLink="/adm/escolas">Ver escolas</a>
       </app-adm-resultado>
     } @else {
       <app-adm-resultado
         titulo="Alterações salvas!"
-        [texto]="'Os dados da ' + c.nome + ' foram atualizados e já valem para professores, alunos e famílias.'"
+        [texto]="
+          'Os dados da ' +
+          c.nome +
+          ' foram atualizados e já valem para professores, alunos e famílias.'
+        "
       >
         <a class="bt bt-secundario" routerLink="/adm/escolas">Voltar à lista</a>
-        <a class="bt bt-primario" routerLink="/adm/escolas/id" [queryParams]="{ id: c.id }">Ver escola</a>
+        <a class="bt bt-primario" routerLink="/adm/escolas/id" [queryParams]="{ id: c.id }"
+          >Ver escola</a
+        >
       </app-adm-resultado>
     }
   } @else if (semId()) {
@@ -36,7 +52,8 @@
   } @else {
     @if (qtdErros()) {
       <p class="alerta-erro" role="alert">
-        Corrija {{ qtdErros() === 1 ? 'o campo destacado' : 'os ' + qtdErros() + ' campos destacados' }}
+        Corrija
+        {{ qtdErros() === 1 ? 'o campo destacado' : 'os ' + qtdErros() + ' campos destacados' }}
         para {{ modo === 'cadastrar' ? 'concluir o cadastro' : 'salvar as alterações' }}.
       </p>
     }
@@ -45,7 +62,8 @@
     }
     @if (modo === 'atualizar' && escola()?.atualizadoEm) {
       <p class="aviso-caixa azul">
-        Última atualização em {{ dataBr(escola()!.atualizadoEm) }}{{ escola()!.atualizadoPor ? ' por ' + escola()!.atualizadoPor : '' }}
+        Última atualização em {{ dataBr(escola()!.atualizadoEm)
+        }}{{ escola()!.atualizadoPor ? ' por ' + escola()!.atualizadoPor : '' }}
       </p>
     }
 
@@ -59,14 +77,24 @@
           <label class="campo-p" [class.invalido]="erro('nome')">
             Nome da escola
             <input name="nome" [(ngModel)]="nome" placeholder="Nome completo da instituição" />
-            @if (erro('nome')) { <span class="msg-erro">{{ erro('nome') }}</span> }
+            @if (erro('nome')) {
+              <span class="msg-erro">{{ erro('nome') }}</span>
+            }
           </label>
 
           @if (modo === 'cadastrar') {
             <label class="campo-p" [class.invalido]="erro('inep')">
               Código INEP
-              <input name="inep" inputmode="numeric" maxlength="8" [(ngModel)]="inep" placeholder="00000000" />
-              @if (erro('inep')) { <span class="msg-erro">{{ erro('inep') }}</span> }
+              <input
+                name="inep"
+                inputmode="numeric"
+                maxlength="8"
+                [(ngModel)]="inep"
+                placeholder="00000000"
+              />
+              @if (erro('inep')) {
+                <span class="msg-erro">{{ erro('inep') }}</span>
+              }
             </label>
           } @else {
             <ng-container *ngTemplateOutlet="campoEmail" />
@@ -79,8 +107,14 @@
 
           <label class="campo-p" [class.invalido]="erro('cidadeUf')">
             Cidade / UF
-            <input name="cidadeUf" [(ngModel)]="cidadeUf" placeholder="Ex.: Francisco Beltrão - PR" />
-            @if (erro('cidadeUf')) { <span class="msg-erro">{{ erro('cidadeUf') }}</span> }
+            <input
+              name="cidadeUf"
+              [(ngModel)]="cidadeUf"
+              placeholder="Ex.: Francisco Beltrão - PR"
+            />
+            @if (erro('cidadeUf')) {
+              <span class="msg-erro">{{ erro('cidadeUf') }}</span>
+            }
           </label>
 
           <label class="campo-p">
@@ -106,19 +140,39 @@
             <label class="campo-p" [class.invalido]="erro('senha')">
               Senha
               <span class="caixa">
-                <input name="senha" [type]="mostrarSenha ? 'text' : 'password'" autocomplete="new-password" [(ngModel)]="senha" placeholder="Mínimo 8 caracteres" />
-                <button type="button" (click)="mostrarSenha = !mostrarSenha">{{ mostrarSenha ? 'ocultar' : 'mostrar' }}</button>
+                <input
+                  name="senha"
+                  [type]="mostrarSenha ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  [(ngModel)]="senha"
+                  placeholder="Mínimo 8 caracteres"
+                />
+                <button type="button" (click)="mostrarSenha = !mostrarSenha">
+                  {{ mostrarSenha ? 'ocultar' : 'mostrar' }}
+                </button>
               </span>
-              @if (erro('senha')) { <span class="msg-erro">{{ erro('senha') }}</span> }
+              @if (erro('senha')) {
+                <span class="msg-erro">{{ erro('senha') }}</span>
+              }
             </label>
 
             <label class="campo-p" [class.invalido]="erro('confirmar')">
               Confirmar senha
               <span class="caixa">
-                <input name="confirmar" [type]="mostrarConfirmar ? 'text' : 'password'" autocomplete="new-password" [(ngModel)]="confirmar" placeholder="Confirmar senha" />
-                <button type="button" (click)="mostrarConfirmar = !mostrarConfirmar">{{ mostrarConfirmar ? 'ocultar' : 'mostrar' }}</button>
+                <input
+                  name="confirmar"
+                  [type]="mostrarConfirmar ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  [(ngModel)]="confirmar"
+                  placeholder="Confirmar senha"
+                />
+                <button type="button" (click)="mostrarConfirmar = !mostrarConfirmar">
+                  {{ mostrarConfirmar ? 'ocultar' : 'mostrar' }}
+                </button>
               </span>
-              @if (erro('confirmar')) { <span class="msg-erro">{{ erro('confirmar') }}</span> }
+              @if (erro('confirmar')) {
+                <span class="msg-erro">{{ erro('confirmar') }}</span>
+              }
             </label>
           </div>
         } @else {
@@ -127,14 +181,28 @@
 
             <label class="campo-p" [class.invalido]="erro('limiteProfessores')">
               Limite de professores
-              <input name="limiteProfessores" inputmode="numeric" [(ngModel)]="limiteProfessores" placeholder="Sem limite" />
-              @if (erro('limiteProfessores')) { <span class="msg-erro">{{ erro('limiteProfessores') }}</span> }
+              <input
+                name="limiteProfessores"
+                inputmode="numeric"
+                [(ngModel)]="limiteProfessores"
+                placeholder="Sem limite"
+              />
+              @if (erro('limiteProfessores')) {
+                <span class="msg-erro">{{ erro('limiteProfessores') }}</span>
+              }
             </label>
 
             <label class="campo-p" [class.invalido]="erro('limiteAlunosNee')">
               Limite de alunos NEE
-              <input name="limiteAlunosNee" inputmode="numeric" [(ngModel)]="limiteAlunosNee" placeholder="Sem limite" />
-              @if (erro('limiteAlunosNee')) { <span class="msg-erro">{{ erro('limiteAlunosNee') }}</span> }
+              <input
+                name="limiteAlunosNee"
+                inputmode="numeric"
+                [(ngModel)]="limiteAlunosNee"
+                placeholder="Sem limite"
+              />
+              @if (erro('limiteAlunosNee')) {
+                <span class="msg-erro">{{ erro('limiteAlunosNee') }}</span>
+              }
             </label>
           </div>
         }
@@ -155,15 +223,29 @@
         <ng-template #campoEmail>
           <label class="campo-p" [class.invalido]="erro('email')">
             E-mail institucional
-            <input name="email" type="email" autocomplete="off" [(ngModel)]="email" placeholder="escola@escola.pr.gov.br" />
-            @if (erro('email')) { <span class="msg-erro">{{ erro('email') }}</span> }
+            <input
+              name="email"
+              type="email"
+              autocomplete="off"
+              [(ngModel)]="email"
+              placeholder="escola@escola.pr.gov.br"
+            />
+            @if (erro('email')) {
+              <span class="msg-erro">{{ erro('email') }}</span>
+            }
           </label>
         </ng-template>
 
         <ng-template #campoTelefone>
           <label class="campo-p">
             Telefone
-            <input name="telefone" type="tel" maxlength="20" [(ngModel)]="telefone" placeholder="(00) 0000-0000" />
+            <input
+              name="telefone"
+              type="tel"
+              maxlength="20"
+              [(ngModel)]="telefone"
+              placeholder="(00) 0000-0000"
+            />
           </label>
         </ng-template>
 

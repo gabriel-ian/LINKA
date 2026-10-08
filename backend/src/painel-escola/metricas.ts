@@ -55,7 +55,10 @@ export function mesesAte(mes: string, quantos: number): string[] {
   });
 }
 
-export function noIntervalo(data: string, [inicio, fim]: [string, string]): boolean {
+export function noIntervalo(
+  data: string,
+  [inicio, fim]: [string, string],
+): boolean {
   return data >= inicio && data <= fim;
 }
 
@@ -70,7 +73,10 @@ export function taxaConclusao(linhas: LinhaTarefa[]): number | null {
  * % das tarefas ja vencidas que foram concluidas dentro do prazo
  * (data de entrega + hora limite, ou fim do dia).
  */
-export function taxaNoPrazo(linhas: LinhaTarefa[], hoje = new Date()): number | null {
+export function taxaNoPrazo(
+  linhas: LinhaTarefa[],
+  hoje = new Date(),
+): number | null {
   const agora = hoje.getTime();
   const prazo = (l: LinhaTarefa) =>
     new Date(`${l.dataEntrega}T${l.horaLimite ?? '23:59:59'}`).getTime();
@@ -119,12 +125,20 @@ export function maiorSequencia(datasConclusao: Date[]): number {
 export function idade(nascimento: string, hoje = new Date()): number {
   const [a, m, d] = nascimento.split('-').map(Number);
   let anos = hoje.getFullYear() - a;
-  if (hoje.getMonth() + 1 < m || (hoje.getMonth() + 1 === m && hoje.getDate() < d)) anos--;
+  if (
+    hoje.getMonth() + 1 < m ||
+    (hoje.getMonth() + 1 === m && hoje.getDate() < d)
+  )
+    anos--;
   return anos;
 }
 
 /** "8º Ano" + "A" -> "8A"; sem serie usa as iniciais do nome. */
-export function codigoTurma(serie: string | null, letra: string | null, nome: string | null): string {
+export function codigoTurma(
+  serie: string | null,
+  letra: string | null,
+  nome: string | null,
+): string {
   const numero = serie?.match(/\d+/)?.[0];
   if (numero && letra) return `${numero}${letra.toUpperCase()}`;
 

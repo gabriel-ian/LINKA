@@ -36,15 +36,20 @@ export class EscolaAlunos {
     return [...mapa].map(([id, nome]) => ({ id, nome }));
   });
 
-  readonly diagnosticos = computed(() => [...new Set(this.alunosNee().flatMap((a) => a.diagnosticos))].sort());
+  readonly diagnosticos = computed(() =>
+    [...new Set(this.alunosNee().flatMap((a) => a.diagnosticos))].sort(),
+  );
 
   /** Contagem por diagnostico; "Outros" soma tudo fora de TDAH/TEA/Dislexia. */
   readonly porDiagnostico = computed(() => {
-    const contar = (nome: string) => this.alunosNee().filter((a) => a.diagnosticos.includes(nome)).length;
+    const contar = (nome: string) =>
+      this.alunosNee().filter((a) => a.diagnosticos.includes(nome)).length;
     const outros = this.alunosNee().filter(
       (a) => a.diagnosticos.length === 0 || a.diagnosticos.some((d) => !DESTAQUES.includes(d)),
     );
-    const nomesOutros = [...new Set(outros.flatMap((a) => a.diagnosticos).filter((d) => !DESTAQUES.includes(d)))];
+    const nomesOutros = [
+      ...new Set(outros.flatMap((a) => a.diagnosticos).filter((d) => !DESTAQUES.includes(d))),
+    ];
 
     return {
       destaques: DESTAQUES.map(contar),
@@ -63,7 +68,9 @@ export class EscolaAlunos {
     );
   });
 
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.filtrados().length / POR_PAGINA)));
+  readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.filtrados().length / POR_PAGINA)),
+  );
   readonly visiveis = computed(() =>
     this.filtrados().slice(this.pagina() * POR_PAGINA, (this.pagina() + 1) * POR_PAGINA),
   );

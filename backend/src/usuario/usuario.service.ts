@@ -34,7 +34,11 @@ export class UsuarioService {
       where: { id },
       relations: { escola: true },
     });
-    return !!usuario && usuario.ativo !== false && (!usuario.escola || usuario.escola.ativo);
+    return (
+      !!usuario &&
+      usuario.ativo !== false &&
+      (!usuario.escola || usuario.escola.ativo)
+    );
   }
 
   /** Troca a senha (ja em texto) gravando o hash; usada por redefinicoes. */

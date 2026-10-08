@@ -29,7 +29,7 @@ export function iniciais(nome: string): string {
   if (palavras.length === 0) return nome.slice(0, 2).toUpperCase();
 
   const primeira = palavras[0][0];
-  const ultima = palavras.length > 1 ? palavras[palavras.length - 1][0] : palavras[0][1] ?? '';
+  const ultima = palavras.length > 1 ? palavras[palavras.length - 1][0] : (palavras[0][1] ?? '');
 
   return (primeira + ultima).toUpperCase();
 }

@@ -27,6 +27,10 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Trocar a propria senha (qualquer perfil logado)' })
   alterarSenha(@UsuarioId() usuarioId: number, @Body() dto: AlterarSenhaDto) {
-    return this.authService.alterarSenha(usuarioId, dto.senhaAtual, dto.novaSenha);
+    return this.authService.alterarSenha(
+      usuarioId,
+      dto.senhaAtual,
+      dto.novaSenha,
+    );
   }
 }

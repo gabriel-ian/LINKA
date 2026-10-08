@@ -18,7 +18,9 @@ export class ProfessorContexto {
   readonly visao = signal<VisaoTurma | null>(null);
   readonly erro = signal('');
 
-  readonly turma = computed(() => this.dados()?.turmas.find((t) => t.id === this.turmaId()) ?? null);
+  readonly turma = computed(
+    () => this.dados()?.turmas.find((t) => t.id === this.turmaId()) ?? null,
+  );
 
   constructor() {
     this.service.contexto().subscribe({

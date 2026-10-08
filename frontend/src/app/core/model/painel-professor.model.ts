@@ -171,7 +171,13 @@ export interface RelatorioProfessor {
   neeEmDia: number | null;
   tarefasCriadas: number;
   adaptacoesIa: number;
-  evolucaoNee: { id: number; nome: string; diagnostico: string | null; taxa: number | null; variacao: number | null }[];
+  evolucaoNee: {
+    id: number;
+    nome: string;
+    diagnostico: string | null;
+    taxa: number | null;
+    variacao: number | null;
+  }[];
   entregasPorSemana: { rotulo: string; taxa: number | null }[];
   sugestao: string | null;
 }

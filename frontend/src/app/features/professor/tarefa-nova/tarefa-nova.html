@@ -12,8 +12,15 @@
     <div class="grade-campos">
       <label class="campo-p" [class.invalido]="erro('titulo')">
         Título da tarefa
-        <input name="titulo" maxlength="255" [(ngModel)]="titulo" placeholder="Ex.: Exercícios 5 a 10 - frações" />
-        @if (erro('titulo')) { <span class="msg-erro">{{ erro('titulo') }}</span> }
+        <input
+          name="titulo"
+          maxlength="255"
+          [(ngModel)]="titulo"
+          placeholder="Ex.: Exercícios 5 a 10 - frações"
+        />
+        @if (erro('titulo')) {
+          <span class="msg-erro">{{ erro('titulo') }}</span>
+        }
       </label>
       <label class="campo-p" [class.invalido]="erro('disciplina')">
         Disciplina
@@ -22,7 +29,9 @@
             <option [ngValue]="d.id">{{ d.nome }}</option>
           }
         </select>
-        @if (erro('disciplina')) { <span class="msg-erro">{{ erro('disciplina') }}</span> }
+        @if (erro('disciplina')) {
+          <span class="msg-erro">{{ erro('disciplina') }}</span>
+        }
       </label>
     </div>
 
@@ -34,12 +43,16 @@
             <option [ngValue]="t.id">{{ t.nome }}</option>
           }
         </select>
-        @if (erro('turma')) { <span class="msg-erro">{{ erro('turma') }}</span> }
+        @if (erro('turma')) {
+          <span class="msg-erro">{{ erro('turma') }}</span>
+        }
       </label>
       <label class="campo-p" [class.invalido]="erro('data')">
         Data de entrega
         <input name="data" type="date" [min]="hoje" [(ngModel)]="dataEntrega" />
-        @if (erro('data')) { <span class="msg-erro">{{ erro('data') }}</span> }
+        @if (erro('data')) {
+          <span class="msg-erro">{{ erro('data') }}</span>
+        }
       </label>
       <label class="campo-p">
         Horário limite
@@ -49,8 +62,16 @@
 
     <label class="campo-p" [class.invalido]="erro('descricao')">
       Enunciado da tarefa
-      <textarea name="descricao" rows="4" maxlength="5000" [(ngModel)]="descricao" placeholder="Escreva o enunciado como faria no quadro ou no caderno."></textarea>
-      @if (erro('descricao')) { <span class="msg-erro">{{ erro('descricao') }}</span> }
+      <textarea
+        name="descricao"
+        rows="4"
+        maxlength="5000"
+        [(ngModel)]="descricao"
+        placeholder="Escreva o enunciado como faria no quadro ou no caderno."
+      ></textarea>
+      @if (erro('descricao')) {
+        <span class="msg-erro">{{ erro('descricao') }}</span>
+      }
     </label>
 
     <div class="rodape">
@@ -61,23 +82,31 @@
             <strong>A Linka vai adaptar esta tarefa automaticamente</strong>
             <p>
               @if (nee().length) {
-                {{ nee().length }} {{ nee().length === 1 ? 'aluno NEE nesta turma vai' : 'alunos NEE nesta turma vão' }} receber uma versão em
-                passos, com linguagem simplificada - gerada pela IA com base no perfil de cada um.
+                {{ nee().length }}
+                {{
+                  nee().length === 1 ? 'aluno NEE nesta turma vai' : 'alunos NEE nesta turma vão'
+                }}
+                receber uma versão em passos, com linguagem simplificada - gerada pela IA com base
+                no perfil de cada um.
               } @else {
-                Esta turma não tem alunos NEE cadastrados; a tarefa vai para todos no formato original.
+                Esta turma não tem alunos NEE cadastrados; a tarefa vai para todos no formato
+                original.
               }
             </p>
           } @else {
             <strong>Versões adaptadas para os alunos NEE</strong>
             <p>
-              A IA não está configurada neste servidor. Depois de criar, você pode escrever os passos de
+              A IA não está configurada neste servidor. Depois de criar, você pode escrever os
+              passos de
               {{ nee().length ? 'cada um dos ' + nee().length + ' alunos NEE' : 'cada aluno NEE' }}.
             </p>
           }
           <div class="alunos">
             @for (a of nee(); track a.id) {
               <span class="aluno" [class]="'c-' + corSituacao(a.situacao)">
-                <span class="selo-cor" style="--tam: 26px; --raio-selo: 50%; --fonte-selo: 11px">{{ iniciais(a.nome) }}</span>
+                <span class="selo-cor" style="--tam: 26px; --raio-selo: 50%; --fonte-selo: 11px">{{
+                  iniciais(a.nome)
+                }}</span>
                 {{ primeiroNome(a.nome) }}{{ a.diagnosticos[0] ? ' - ' + a.diagnosticos[0] : '' }}
               </span>
             }

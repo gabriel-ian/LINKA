@@ -68,7 +68,9 @@ export class PainelEscolaService {
   async opcoes(escolaId: number) {
     const [disciplinas, diagnosticos, turmas, professores] = await Promise.all([
       this.dataSource.query('SELECT id, nome FROM disciplina ORDER BY nome'),
-      this.dataSource.query('SELECT id, nome FROM neurodivergencia ORDER BY id'),
+      this.dataSource.query(
+        'SELECT id, nome FROM neurodivergencia ORDER BY id',
+      ),
       this.dataSource.query(
         'SELECT id, nome, serie, letra FROM turma WHERE escola_id = ? ORDER BY serie, letra, nome',
         [escolaId],
@@ -78,8 +80,14 @@ export class PainelEscolaService {
 
     return {
       data: {
-        disciplinas: disciplinas.map((d: any) => ({ id: Number(d.id), nome: d.nome })),
-        diagnosticos: diagnosticos.map((d: any) => ({ id: Number(d.id), nome: d.nome })),
+        disciplinas: disciplinas.map((d: any) => ({
+          id: Number(d.id),
+          nome: d.nome,
+        })),
+        diagnosticos: diagnosticos.map((d: any) => ({
+          id: Number(d.id),
+          nome: d.nome,
+        })),
         turmas: turmas.map((t: any) => ({
           id: Number(t.id),
           nome: t.nome ?? 'Turma sem nome',
@@ -107,9 +115,13 @@ export class PainelEscolaService {
     if (!turma) throw new NotFoundException('Turma nao encontrada');
 
     const resumo = this.resumoTurma(turma, base);
-    const alunosDaTurma = base.alunos.filter((a) => base.turmaDoAluno.get(a.id) === turmaId);
+    const alunosDaTurma = base.alunos.filter(
+      (a) => base.turmaDoAluno.get(a.id) === turmaId,
+    );
     const linhasTurma = base.linhas.filter((l) => l.turmaId === turmaId);
-    const idsNee = new Set(alunosDaTurma.filter((a) => a.neurodivergente).map((a) => a.id));
+    const idsNee = new Set(
+      alunosDaTurma.filter((a) => a.neurodivergente).map((a) => a.id),
+    );
 
     const [{ total: tarefasNoMes }] = await this.dataSource.query(
       'SELECT COUNT(*) total FROM tarefa WHERE turma_id = ? AND criado_em BETWEEN ? AND ?',
@@ -124,11 +136,15 @@ export class PainelEscolaService {
     return {
       data: {
         ...resumo,
-        entregasNoPrazo: taxaNoPrazo(linhasTurma.filter((l) => idsNee.has(l.alunoId))),
+        entregasNoPrazo: taxaNoPrazo(
+          linhasTurma.filter((l) => idsNee.has(l.alunoId)),
+        ),
         tarefasNoMes: Number(tarefasNoMes),
         tarefasAdaptadasNoMes: Number(adaptadas),
         alunosNee: this.ordenarPorAtencao(
-          alunosDaTurma.filter((a) => a.neurodivergente).map((a) => this.resumoAluno(a, base)),
+          alunosDaTurma
+            .filter((a) => a.neurodivergente)
+            .map((a) => this.resumoAluno(a, base)),
         ),
       },
     };
@@ -150,21 +166,27 @@ export class PainelEscolaService {
       [escolaId],
     );
 
-    const disciplinas: { professorId: number; nome: string }[] = await this.dataSource.query(
-      `SELECT pd.professor_id professorId, d.nome FROM professor_disciplina pd
+    const disciplinas: { professorId: number; nome: string }[] =
+      await this.dataSource.query(
+        `SELECT pd.professor_id professorId, d.nome FROM professor_disciplina pd
          JOIN disciplina d ON d.id = pd.disciplina_id
          JOIN professor p ON p.id = pd.professor_id
         WHERE p.escola_id = ? ORDER BY d.nome`,
-      [escolaId],
-    );
+        [escolaId],
+      );
 
     const alocacoes = await this.alocacoes(escolaId);
 
     return {
       data: professores.map((p) => {
         const turmas = new Map<number, string>();
-        for (const a of alocacoes.filter((x) => Number(x.professorId) === Number(p.id))) {
-          turmas.set(Number(a.turmaId), codigoTurma(a.serie, a.letra, a.turmaNome));
+        for (const a of alocacoes.filter(
+          (x) => Number(x.professorId) === Number(p.id),
+        )) {
+          turmas.set(
+            Number(a.turmaId),
+            codigoTurma(a.serie, a.letra, a.turmaNome),
+          );
         }
 
         return {
@@ -187,7 +209,9 @@ export class PainelEscolaService {
   async listarAlunos(escolaId: number) {
     const base = await this.carregarBase(escolaId, semanaDe(new Date()));
     return {
-      data: this.ordenarPorAtencao(base.alunos.map((a) => this.resumoAluno(a, base))),
+      data: this.ordenarPorAtencao(
+        base.alunos.map((a) => this.resumoAluno(a, base)),
+      ),
     };
   }
 
@@ -228,10 +252,14 @@ export class PainelEscolaService {
       [alunoId, `${mes[0]} 00:00:00`, `${mes[1]} 23:59:59`],
     );
 
-    const linhasMes = base.linhas.filter((l) => l.alunoId === alunoId && noIntervalo(l.dataEntrega, mes));
+    const linhasMes = base.linhas.filter(
+      (l) => l.alunoId === alunoId && noIntervalo(l.dataEntrega, mes),
+    );
     const turmaId = base.turmaDoAluno.get(alunoId);
     const professores = turmaId ? this.professoresDaTurma(turmaId, base) : [];
-    const nascimento = extra.dataNascimento ? paraIso(extra.dataNascimento) : null;
+    const nascimento = extra.dataNascimento
+      ? paraIso(extra.dataNascimento)
+      : null;
 
     return {
       data: {
@@ -261,7 +289,9 @@ export class PainelEscolaService {
         },
         tarefasAdaptadasNoMes: Number(adaptadas),
         maiorSequencia: maiorSequencia(
-          linhasMes.filter((l) => l.concluidoEm).map((l) => l.concluidoEm as Date),
+          linhasMes
+            .filter((l) => l.concluidoEm)
+            .map((l) => l.concluidoEm as Date),
         ),
       },
     };
@@ -280,7 +310,9 @@ export class PainelEscolaService {
 
     let alunosFiltro = base.alunos;
     if (filtros.turmaId) {
-      alunosFiltro = alunosFiltro.filter((a) => base.turmaDoAluno.get(a.id) === filtros.turmaId);
+      alunosFiltro = alunosFiltro.filter(
+        (a) => base.turmaDoAluno.get(a.id) === filtros.turmaId,
+      );
     }
     if (filtros.diagnosticoId) {
       alunosFiltro = alunosFiltro.filter((a) =>
@@ -292,7 +324,9 @@ export class PainelEscolaService {
     const doMes = linhas.filter((l) => noIntervalo(l.dataEntrega, mesDe(mes)));
     const [inicioMes, fimMes] = mesDe(mes);
 
-    const turmasIds = filtros.turmaId ? [filtros.turmaId] : base.turmas.map((t) => t.id);
+    const turmasIds = filtros.turmaId
+      ? [filtros.turmaId]
+      : base.turmas.map((t) => t.id);
     const [{ total: tarefasCriadas }] = turmasIds.length
       ? await this.dataSource.query(
           `SELECT COUNT(*) total FROM tarefa WHERE turma_id IN (?) AND criado_em BETWEEN ? AND ?`,
@@ -323,7 +357,9 @@ export class PainelEscolaService {
           })),
         evolucao: meses.map((m) => ({
           mes: m,
-          taxa: taxaConclusao(linhas.filter((l) => noIntervalo(l.dataEntrega, mesDe(m)))),
+          taxa: taxaConclusao(
+            linhas.filter((l) => noIntervalo(l.dataEntrega, mesDe(m))),
+          ),
         })),
       },
     };
@@ -332,8 +368,12 @@ export class PainelEscolaService {
   // -------------------------------------------------------------- internos
 
   private resumoTurma(t: TurmaBase, base: Base): TurmaResumo {
-    const alunos = base.alunos.filter((a) => base.turmaDoAluno.get(a.id) === t.id);
-    const nee = new Set(alunos.filter((a) => a.neurodivergente).map((a) => a.id));
+    const alunos = base.alunos.filter(
+      (a) => base.turmaDoAluno.get(a.id) === t.id,
+    );
+    const nee = new Set(
+      alunos.filter((a) => a.neurodivergente).map((a) => a.id),
+    );
 
     return {
       ...t,
@@ -343,17 +383,28 @@ export class PainelEscolaService {
       professores: this.professoresDaTurma(t.id, base),
       desempenho: taxaConclusao(
         base.linhas.filter(
-          (l) => l.turmaId === t.id && nee.has(l.alunoId) && noIntervalo(l.dataEntrega, base.intervalo),
+          (l) =>
+            l.turmaId === t.id &&
+            nee.has(l.alunoId) &&
+            noIntervalo(l.dataEntrega, base.intervalo),
         ),
       ),
     };
   }
 
-  private resumoAluno(a: AlunoBase, base: Base, semana = semanaDe(new Date())): AlunoResumo {
+  private resumoAluno(
+    a: AlunoBase,
+    base: Base,
+    semana = semanaDe(new Date()),
+  ): AlunoResumo {
     const turmaId = base.turmaDoAluno.get(a.id);
-    const turma = turmaId ? base.turmas.find((t) => t.id === turmaId) : undefined;
+    const turma = turmaId
+      ? base.turmas.find((t) => t.id === turmaId)
+      : undefined;
     const taxa = taxaConclusao(
-      base.linhas.filter((l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, semana)),
+      base.linhas.filter(
+        (l) => l.alunoId === a.id && noIntervalo(l.dataEntrega, semana),
+      ),
     );
 
     return {
@@ -362,7 +413,11 @@ export class PainelEscolaService {
       cgm: a.cgm,
       neurodivergente: a.neurodivergente,
       turma: turma
-        ? { id: turma.id, nome: turma.nome, codigo: codigoTurma(turma.serie, turma.letra, turma.nome) }
+        ? {
+            id: turma.id,
+            nome: turma.nome,
+            codigo: codigoTurma(turma.serie, turma.letra, turma.nome),
+          }
         : null,
       diagnosticos: a.diagnosticos.map((d) => d.nome),
       desempenhoSemana: taxa,
@@ -371,7 +426,10 @@ export class PainelEscolaService {
   }
 
   private professoresDaTurma(turmaId: number, base: Base) {
-    const porProfessor = new Map<number, { id: number; nome: string; disciplinas: string[] }>();
+    const porProfessor = new Map<
+      number,
+      { id: number; nome: string; disciplinas: string[] }
+    >();
 
     for (const a of base.alocacoes.filter((x) => x.turmaId === turmaId)) {
       const p = porProfessor.get(a.professorId) ?? {
@@ -379,7 +437,8 @@ export class PainelEscolaService {
         nome: a.professorNome ?? 'Sem nome',
         disciplinas: [],
       };
-      if (a.disciplina && !p.disciplinas.includes(a.disciplina)) p.disciplinas.push(a.disciplina);
+      if (a.disciplina && !p.disciplinas.includes(a.disciplina))
+        p.disciplinas.push(a.disciplina);
       porProfessor.set(a.professorId, p);
     }
 
@@ -409,46 +468,51 @@ export class PainelEscolaService {
   }
 
   /** Carrega numa tacada o que as telas cruzam: turmas, alunos, alocacoes e tarefas. */
-  private async carregarBase(escolaId: number, intervalo: [string, string]): Promise<Base> {
-    const [turmas, alunos, matriculas, diagnosticos, alocacoes, linhas] = await Promise.all([
-      this.dataSource.query(
-        `SELECT id, nome, serie, letra, turno, ano_letivo anoLetivo, sala,
+  private async carregarBase(
+    escolaId: number,
+    intervalo: [string, string],
+  ): Promise<Base> {
+    const [turmas, alunos, matriculas, diagnosticos, alocacoes, linhas] =
+      await Promise.all([
+        this.dataSource.query(
+          `SELECT id, nome, serie, letra, turno, ano_letivo anoLetivo, sala,
                 limite_alunos limiteAlunos, criado_em criadoEm
            FROM turma WHERE escola_id = ? ORDER BY serie, letra, nome`,
-        [escolaId],
-      ),
-      this.dataSource.query(
-        `SELECT id, nome_completo nome, cgm, neurodivergente FROM aluno
+          [escolaId],
+        ),
+        this.dataSource.query(
+          `SELECT id, nome_completo nome, cgm, neurodivergente FROM aluno
           WHERE escola_id = ? AND ativo = 1 ORDER BY nome_completo`,
-        [escolaId],
-      ),
-      this.dataSource.query(
-        `SELECT m.aluno_id alunoId, m.turma_id turmaId FROM matricula m
+          [escolaId],
+        ),
+        this.dataSource.query(
+          `SELECT m.aluno_id alunoId, m.turma_id turmaId FROM matricula m
            JOIN aluno a ON a.id = m.aluno_id WHERE a.escola_id = ?`,
-        [escolaId],
-      ),
-      this.dataSource.query(
-        `SELECT an.aluno_id alunoId, n.id, n.nome FROM aluno_neurodivergencia an
+          [escolaId],
+        ),
+        this.dataSource.query(
+          `SELECT an.aluno_id alunoId, n.id, n.nome FROM aluno_neurodivergencia an
            JOIN neurodivergencia n ON n.id = an.neurodivergencia_id
            JOIN aluno a ON a.id = an.aluno_id WHERE a.escola_id = ? ORDER BY n.id`,
-        [escolaId],
-      ),
-      this.alocacoes(escolaId),
-      this.dataSource.query(
-        `SELECT m.aluno_id alunoId, t.id tarefaId, t.turma_id turmaId, t.data_entrega dataEntrega,
+          [escolaId],
+        ),
+        this.alocacoes(escolaId),
+        this.dataSource.query(
+          `SELECT m.aluno_id alunoId, t.id tarefaId, t.turma_id turmaId, t.data_entrega dataEntrega,
                 t.hora_limite horaLimite, ts.status, ts.concluido_em concluidoEm
            FROM matricula m
            JOIN aluno a ON a.id = m.aluno_id
            JOIN tarefa t ON t.turma_id = m.turma_id
            LEFT JOIN tarefa_status ts ON ts.aluno_id = m.aluno_id AND ts.tarefa_id = t.id
           WHERE a.escola_id = ? AND a.ativo = 1 AND t.data_entrega BETWEEN ? AND ?`,
-        [escolaId, intervalo[0], intervalo[1]],
-      ),
-    ]);
+          [escolaId, intervalo[0], intervalo[1]],
+        ),
+      ]);
 
     const turmaDoAluno = new Map<number, number>();
     for (const m of matriculas) {
-      if (!turmaDoAluno.has(Number(m.alunoId))) turmaDoAluno.set(Number(m.alunoId), Number(m.turmaId));
+      if (!turmaDoAluno.has(Number(m.alunoId)))
+        turmaDoAluno.set(Number(m.alunoId), Number(m.turmaId));
     }
 
     return {
@@ -526,4 +590,3 @@ interface Base {
   alocacoes: Alocacao[];
   linhas: LinhaTarefa[];
 }
-

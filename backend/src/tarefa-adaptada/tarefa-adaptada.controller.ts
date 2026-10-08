@@ -21,9 +21,7 @@ import { CreateTarefaAdaptadaDto } from './dto/create-tarefa-adaptada.dto';
 @Roles('escola', 'professor')
 @Controller('tarefas-adaptadas')
 export class TarefaAdaptadaController {
-  constructor(
-    private readonly tarefaAdaptadaService: TarefaAdaptadaService,
-  ) {}
+  constructor(private readonly tarefaAdaptadaService: TarefaAdaptadaService) {}
 
   @Get(':tarefaId')
   @ApiOperation({ summary: 'Listar adaptacoes de uma tarefa' })
@@ -37,10 +35,7 @@ export class TarefaAdaptadaController {
   @Post()
   @Roles('professor')
   @ApiOperation({ summary: 'Criar adaptacao de uma tarefa para um aluno' })
-  create(
-    @Body() body: CreateTarefaAdaptadaDto,
-    @EscolaId() escolaId: number,
-  ) {
+  create(@Body() body: CreateTarefaAdaptadaDto, @EscolaId() escolaId: number) {
     return this.tarefaAdaptadaService.create(body, escolaId);
   }
 }

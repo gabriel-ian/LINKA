@@ -18,7 +18,12 @@ export class Responsavel {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'nome_completo', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'nome_completo',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   nomeCompleto!: string | null;
 
   @Column({ type: 'varchar', length: 20, nullable: true })

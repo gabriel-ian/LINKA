@@ -3,7 +3,11 @@
 
   @if (salvo()) {
     <p class="aviso-caixa verde forte" role="status">
-      {{ salvo() === 'laudo' ? 'Alterações salvas, mas o laudo não foi enviado. Tente anexar de novo.' : 'Alterações salvas.' }}
+      {{
+        salvo() === 'laudo'
+          ? 'Alterações salvas, mas o laudo não foi enviado. Tente anexar de novo.'
+          : 'Alterações salvas.'
+      }}
     </p>
   }
 
@@ -24,7 +28,11 @@
       <div class="indicador" [class]="'c-' + corSituacao(a.situacao)">
         <span>Desempenho semana</span>
         <strong>{{ pct(a.desempenhoSemana) }}</strong>
-        <small>{{ a.situacao === 'sem-dados' ? 'sem tarefas na semana' : rotuloSituacao[a.situacao].toLowerCase() }}</small>
+        <small>{{
+          a.situacao === 'sem-dados'
+            ? 'sem tarefas na semana'
+            : rotuloSituacao[a.situacao].toLowerCase()
+        }}</small>
       </div>
       <div class="indicador c-azul">
         <span>Tarefas no mês</span>
@@ -52,7 +60,12 @@
             {{ a.diagnosticos.length ? juntar(a.diagnosticos) : 'Não informado' }}
             @if (a.laudo) {
               - laudo anexado em {{ dataBr(a.laudo.enviadoEm) }}
-              <button type="button" class="link-acao" [disabled]="baixando()" (click)="baixarLaudo(a)">
+              <button
+                type="button"
+                class="link-acao"
+                [disabled]="baixando()"
+                (click)="baixarLaudo(a)"
+              >
                 {{ baixando() ? 'Baixando...' : 'Baixar laudo' }}
               </button>
             }
@@ -65,7 +78,14 @@
           <dd>
             @if (a.email) {
               {{ a.email }}
-              <button type="button" class="link-acao" [disabled]="gerando() === 'alunos-' + a.id" (click)="redefinirSenha('alunos', a.id, a.nome)">Redefinir senha</button>
+              <button
+                type="button"
+                class="link-acao"
+                [disabled]="gerando() === 'alunos-' + a.id"
+                (click)="redefinirSenha('alunos', a.id, a.nome)"
+              >
+                Redefinir senha
+              </button>
             } @else {
               Sem login próprio
             }
@@ -73,7 +93,9 @@
         </dl>
         @if (!a.dificuldades && !a.pontosFortes && !a.interesses.length) {
           <p class="aviso-caixa roxo">
-            Preencha o perfil de aprendizagem em <a [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>: a IA usa essas informações para personalizar as tarefas.
+            Preencha o perfil de aprendizagem em
+            <a [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>: a IA usa essas
+            informações para personalizar as tarefas.
           </p>
         }
         @if (a.interesses.length) {
@@ -90,14 +112,18 @@
           <h2>Professores</h2>
           @for (p of a.professores; track p.id; let i = $index) {
             <div class="pessoa" [class]="'c-' + cor(i)">
-              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(p.nome) }}</span>
+              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
+                iniciais(p.nome)
+              }}</span>
               <div>
                 <strong>{{ p.nome }}</strong>
                 <small>{{ juntar(p.disciplinas) || 'Sem disciplina' }}</small>
               </div>
             </div>
           } @empty {
-            <p class="vazio">{{ a.turma ? 'A turma ainda não tem professores.' : 'Aluno sem turma.' }}</p>
+            <p class="vazio">
+              {{ a.turma ? 'A turma ainda não tem professores.' : 'Aluno sem turma.' }}
+            </p>
           }
         </section>
 
@@ -105,7 +131,9 @@
           <h2>Responsável</h2>
           @for (r of a.responsaveis; track r.email) {
             <div class="pessoa c-roxo">
-              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(r.nome ?? '?') }}</span>
+              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
+                iniciais(r.nome ?? '?')
+              }}</span>
               <div>
                 <strong>{{ r.nome }}</strong>
                 <small>{{ r.parentesco ? r.parentesco + ' - ' : '' }}{{ r.email }}</small>
@@ -122,7 +150,14 @@
                 {{ r.acessou ? 'Acompanha pela Linka' : 'Aguardando primeiro acesso' }}
               </span>
               @if (r.email) {
-                <button type="button" class="link-acao" [disabled]="gerando() === 'responsaveis-' + r.id" (click)="redefinirSenha('responsaveis', r.id, r.nome ?? 'o responsável')">Redefinir senha</button>
+                <button
+                  type="button"
+                  class="link-acao"
+                  [disabled]="gerando() === 'responsaveis-' + r.id"
+                  (click)="redefinirSenha('responsaveis', r.id, r.nome ?? 'o responsável')"
+                >
+                  Redefinir senha
+                </button>
               }
             </div>
           } @empty {
@@ -134,12 +169,22 @@
 
     @if (a.turma) {
       <div class="acoes">
-        <a class="bt bt-primario" routerLink="/escola/relatorios" [queryParams]="{ turmaId: a.turma.id }">Ver relatório da turma</a>
+        <a
+          class="bt bt-primario"
+          routerLink="/escola/relatorios"
+          [queryParams]="{ turmaId: a.turma.id }"
+          >Ver relatório da turma</a
+        >
       </div>
     }
   }
 </div>
 
 @if (senha(); as s) {
-  <app-senha-provisoria [nome]="s.nome" [email]="s.email" [senha]="s.senha" (fechar)="senha.set(null)" />
+  <app-senha-provisoria
+    [nome]="s.nome"
+    [email]="s.email"
+    [senha]="s.senha"
+    (fechar)="senha.set(null)"
+  />
 }

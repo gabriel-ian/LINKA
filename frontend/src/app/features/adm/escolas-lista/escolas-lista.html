@@ -8,18 +8,37 @@
   </header>
 
   <div class="filtros">
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'todas'" (click)="filtrar('todas')">
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'todas'"
+      (click)="filtrar('todas')"
+    >
       Todas ({{ store.escolas().length }})
     </button>
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'ativas'" (click)="filtrar('ativas')">
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'ativas'"
+      (click)="filtrar('ativas')"
+    >
       Ativas ({{ store.ativas().length }})
     </button>
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'inativas'" (click)="filtrar('inativas')">
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'inativas'"
+      (click)="filtrar('inativas')"
+    >
       Inativas ({{ store.inativas().length }})
     </button>
 
     <label class="campo-p cidade">
-      <select aria-label="Cidade" [value]="cidade()" (change)="escolherCidade($any($event.target).value)">
+      <select
+        aria-label="Cidade"
+        [value]="cidade()"
+        (change)="escolherCidade($any($event.target).value)"
+      >
         <option value="">Cidade: Todas</option>
         @for (c of cidades(); track c) {
           <option [value]="c">{{ c }}</option>
@@ -55,9 +74,13 @@
             <td>{{ e.cidade || '—' }}</td>
             <td>{{ rotuloPlano[e.plano] }}</td>
             <td>{{ e.totalAlunosNee }}</td>
-            <td><span class="pilula" [class]="status(e)">{{ rotuloStatus[status(e)] }}</span></td>
             <td>
-              <a class="link-acao" routerLink="/adm/escolas/atualizar" [queryParams]="{ id: e.id }">Editar</a>
+              <span class="pilula" [class]="status(e)">{{ rotuloStatus[status(e)] }}</span>
+            </td>
+            <td>
+              <a class="link-acao" routerLink="/adm/escolas/atualizar" [queryParams]="{ id: e.id }"
+                >Editar</a
+              >
             </td>
           </tr>
         } @empty {

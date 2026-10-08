@@ -26,18 +26,29 @@ export class EscolasLista {
   readonly pagina = signal(0);
 
   readonly cidades = computed(() =>
-    [...new Set(this.store.escolas().map((e) => e.cidade).filter((c): c is string => !!c))].sort(),
+    [
+      ...new Set(
+        this.store
+          .escolas()
+          .map((e) => e.cidade)
+          .filter((c): c is string => !!c),
+      ),
+    ].sort(),
   );
 
   readonly filtradas = computed(() =>
-    this.store.escolas().filter(
-      (e) =>
-        (this.filtro() === 'todas' || e.ativo === (this.filtro() === 'ativas')) &&
-        (!this.cidade() || e.cidade === this.cidade()),
-    ),
+    this.store
+      .escolas()
+      .filter(
+        (e) =>
+          (this.filtro() === 'todas' || e.ativo === (this.filtro() === 'ativas')) &&
+          (!this.cidade() || e.cidade === this.cidade()),
+      ),
   );
 
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.filtradas().length / POR_PAGINA)));
+  readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.filtradas().length / POR_PAGINA)),
+  );
 
   readonly visiveis = computed(() =>
     this.filtradas().slice(this.pagina() * POR_PAGINA, (this.pagina() + 1) * POR_PAGINA),

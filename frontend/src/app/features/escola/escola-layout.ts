@@ -1,10 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {
-  ConfigPainel,
-  Notificacao,
-  PainelLayout,
-} from '../../shared/painel-layout/painel-layout';
+import { ConfigPainel, Notificacao, PainelLayout } from '../../shared/painel-layout/painel-layout';
 import { EscolaContexto } from './escola-contexto';
 import { iniciais, ROTULO_PLANO } from '../adm/escola-ui';
 import { juntar } from './escola-ui';
@@ -30,7 +26,9 @@ export class EscolaLayout {
 
     return {
       titulo: escola?.nome ?? 'Painel da escola',
-      detalhe: escola ? `Plano ${ROTULO_PLANO[escola.plano]} - ${escola.ativo ? 'Ativo' : 'Inativo'}` : '',
+      detalhe: escola
+        ? `Plano ${ROTULO_PLANO[escola.plano]} - ${escola.ativo ? 'Ativo' : 'Inativo'}`
+        : '',
       tituloPequeno: true,
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
       secoes: [
@@ -38,8 +36,18 @@ export class EscolaLayout {
           titulo: 'MENU',
           itens: [
             { rota: '/escola', rotulo: 'Visão geral', icone: 'visao' },
-            { rota: '/escola/turmas', rotulo: 'Turmas', exato: false, icone: [{ src: ICONE + 'turmas', left: 11.15, top: 16.2 }] },
-            { rota: '/escola/professores', rotulo: 'Professores', exato: false, icone: [{ src: ICONE + 'professores', left: 11.9, top: 16 }] },
+            {
+              rota: '/escola/turmas',
+              rotulo: 'Turmas',
+              exato: false,
+              icone: [{ src: ICONE + 'turmas', left: 11.15, top: 16.2 }],
+            },
+            {
+              rota: '/escola/professores',
+              rotulo: 'Professores',
+              exato: false,
+              icone: [{ src: ICONE + 'professores', left: 11.9, top: 16 }],
+            },
             {
               rota: '/escola/alunos',
               rotulo: 'Alunos NEE',
@@ -49,14 +57,26 @@ export class EscolaLayout {
                 { src: ICONE + 'alunos-check', left: 25, top: 21 },
               ],
             },
-            { rota: '/escola/relatorios', rotulo: 'Relatórios', icone: [{ src: ICONE + 'relatorios', left: 10.9, top: 14, espelhar: true }] },
+            {
+              rota: '/escola/relatorios',
+              rotulo: 'Relatórios',
+              icone: [{ src: ICONE + 'relatorios', left: 10.9, top: 14, espelhar: true }],
+            },
           ],
         },
         {
           titulo: 'CADASTRO',
           itens: [
-            { rota: '/escola/cadastro/aluno', rotulo: 'Aluno (a)', icone: [{ src: ICONE + 'cad-aluno', left: 11.9, top: 15 }] },
-            { rota: '/escola/cadastro/professor', rotulo: 'Professor (a)', icone: [{ src: ICONE + 'cad-professor', left: 11.9, top: 13.7 }] },
+            {
+              rota: '/escola/cadastro/aluno',
+              rotulo: 'Aluno (a)',
+              icone: [{ src: ICONE + 'cad-aluno', left: 11.9, top: 15 }],
+            },
+            {
+              rota: '/escola/cadastro/professor',
+              rotulo: 'Professor (a)',
+              icone: [{ src: ICONE + 'cad-professor', left: 11.9, top: 13.7 }],
+            },
           ],
         },
       ],

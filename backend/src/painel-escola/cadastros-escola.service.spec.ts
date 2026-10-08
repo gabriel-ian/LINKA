@@ -1,7 +1,10 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { promises as fs } from 'fs';
-import { CadastrosEscolaService, perfilParaColunas } from './cadastros-escola.service';
+import {
+  CadastrosEscolaService,
+  perfilParaColunas,
+} from './cadastros-escola.service';
 import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
 import { TarefaStatusService } from '../tarefa-status/tarefa-status.service';
 
@@ -15,7 +18,9 @@ describe('CadastrosEscolaService', () => {
 
   beforeEach(() => {
     alunoRepo = { findOne: jest.fn(), update: jest.fn() };
-    const dataSource = { getRepository: jest.fn(() => alunoRepo) } as unknown as DataSource;
+    const dataSource = {
+      getRepository: jest.fn(() => alunoRepo),
+    } as unknown as DataSource;
     service = new CadastrosEscolaService(dataSource, {} as TarefaStatusService);
     jest.spyOn(fs, 'mkdir').mockResolvedValue(undefined);
     jest.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
@@ -37,23 +42,27 @@ describe('CadastrosEscolaService', () => {
     const PDF = [0x25, 0x50, 0x44, 0x46, 0x2d];
 
     it('recusa arquivo que nao e PDF/PNG/JPG pelos bytes, mesmo com nome .pdf', async () => {
-      await expect(service.salvarLaudo(1, 5, arquivo([0x4d, 0x5a, 0x00]))).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.salvarLaudo(1, 5, arquivo([0x4d, 0x5a, 0x00])),
+      ).rejects.toThrow(BadRequestException);
       expect(fs.writeFile).not.toHaveBeenCalled();
     });
 
     it('recusa laudo acima de 10 MB', async () => {
-      await expect(service.salvarLaudo(1, 5, arquivo(PDF, 11 * 1024 * 1024))).rejects.toThrow(
-        'O laudo pode ter ate 10 MB',
-      );
+      await expect(
+        service.salvarLaudo(1, 5, arquivo(PDF, 11 * 1024 * 1024)),
+      ).rejects.toThrow('O laudo pode ter ate 10 MB');
     });
 
     it('so aceita aluno da propria escola', async () => {
       alunoRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.salvarLaudo(1, 5, arquivo(PDF))).rejects.toThrow(NotFoundException);
-      expect(alunoRepo.findOne).toHaveBeenCalledWith({ where: { id: 1, escolaId: 5 } });
+      await expect(service.salvarLaudo(1, 5, arquivo(PDF))).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(alunoRepo.findOne).toHaveBeenCalledWith({
+        where: { id: 1, escolaId: 5 },
+      });
     });
 
     it('grava o PDF e apaga o laudo anterior', async () => {
@@ -61,8 +70,14 @@ describe('CadastrosEscolaService', () => {
 
       await service.salvarLaudo(1, 5, arquivo(PDF));
 
-      expect(fs.writeFile).toHaveBeenCalledWith(expect.stringMatching(/1-\d+\.pdf$/), expect.any(Buffer));
-      expect(fs.rm).toHaveBeenCalledWith(expect.stringMatching(/1-antigo\.pdf$/), { force: true });
+      expect(fs.writeFile).toHaveBeenCalledWith(
+        expect.stringMatching(/1-\d+\.pdf$/),
+        expect.any(Buffer),
+      );
+      expect(fs.rm).toHaveBeenCalledWith(
+        expect.stringMatching(/1-antigo\.pdf$/),
+        { force: true },
+      );
       expect(alunoRepo.update).toHaveBeenCalledWith(1, {
         laudo: expect.stringMatching(/^1-\d+\.pdf$/),
         laudoEnviadoEm: expect.any(Date),
@@ -81,7 +96,9 @@ describe('perfilParaColunas', () => {
 
   it('junta interesses sem repetir e sem virgulas internas', () => {
     expect(
-      perfilParaColunas({ interesses: ['Dinossauros', ' Futebol ', 'Dinossauros', 'a,b', ''] }),
+      perfilParaColunas({
+        interesses: ['Dinossauros', ' Futebol ', 'Dinossauros', 'a,b', ''],
+      }),
     ).toEqual({ interesses: 'Dinossauros, Futebol, a b' });
     expect(perfilParaColunas({ interesses: [] })).toEqual({ interesses: null });
   });
@@ -89,12 +106,24 @@ describe('perfilParaColunas', () => {
 
 describe('CadastrosEscolaService.redefinirSenha', () => {
   it('nao redefine senha de professor de outra escola', async () => {
-    const repo = { findOne: jest.fn().mockResolvedValue(null), update: jest.fn() };
-    const dataSource = { getRepository: jest.fn(() => repo) } as unknown as DataSource;
-    const service = new CadastrosEscolaService(dataSource, {} as TarefaStatusService);
+    const repo = {
+      findOne: jest.fn().mockResolvedValue(null),
+      update: jest.fn(),
+    };
+    const dataSource = {
+      getRepository: jest.fn(() => repo),
+    } as unknown as DataSource;
+    const service = new CadastrosEscolaService(
+      dataSource,
+      {} as TarefaStatusService,
+    );
 
-    await expect(service.redefinirSenha('professor', 9, 5)).rejects.toThrow(NotFoundException);
-    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 9, escolaId: 5 } });
+    await expect(service.redefinirSenha('professor', 9, 5)).rejects.toThrow(
+      NotFoundException,
+    );
+    expect(repo.findOne).toHaveBeenCalledWith({
+      where: { id: 9, escolaId: 5 },
+    });
     expect(repo.update).not.toHaveBeenCalled();
   });
 });

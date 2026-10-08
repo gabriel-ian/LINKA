@@ -17,12 +17,20 @@ import { AlterarSenha } from '../../shared/senha/alterar-senha';
         <h1>Olá{{ aluno ? '' : ', família' }}!</h1>
         <p>
           @if (aluno) {
-            Seu acesso à Linka está funcionando. Em breve suas tarefas, passo a passo, aparecem aqui.
+            Seu acesso à Linka está funcionando. Em breve suas tarefas, passo a passo, aparecem
+            aqui.
           } @else {
-            Seu acesso à Linka está funcionando. Em breve você vai acompanhar as tarefas e os avisos da escola por aqui.
+            Seu acesso à Linka está funcionando. Em breve você vai acompanhar as tarefas e os avisos
+            da escola por aqui.
           }
         </p>
-        <button type="button" class="btn btn-secundario btn-bloco" (click)="alterandoSenha.set(true)">Alterar minha senha</button>
+        <button
+          type="button"
+          class="btn btn-secundario btn-bloco"
+          (click)="alterandoSenha.set(true)"
+        >
+          Alterar minha senha
+        </button>
         <button type="button" class="btn btn-primario btn-bloco" (click)="sair()">Sair</button>
       </div>
     </app-entrada-layout>

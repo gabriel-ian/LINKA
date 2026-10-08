@@ -8,16 +8,44 @@
       <h1>Turma {{ d.turma.nome }}</h1>
       <p>
         {{ contagem().todos }} alunos - {{ contagem().nee }} com acompanhamento NEE
-        @if (disciplinas(d)) { - {{ disciplinas(d) }} }
+        @if (disciplinas(d)) {
+          - {{ disciplinas(d) }}
+        }
       </p>
     </header>
 
     <div class="filtros">
-      <button type="button" class="pilula" [class.selecionada]="filtro() === 'todos'" (click)="filtrar('todos')">Todos ({{ contagem().todos }})</button>
-      <button type="button" class="pilula" [class.selecionada]="filtro() === 'nee'" (click)="filtrar('nee')">NEE ({{ contagem().nee }})</button>
-      <button type="button" class="pilula" [class.selecionada]="filtro() === 'atraso'" (click)="filtrar('atraso')">Com atraso ({{ contagem().atraso }})</button>
+      <button
+        type="button"
+        class="pilula"
+        [class.selecionada]="filtro() === 'todos'"
+        (click)="filtrar('todos')"
+      >
+        Todos ({{ contagem().todos }})
+      </button>
+      <button
+        type="button"
+        class="pilula"
+        [class.selecionada]="filtro() === 'nee'"
+        (click)="filtrar('nee')"
+      >
+        NEE ({{ contagem().nee }})
+      </button>
+      <button
+        type="button"
+        class="pilula"
+        [class.selecionada]="filtro() === 'atraso'"
+        (click)="filtrar('atraso')"
+      >
+        Com atraso ({{ contagem().atraso }})
+      </button>
       <label class="campo-p busca">
-        <input aria-label="Buscar aluno" placeholder="Buscar aluno..." [value]="busca()" (input)="busca.set($any($event.target).value); pagina.set(0)" />
+        <input
+          aria-label="Buscar aluno"
+          placeholder="Buscar aluno..."
+          [value]="busca()"
+          (input)="busca.set($any($event.target).value); pagina.set(0)"
+        />
       </label>
       <a class="bt bt-primario" routerLink="/professor/tarefas/nova">+ Nova tarefa</a>
     </div>
@@ -39,7 +67,11 @@
             <tr [class]="'c-' + corSituacao(a.situacao)">
               <td>
                 <div class="pessoa">
-                  <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(a.nome) }}</span>
+                  <span
+                    class="selo-cor"
+                    style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px"
+                    >{{ iniciais(a.nome) }}</span
+                  >
                   <div>
                     <strong>{{ a.nome }}</strong>
                     <small>{{ a.idade !== null ? a.idade + ' anos' : '' }}</small>
@@ -53,7 +85,9 @@
                   -
                 }
               </td>
-              <td title="Concluídas na semana">{{ a.tarefasSemana.concluidas }}/{{ a.tarefasSemana.total }}</td>
+              <td title="Concluídas na semana">
+                {{ a.tarefasSemana.concluidas }}/{{ a.tarefasSemana.total }}
+              </td>
               <td>
                 <span class="entregas">
                   <span class="progresso"><span [style.width.%]="a.entregasMes ?? 0"></span></span>
@@ -61,10 +95,14 @@
                 </span>
               </td>
               <td>{{ quando(a.ultimaAtividade) }}</td>
-              <td><a class="link-acao" [routerLink]="['/professor/alunos', a.id]">Ver perfil</a></td>
+              <td>
+                <a class="link-acao" [routerLink]="['/professor/alunos', a.id]">Ver perfil</a>
+              </td>
             </tr>
           } @empty {
-            <tr><td colspan="6" class="vazio">Nenhum aluno neste filtro.</td></tr>
+            <tr>
+              <td colspan="6" class="vazio">Nenhum aluno neste filtro.</td>
+            </tr>
           }
         </tbody>
       </table>

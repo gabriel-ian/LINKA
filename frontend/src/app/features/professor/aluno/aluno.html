@@ -7,7 +7,9 @@
 
   @if (aluno(); as a) {
     <header class="cabecalho" [class]="'c-' + corSituacao(situacao(a.desempenhoMes))">
-      <span class="selo-cor" style="--tam: 76px; --raio-selo: 10px; --fonte-selo: 32px">{{ iniciais(a.nome) }}</span>
+      <span class="selo-cor" style="--tam: 76px; --raio-selo: 10px; --fonte-selo: 32px">{{
+        iniciais(a.nome)
+      }}</span>
       <div class="painel-cabecalho">
         <h1>{{ a.nome }}</h1>
         <p>{{ subtitulo(a) }}</p>
@@ -17,7 +19,12 @@
     <div class="indicadores tres">
       <div class="indicador" [class]="'c-' + corSituacao(situacao(a.desempenhoMes))">
         <span>Desempenho no mês</span>
-        <strong>{{ a.desempenhoMes ?? '—' }}@if (a.desempenhoMes !== null) {<small>%</small>}</strong>
+        <strong
+          >{{ a.desempenhoMes ?? '—' }}
+          @if (a.desempenhoMes !== null) {
+            <small>%</small>
+          }
+        </strong>
         <span class="progresso"><span [style.width.%]="a.desempenhoMes ?? 0"></span></span>
       </div>
       <div class="indicador c-azul">
@@ -45,15 +52,32 @@
           @for (d of a.diagnosticos; track d) {
             <span class="pilula pendente">{{ d }}</span>
           } @empty {
-            <span class="pilula inativa">{{ a.neurodivergente ? 'Não informado' : 'Sem NEE' }}</span>
+            <span class="pilula inativa">{{
+              a.neurodivergente ? 'Não informado' : 'Sem NEE'
+            }}</span>
           }
         </div>
         @if (editando()) {
-          <app-perfil-aprendizagem [(dificuldades)]="dificuldades" [(pontosFortes)]="pontosFortes" [(interesses)]="interesses" />
-          @if (erroEdicao()) { <p class="alerta-erro" role="alert">{{ erroEdicao() }}</p> }
+          <app-perfil-aprendizagem
+            [(dificuldades)]="dificuldades"
+            [(pontosFortes)]="pontosFortes"
+            [(interesses)]="interesses"
+          />
+          @if (erroEdicao()) {
+            <p class="alerta-erro" role="alert">{{ erroEdicao() }}</p>
+          }
           <div class="acoes">
-            <button type="button" class="bt bt-secundario bt-p" (click)="editando.set(false)">Cancelar</button>
-            <button type="button" class="bt bt-primario bt-p" [disabled]="salvando()" (click)="salvar(a)">{{ salvando() ? 'Salvando...' : 'Salvar perfil' }}</button>
+            <button type="button" class="bt bt-secundario bt-p" (click)="editando.set(false)">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="bt bt-primario bt-p"
+              [disabled]="salvando()"
+              (click)="salvar(a)"
+            >
+              {{ salvando() ? 'Salvando...' : 'Salvar perfil' }}
+            </button>
           </div>
         } @else {
           <h3>Maiores dificuldades</h3>
@@ -69,7 +93,10 @@
             </div>
           }
           @if (!a.dificuldades && !a.pontosFortes && !a.interesses.length) {
-            <p class="convite">Preencha o perfil: a IA usa estas informações para adaptar as tarefas de {{ a.nome.split(' ')[0] }}.</p>
+            <p class="convite">
+              Preencha o perfil: a IA usa estas informações para adaptar as tarefas de
+              {{ a.nome.split(' ')[0] }}.
+            </p>
           }
         }
       </section>
@@ -80,7 +107,9 @@
           <div class="materias">
             @for (m of a.progressoPorMateria; track m.disciplina; let i = $index) {
               <div class="materia" [class]="'c-' + cor(i + 1)">
-                <span class="rotulo">{{ m.disciplina }} <b>{{ pct(m.taxa) }}</b></span>
+                <span class="rotulo"
+                  >{{ m.disciplina }} <b>{{ pct(m.taxa) }}</b></span
+                >
                 <span class="progresso"><span [style.width.%]="m.taxa ?? 0"></span></span>
               </div>
             } @empty {
@@ -93,9 +122,13 @@
           <h2>Sugestões pedagógicas</h2>
           <div class="sugestoes">
             @for (s of a.sugestoes; track s.texto; let i = $index) {
-              <p class="aviso-caixa" [class]="i % 2 ? 'aviso-caixa verde' : 'aviso-caixa azul'">{{ s.texto }}</p>
+              <p class="aviso-caixa" [class]="i % 2 ? 'aviso-caixa verde' : 'aviso-caixa azul'">
+                {{ s.texto }}
+              </p>
             } @empty {
-              <p class="vazio">As sugestões aparecem quando houver algumas semanas de tarefas concluídas.</p>
+              <p class="vazio">
+                As sugestões aparecem quando houver algumas semanas de tarefas concluídas.
+              </p>
             }
           </div>
         </section>

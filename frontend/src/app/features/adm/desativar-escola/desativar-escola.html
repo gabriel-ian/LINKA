@@ -26,7 +26,9 @@
   } @else if (escola(); as e) {
     <form class="cartao" (ngSubmit)="desativar()">
       <div class="topo">
-        <span class="avatar" style="--tam: 56px; --raio-avatar: 12px; --fonte-avatar: 22px">{{ iniciais(e.nome) }}</span>
+        <span class="avatar" style="--tam: 56px; --raio-avatar: 12px; --fonte-avatar: 22px">{{
+          iniciais(e.nome)
+        }}</span>
         <div class="nome">
           <h2>{{ e.nome }}</h2>
           <p>ID #{{ e.id }}{{ cidadeUf(e) ? ' - ' + cidadeUf(e) : '' }}</p>
@@ -42,8 +44,9 @@
       } @else {
         <div class="aviso-caixa vermelho">
           <strong>Atenção: essa ação afeta toda a escola</strong>
-          {{ e.totalAlunosNee }} alunos, {{ e.totalProfessores }} professores e as famílias vinculadas perdem o
-          acesso imediatamente. Os dados ficam guardados e a escola pode ser reativada depois.
+          {{ e.totalAlunosNee }} alunos, {{ e.totalProfessores }} professores e as famílias
+          vinculadas perdem o acesso imediatamente. Os dados ficam guardados e a escola pode ser
+          reativada depois.
         </div>
 
         <div class="grade-campos">
@@ -63,7 +66,12 @@
 
         <label class="campo-p">
           Observações (opcional)
-          <textarea name="observacao" maxlength="1000" [(ngModel)]="observacao" placeholder="Descreva o motivo para o histórico da escola..."></textarea>
+          <textarea
+            name="observacao"
+            maxlength="1000"
+            [(ngModel)]="observacao"
+            placeholder="Descreva o motivo para o histórico da escola..."
+          ></textarea>
         </label>
 
         <label class="marcar">
@@ -75,7 +83,11 @@
 
         <div class="acoes">
           <button type="button" class="bt bt-secundario" (click)="cancelar()">Cancelar</button>
-          <button type="submit" class="bt bt-perigo-cheio" [disabled]="!confirmado || !data || enviando()">
+          <button
+            type="submit"
+            class="bt bt-perigo-cheio"
+            [disabled]="!confirmado || !data || enviando()"
+          >
             {{ enviando() ? 'Desativando...' : 'Desativar escola' }}
           </button>
         </div>

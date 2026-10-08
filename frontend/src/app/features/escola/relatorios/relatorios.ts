@@ -39,7 +39,10 @@ export class EscolaRelatorios {
     if (comDados.length < 2) return null;
     const primeiro = comDados[0];
     const ultimo = comDados[comDados.length - 1];
-    return { pontos: ultimo.taxa! - primeiro.taxa!, desde: nomeMes(primeiro.mes).split(' ')[0].toLowerCase() };
+    return {
+      pontos: ultimo.taxa! - primeiro.taxa!,
+      desde: nomeMes(primeiro.mes).split(' ')[0].toLowerCase(),
+    };
   });
 
   constructor() {

@@ -38,10 +38,18 @@
   font-weight: 500;
 }
 
-.azul { color: var(--cor-azul-forte); }
-.verde { color: var(--cor-sucesso); }
-.laranja { color: #ea6819; }
-.roxo { color: #7c3aed; }
+.azul {
+  color: var(--cor-azul-forte);
+}
+.verde {
+  color: var(--cor-sucesso);
+}
+.laranja {
+  color: #ea6819;
+}
+.roxo {
+  color: #7c3aed;
+}
 
 .blocos {
   display: flex;

@@ -27,9 +27,15 @@ function linha(parcial: Partial<LinhaTarefa>): LinhaTarefa {
 describe('metricas do painel da escola', () => {
   it('semanaDe vai de segunda a domingo', () => {
     // 2026-07-15 e uma quarta-feira
-    expect(semanaDe(new Date(2026, 6, 15))).toEqual(['2026-07-13', '2026-07-19']);
+    expect(semanaDe(new Date(2026, 6, 15))).toEqual([
+      '2026-07-13',
+      '2026-07-19',
+    ]);
     // domingo pertence a semana que comecou na segunda anterior
-    expect(semanaDe(new Date(2026, 6, 19))).toEqual(['2026-07-13', '2026-07-19']);
+    expect(semanaDe(new Date(2026, 6, 19))).toEqual([
+      '2026-07-13',
+      '2026-07-19',
+    ]);
   });
 
   it('mesDe e mesesAte respeitam a virada de ano', () => {
@@ -53,7 +59,9 @@ describe('metricas do painel da escola', () => {
       linha({ dataEntrega: '2026-07-30' }), // ainda nao venceu: fora da conta
     ];
     expect(taxaNoPrazo(linhas, hoje)).toBe(33);
-    expect(taxaNoPrazo([linha({ dataEntrega: '2026-07-30' })], hoje)).toBeNull();
+    expect(
+      taxaNoPrazo([linha({ dataEntrega: '2026-07-30' })], hoje),
+    ).toBeNull();
   });
 
   it('situacao segue as faixas do Figma', () => {

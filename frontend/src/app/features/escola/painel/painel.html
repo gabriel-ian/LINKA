@@ -39,8 +39,9 @@
         <a class="linha" [class]="'c-' + cor(i)" [routerLink]="['/escola/turmas', t.id]">
           <span class="selo-cor">{{ t.codigo }}</span>
           <span class="texto">
-            <strong>{{ t.nome }}</strong> - {{ t.totalNee }} alunos NEE
-            <br />{{ t.professores[0]?.nome ?? 'Sem professor vinculado' }}
+            <strong>{{ t.nome }}</strong> - {{ t.totalNee }} alunos NEE <br />{{
+              t.professores[0]?.nome ?? 'Sem professor vinculado'
+            }}
             <span class="barra-linha">
               <span class="progresso"><span [style.width.%]="t.desempenho ?? 0"></span></span>
               <span class="pilula-cor">{{ pct(t.desempenho) }}</span>
@@ -49,7 +50,8 @@
         </a>
       } @empty {
         <p class="vazio">
-          Nenhuma turma cadastrada. <a class="link-acao" routerLink="/escola/turmas/nova">Criar turma</a>
+          Nenhuma turma cadastrada.
+          <a class="link-acao" routerLink="/escola/turmas/nova">Criar turma</a>
         </p>
       }
     </section>
@@ -61,8 +63,8 @@
           <span class="selo-cor">{{ iniciais(a.nome) }}</span>
           <span class="texto">
             <strong>{{ a.nome }}</strong>
-            <br />{{ a.turma?.codigo ?? 'Sem turma' }} - {{ a.diagnosticos[0] || 'NEE' }} - {{ pct(a.desempenhoSemana) }}
-            <br />esta semana
+            <br />{{ a.turma?.codigo ?? 'Sem turma' }} - {{ a.diagnosticos[0] || 'NEE' }} -
+            {{ pct(a.desempenhoSemana) }} <br />esta semana
           </span>
           <span class="pilula-cor">Atenção</span>
         </a>

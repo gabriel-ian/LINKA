@@ -17,10 +17,38 @@
   </div>
 
   <div class="pilulas">
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'todos'" (click)="filtrar('todos')">Todos ({{ contagem().todos }})</button>
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'ativo'" (click)="filtrar('ativo')">Ativos ({{ contagem().ativo }})</button>
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'pendente'" (click)="filtrar('pendente')">Pendentes ({{ contagem().pendente }})</button>
-    <button type="button" class="pilula" [class.selecionada]="filtro() === 'inativo'" (click)="filtrar('inativo')">Inativos ({{ contagem().inativo }})</button>
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'todos'"
+      (click)="filtrar('todos')"
+    >
+      Todos ({{ contagem().todos }})
+    </button>
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'ativo'"
+      (click)="filtrar('ativo')"
+    >
+      Ativos ({{ contagem().ativo }})
+    </button>
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'pendente'"
+      (click)="filtrar('pendente')"
+    >
+      Pendentes ({{ contagem().pendente }})
+    </button>
+    <button
+      type="button"
+      class="pilula"
+      [class.selecionada]="filtro() === 'inativo'"
+      (click)="filtrar('inativo')"
+    >
+      Inativos ({{ contagem().inativo }})
+    </button>
   </div>
 
   @if (erro()) {
@@ -43,7 +71,9 @@
           <tr>
             <td>
               <div class="pessoa" [class]="'c-' + (p.status === 'inativo' ? 'cinza' : cor(i))">
-                <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(p.nome) }}</span>
+                <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
+                  iniciais(p.nome)
+                }}</span>
                 <div>
                   <strong>{{ p.nome }}</strong>
                   <small>{{ p.email }}</small>
@@ -51,26 +81,38 @@
               </div>
             </td>
             <td class="quebra">{{ juntar(p.disciplinas) || '—' }}</td>
-            <td>{{ p.turmas.length ? p.turmas.map(t => t.codigo).join(', ') : '—' }}</td>
+            <td>{{ p.turmas.length ? p.turmas.map((t) => t.codigo).join(', ') : '—' }}</td>
             <td>
-              <span class="pilula" [class]="p.status === 'ativo' ? 'ativa' : p.status === 'pendente' ? 'pendente' : 'inativa'">
+              <span
+                class="pilula"
+                [class]="
+                  p.status === 'ativo' ? 'ativa' : p.status === 'pendente' ? 'pendente' : 'inativa'
+                "
+              >
                 {{ rotuloStatus[p.status] }}
               </span>
             </td>
             <td>
               <span class="acoes-linha">
-              @if (p.status !== 'inativo') {
-                <button type="button" class="link-acao" [disabled]="alterando() === p.id" (click)="redefinirSenha(p)">Nova senha</button>
-              }
-              <button
-                type="button"
-                class="link-acao"
-                [class.perigo]="p.status !== 'inativo'"
-                [disabled]="alterando() === p.id"
-                (click)="alternarAtivo(p)"
-              >
-                {{ p.status === 'inativo' ? 'Reativar' : 'Desativar' }}
-              </button>
+                @if (p.status !== 'inativo') {
+                  <button
+                    type="button"
+                    class="link-acao"
+                    [disabled]="alterando() === p.id"
+                    (click)="redefinirSenha(p)"
+                  >
+                    Nova senha
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="link-acao"
+                  [class.perigo]="p.status !== 'inativo'"
+                  [disabled]="alterando() === p.id"
+                  (click)="alternarAtivo(p)"
+                >
+                  {{ p.status === 'inativo' ? 'Reativar' : 'Desativar' }}
+                </button>
               </span>
             </td>
           </tr>
@@ -94,5 +136,10 @@
 </div>
 
 @if (senha(); as s) {
-  <app-senha-provisoria [nome]="s.nome" [email]="s.email" [senha]="s.senha" (fechar)="senha.set(null)" />
+  <app-senha-provisoria
+    [nome]="s.nome"
+    [email]="s.email"
+    [senha]="s.senha"
+    (fechar)="senha.set(null)"
+  />
 }

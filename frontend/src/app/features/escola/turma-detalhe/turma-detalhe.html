@@ -8,15 +8,20 @@
   @if (turma(); as t) {
     <header class="topo-turma">
       <div class="painel-cabecalho">
-      <h1>{{ t.nome }}</h1>
-      @if (t.totalAlunos === 0) {
-        <p>{{ criada() ? 'Turma criada agora' : 'Ano letivo ' + (t.anoLetivo ?? '') }} - 0 alunos - {{ nomesProfessores(t) }}</p>
-      } @else {
-        <p>
-          {{ t.totalAlunos }} alunos - {{ t.totalNee }} com acompanhamento NEE
-          @if (t.anoLetivo) { - ano letivo {{ t.anoLetivo }} }
-        </p>
-      }
+        <h1>{{ t.nome }}</h1>
+        @if (t.totalAlunos === 0) {
+          <p>
+            {{ criada() ? 'Turma criada agora' : 'Ano letivo ' + (t.anoLetivo ?? '') }} - 0 alunos -
+            {{ nomesProfessores(t) }}
+          </p>
+        } @else {
+          <p>
+            {{ t.totalAlunos }} alunos - {{ t.totalNee }} com acompanhamento NEE
+            @if (t.anoLetivo) {
+              - ano letivo {{ t.anoLetivo }}
+            }
+          </p>
+        }
       </div>
       <a class="bt bt-secundario" [routerLink]="['/escola/turmas', t.id, 'editar']">Editar turma</a>
     </header>
@@ -34,10 +39,16 @@
         <span class="mais">+</span>
         <h2>Esta turma ainda não tem alunos</h2>
         <p>
-          Cadastre os alunos um a um. Os alunos NEE recebem as tarefas adaptadas assim que forem vinculados.
+          Cadastre os alunos um a um. Os alunos NEE recebem as tarefas adaptadas assim que forem
+          vinculados.
         </p>
         <div class="acoes centro">
-          <a class="bt bt-primario" routerLink="/escola/cadastro/aluno" [queryParams]="{ turmaId: t.id }">Cadastrar aluno</a>
+          <a
+            class="bt bt-primario"
+            routerLink="/escola/cadastro/aluno"
+            [queryParams]="{ turmaId: t.id }"
+            >Cadastrar aluno</a
+          >
         </div>
       </section>
     } @else {
@@ -69,7 +80,9 @@
           <h2>Professores da turma</h2>
           @for (p of t.professores; track p.id; let i = $index) {
             <div class="pessoa" [class]="'c-' + cor(i)">
-              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(p.nome) }}</span>
+              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
+                iniciais(p.nome)
+              }}</span>
               <div>
                 <strong>{{ p.nome }}</strong>
                 <small>{{ juntar(p.disciplinas) || 'Sem disciplina' }}</small>
@@ -83,16 +96,31 @@
         <section class="cartao bloco alunos">
           <div class="bloco-topo">
             <h2>Alunos NEE da turma</h2>
-            <a class="link-acao" routerLink="/escola/alunos" [queryParams]="{ turma: t.id }">Ver todos os {{ t.totalAlunos }} alunos</a>
+            <a class="link-acao" routerLink="/escola/alunos" [queryParams]="{ turma: t.id }"
+              >Ver todos os {{ t.totalAlunos }} alunos</a
+            >
           </div>
           @for (a of t.alunosNee; track a.id; let ultimo = $last) {
-            <a class="aluno" [class]="'c-' + corSituacao(a.situacao)" [routerLink]="['/escola/alunos', a.id]">
-              <span class="selo-cor c-cinza" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{ iniciais(a.nome) }}</span>
+            <a
+              class="aluno"
+              [class]="'c-' + corSituacao(a.situacao)"
+              [routerLink]="['/escola/alunos', a.id]"
+            >
+              <span
+                class="selo-cor c-cinza"
+                style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px"
+                >{{ iniciais(a.nome) }}</span
+              >
               <span class="nome">
                 <strong>{{ a.nome }}</strong>
-                <small>{{ a.diagnosticos[0] || 'NEE' }} - {{ pct(a.desempenhoSemana) }} esta semana</small>
+                <small
+                  >{{ a.diagnosticos[0] || 'NEE' }} - {{ pct(a.desempenhoSemana) }} esta
+                  semana</small
+                >
               </span>
-              <span class="progresso mini"><span [style.width.%]="a.desempenhoSemana ?? 0"></span></span>
+              <span class="progresso mini"
+                ><span [style.width.%]="a.desempenhoSemana ?? 0"></span
+              ></span>
               <span class="pilula-cor">{{ rotuloSituacao[a.situacao] }}</span>
             </a>
           } @empty {
@@ -102,7 +130,9 @@
       </div>
 
       <div class="acoes">
-        <a class="bt bt-primario" routerLink="/escola/relatorios" [queryParams]="{ turmaId: t.id }">Ver relatório da turma</a>
+        <a class="bt bt-primario" routerLink="/escola/relatorios" [queryParams]="{ turmaId: t.id }"
+          >Ver relatório da turma</a
+        >
       </div>
     }
   }

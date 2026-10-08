@@ -39,13 +39,27 @@ export class Escola {
   @Column({ type: 'varchar', length: 20, nullable: true })
   telefone!: string | null;
 
-  @Column({ type: 'enum', enum: ['basico', 'institucional'], default: 'basico' })
+  @Column({
+    type: 'enum',
+    enum: ['basico', 'institucional'],
+    default: 'basico',
+  })
   plano!: PlanoEscola;
 
-  @Column({ name: 'limite_professores', type: 'int', unsigned: true, nullable: true })
+  @Column({
+    name: 'limite_professores',
+    type: 'int',
+    unsigned: true,
+    nullable: true,
+  })
   limiteProfessores!: number | null;
 
-  @Column({ name: 'limite_alunos_nee', type: 'int', unsigned: true, nullable: true })
+  @Column({
+    name: 'limite_alunos_nee',
+    type: 'int',
+    unsigned: true,
+    nullable: true,
+  })
   limiteAlunosNee!: number | null;
 
   @Column({ default: true })
@@ -54,7 +68,12 @@ export class Escola {
   @Column({ name: 'desativada_em', type: 'date', nullable: true })
   desativadaEm!: string | null;
 
-  @Column({ name: 'motivo_desativacao', type: 'varchar', length: 60, nullable: true })
+  @Column({
+    name: 'motivo_desativacao',
+    type: 'varchar',
+    length: 60,
+    nullable: true,
+  })
   motivoDesativacao!: string | null;
 
   @Column({ name: 'observacao_desativacao', type: 'text', nullable: true })
@@ -67,6 +86,11 @@ export class Escola {
   atualizadoEm!: Date | null;
 
   /** E-mail do admin que fez a ultima alteracao. */
-  @Column({ name: 'atualizado_por', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'atualizado_por',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   atualizadoPor!: string | null;
 }

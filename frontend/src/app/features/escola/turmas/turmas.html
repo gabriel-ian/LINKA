@@ -1,7 +1,10 @@
 <div class="pagina">
   <header class="painel-cabecalho">
     <h1>Turmas</h1>
-    <p>{{ contexto.escola()?.nome }} - {{ turmas().length }} turmas cadastradas - ano letivo {{ ano }}</p>
+    <p>
+      {{ contexto.escola()?.nome }} - {{ turmas().length }} turmas cadastradas - ano letivo
+      {{ ano }}
+    </p>
   </header>
 
   <div class="filtros">
@@ -44,7 +47,13 @@
       </article>
     } @empty {
       <p class="vazio">
-        {{ carregando() ? 'Carregando...' : busca() || serie() ? 'Nenhuma turma com esse filtro.' : 'Nenhuma turma cadastrada ainda.' }}
+        {{
+          carregando()
+            ? 'Carregando...'
+            : busca() || serie()
+              ? 'Nenhuma turma com esse filtro.'
+              : 'Nenhuma turma cadastrada ainda.'
+        }}
       </p>
     }
   </div>

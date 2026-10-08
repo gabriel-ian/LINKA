@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { DataSource, EntityManager, In } from 'typeorm';
@@ -30,10 +34,16 @@ import {
 /** Converte o DTO de perfil nas colunas do aluno (so o que veio). */
 export function perfilParaColunas(dto: PerfilAprendizagemDto): Partial<Aluno> {
   const colunas: Partial<Aluno> = {};
-  if (dto.dificuldades !== undefined) colunas.dificuldades = dto.dificuldades?.trim() || null;
-  if (dto.pontosFortes !== undefined) colunas.pontosFortes = dto.pontosFortes?.trim() || null;
+  if (dto.dificuldades !== undefined)
+    colunas.dificuldades = dto.dificuldades?.trim() || null;
+  if (dto.pontosFortes !== undefined)
+    colunas.pontosFortes = dto.pontosFortes?.trim() || null;
   if (dto.interesses !== undefined) {
-    const lista = [...new Set(dto.interesses.map((i) => i.replace(/,/g, ' ').trim()).filter(Boolean))];
+    const lista = [
+      ...new Set(
+        dto.interesses.map((i) => i.replace(/,/g, ' ').trim()).filter(Boolean),
+      ),
+    ];
     colunas.interesses = lista.length ? lista.join(', ') : null;
   }
   return colunas;
@@ -44,7 +54,11 @@ export const LAUDO_TAMANHO_MAXIMO = 10 * 1024 * 1024;
 
 /** Tipos aceitos para laudo, conferidos pelos primeiros bytes do arquivo. */
 const TIPOS_LAUDO = [
-  { ext: '.pdf', mime: 'application/pdf', assinatura: [0x25, 0x50, 0x44, 0x46] },
+  {
+    ext: '.pdf',
+    mime: 'application/pdf',
+    assinatura: [0x25, 0x50, 0x44, 0x46],
+  },
   { ext: '.png', mime: 'image/png', assinatura: [0x89, 0x50, 0x4e, 0x47] },
   { ext: '.jpg', mime: 'image/jpeg', assinatura: [0xff, 0xd8, 0xff] },
 ];
@@ -66,11 +80,21 @@ export class CadastrosEscolaService {
     return this.dataSource.transaction(async (manager) => {
       const turmaRepo = manager.getRepository(Turma);
 
-      if (await turmaRepo.findOne({ where: { escolaId, nome, anoLetivo: dto.anoLetivo } })) {
-        throw new BadRequestException(`Ja existe a turma ${nome} em ${dto.anoLetivo}`);
+      if (
+        await turmaRepo.findOne({
+          where: { escolaId, nome, anoLetivo: dto.anoLetivo },
+        })
+      ) {
+        throw new BadRequestException(
+          `Ja existe a turma ${nome} em ${dto.anoLetivo}`,
+        );
       }
 
-      const professores = await this.professoresDaEscola(manager, dto.professorIds ?? [], escolaId);
+      const professores = await this.professoresDaEscola(
+        manager,
+        dto.professorIds ?? [],
+        escolaId,
+      );
 
       const turma = await turmaRepo.save(
         turmaRepo.create({
@@ -86,7 +110,10 @@ export class CadastrosEscolaService {
       );
 
       for (const professor of professores) {
-        const disciplinaIds = await this.disciplinasDoProfessor(manager, professor.id);
+        const disciplinaIds = await this.disciplinasDoProfessor(
+          manager,
+          professor.id,
+        );
         await this.alocar(manager, [turma.id], professor.id, disciplinaIds);
       }
 
@@ -98,7 +125,9 @@ export class CadastrosEscolaService {
   async editarTurma(turmaId: number, dto: EditarTurmaDto, escolaId: number) {
     return this.dataSource.transaction(async (manager) => {
       const turmaRepo = manager.getRepository(Turma);
-      const turma = await turmaRepo.findOne({ where: { id: turmaId, escolaId } });
+      const turma = await turmaRepo.findOne({
+        where: { id: turmaId, escolaId },
+      });
       if (!turma) throw new NotFoundException('Turma nao encontrada');
 
       const serie = dto.serie?.trim() ?? turma.serie ?? '';
@@ -107,9 +136,17 @@ export class CadastrosEscolaService {
       const nome = serie && letra ? `${serie} ${letra}` : turma.nome;
 
       if (nome !== turma.nome || anoLetivo !== turma.anoLetivo) {
-        const repetida = await turmaRepo.findOne({ where: { escolaId, nome: nome ?? undefined, anoLetivo: anoLetivo ?? undefined } });
+        const repetida = await turmaRepo.findOne({
+          where: {
+            escolaId,
+            nome: nome ?? undefined,
+            anoLetivo: anoLetivo ?? undefined,
+          },
+        });
         if (repetida && repetida.id !== turma.id) {
-          throw new BadRequestException(`Ja existe a turma ${nome} em ${anoLetivo}`);
+          throw new BadRequestException(
+            `Ja existe a turma ${nome} em ${anoLetivo}`,
+          );
         }
       }
 
@@ -120,14 +157,25 @@ export class CadastrosEscolaService {
         anoLetivo,
         ...(dto.turno !== undefined && { turno: dto.turno }),
         ...(dto.sala !== undefined && { sala: dto.sala?.trim() || null }),
-        ...(dto.limiteAlunos !== undefined && { limiteAlunos: dto.limiteAlunos ?? null }),
+        ...(dto.limiteAlunos !== undefined && {
+          limiteAlunos: dto.limiteAlunos ?? null,
+        }),
       });
 
       if (dto.professorIds) {
-        const professores = await this.professoresDaEscola(manager, dto.professorIds, escolaId);
-        await manager.getRepository(TurmaProfessorDisciplina).delete({ turmaId: turma.id });
+        const professores = await this.professoresDaEscola(
+          manager,
+          dto.professorIds,
+          escolaId,
+        );
+        await manager
+          .getRepository(TurmaProfessorDisciplina)
+          .delete({ turmaId: turma.id });
         for (const professor of professores) {
-          const disciplinaIds = await this.disciplinasDoProfessor(manager, professor.id);
+          const disciplinaIds = await this.disciplinasDoProfessor(
+            manager,
+            professor.id,
+          );
           await this.alocar(manager, [turma.id], professor.id, disciplinaIds);
         }
       }
@@ -141,7 +189,11 @@ export class CadastrosEscolaService {
   async criarProfessor(dto: CriarProfessorDto, escolaId: number) {
     return this.dataSource.transaction(async (manager) => {
       await this.garantirEmailLivre(manager, dto.email);
-      const turmas = await this.turmasDaEscola(manager, dto.turmaIds ?? [], escolaId);
+      const turmas = await this.turmasDaEscola(
+        manager,
+        dto.turmaIds ?? [],
+        escolaId,
+      );
 
       const usuarioRepo = manager.getRepository(Usuario);
       const usuario = await usuarioRepo.save(
@@ -155,31 +207,59 @@ export class CadastrosEscolaService {
 
       const professorRepo = manager.getRepository(Professor);
       const professor = await professorRepo.save(
-        professorRepo.create({ nomeCompleto: dto.nomeCompleto.trim(), usuarioId: usuario.id, escolaId }),
+        professorRepo.create({
+          nomeCompleto: dto.nomeCompleto.trim(),
+          usuarioId: usuario.id,
+          escolaId,
+        }),
       );
 
-      const disciplinaIds = await this.disciplinasPorNome(manager, dto.disciplinas ?? []);
+      const disciplinaIds = await this.disciplinasPorNome(
+        manager,
+        dto.disciplinas ?? [],
+      );
       if (disciplinaIds.length) {
         await manager.getRepository(ProfessorDisciplina).save(
-          disciplinaIds.map((disciplinaId) => ({ professorId: professor.id, disciplinaId })),
+          disciplinaIds.map((disciplinaId) => ({
+            professorId: professor.id,
+            disciplinaId,
+          })),
         );
       }
 
-      await this.alocar(manager, turmas.map((t) => t.id), professor.id, disciplinaIds);
+      await this.alocar(
+        manager,
+        turmas.map((t) => t.id),
+        professor.id,
+        disciplinaIds,
+      );
 
-      return { data: { id: professor.id, nome: professor.nomeCompleto, email: usuario.email } };
+      return {
+        data: {
+          id: professor.id,
+          nome: professor.nomeCompleto,
+          email: usuario.email,
+        },
+      };
     });
   }
 
-  async atualizarProfessor(professorId: number, dto: AtualizarProfessorDto, escolaId: number) {
+  async atualizarProfessor(
+    professorId: number,
+    dto: AtualizarProfessorDto,
+    escolaId: number,
+  ) {
     const professor = await this.dataSource
       .getRepository(Professor)
       .findOne({ where: { id: professorId, escolaId } });
 
     if (!professor) throw new NotFoundException('Professor nao encontrado');
-    if (!professor.usuarioId) throw new BadRequestException('Professor sem login cadastrado');
+    if (!professor.usuarioId)
+      throw new BadRequestException('Professor sem login cadastrado');
 
-    await this.dataSource.getRepository(Usuario).update(professor.usuarioId, { ativo: dto.ativo });
+    await this.dataSource
+      .getRepository(Usuario)
+      .update(professor.usuarioId, { ativo: dto.ativo });
 
     return { data: { id: professor.id, ativo: dto.ativo } };
   }
@@ -188,14 +268,17 @@ export class CadastrosEscolaService {
 
   async criarAluno(dto: CriarAlunoDto, escolaId: number) {
     return this.dataSource.transaction(async (manager) => {
-      const [turma] = dto.turmaId ? await this.turmasDaEscola(manager, [dto.turmaId], escolaId) : [];
+      const [turma] = dto.turmaId
+        ? await this.turmasDaEscola(manager, [dto.turmaId], escolaId)
+        : [];
 
       const diagnosticoIds = dto.diagnosticoIds ?? [];
       if (diagnosticoIds.length) {
         const existentes = await manager
           .getRepository(Neurodivergencia)
           .count({ where: { id: In(diagnosticoIds) } });
-        if (existentes !== diagnosticoIds.length) throw new BadRequestException('Diagnostico invalido');
+        if (existentes !== diagnosticoIds.length)
+          throw new BadRequestException('Diagnostico invalido');
       }
 
       const usuarioRepo = manager.getRepository(Usuario);
@@ -222,19 +305,29 @@ export class CadastrosEscolaService {
           cgm: dto.cgm?.trim() || null,
           escolaId,
           usuarioId: usuarioAlunoId,
-          neurodivergente: diagnosticoIds.length > 0 || !!dto.prefiroNaoInformar,
+          neurodivergente:
+            diagnosticoIds.length > 0 || !!dto.prefiroNaoInformar,
         }),
       );
 
       if (diagnosticoIds.length) {
-        await manager
-          .getRepository(AlunoNeurodivergencia)
-          .save(diagnosticoIds.map((id) => ({ alunoId: aluno.id, neurodivergenciaId: id })));
+        await manager.getRepository(AlunoNeurodivergencia).save(
+          diagnosticoIds.map((id) => ({
+            alunoId: aluno.id,
+            neurodivergenciaId: id,
+          })),
+        );
       }
 
       if (turma) {
-        await manager.getRepository(Matricula).save({ alunoId: aluno.id, turmaId: turma.id });
-        await this.tarefaStatusService.seedParaAluno(aluno.id, turma.id, manager);
+        await manager
+          .getRepository(Matricula)
+          .save({ alunoId: aluno.id, turmaId: turma.id });
+        await this.tarefaStatusService.seedParaAluno(
+          aluno.id,
+          turma.id,
+          manager,
+        );
       }
 
       const responsavel = dto.responsavel
@@ -259,37 +352,59 @@ export class CadastrosEscolaService {
   async editarAluno(alunoId: number, dto: EditarAlunoDto, escolaId: number) {
     return this.dataSource.transaction(async (manager) => {
       const alunoRepo = manager.getRepository(Aluno);
-      const aluno = await alunoRepo.findOne({ where: { id: alunoId, escolaId } });
+      const aluno = await alunoRepo.findOne({
+        where: { id: alunoId, escolaId },
+      });
       if (!aluno) throw new NotFoundException('Aluno nao encontrado');
 
       const mudancas: Partial<Aluno> = { ...perfilParaColunas(dto) };
-      if (dto.nomeCompleto !== undefined) mudancas.nomeCompleto = dto.nomeCompleto.trim();
-      if (dto.dataNascimento !== undefined) mudancas.data_nascimento = dto.dataNascimento?.slice(0, 10) ?? null;
+      if (dto.nomeCompleto !== undefined)
+        mudancas.nomeCompleto = dto.nomeCompleto.trim();
+      if (dto.dataNascimento !== undefined)
+        mudancas.data_nascimento = dto.dataNascimento?.slice(0, 10) ?? null;
       if (dto.cgm !== undefined) mudancas.cgm = dto.cgm?.trim() || null;
 
-      if (dto.diagnosticoIds !== undefined || dto.prefiroNaoInformar !== undefined) {
+      if (
+        dto.diagnosticoIds !== undefined ||
+        dto.prefiroNaoInformar !== undefined
+      ) {
         const ids = dto.diagnosticoIds ?? [];
         if (ids.length) {
-          const existentes = await manager.getRepository(Neurodivergencia).count({ where: { id: In(ids) } });
-          if (existentes !== ids.length) throw new BadRequestException('Diagnostico invalido');
+          const existentes = await manager
+            .getRepository(Neurodivergencia)
+            .count({ where: { id: In(ids) } });
+          if (existentes !== ids.length)
+            throw new BadRequestException('Diagnostico invalido');
         }
         const vinculos = manager.getRepository(AlunoNeurodivergencia);
         await vinculos.delete({ alunoId: aluno.id });
-        if (ids.length) await vinculos.save(ids.map((id) => ({ alunoId: aluno.id, neurodivergenciaId: id })));
+        if (ids.length)
+          await vinculos.save(
+            ids.map((id) => ({ alunoId: aluno.id, neurodivergenciaId: id })),
+          );
         mudancas.neurodivergente = ids.length > 0 || !!dto.prefiroNaoInformar;
       }
 
-      if (Object.keys(mudancas).length) await alunoRepo.update(aluno.id, mudancas);
+      if (Object.keys(mudancas).length)
+        await alunoRepo.update(aluno.id, mudancas);
 
       if (dto.turmaId !== undefined) {
         const matriculas = manager.getRepository(Matricula);
-        const atual = await matriculas.findOne({ where: { alunoId: aluno.id } });
+        const atual = await matriculas.findOne({
+          where: { alunoId: aluno.id },
+        });
         if ((atual?.turmaId ?? null) !== dto.turmaId) {
-          const [turma] = dto.turmaId ? await this.turmasDaEscola(manager, [dto.turmaId], escolaId) : [];
+          const [turma] = dto.turmaId
+            ? await this.turmasDaEscola(manager, [dto.turmaId], escolaId)
+            : [];
           await matriculas.delete({ alunoId: aluno.id });
           if (turma) {
             await matriculas.save({ alunoId: aluno.id, turmaId: turma.id });
-            await this.tarefaStatusService.seedParaAluno(aluno.id, turma.id, manager);
+            await this.tarefaStatusService.seedParaAluno(
+              aluno.id,
+              turma.id,
+              manager,
+            );
           }
         }
       }
@@ -304,13 +419,25 @@ export class CadastrosEscolaService {
    * Gera uma senha provisoria para um login da escola (aluno, professor ou
    * responsavel de aluno da escola). Devolvida UMA vez para ser repassada.
    */
-  async redefinirSenha(tipo: 'aluno' | 'professor' | 'responsavel', id: number, escolaId: number) {
+  async redefinirSenha(
+    tipo: 'aluno' | 'professor' | 'responsavel',
+    id: number,
+    escolaId: number,
+  ) {
     let usuarioId: number | null | undefined;
 
     if (tipo === 'aluno') {
-      usuarioId = (await this.dataSource.getRepository(Aluno).findOne({ where: { id, escolaId } }))?.usuarioId;
+      usuarioId = (
+        await this.dataSource
+          .getRepository(Aluno)
+          .findOne({ where: { id, escolaId } })
+      )?.usuarioId;
     } else if (tipo === 'professor') {
-      usuarioId = (await this.dataSource.getRepository(Professor).findOne({ where: { id, escolaId } }))?.usuarioId;
+      usuarioId = (
+        await this.dataSource
+          .getRepository(Professor)
+          .findOne({ where: { id, escolaId } })
+      )?.usuarioId;
     } else {
       // O responsavel nao tem escola: vale se acompanha algum aluno desta escola.
       const [r] = await this.dataSource.query(
@@ -323,16 +450,21 @@ export class CadastrosEscolaService {
       usuarioId = r?.usuarioId ?? undefined;
     }
 
-    if (usuarioId === undefined) throw new NotFoundException('Cadastro nao encontrado nesta escola');
-    if (!usuarioId) throw new BadRequestException('Este cadastro nao tem login na Linka');
+    if (usuarioId === undefined)
+      throw new NotFoundException('Cadastro nao encontrado nesta escola');
+    if (!usuarioId)
+      throw new BadRequestException('Este cadastro nao tem login na Linka');
 
-    const usuario = await this.dataSource.getRepository(Usuario).findOne({ where: { id: Number(usuarioId) } });
-    if (!usuario) throw new BadRequestException('Este cadastro nao tem login na Linka');
+    const usuario = await this.dataSource
+      .getRepository(Usuario)
+      .findOne({ where: { id: Number(usuarioId) } });
+    if (!usuario)
+      throw new BadRequestException('Este cadastro nao tem login na Linka');
 
     const senhaProvisoria = gerarSenhaProvisoria();
-    await this.dataSource
-      .getRepository(Usuario)
-      .update(usuario.id, { senha: await UsuarioService.hashSenha(senhaProvisoria) });
+    await this.dataSource.getRepository(Usuario).update(usuario.id, {
+      senha: await UsuarioService.hashSenha(senhaProvisoria),
+    });
 
     return { data: { email: usuario.email, senhaProvisoria } };
   }
@@ -352,7 +484,9 @@ export class CadastrosEscolaService {
     let senhaProvisoria: string | null = null;
 
     if (usuario && usuario.perfil !== 'responsavel') {
-      throw new BadRequestException('O e-mail do responsavel ja e usado por outro tipo de conta');
+      throw new BadRequestException(
+        'O e-mail do responsavel ja e usado por outro tipo de conta',
+      );
     }
 
     if (!usuario) {
@@ -378,19 +512,33 @@ export class CadastrosEscolaService {
         }),
       ));
 
-    await manager.getRepository(AlunoResponsavel).save({ alunoId, responsavelId: responsavel.id });
+    await manager
+      .getRepository(AlunoResponsavel)
+      .save({ alunoId, responsavelId: responsavel.id });
 
-    return { nome: responsavel.nomeCompleto, email: dados.email, senhaProvisoria };
+    return {
+      nome: responsavel.nomeCompleto,
+      email: dados.email,
+      senhaProvisoria,
+    };
   }
 
   // ---------------------------------------------------------------- laudo
 
-  async salvarLaudo(alunoId: number, escolaId: number, arquivo: Express.Multer.File | undefined) {
+  async salvarLaudo(
+    alunoId: number,
+    escolaId: number,
+    arquivo: Express.Multer.File | undefined,
+  ) {
     if (!arquivo) throw new BadRequestException('Envie o arquivo do laudo');
-    if (arquivo.size > LAUDO_TAMANHO_MAXIMO) throw new BadRequestException('O laudo pode ter ate 10 MB');
+    if (arquivo.size > LAUDO_TAMANHO_MAXIMO)
+      throw new BadRequestException('O laudo pode ter ate 10 MB');
 
-    const tipo = TIPOS_LAUDO.find((t) => t.assinatura.every((byte, i) => arquivo.buffer[i] === byte));
-    if (!tipo) throw new BadRequestException('O laudo deve ser PDF, PNG ou JPG');
+    const tipo = TIPOS_LAUDO.find((t) =>
+      t.assinatura.every((byte, i) => arquivo.buffer[i] === byte),
+    );
+    if (!tipo)
+      throw new BadRequestException('O laudo deve ser PDF, PNG ou JPG');
 
     const alunoRepo = this.dataSource.getRepository(Aluno);
     const aluno = await alunoRepo.findOne({ where: { id: alunoId, escolaId } });
@@ -404,14 +552,19 @@ export class CadastrosEscolaService {
       await fs.rm(join(PASTA_LAUDOS, aluno.laudo), { force: true });
     }
 
-    await alunoRepo.update(aluno.id, { laudo: nomeArquivo, laudoEnviadoEm: new Date() });
+    await alunoRepo.update(aluno.id, {
+      laudo: nomeArquivo,
+      laudoEnviadoEm: new Date(),
+    });
 
     return { data: { enviadoEm: new Date() } };
   }
 
   /** Caminho do laudo para download; so a escola do aluno chega aqui. */
   async caminhoLaudo(alunoId: number, escolaId: number) {
-    const aluno = await this.dataSource.getRepository(Aluno).findOne({ where: { id: alunoId, escolaId } });
+    const aluno = await this.dataSource
+      .getRepository(Aluno)
+      .findOne({ where: { id: alunoId, escolaId } });
     if (!aluno?.laudo) throw new NotFoundException('Laudo nao encontrado');
 
     const tipo = TIPOS_LAUDO.find((t) => aluno.laudo!.endsWith(t.ext))!;
@@ -430,21 +583,38 @@ export class CadastrosEscolaService {
     }
   }
 
-  private async turmasDaEscola(manager: EntityManager, ids: number[], escolaId: number) {
+  private async turmasDaEscola(
+    manager: EntityManager,
+    ids: number[],
+    escolaId: number,
+  ) {
     if (!ids.length) return [];
-    const turmas = await manager.getRepository(Turma).find({ where: { id: In(ids), escolaId } });
-    if (turmas.length !== ids.length) throw new BadRequestException('Turma invalida');
+    const turmas = await manager
+      .getRepository(Turma)
+      .find({ where: { id: In(ids), escolaId } });
+    if (turmas.length !== ids.length)
+      throw new BadRequestException('Turma invalida');
     return turmas;
   }
 
-  private async professoresDaEscola(manager: EntityManager, ids: number[], escolaId: number) {
+  private async professoresDaEscola(
+    manager: EntityManager,
+    ids: number[],
+    escolaId: number,
+  ) {
     if (!ids.length) return [];
-    const professores = await manager.getRepository(Professor).find({ where: { id: In(ids), escolaId } });
-    if (professores.length !== ids.length) throw new BadRequestException('Professor invalido');
+    const professores = await manager
+      .getRepository(Professor)
+      .find({ where: { id: In(ids), escolaId } });
+    if (professores.length !== ids.length)
+      throw new BadRequestException('Professor invalido');
     return professores;
   }
 
-  private async disciplinasDoProfessor(manager: EntityManager, professorId: number): Promise<number[]> {
+  private async disciplinasDoProfessor(
+    manager: EntityManager,
+    professorId: number,
+  ): Promise<number[]> {
     const linhas: { disciplinaId: number }[] = await manager.query(
       'SELECT disciplina_id disciplinaId FROM professor_disciplina WHERE professor_id = ?',
       [professorId],
@@ -453,7 +623,10 @@ export class CadastrosEscolaService {
   }
 
   /** Acha pelo nome (sem diferenciar maiusculas) ou cria a disciplina. */
-  private async disciplinasPorNome(manager: EntityManager, nomes: string[]): Promise<number[]> {
+  private async disciplinasPorNome(
+    manager: EntityManager,
+    nomes: string[],
+  ): Promise<number[]> {
     const repo = manager.getRepository(Disciplina);
     const todas = await repo.find();
     const ids: number[] = [];
@@ -461,7 +634,10 @@ export class CadastrosEscolaService {
     for (const bruto of nomes) {
       const nome = bruto.trim();
       if (!nome) continue;
-      let disciplina = todas.find((d) => d.nome.toLocaleLowerCase('pt-BR') === nome.toLocaleLowerCase('pt-BR'));
+      let disciplina = todas.find(
+        (d) =>
+          d.nome.toLocaleLowerCase('pt-BR') === nome.toLocaleLowerCase('pt-BR'),
+      );
       if (!disciplina) {
         disciplina = await repo.save(repo.create({ nome }));
         todas.push(disciplina);
@@ -473,7 +649,12 @@ export class CadastrosEscolaService {
   }
 
   /** Uma linha turma x professor x disciplina (ou sem disciplina). */
-  private async alocar(manager: EntityManager, turmaIds: number[], professorId: number, disciplinaIds: number[]) {
+  private async alocar(
+    manager: EntityManager,
+    turmaIds: number[],
+    professorId: number,
+    disciplinaIds: number[],
+  ) {
     const linhas = turmaIds.flatMap((turmaId) =>
       (disciplinaIds.length ? disciplinaIds : [null]).map((disciplinaId) => ({
         turmaId,

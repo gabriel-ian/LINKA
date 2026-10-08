@@ -6,8 +6,13 @@ import { Component, input } from '@angular/core';
   template: `
     <ol class="etapas" aria-label="Etapas do cadastro">
       @for (nome of nomes; track nome; let i = $index) {
-        <li [class.feita]="i + 1 < atual()" [class.atual]="i + 1 === atual()" [attr.aria-current]="i + 1 === atual() ? 'step' : null">
-          <span class="num">{{ i + 1 }}</span>{{ nome }}
+        <li
+          [class.feita]="i + 1 < atual()"
+          [class.atual]="i + 1 === atual()"
+          [attr.aria-current]="i + 1 === atual() ? 'step' : null"
+        >
+          <span class="num">{{ i + 1 }}</span
+          >{{ nome }}
         </li>
       }
     </ol>

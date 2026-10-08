@@ -5,6 +5,38 @@
   max-width: 919px;
 }
 
+.topo-perfil {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.forte {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.linha-resp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.aviso-caixa.roxo {
+  margin: 4px 0 0;
+  background: #f3e8ff;
+  color: #5b21b6;
+  font-size: 13px;
+}
+
+.aviso-caixa.roxo a {
+  color: inherit;
+  font-weight: 700;
+}
+
 .alerta-erro {
   margin: 0;
 }

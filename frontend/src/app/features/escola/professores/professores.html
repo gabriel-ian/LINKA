@@ -35,7 +35,7 @@
           <th style="width: 150px">Disciplina</th>
           <th style="width: 120px">Turmas</th>
           <th style="width: 130px">Status</th>
-          <th style="width: 130px">Ações</th>
+          <th style="width: 170px">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -58,6 +58,10 @@
               </span>
             </td>
             <td>
+              <span class="acoes-linha">
+              @if (p.status !== 'inativo') {
+                <button type="button" class="link-acao" [disabled]="alterando() === p.id" (click)="redefinirSenha(p)">Nova senha</button>
+              }
               <button
                 type="button"
                 class="link-acao"
@@ -67,6 +71,7 @@
               >
                 {{ p.status === 'inativo' ? 'Reativar' : 'Desativar' }}
               </button>
+              </span>
             </td>
           </tr>
         } @empty {
@@ -87,3 +92,7 @@
     }
   </div>
 </div>
+
+@if (senha(); as s) {
+  <app-senha-provisoria [nome]="s.nome" [email]="s.email" [senha]="s.senha" (fechar)="senha.set(null)" />
+}

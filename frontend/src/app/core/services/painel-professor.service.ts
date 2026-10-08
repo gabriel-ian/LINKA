@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../model/escola.model';
+import { PerfilAprendizagem } from '../model/painel-escola.model';
 import {
   AlunoProfessor,
   AlunosTurma,
@@ -37,6 +38,10 @@ export class PainelProfessorService {
 
   aluno(id: number): Observable<ApiResponse<AlunoProfessor>> {
     return this.http.get<ApiResponse<AlunoProfessor>>(`${this.api}/alunos/${id}`);
+  }
+
+  editarPerfilAluno(id: number, perfil: PerfilAprendizagem): Observable<ApiResponse<AlunoProfessor>> {
+    return this.http.patch<ApiResponse<AlunoProfessor>>(`${this.api}/alunos/${id}/perfil`, perfil);
   }
 
   criarTarefa(dados: NovaTarefa): Observable<ApiResponse<{ id: number }>> {

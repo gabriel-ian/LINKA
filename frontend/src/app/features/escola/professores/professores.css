@@ -28,6 +28,11 @@
   white-space: normal;
 }
 
+.acoes-linha {
+  display: flex;
+  gap: 14px;
+}
+
 .perigo {
   color: var(--cor-erro);
 }

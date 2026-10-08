@@ -8,6 +8,7 @@ import { DataSource, In, Not, Repository } from 'typeorm';
 import { Escola } from './escola.entity';
 import { Usuario } from '../usuario/usuario.entity';
 import { UsuarioService } from '../usuario/usuario.service';
+import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
 import { Aluno } from '../aluno/aluno.entity';
 import { Professor } from '../professor/professor.entity';
 import { Turma } from '../turma/turma.entity';
@@ -148,6 +149,25 @@ export class EscolaService {
     });
 
     return this.findOne(id);
+  }
+
+  /** Senha provisoria para o login da coordenacao; devolvida UMA vez. */
+  async redefinirSenha(id: number) {
+    await this.buscarOuFalhar(id);
+    const login = await this.dataSource.getRepository(Usuario).findOne({
+      where: { escolaId: id, perfil: 'escola' },
+      order: { id: 'ASC' },
+    });
+    if (!login) {
+      throw new BadRequestException('Esta escola nao tem login de acesso cadastrado');
+    }
+
+    const senhaProvisoria = gerarSenhaProvisoria();
+    await this.dataSource
+      .getRepository(Usuario)
+      .update(login.id, { senha: await UsuarioService.hashSenha(senhaProvisoria) });
+
+    return { data: { email: login.email, senhaProvisoria } };
   }
 
   async activate(id: number, adminEmail: string | null = null) {

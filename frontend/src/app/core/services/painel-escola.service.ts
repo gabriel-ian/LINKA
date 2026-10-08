@@ -7,12 +7,14 @@ import {
   AlunoCriado,
   AlunoDetalhe,
   AlunoResumo,
+  EdicaoAluno,
   NovaTurma,
   NovoAluno,
   NovoProfessor,
   Opcoes,
   ProfessorResumo,
   Relatorio,
+  SenhaGerada,
   TurmaDetalhe,
   TurmaResumo,
 } from '../model/painel-escola.model';
@@ -37,6 +39,19 @@ export class PainelEscolaService {
 
   criarTurma(dados: NovaTurma): Observable<ApiResponse<{ id: number; nome: string }>> {
     return this.http.post<ApiResponse<{ id: number; nome: string }>>(`${this.api}/turmas`, dados);
+  }
+
+  editarTurma(id: number, dados: Partial<NovaTurma>): Observable<unknown> {
+    return this.http.patch(`${this.api}/turmas/${id}`, dados);
+  }
+
+  editarAluno(id: number, dados: EdicaoAluno): Observable<unknown> {
+    return this.http.patch(`${this.api}/alunos/${id}`, dados);
+  }
+
+  /** Gera senha provisoria para professor, aluno ou responsavel. */
+  redefinirSenha(tipo: 'professores' | 'alunos' | 'responsaveis', id: number): Observable<ApiResponse<SenhaGerada>> {
+    return this.http.post<ApiResponse<SenhaGerada>>(`${this.api}/${tipo}/${id}/senha`, {});
   }
 
   professores(): Observable<ApiResponse<ProfessorResumo[]>> {

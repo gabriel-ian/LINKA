@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -16,6 +17,7 @@ import { Roles } from '../auth/roles.decorator';
 import { EscolaId } from '../auth/escola-id.decorator';
 import { UsuarioId } from '../auth/usuario-id.decorator';
 import { PainelProfessorService } from './painel-professor.service';
+import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import {
   CriarTarefaProfessorDto,
   EditarAdaptacaoDto,
@@ -67,6 +69,17 @@ export class PainelProfessorController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.painel.aluno(usuarioId, escolaId, id);
+  }
+
+  @Patch('alunos/:id/perfil')
+  @ApiOperation({ summary: 'Editar o perfil de aprendizagem do aluno (usado pela IA)' })
+  editarPerfil(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: PerfilAprendizagemDto,
+  ) {
+    return this.painel.editarPerfilAluno(usuarioId, escolaId, id, dto);
   }
 
   @Post('tarefas')

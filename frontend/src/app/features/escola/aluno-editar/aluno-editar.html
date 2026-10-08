@@ -1,0 +1,93 @@
+<div class="pagina">
+  <a class="voltar" [routerLink]="['/escola/alunos', id]">&lt; Voltar para o perfil</a>
+
+  <header class="painel-cabecalho">
+    <h1>Editar aluno(a)</h1>
+    <p>{{ aluno()?.nome }}</p>
+  </header>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (aluno(); as a) {
+    <form class="cartao" (ngSubmit)="salvar()" novalidate>
+      <h2 class="cartao-titulo">Dados do aluno</h2>
+      <div class="grade-campos">
+        <label class="campo-p" [class.invalido]="erroNome()">
+          Nome completo
+          <input name="nome" maxlength="255" [(ngModel)]="nome" />
+          @if (erroNome()) { <span class="msg-erro">Informe o nome do aluno.</span> }
+        </label>
+        <label class="campo-p">
+          Turma
+          <select name="turma" [(ngModel)]="turmaId">
+            <option [ngValue]="null">Sem turma</option>
+            @for (t of opcoes()?.turmas ?? []; track t.id) {
+              <option [ngValue]="t.id">{{ t.nome }}</option>
+            }
+          </select>
+        </label>
+        <label class="campo-p">
+          Data de nascimento
+          <input name="nascimento" type="date" [max]="hoje" [(ngModel)]="nascimento" />
+        </label>
+        <label class="campo-p">
+          CGM do aluno (ID)
+          <input name="cgm" maxlength="50" [(ngModel)]="cgm" />
+        </label>
+      </div>
+      @if ((a.turma?.id ?? null) !== turmaId) {
+        <p class="aviso-caixa laranja">
+          {{ turmaId ? 'O aluno passa para a nova turma e recebe as tarefas dela.' : 'O aluno sai da turma e deixa de receber tarefas.' }}
+          O histórico das tarefas anteriores continua guardado.
+        </p>
+      }
+
+      <hr class="divisor" />
+
+      <div>
+        <h2 class="cartao-titulo">Necessidades educacionais</h2>
+        <p class="ajuda">Selecione os diagnósticos que se aplicam</p>
+        <div class="diagnosticos">
+          @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
+            <button type="button" class="diagnostico" [attr.aria-pressed]="diagnosticos().has(d.id)" (click)="alternarDiagnostico(d.id)">{{ d.nome }}</button>
+          }
+          <button type="button" class="diagnostico" [attr.aria-pressed]="prefiroNaoInformar()" (click)="alternarPrefiro()">Prefiro não informar</button>
+        </div>
+      </div>
+
+      <div class="laudo" [class.invalido]="erroLaudo()">
+        <div>
+          <strong>Laudo clínico</strong>
+          @if (laudo(); as l) {
+            <span>Novo arquivo: {{ l.name }}</span>
+          } @else if (a.laudo) {
+            <span>Já existe um laudo anexado. Envie outro para substituir.</span>
+          } @else {
+            <span>Nenhum laudo anexado - PDF ou imagem, até 10 MB</span>
+          }
+          @if (erroLaudo()) { <span class="msg-erro">{{ erroLaudo() }}</span> }
+        </div>
+        @if (laudo()) {
+          <button type="button" class="bt bt-secundario" (click)="laudo.set(null)">Remover</button>
+        } @else {
+          <label class="bt bt-secundario">
+            {{ a.laudo ? 'Substituir laudo' : 'Anexar laudo' }}
+            <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" hidden (change)="escolherLaudo($any($event.target).files)" />
+          </label>
+        }
+      </div>
+
+      <hr class="divisor" />
+
+      <h2 class="cartao-titulo">Perfil de aprendizagem</h2>
+      <app-perfil-aprendizagem [(dificuldades)]="dificuldades" [(pontosFortes)]="pontosFortes" [(interesses)]="interesses" />
+
+      <div class="acoes">
+        <a class="bt bt-secundario" [routerLink]="['/escola/alunos', id]">Cancelar</a>
+        <button type="submit" class="bt bt-primario" [disabled]="salvando()">{{ salvando() ? 'Salvando...' : 'Salvar alterações' }}</button>
+      </div>
+    </form>
+  }
+</div>

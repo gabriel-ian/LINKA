@@ -26,6 +26,8 @@ import {
   CriarAlunoDto,
   CriarProfessorDto,
   CriarTurmaDto,
+  EditarAlunoDto,
+  EditarTurmaDto,
 } from './dto/cadastros.dto';
 
 /**
@@ -67,6 +69,12 @@ export class PainelEscolaController {
     return this.cadastros.criarTurma(dto, escolaId);
   }
 
+  @Patch('turmas/:id')
+  @ApiOperation({ summary: 'Editar turma (dados e professores)' })
+  editarTurma(@EscolaId() escolaId: number, @Param('id', ParseIntPipe) id: number, @Body() dto: EditarTurmaDto) {
+    return this.cadastros.editarTurma(id, dto, escolaId);
+  }
+
   @Get('professores')
   @ApiOperation({ summary: 'Professores com disciplinas, turmas e status' })
   professores(@EscolaId() escolaId: number) {
@@ -89,6 +97,12 @@ export class PainelEscolaController {
     return this.cadastros.atualizarProfessor(id, dto, escolaId);
   }
 
+  @Post('professores/:id/senha')
+  @ApiOperation({ summary: 'Gerar senha provisoria para o professor' })
+  senhaProfessor(@EscolaId() escolaId: number, @Param('id', ParseIntPipe) id: number) {
+    return this.cadastros.redefinirSenha('professor', id, escolaId);
+  }
+
   @Get('alunos')
   @ApiOperation({ summary: 'Alunos com diagnosticos e desempenho da semana' })
   alunos(@EscolaId() escolaId: number) {
@@ -105,6 +119,24 @@ export class PainelEscolaController {
   @ApiOperation({ summary: 'Cadastrar aluno, matricular e vincular responsavel' })
   criarAluno(@EscolaId() escolaId: number, @Body() dto: CriarAlunoDto) {
     return this.cadastros.criarAluno(dto, escolaId);
+  }
+
+  @Patch('alunos/:id')
+  @ApiOperation({ summary: 'Editar aluno (dados, diagnosticos, perfil de aprendizagem, turma)' })
+  editarAluno(@EscolaId() escolaId: number, @Param('id', ParseIntPipe) id: number, @Body() dto: EditarAlunoDto) {
+    return this.cadastros.editarAluno(id, dto, escolaId);
+  }
+
+  @Post('alunos/:id/senha')
+  @ApiOperation({ summary: 'Gerar senha provisoria para o aluno' })
+  senhaAluno(@EscolaId() escolaId: number, @Param('id', ParseIntPipe) id: number) {
+    return this.cadastros.redefinirSenha('aluno', id, escolaId);
+  }
+
+  @Post('responsaveis/:id/senha')
+  @ApiOperation({ summary: 'Gerar senha provisoria para o responsavel de um aluno da escola' })
+  senhaResponsavel(@EscolaId() escolaId: number, @Param('id', ParseIntPipe) id: number) {
+    return this.cadastros.redefinirSenha('responsavel', id, escolaId);
   }
 
   @Post('alunos/:id/laudo')

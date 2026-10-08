@@ -1,6 +1,7 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   ArrayUnique,
   IsArray,
   IsBoolean,
@@ -182,3 +183,70 @@ export class CriarAlunoDto {
   @Type(() => ResponsavelDto)
   responsavel?: ResponsavelDto;
 }
+
+/**
+ * Perfil de aprendizagem (usado pela IA para personalizar as tarefas).
+ * Escola e professor podem editar. null limpa o campo.
+ */
+export class PerfilAprendizagemDto {
+  @ApiPropertyOptional({ example: 'Iniciar tarefas e manter o foco.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  dificuldades?: string | null;
+
+  @ApiPropertyOptional({ example: 'Criatividade e raciocinio visual.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  pontosFortes?: string | null;
+
+  @ApiPropertyOptional({ type: [String], example: ['Dinossauros', 'Futebol'] })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsString({ each: true })
+  @MaxLength(40, { each: true })
+  interesses?: string[];
+}
+
+/** Edicao do aluno pela escola. Campo ausente = nao muda; null = limpa. */
+export class EditarAlunoDto extends PerfilAprendizagemDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  nomeCompleto?: string;
+
+  @ApiPropertyOptional({ example: '2012-03-12' })
+  @IsOptional()
+  @IsDateString()
+  dataNascimento?: string | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  cgm?: string | null;
+
+  @ApiPropertyOptional({ description: 'Troca de turma; null tira o aluno da turma' })
+  @IsOptional()
+  @IsInt()
+  turmaId?: number | null;
+
+  @ApiPropertyOptional({ type: [Number] })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsInt({ each: true })
+  diagnosticoIds?: number[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  prefiroNaoInformar?: boolean;
+}
+
+/** Edicao da turma: mesmos campos do cadastro, todos opcionais. */
+export class EditarTurmaDto extends PartialType(CriarTurmaDto) {}

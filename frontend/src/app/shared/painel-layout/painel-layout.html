@@ -94,6 +94,7 @@
         @for (l of config().conta.links; track l.rota) {
           <a [routerLink]="l.rota" role="menuitem" (click)="painel.set(null)">{{ l.rotulo }}</a>
         }
+        <button type="button" class="opcao" role="menuitem" (click)="painel.set(null); alterandoSenha.set(true)">Alterar minha senha</button>
         <button type="button" class="sair" role="menuitem" (click)="sair()">Sair da conta</button>
       </div>
     } @else {
@@ -119,4 +120,8 @@
       </div>
     }
   </div>
+}
+
+@if (alterandoSenha()) {
+  <app-alterar-senha (fechar)="alterandoSenha.set(false)" />
 }

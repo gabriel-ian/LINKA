@@ -23,9 +23,9 @@ export class AuthService {
     });
   }
 
-  /** Pede o link de nova senha. Depende da rota POST /auth/recuperar-senha no backend. */
-  recuperarSenha(email: string): Observable<void> {
-    return this.http.post<void>(`${this.api}/recuperar-senha`, { email });
+  /** Troca a senha do usuario logado. */
+  alterarSenha(senhaAtual: string, novaSenha: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha`, { senhaAtual, novaSenha });
   }
 
   guardarSessao(res: LoginResponse): void {

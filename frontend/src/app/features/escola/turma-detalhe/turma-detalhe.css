@@ -5,6 +5,13 @@
   max-width: 919px;
 }
 
+.topo-turma {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .forte {
   margin: 0;
   font-size: 15px;

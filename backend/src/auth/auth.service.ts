@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
@@ -17,6 +18,20 @@ export class AuthService {
    * O perfil NAO vem mais do formulario: ele e lido da tabela `usuario`.
    * Deixar o cliente escolher o proprio perfil era uma falha de autorizacao.
    */
+  /** Qualquer perfil troca a propria senha (ex.: depois de uma provisoria). */
+  async alterarSenha(usuarioId: number, senhaAtual: string, novaSenha: string) {
+    const usuario = await this.usuarioService.findById(usuarioId);
+    if (!usuario || !(await UsuarioService.conferirSenha(senhaAtual, usuario.senha))) {
+      throw new BadRequestException('Senha atual incorreta');
+    }
+    if (senhaAtual === novaSenha) {
+      throw new BadRequestException('A nova senha precisa ser diferente da atual');
+    }
+
+    await this.usuarioService.definirSenha(usuario.id, novaSenha);
+    return { data: true };
+  }
+
   async login(email: string, senha: string) {
     const usuario = await this.usuarioService.findByEmail(email);
 

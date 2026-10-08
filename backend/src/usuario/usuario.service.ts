@@ -37,6 +37,17 @@ export class UsuarioService {
     return !!usuario && usuario.ativo !== false && (!usuario.escola || usuario.escola.ativo);
   }
 
+  /** Troca a senha (ja em texto) gravando o hash; usada por redefinicoes. */
+  async definirSenha(
+    id: number,
+    senha: string,
+    repository: Repository<Usuario> = this.usuarioRepository,
+  ): Promise<void> {
+    await repository.update(id, {
+      senha: await UsuarioService.hashSenha(senha),
+    });
+  }
+
   async registrarLogin(id: number): Promise<void> {
     await this.usuarioRepository.update(id, { ultimoLogin: new Date() });
   }

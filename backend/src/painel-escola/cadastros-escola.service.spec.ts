@@ -1,7 +1,8 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { promises as fs } from 'fs';
-import { CadastrosEscolaService, gerarSenhaProvisoria } from './cadastros-escola.service';
+import { CadastrosEscolaService, perfilParaColunas } from './cadastros-escola.service';
+import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
 import { TarefaStatusService } from '../tarefa-status/tarefa-status.service';
 
 function arquivo(bytes: number[], size = bytes.length) {
@@ -67,5 +68,33 @@ describe('CadastrosEscolaService', () => {
         laudoEnviadoEm: expect.any(Date),
       });
     });
+  });
+});
+
+describe('perfilParaColunas', () => {
+  it('so converte os campos enviados e limpa com null', () => {
+    expect(perfilParaColunas({})).toEqual({});
+    expect(
+      perfilParaColunas({ dificuldades: '  Foco  ', pontosFortes: null }),
+    ).toEqual({ dificuldades: 'Foco', pontosFortes: null });
+  });
+
+  it('junta interesses sem repetir e sem virgulas internas', () => {
+    expect(
+      perfilParaColunas({ interesses: ['Dinossauros', ' Futebol ', 'Dinossauros', 'a,b', ''] }),
+    ).toEqual({ interesses: 'Dinossauros, Futebol, a b' });
+    expect(perfilParaColunas({ interesses: [] })).toEqual({ interesses: null });
+  });
+});
+
+describe('CadastrosEscolaService.redefinirSenha', () => {
+  it('nao redefine senha de professor de outra escola', async () => {
+    const repo = { findOne: jest.fn().mockResolvedValue(null), update: jest.fn() };
+    const dataSource = { getRepository: jest.fn(() => repo) } as unknown as DataSource;
+    const service = new CadastrosEscolaService(dataSource, {} as TarefaStatusService);
+
+    await expect(service.redefinirSenha('professor', 9, 5)).rejects.toThrow(NotFoundException);
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 9, escolaId: 5 } });
+    expect(repo.update).not.toHaveBeenCalled();
   });
 });

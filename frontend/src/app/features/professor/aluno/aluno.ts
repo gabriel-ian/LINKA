@@ -1,4 +1,5 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { PerfilAprendizagemForm } from '../../../shared/perfil-aprendizagem/perfil-aprendizagem';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -17,6 +18,7 @@ import { situacaoDe } from './situacao';
 /** "Professor - Perfil do aluno" do Figma. */
 @Component({
   selector: 'app-professor-aluno',
+  imports: [PerfilAprendizagemForm],
   templateUrl: './aluno.html',
   styleUrl: './aluno.css',
 })
@@ -33,6 +35,12 @@ export class ProfessorAluno {
 
   readonly aluno = signal<AlunoProfessor | null>(null);
   readonly erro = signal('');
+  readonly editando = signal(false);
+  readonly salvando = signal(false);
+  readonly erroEdicao = signal('');
+  readonly dificuldades = signal('');
+  readonly pontosFortes = signal('');
+  readonly interesses = signal<string[]>([]);
 
   constructor() {
     inject(ActivatedRoute)
@@ -44,6 +52,35 @@ export class ProfessorAluno {
             this.erro.set(e.status === 404 ? 'Aluno não encontrado nas suas turmas.' : 'Não foi possível carregar o aluno.'),
         }),
       );
+  }
+
+  editar(a: AlunoProfessor): void {
+    this.dificuldades.set(a.dificuldades ?? '');
+    this.pontosFortes.set(a.pontosFortes ?? '');
+    this.interesses.set([...a.interesses]);
+    this.erroEdicao.set('');
+    this.editando.set(true);
+  }
+
+  salvar(a: AlunoProfessor): void {
+    this.salvando.set(true);
+    this.service
+      .editarPerfilAluno(a.id, {
+        dificuldades: this.dificuldades().trim() || null,
+        pontosFortes: this.pontosFortes().trim() || null,
+        interesses: this.interesses(),
+      })
+      .subscribe({
+        next: (res) => {
+          this.salvando.set(false);
+          this.editando.set(false);
+          this.aluno.set(res.data);
+        },
+        error: () => {
+          this.salvando.set(false);
+          this.erroEdicao.set('Não foi possível salvar o perfil.');
+        },
+      });
   }
 
   voltar(): void {

@@ -47,6 +47,11 @@ export class EscolaService {
     return this.http.patch<ApiResponse<Escola>>(`${this.adminUrl}/${id}/desativar`, dados);
   }
 
+  /** Senha provisoria para o login da escola. */
+  redefinirSenha(id: number): Observable<ApiResponse<{ email: string; senhaProvisoria: string }>> {
+    return this.http.post<ApiResponse<{ email: string; senhaProvisoria: string }>>(`${this.adminUrl}/${id}/senha`, {});
+  }
+
   ativar(id: number): Observable<ApiResponse<boolean>> {
     return this.http.patch<ApiResponse<boolean>>(`${this.adminUrl}/${id}/ativar`, {});
   }

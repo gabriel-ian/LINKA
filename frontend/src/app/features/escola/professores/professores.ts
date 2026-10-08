@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { ProfessorResumo, StatusProfessor } from '../../../core/model/painel-escola.model';
 import { EscolaContexto } from '../escola-contexto';
@@ -10,7 +11,7 @@ const POR_PAGINA = 6;
 /** "Escola - Professores" do Figma. */
 @Component({
   selector: 'app-escola-professores',
-  imports: [RouterLink],
+  imports: [RouterLink, SenhaProvisoria],
   templateUrl: './professores.html',
   styleUrl: './professores.css',
 })
@@ -28,6 +29,7 @@ export class EscolaProfessores {
   readonly pagina = signal(0);
   readonly erro = signal('');
   readonly alterando = signal<number | null>(null);
+  readonly senha = signal<{ nome: string; email: string; senha: string } | null>(null);
 
   readonly professores = this.contexto.professores;
 
@@ -62,6 +64,21 @@ export class EscolaProfessores {
 
   proximaPagina(): void {
     this.pagina.update((p) => (p + 1 < this.totalPaginas() ? p + 1 : 0));
+  }
+
+  redefinirSenha(p: ProfessorResumo): void {
+    if (!confirm(`Gerar uma nova senha para ${p.nome}? A senha atual deixa de funcionar.`)) return;
+    this.alterando.set(p.id);
+    this.service.redefinirSenha('professores', p.id).subscribe({
+      next: (res) => {
+        this.alterando.set(null);
+        this.senha.set({ nome: p.nome, email: res.data.email, senha: res.data.senhaProvisoria });
+      },
+      error: () => {
+        this.alterando.set(null);
+        this.erro.set(`Não foi possível gerar a senha de ${p.nome}.`);
+      },
+    });
   }
 
   alternarAtivo(p: ProfessorResumo): void {

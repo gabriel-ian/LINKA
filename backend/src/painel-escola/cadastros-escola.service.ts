@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { randomInt } from 'crypto';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { DataSource, EntityManager, In } from 'typeorm';
 import { Usuario } from '../usuario/usuario.entity';
 import { UsuarioService } from '../usuario/usuario.service';
+import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
 import { Turma } from '../turma/turma.entity';
 import { Professor } from '../professor/professor.entity';
 import { Aluno } from '../aluno/aluno.entity';
@@ -22,7 +22,22 @@ import {
   CriarAlunoDto,
   CriarProfessorDto,
   CriarTurmaDto,
+  EditarAlunoDto,
+  EditarTurmaDto,
+  PerfilAprendizagemDto,
 } from './dto/cadastros.dto';
+
+/** Converte o DTO de perfil nas colunas do aluno (so o que veio). */
+export function perfilParaColunas(dto: PerfilAprendizagemDto): Partial<Aluno> {
+  const colunas: Partial<Aluno> = {};
+  if (dto.dificuldades !== undefined) colunas.dificuldades = dto.dificuldades?.trim() || null;
+  if (dto.pontosFortes !== undefined) colunas.pontosFortes = dto.pontosFortes?.trim() || null;
+  if (dto.interesses !== undefined) {
+    const lista = [...new Set(dto.interesses.map((i) => i.replace(/,/g, ' ').trim()).filter(Boolean))];
+    colunas.interesses = lista.length ? lista.join(', ') : null;
+  }
+  return colunas;
+}
 
 export const PASTA_LAUDOS = join(process.cwd(), 'uploads', 'laudos');
 export const LAUDO_TAMANHO_MAXIMO = 10 * 1024 * 1024;
@@ -33,13 +48,6 @@ const TIPOS_LAUDO = [
   { ext: '.png', mime: 'image/png', assinatura: [0x89, 0x50, 0x4e, 0x47] },
   { ext: '.jpg', mime: 'image/jpeg', assinatura: [0xff, 0xd8, 0xff] },
 ];
-
-/** Sem caracteres que se confundem ao ditar (0/O, 1/l/I). */
-const ALFABETO_SENHA = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
-
-export function gerarSenhaProvisoria(tamanho = 10): string {
-  return Array.from({ length: tamanho }, () => ALFABETO_SENHA[randomInt(ALFABETO_SENHA.length)]).join('');
-}
 
 /** Escritas do painel da escola. Sempre dentro do escolaId do token. */
 @Injectable()
@@ -83,6 +91,48 @@ export class CadastrosEscolaService {
       }
 
       return { data: { id: turma.id, nome: turma.nome } };
+    });
+  }
+
+  /** Altera dados da turma; com professorIds, troca o time de professores. */
+  async editarTurma(turmaId: number, dto: EditarTurmaDto, escolaId: number) {
+    return this.dataSource.transaction(async (manager) => {
+      const turmaRepo = manager.getRepository(Turma);
+      const turma = await turmaRepo.findOne({ where: { id: turmaId, escolaId } });
+      if (!turma) throw new NotFoundException('Turma nao encontrada');
+
+      const serie = dto.serie?.trim() ?? turma.serie ?? '';
+      const letra = dto.letra?.toUpperCase() ?? turma.letra ?? '';
+      const anoLetivo = dto.anoLetivo ?? turma.anoLetivo;
+      const nome = serie && letra ? `${serie} ${letra}` : turma.nome;
+
+      if (nome !== turma.nome || anoLetivo !== turma.anoLetivo) {
+        const repetida = await turmaRepo.findOne({ where: { escolaId, nome: nome ?? undefined, anoLetivo: anoLetivo ?? undefined } });
+        if (repetida && repetida.id !== turma.id) {
+          throw new BadRequestException(`Ja existe a turma ${nome} em ${anoLetivo}`);
+        }
+      }
+
+      await turmaRepo.update(turma.id, {
+        nome,
+        serie: serie || null,
+        letra: letra || null,
+        anoLetivo,
+        ...(dto.turno !== undefined && { turno: dto.turno }),
+        ...(dto.sala !== undefined && { sala: dto.sala?.trim() || null }),
+        ...(dto.limiteAlunos !== undefined && { limiteAlunos: dto.limiteAlunos ?? null }),
+      });
+
+      if (dto.professorIds) {
+        const professores = await this.professoresDaEscola(manager, dto.professorIds, escolaId);
+        await manager.getRepository(TurmaProfessorDisciplina).delete({ turmaId: turma.id });
+        for (const professor of professores) {
+          const disciplinaIds = await this.disciplinasDoProfessor(manager, professor.id);
+          await this.alocar(manager, [turma.id], professor.id, disciplinaIds);
+        }
+      }
+
+      return { data: { id: turma.id, nome } };
     });
   }
 
@@ -200,6 +250,91 @@ export class CadastrosEscolaService {
         },
       };
     });
+  }
+
+  /**
+   * Edita o aluno: dados, diagnosticos, perfil de aprendizagem e turma.
+   * Trocar de turma refaz a matricula e cria os status das tarefas da turma nova.
+   */
+  async editarAluno(alunoId: number, dto: EditarAlunoDto, escolaId: number) {
+    return this.dataSource.transaction(async (manager) => {
+      const alunoRepo = manager.getRepository(Aluno);
+      const aluno = await alunoRepo.findOne({ where: { id: alunoId, escolaId } });
+      if (!aluno) throw new NotFoundException('Aluno nao encontrado');
+
+      const mudancas: Partial<Aluno> = { ...perfilParaColunas(dto) };
+      if (dto.nomeCompleto !== undefined) mudancas.nomeCompleto = dto.nomeCompleto.trim();
+      if (dto.dataNascimento !== undefined) mudancas.data_nascimento = dto.dataNascimento?.slice(0, 10) ?? null;
+      if (dto.cgm !== undefined) mudancas.cgm = dto.cgm?.trim() || null;
+
+      if (dto.diagnosticoIds !== undefined || dto.prefiroNaoInformar !== undefined) {
+        const ids = dto.diagnosticoIds ?? [];
+        if (ids.length) {
+          const existentes = await manager.getRepository(Neurodivergencia).count({ where: { id: In(ids) } });
+          if (existentes !== ids.length) throw new BadRequestException('Diagnostico invalido');
+        }
+        const vinculos = manager.getRepository(AlunoNeurodivergencia);
+        await vinculos.delete({ alunoId: aluno.id });
+        if (ids.length) await vinculos.save(ids.map((id) => ({ alunoId: aluno.id, neurodivergenciaId: id })));
+        mudancas.neurodivergente = ids.length > 0 || !!dto.prefiroNaoInformar;
+      }
+
+      if (Object.keys(mudancas).length) await alunoRepo.update(aluno.id, mudancas);
+
+      if (dto.turmaId !== undefined) {
+        const matriculas = manager.getRepository(Matricula);
+        const atual = await matriculas.findOne({ where: { alunoId: aluno.id } });
+        if ((atual?.turmaId ?? null) !== dto.turmaId) {
+          const [turma] = dto.turmaId ? await this.turmasDaEscola(manager, [dto.turmaId], escolaId) : [];
+          await matriculas.delete({ alunoId: aluno.id });
+          if (turma) {
+            await matriculas.save({ alunoId: aluno.id, turmaId: turma.id });
+            await this.tarefaStatusService.seedParaAluno(aluno.id, turma.id, manager);
+          }
+        }
+      }
+
+      return { data: { id: aluno.id } };
+    });
+  }
+
+  // --------------------------------------------------------------- senhas
+
+  /**
+   * Gera uma senha provisoria para um login da escola (aluno, professor ou
+   * responsavel de aluno da escola). Devolvida UMA vez para ser repassada.
+   */
+  async redefinirSenha(tipo: 'aluno' | 'professor' | 'responsavel', id: number, escolaId: number) {
+    let usuarioId: number | null | undefined;
+
+    if (tipo === 'aluno') {
+      usuarioId = (await this.dataSource.getRepository(Aluno).findOne({ where: { id, escolaId } }))?.usuarioId;
+    } else if (tipo === 'professor') {
+      usuarioId = (await this.dataSource.getRepository(Professor).findOne({ where: { id, escolaId } }))?.usuarioId;
+    } else {
+      // O responsavel nao tem escola: vale se acompanha algum aluno desta escola.
+      const [r] = await this.dataSource.query(
+        `SELECT r.usuario_id usuarioId FROM responsavel r
+           JOIN aluno_responsavel ar ON ar.responsavel_id = r.id
+           JOIN aluno a ON a.id = ar.aluno_id
+          WHERE r.id = ? AND a.escola_id = ? LIMIT 1`,
+        [id, escolaId],
+      );
+      usuarioId = r?.usuarioId ?? undefined;
+    }
+
+    if (usuarioId === undefined) throw new NotFoundException('Cadastro nao encontrado nesta escola');
+    if (!usuarioId) throw new BadRequestException('Este cadastro nao tem login na Linka');
+
+    const usuario = await this.dataSource.getRepository(Usuario).findOne({ where: { id: Number(usuarioId) } });
+    if (!usuario) throw new BadRequestException('Este cadastro nao tem login na Linka');
+
+    const senhaProvisoria = gerarSenhaProvisoria();
+    await this.dataSource
+      .getRepository(Usuario)
+      .update(usuario.id, { senha: await UsuarioService.hashSenha(senhaProvisoria) });
+
+    return { data: { email: usuario.email, senhaProvisoria } };
   }
 
   /**

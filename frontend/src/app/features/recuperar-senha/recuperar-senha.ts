@@ -1,45 +1,16 @@
-import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { EntradaLayout } from '../../shared/entrada-layout/entrada-layout';
 
-/** "Entrada - Recuperar senha" do Figma. */
+/**
+ * "Esqueci minha senha". A Linka nao envia e-mails: quem redefine a senha
+ * e a coordenacao da escola (alunos, familias e professores) ou a equipe
+ * Linka (escolas), pelos paineis.
+ */
 @Component({
   selector: 'app-recuperar-senha',
-  imports: [FormsModule, RouterLink, EntradaLayout],
+  imports: [RouterLink, EntradaLayout],
   templateUrl: './recuperar-senha.html',
   styleUrl: './recuperar-senha.css',
 })
-export class RecuperarSenha {
-  private router = inject(Router);
-  private auth = inject(AuthService);
-
-  email = '';
-  erro = '';
-  enviando = false;
-
-  enviar(): void {
-    this.erro = '';
-
-    if (!this.email) {
-      this.erro = 'Informe o e-mail cadastrado.';
-      return;
-    }
-
-    this.enviando = true;
-
-    this.auth.recuperarSenha(this.email).subscribe({
-      next: () => {
-        this.enviando = false;
-        this.router.navigate(['/recuperar-senha/enviado'], {
-          queryParams: { email: this.email },
-        });
-      },
-      error: () => {
-        this.enviando = false;
-        this.erro = 'Não foi possível enviar o link agora. Tente novamente.';
-      },
-    });
-  }
-}
+export class RecuperarSenha {}

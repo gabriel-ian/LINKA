@@ -34,7 +34,12 @@
 
     <div class="blocos">
       <section class="cartao bloco">
-        <h2>Perfil de aprendizado</h2>
+        <div class="topo-bloco">
+          <h2>Perfil de aprendizado</h2>
+          @if (!editando()) {
+            <button type="button" class="link-acao" (click)="editar(a)">Editar perfil</button>
+          }
+        </div>
         <div class="linha-diag">
           <span>Diagnóstico</span>
           @for (d of a.diagnosticos; track d) {
@@ -43,17 +48,29 @@
             <span class="pilula inativa">{{ a.neurodivergente ? 'Não informado' : 'Sem NEE' }}</span>
           }
         </div>
-        <h3>Maiores dificuldades</h3>
-        <p>{{ a.dificuldades || 'A coordenação ainda não preencheu.' }}</p>
-        <h3>Pontos fortes</h3>
-        <p>{{ a.pontosFortes || 'A coordenação ainda não preencheu.' }}</p>
-        @if (a.interesses.length) {
-          <h3>Interesses</h3>
-          <div class="interesses">
-            @for (i of a.interesses; track i) {
-              <span class="pilula-cor c-azul">{{ i }}</span>
-            }
+        @if (editando()) {
+          <app-perfil-aprendizagem [(dificuldades)]="dificuldades" [(pontosFortes)]="pontosFortes" [(interesses)]="interesses" />
+          @if (erroEdicao()) { <p class="alerta-erro" role="alert">{{ erroEdicao() }}</p> }
+          <div class="acoes">
+            <button type="button" class="bt bt-secundario bt-p" (click)="editando.set(false)">Cancelar</button>
+            <button type="button" class="bt bt-primario bt-p" [disabled]="salvando()" (click)="salvar(a)">{{ salvando() ? 'Salvando...' : 'Salvar perfil' }}</button>
           </div>
+        } @else {
+          <h3>Maiores dificuldades</h3>
+          <p>{{ a.dificuldades || 'Ainda não preenchido.' }}</p>
+          <h3>Pontos fortes</h3>
+          <p>{{ a.pontosFortes || 'Ainda não preenchido.' }}</p>
+          @if (a.interesses.length) {
+            <h3>Interesses</h3>
+            <div class="interesses">
+              @for (i of a.interesses; track i) {
+                <span class="pilula-cor c-azul">{{ i }}</span>
+              }
+            </div>
+          }
+          @if (!a.dificuldades && !a.pontosFortes && !a.interesses.length) {
+            <p class="convite">Preencha o perfil: a IA usa estas informações para adaptar as tarefas de {{ a.nome.split(' ')[0] }}.</p>
+          }
         }
       </section>
 

@@ -117,6 +117,12 @@ textarea {
   background: var(--cor-primaria-escura);
 }
 
+.btn-secundario {
+  border: 1px solid var(--cor-primaria);
+  background: #fff;
+  color: var(--cor-primaria);
+}
+
 .btn-bloco {
   width: 100%;
 }

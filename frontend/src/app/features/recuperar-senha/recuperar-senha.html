@@ -1,30 +1,21 @@
 <app-entrada-layout>
-  <form class="etapa" (ngSubmit)="enviar()">
-    <h1 class="titulo">Recuperar senha</h1>
-    <p class="descricao">
-      Informe o e-mail cadastrado na Linka. Vamos enviar um link para você criar uma nova senha.
-    </p>
+  <div class="etapa">
+    <h1 class="titulo">Esqueceu a senha?</h1>
+    <p class="descricao">A coordenação gera uma senha nova para você na hora, pelo painel da Linka.</p>
 
-    <label class="campo-grupo">
-      <span class="campo-rotulo">E-mail</span>
-      <input
-        class="campo"
-        type="email"
-        name="email"
-        autocomplete="email"
-        placeholder="seu@email.com"
-        [(ngModel)]="email"
-      />
-    </label>
+    <ul class="caminhos">
+      <li>
+        <strong>Alunos, famílias e professores</strong>
+        Peça à coordenação da sua escola uma senha nova.
+      </li>
+      <li>
+        <strong>Escolas</strong>
+        Fale com a equipe Linka para receber uma senha nova de acesso.
+      </li>
+    </ul>
 
-    <button type="submit" class="btn btn-primario btn-bloco" [disabled]="enviando">
-      {{ enviando ? 'Enviando...' : 'Enviar link de recuperação' }}
-    </button>
+    <p class="descricao">Depois de entrar, troque a senha em <b>Alterar minha senha</b>.</p>
 
-    @if (erro) {
-      <p class="alerta-erro" role="alert">{{ erro }}</p>
-    }
-
-    <a class="link-acao voltar" routerLink="/login">Voltar para o login</a>
-  </form>
+    <a class="btn btn-primario btn-bloco" routerLink="/login">Voltar para o login</a>
+  </div>
 </app-entrada-layout>

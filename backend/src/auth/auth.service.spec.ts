@@ -1,4 +1,8 @@
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
@@ -16,7 +20,12 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: UsuarioService,
-          useValue: { findByEmail: jest.fn(), registrarLogin: jest.fn() },
+          useValue: {
+            findByEmail: jest.fn(),
+            registrarLogin: jest.fn(),
+            findById: jest.fn(),
+            definirSenha: jest.fn(),
+          },
         },
         {
           provide: JwtService,
@@ -154,6 +163,29 @@ describe('AuthService', () => {
       ).rejects.toThrow(ForbiddenException);
       expect(usuarioService.registrarLogin).not.toHaveBeenCalled();
       expect(jwtService.sign).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('alterarSenha', () => {
+    const usuario = { id: 3, senha: 'hash' } as Usuario;
+
+    it('recusa senha atual errada', async () => {
+      usuarioService.findById.mockResolvedValue(usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(false);
+
+      await expect(service.alterarSenha(3, 'errada', 'novaSenha1')).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(usuarioService.definirSenha).not.toHaveBeenCalled();
+    });
+
+    it('grava a nova senha quando a atual confere', async () => {
+      usuarioService.findById.mockResolvedValue(usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await service.alterarSenha(3, 'atual123', 'novaSenha1');
+
+      expect(usuarioService.definirSenha).toHaveBeenCalledWith(3, 'novaSenha1');
     });
   });
 });

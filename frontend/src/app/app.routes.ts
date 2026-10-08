@@ -24,11 +24,6 @@ export const routes: Routes = [
       import('./features/recuperar-senha/recuperar-senha').then((m) => m.RecuperarSenha),
   },
   {
-    path: 'recuperar-senha/enviado',
-    loadComponent: () =>
-      import('./features/recuperar-senha/email-enviado').then((m) => m.EmailEnviado),
-  },
-  {
     path: 'adm',
     canActivate: [authGuard, perfilGuard('admin')],
     loadComponent: () =>
@@ -107,6 +102,11 @@ export const routes: Routes = [
           import('./features/escola/turma-nova/turma-nova').then((m) => m.EscolaTurmaNova),
       },
       {
+        path: 'turmas/:id/editar',
+        loadComponent: () =>
+          import('./features/escola/turma-nova/turma-nova').then((m) => m.EscolaTurmaNova),
+      },
+      {
         path: 'turmas/:id',
         loadComponent: () =>
           import('./features/escola/turma-detalhe/turma-detalhe').then((m) => m.EscolaTurmaDetalhe),
@@ -119,6 +119,11 @@ export const routes: Routes = [
       {
         path: 'alunos',
         loadComponent: () => import('./features/escola/alunos/alunos').then((m) => m.EscolaAlunos),
+      },
+      {
+        path: 'alunos/:id/editar',
+        loadComponent: () =>
+          import('./features/escola/aluno-editar/aluno-editar').then((m) => m.EscolaAlunoEditar),
       },
       {
         path: 'alunos/:id',

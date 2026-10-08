@@ -13,11 +13,12 @@ import {
   iniciais,
   statusEscola,
 } from '../escola-ui';
+import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 
 /** "ADM - Buscar por ID" do Figma. O ID fica na URL (?id=) para poder ser linkado. */
 @Component({
   selector: 'app-buscar-id',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, SenhaProvisoria],
   templateUrl: './buscar-id.html',
   styleUrl: './buscar-id.css',
 })
@@ -36,6 +37,8 @@ export class BuscarId {
   readonly escola = signal<Escola | null>(null);
   readonly erro = signal('');
   readonly carregando = signal(false);
+  readonly redefinindo = signal(false);
+  readonly senhaGerada = signal<{ email: string; senhaProvisoria: string } | null>(null);
 
   constructor() {
     inject(ActivatedRoute)
@@ -77,6 +80,22 @@ export class BuscarId {
             ? `Nenhuma escola com o ID #${id}.`
             : 'Não foi possível buscar a escola agora.',
         );
+      },
+    });
+  }
+
+  redefinirSenha(e: Escola): void {
+    if (!confirm(`Gerar uma nova senha de acesso para ${e.nome}? A senha atual deixa de funcionar.`)) return;
+    this.erro.set('');
+    this.redefinindo.set(true);
+    this.service.redefinirSenha(e.id).subscribe({
+      next: (res) => {
+        this.redefinindo.set(false);
+        this.senhaGerada.set(res.data);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.redefinindo.set(false);
+        this.erro.set(err.error?.message ?? 'Não foi possível redefinir a senha.');
       },
     });
   }

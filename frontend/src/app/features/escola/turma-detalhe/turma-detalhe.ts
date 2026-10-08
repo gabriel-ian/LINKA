@@ -32,12 +32,14 @@ export class EscolaTurmaDetalhe {
 
   readonly turma = signal<TurmaDetalhe | null>(null);
   readonly criada = signal(false);
+  readonly salva = signal(false);
   readonly erro = signal('');
 
   constructor() {
     const rota = inject(ActivatedRoute);
     rota.paramMap.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe((p) => {
       this.criada.set(rota.snapshot.queryParamMap.get('criada') === '1');
+      this.salva.set(rota.snapshot.queryParamMap.get('salva') === '1');
       this.service.turma(Number(p.get('id'))).subscribe({
         next: (res) => this.turma.set(res.data),
         error: (e: HttpErrorResponse) =>

@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { EntradaLayout } from '../../shared/entrada-layout/entrada-layout';
+import { AlterarSenha } from '../../shared/senha/alterar-senha';
 
 /**
  * Pagina provisoria de aluno e familia ate as telas deles ficarem prontas
@@ -9,7 +10,7 @@ import { EntradaLayout } from '../../shared/entrada-layout/entrada-layout';
  */
 @Component({
   selector: 'app-inicio',
-  imports: [EntradaLayout],
+  imports: [EntradaLayout, AlterarSenha],
   template: `
     <app-entrada-layout>
       <div class="etapa">
@@ -21,9 +22,13 @@ import { EntradaLayout } from '../../shared/entrada-layout/entrada-layout';
             Seu acesso à Linka está funcionando. Em breve você vai acompanhar as tarefas e os avisos da escola por aqui.
           }
         </p>
+        <button type="button" class="btn btn-secundario btn-bloco" (click)="alterandoSenha.set(true)">Alterar minha senha</button>
         <button type="button" class="btn btn-primario btn-bloco" (click)="sair()">Sair</button>
       </div>
     </app-entrada-layout>
+    @if (alterandoSenha()) {
+      <app-alterar-senha (fechar)="alterandoSenha.set(false)" />
+    }
   `,
   styles: `
     .etapa {
@@ -49,6 +54,7 @@ export class Inicio {
   private router = inject(Router);
 
   readonly aluno = this.auth.perfil === 'aluno';
+  readonly alterandoSenha = signal(false);
 
   sair(): void {
     this.auth.logout();

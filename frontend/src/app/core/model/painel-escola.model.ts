@@ -64,6 +64,7 @@ export interface AlunoDetalhe extends AlunoResumo {
   interesses: string[];
   professores: ProfessorDaTurma[];
   responsaveis: {
+    id: number;
     nome: string | null;
     telefone: string | null;
     parentesco: string | null;
@@ -97,8 +98,9 @@ export interface NovaTurma {
   letra: string;
   turno: Turno;
   anoLetivo: number;
-  sala?: string;
-  limiteAlunos?: number;
+  /** null limpa o campo na edicao. */
+  sala?: string | null;
+  limiteAlunos?: number | null;
   professorIds: number[];
 }
 
@@ -132,4 +134,27 @@ export interface AlunoCriado {
   nome: string;
   turma: { id: number; nome: string } | null;
   responsavel: { nome: string; email: string; senhaProvisoria: string | null } | null;
+}
+
+/** Senha provisoria gerada pela escola ou pelo ADM (mostrada uma vez). */
+export interface SenhaGerada {
+  email: string;
+  senhaProvisoria: string;
+}
+
+/** Perfil de aprendizagem; null limpa o campo. */
+export interface PerfilAprendizagem {
+  dificuldades?: string | null;
+  pontosFortes?: string | null;
+  interesses?: string[];
+}
+
+/** Edicao do aluno: so os campos enviados mudam. */
+export interface EdicaoAluno extends PerfilAprendizagem {
+  nomeCompleto?: string;
+  dataNascimento?: string | null;
+  cgm?: string | null;
+  turmaId?: number | null;
+  diagnosticoIds?: number[];
+  prefiroNaoInformar?: boolean;
 }

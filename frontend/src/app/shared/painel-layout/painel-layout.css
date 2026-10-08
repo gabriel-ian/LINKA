@@ -219,6 +219,7 @@
 }
 
 .conta a,
+.conta .opcao,
 .conta .sair {
   display: block;
   width: 100%;

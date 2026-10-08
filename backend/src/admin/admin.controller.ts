@@ -77,6 +77,12 @@ export class AdminController {
     return this.escolaService.desativar(id, body, adminEmail);
   }
 
+  @Post(':id/senha')
+  @ApiOperation({ summary: 'Gerar senha provisoria para o login da escola' })
+  redefinirSenha(@Param('id', ParseIntPipe) id: number) {
+    return this.escolaService.redefinirSenha(id);
+  }
+
   @Patch(':id/ativar')
   @ApiOperation({ summary: 'Reativar escola' })
   activate(

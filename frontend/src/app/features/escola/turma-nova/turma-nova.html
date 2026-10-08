@@ -1,15 +1,20 @@
 <div class="pagina">
-  <a class="voltar" routerLink="/escola/turmas">&lt; Voltar para turmas</a>
+  @if (editandoId) {
+    <a class="voltar" [routerLink]="['/escola/turmas', editandoId]">&lt; Voltar para a turma</a>
+  } @else {
+    <a class="voltar" routerLink="/escola/turmas">&lt; Voltar para turmas</a>
+  }
 
   <header class="painel-cabecalho">
-    <h1>Nova turma</h1>
-    <p>Cadastre a turma e vincule os professores</p>
+    <h1>{{ editandoId ? 'Editar turma' : 'Nova turma' }}</h1>
+    <p>{{ editandoId ? 'Altere os dados e os professores da turma' : 'Cadastre a turma e vincule os professores' }}</p>
   </header>
 
   @if (erro()) {
     <p class="alerta-erro" role="alert">{{ erro() }}</p>
   }
 
+  @if (carregado()) {
   <form class="cartao" (ngSubmit)="salvar()" novalidate>
     <div class="grade-campos" style="--colunas: 4">
       <label class="campo-p">
@@ -75,13 +80,16 @@
       </div>
     </div>
 
-    <p class="aviso-caixa azul">Depois de salvar, você pode adicionar alunos pela tela de cadastro de aluno.</p>
+    @if (!editandoId) {
+      <p class="aviso-caixa azul">Depois de salvar, você pode adicionar alunos pela tela de cadastro de aluno.</p>
+    }
 
     <div class="acoes">
-      <a class="bt bt-secundario" routerLink="/escola/turmas">Cancelar</a>
+      <a class="bt bt-secundario" [routerLink]="editandoId ? ['/escola/turmas', editandoId] : ['/escola/turmas']">Cancelar</a>
       <button type="submit" class="bt bt-primario" [disabled]="salvando()">
-        {{ salvando() ? 'Salvando...' : 'Salvar turma' }}
+        {{ salvando() ? 'Salvando...' : editandoId ? 'Salvar alterações' : 'Salvar turma' }}
       </button>
     </div>
   </form>
+  }
 </div>

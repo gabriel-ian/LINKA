@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { AlterarSenha } from '../senha/alterar-senha';
 
 /** Uma camada de icone do menu, na posicao do Figma (relativa a borda externa do botao). */
 export interface CamadaIcone {
@@ -55,7 +56,7 @@ export interface Notificacao {
  */
 @Component({
   selector: 'app-painel-layout',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, AlterarSenha],
   templateUrl: './painel-layout.html',
   styleUrl: './painel-layout.css',
   host: {
@@ -75,6 +76,7 @@ export class PainelLayout {
   readonly painel = signal<'conta' | 'notificacoes' | null>(null);
   /** Gaveta do menu em telas estreitas (abaixo de 1000px). */
   readonly menuAberto = signal(false);
+  readonly alterandoSenha = signal(false);
   private readonly lidas = signal<Set<string>>(new Set());
 
   readonly naoLidas = computed(

@@ -7,6 +7,9 @@ import {
 import { DataSource } from 'typeorm';
 import { TarefaService } from '../tarefa/tarefa.service';
 import { TarefaAdaptada } from '../tarefa-adaptada/tarefa-adaptada.entity';
+import { Aluno } from '../aluno/aluno.entity';
+import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
+import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import { AdaptacaoIaService, PerfilParaIa } from './adaptacao-ia.service';
 import {
   CriarTarefaProfessorDto,
@@ -250,6 +253,29 @@ export class PainelProfessorService {
         }),
       },
     };
+  }
+
+  /** Professor edita o perfil de aprendizagem de alunos das suas turmas. */
+  async editarPerfilAluno(
+    usuarioId: number,
+    escolaId: number,
+    alunoId: number,
+    dto: PerfilAprendizagemDto,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    const [matricula] = await this.dataSource.query(
+      `SELECT m.turma_id turmaId FROM matricula m
+         JOIN turma_professor_disciplina tpd ON tpd.turma_id = m.turma_id AND tpd.professor_id = ?
+        WHERE m.aluno_id = ? LIMIT 1`,
+      [professor.id, alunoId],
+    );
+    if (!matricula) throw new NotFoundException('Aluno nao encontrado nas suas turmas');
+
+    const colunas = perfilParaColunas(dto);
+    if (Object.keys(colunas).length) {
+      await this.dataSource.getRepository(Aluno).update(alunoId, colunas);
+    }
+    return this.aluno(usuarioId, escolaId, alunoId);
   }
 
   async aluno(usuarioId: number, escolaId: number, alunoId: number) {

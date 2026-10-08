@@ -55,6 +55,9 @@
       <hr class="divisor" />
 
       <div class="acoes">
+        <button type="button" class="bt bt-secundario" [disabled]="redefinindo()" (click)="redefinirSenha(e)">
+          {{ redefinindo() ? 'Gerando...' : 'Redefinir senha de acesso' }}
+        </button>
         @if (e.ativo) {
           <a class="bt bt-perigo" routerLink="/adm/escolas/desativar" [queryParams]="{ id: e.id }">Desativar escola</a>
         } @else {
@@ -63,5 +66,9 @@
         <a class="bt bt-primario" routerLink="/adm/escolas/atualizar" [queryParams]="{ id: e.id }">Atualizar dados</a>
       </div>
     </section>
+
+    @if (senhaGerada(); as s) {
+      <app-senha-provisoria [nome]="e.nome" [email]="s.email" [senha]="s.senhaProvisoria" (fechar)="senhaGerada.set(null)" />
+    }
   }
 </div>

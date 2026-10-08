@@ -6,7 +6,8 @@
   }
 
   @if (turma(); as t) {
-    <header class="painel-cabecalho">
+    <header class="topo-turma">
+      <div class="painel-cabecalho">
       <h1>{{ t.nome }}</h1>
       @if (t.totalAlunos === 0) {
         <p>{{ criada() ? 'Turma criada agora' : 'Ano letivo ' + (t.anoLetivo ?? '') }} - 0 alunos - {{ nomesProfessores(t) }}</p>
@@ -16,7 +17,13 @@
           @if (t.anoLetivo) { - ano letivo {{ t.anoLetivo }} }
         </p>
       }
+      </div>
+      <a class="bt bt-secundario" [routerLink]="['/escola/turmas', t.id, 'editar']">Editar turma</a>
     </header>
+
+    @if (salva()) {
+      <p class="aviso-caixa verde forte">Alterações da turma salvas.</p>
+    }
 
     @if (criada()) {
       <p class="aviso-caixa verde forte">Turma {{ t.nome }} criada com sucesso.</p>

@@ -209,13 +209,14 @@ export class PainelEscolaService {
     );
 
     const responsaveis: {
+      id: number;
       nome: string | null;
       telefone: string | null;
       parentesco: string | null;
       email: string | null;
       ultimoLogin: Date | null;
     }[] = await this.dataSource.query(
-      `SELECT r.nome_completo nome, r.telefone, r.parentesco, u.email, u.ultimo_login ultimoLogin
+      `SELECT r.id, r.nome_completo nome, r.telefone, r.parentesco, u.email, u.ultimo_login ultimoLogin
          FROM aluno_responsavel ar JOIN responsavel r ON r.id = ar.responsavel_id
          LEFT JOIN usuario u ON u.id = r.usuario_id
         WHERE ar.aluno_id = ?`,
@@ -247,6 +248,7 @@ export class PainelEscolaService {
           .filter(Boolean),
         professores,
         responsaveis: responsaveis.map((r) => ({
+          id: Number(r.id),
           nome: r.nome,
           telefone: r.telefone,
           parentesco: r.parentesco,

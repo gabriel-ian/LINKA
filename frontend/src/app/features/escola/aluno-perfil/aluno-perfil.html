@@ -1,14 +1,23 @@
 <div class="pagina">
   <a class="voltar" routerLink="/escola/alunos">&lt; Voltar para alunos NEE</a>
 
+  @if (salvo()) {
+    <p class="aviso-caixa verde forte" role="status">
+      {{ salvo() === 'laudo' ? 'Alterações salvas, mas o laudo não foi enviado. Tente anexar de novo.' : 'Alterações salvas.' }}
+    </p>
+  }
+
   @if (erro()) {
     <p class="alerta-erro" role="alert">{{ erro() }}</p>
   }
 
   @if (aluno(); as a) {
-    <header class="painel-cabecalho">
-      <h1>{{ a.nome }}</h1>
-      <p>{{ subtitulo(a) }}</p>
+    <header class="topo-perfil">
+      <div class="painel-cabecalho">
+        <h1>{{ a.nome }}</h1>
+        <p>{{ subtitulo(a) }}</p>
+      </div>
+      <a class="bt bt-secundario" [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>
     </header>
 
     <div class="indicadores">
@@ -52,7 +61,21 @@
           <dd>{{ a.dificuldades || 'Ainda não preenchido.' }}</dd>
           <dt>Pontos fortes</dt>
           <dd>{{ a.pontosFortes || 'Ainda não preenchido.' }}</dd>
+          <dt>Acesso do aluno</dt>
+          <dd>
+            @if (a.email) {
+              {{ a.email }}
+              <button type="button" class="link-acao" [disabled]="gerando() === 'alunos-' + a.id" (click)="redefinirSenha('alunos', a.id, a.nome)">Redefinir senha</button>
+            } @else {
+              Sem login próprio
+            }
+          </dd>
         </dl>
+        @if (!a.dificuldades && !a.pontosFortes && !a.interesses.length) {
+          <p class="aviso-caixa roxo">
+            Preencha o perfil de aprendizagem em <a [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>: a IA usa essas informações para personalizar as tarefas.
+          </p>
+        }
         @if (a.interesses.length) {
           <div class="interesses">
             @for (i of a.interesses; track i; let n = $index) {
@@ -94,9 +117,14 @@
                 <dd>{{ r.telefone }}</dd>
               </dl>
             }
-            <span class="pilula" [class]="r.acessou ? 'ativa' : 'pendente'">
-              {{ r.acessou ? 'Acompanha pela Linka' : 'Aguardando primeiro acesso' }}
-            </span>
+            <div class="linha-resp">
+              <span class="pilula" [class]="r.acessou ? 'ativa' : 'pendente'">
+                {{ r.acessou ? 'Acompanha pela Linka' : 'Aguardando primeiro acesso' }}
+              </span>
+              @if (r.email) {
+                <button type="button" class="link-acao" [disabled]="gerando() === 'responsaveis-' + r.id" (click)="redefinirSenha('responsaveis', r.id, r.nome ?? 'o responsável')">Redefinir senha</button>
+              }
+            </div>
           } @empty {
             <p class="vazio">Nenhum responsável vinculado.</p>
           }
@@ -111,3 +139,7 @@
     }
   }
 </div>
+
+@if (senha(); as s) {
+  <app-senha-provisoria [nome]="s.nome" [email]="s.email" [senha]="s.senha" (fechar)="senha.set(null)" />
+}

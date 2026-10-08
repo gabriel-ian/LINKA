@@ -1,5 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { UsuarioId } from './usuario-id.decorator';
+import { AlterarSenhaDto } from './dto/alterar-senha.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
@@ -17,5 +20,13 @@ export class AuthController {
   })
   login(@Body() body: LoginDto) {
     return this.authService.login(body.email, body.senha);
+  }
+
+  @Post('senha')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Trocar a propria senha (qualquer perfil logado)' })
+  alterarSenha(@UsuarioId() usuarioId: number, @Body() dto: AlterarSenhaDto) {
+    return this.authService.alterarSenha(usuarioId, dto.senhaAtual, dto.novaSenha);
   }
 }

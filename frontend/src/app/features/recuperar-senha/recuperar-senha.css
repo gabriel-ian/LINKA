@@ -1,4 +1,3 @@
-/* Estilos compartilhados com a tela "E-mail enviado". */
 .etapa {
   display: flex;
   flex-direction: column;
@@ -19,18 +18,37 @@
   font-weight: 500;
 }
 
-.campo-grupo {
-  gap: 10px;
+.caminhos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.caminhos li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.caminhos strong {
+  color: var(--cor-primaria);
+  font-size: 16px;
 }
 
 .btn {
   font-size: 16px;
 }
 
-.alerta-erro {
-  margin: 0;
-}
-
-.voltar {
-  align-self: center;
+@media (max-width: 600px) {
+  .titulo {
+    font-size: 32px;
+  }
 }

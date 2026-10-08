@@ -68,6 +68,24 @@
   font-weight: 600;
 }
 
+.topo-bloco {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.convite {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f3e8ff;
+  color: #5b21b6 !important;
+  font-size: 13px !important;
+}
+
+.acoes {
+  margin-top: 4px;
+}
+
 .bloco h3 {
   margin: 10px 0 0;
   font-size: 15px;

@@ -62,11 +62,25 @@ export function noIntervalo(
   return data >= inicio && data <= fim;
 }
 
-/** % de tarefas concluidas; null quando nao ha tarefa no periodo. */
-export function taxaConclusao(linhas: LinhaTarefa[]): number | null {
-  if (linhas.length === 0) return null;
-  const feitas = linhas.filter((l) => l.concluida).length;
-  return Math.round((feitas / linhas.length) * 100);
+/** Fim do prazo da tarefa: data de entrega + hora limite (ou fim do dia). */
+function prazoDe(l: LinhaTarefa): number {
+  return new Date(`${l.dataEntrega}T${l.horaLimite ?? '23:59:59'}`).getTime();
+}
+
+/**
+ * % de tarefas concluidas. Tarefa ainda dentro do prazo e nao feita nao conta
+ * contra o aluno (senao toda segunda-feira a turma aparece com 0%).
+ * null quando nao ha tarefa vencida nem concluida no periodo.
+ */
+export function taxaConclusao(
+  linhas: LinhaTarefa[],
+  hoje = new Date(),
+): number | null {
+  const agora = hoje.getTime();
+  const contadas = linhas.filter((l) => l.concluida || prazoDe(l) <= agora);
+  if (contadas.length === 0) return null;
+  const feitas = contadas.filter((l) => l.concluida).length;
+  return Math.round((feitas / contadas.length) * 100);
 }
 
 /**
@@ -78,8 +92,7 @@ export function taxaNoPrazo(
   hoje = new Date(),
 ): number | null {
   const agora = hoje.getTime();
-  const prazo = (l: LinhaTarefa) =>
-    new Date(`${l.dataEntrega}T${l.horaLimite ?? '23:59:59'}`).getTime();
+  const prazo = prazoDe;
 
   const vencidas = linhas.filter((l) => prazo(l) <= agora);
   if (vencidas.length === 0) return null;

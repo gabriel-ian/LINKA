@@ -27,31 +27,61 @@ import { AuthService } from '../../core/services/auth.service';
         } @else {
           <label class="campo-p">
             Senha atual
-            <input
-              name="atual"
-              type="password"
-              autocomplete="current-password"
-              [(ngModel)]="atual"
-            />
+            <span class="caixa">
+              <input
+                name="atual"
+                [type]="mostrarAtual ? 'text' : 'password'"
+                autocomplete="current-password"
+                [(ngModel)]="atual"
+              />
+              <button
+                type="button"
+                class="olho"
+                [attr.aria-label]="mostrarAtual ? 'Esconder senha' : 'Mostrar senha'"
+                (click)="mostrarAtual = !mostrarAtual"
+              >
+                <img src="assets/entrada/icone-olho.svg" alt="" />
+              </button>
+            </span>
           </label>
           <label class="campo-p" [class.invalido]="erroNova()">
             Nova senha
-            <input
-              name="nova"
-              type="password"
-              autocomplete="new-password"
-              [(ngModel)]="nova"
-              placeholder="Mínimo 8 caracteres"
-            />
+            <span class="caixa">
+              <input
+                name="nova"
+                [type]="mostrarNova ? 'text' : 'password'"
+                autocomplete="new-password"
+                [(ngModel)]="nova"
+                placeholder="Mínimo 8 caracteres"
+              />
+              <button
+                type="button"
+                class="olho"
+                [attr.aria-label]="mostrarNova ? 'Esconder senha' : 'Mostrar senha'"
+                (click)="mostrarNova = !mostrarNova"
+              >
+                <img src="assets/entrada/icone-olho.svg" alt="" />
+              </button>
+            </span>
           </label>
           <label class="campo-p" [class.invalido]="erroNova()">
             Repita a nova senha
-            <input
-              name="repetir"
-              type="password"
-              autocomplete="new-password"
-              [(ngModel)]="repetir"
-            />
+            <span class="caixa">
+              <input
+                name="repetir"
+                [type]="mostrarRepetir ? 'text' : 'password'"
+                autocomplete="new-password"
+                [(ngModel)]="repetir"
+              />
+              <button
+                type="button"
+                class="olho"
+                [attr.aria-label]="mostrarRepetir ? 'Esconder senha' : 'Mostrar senha'"
+                (click)="mostrarRepetir = !mostrarRepetir"
+              >
+                <img src="assets/entrada/icone-olho.svg" alt="" />
+              </button>
+            </span>
             @if (erroNova()) {
               <span class="msg-erro">{{ erroNova() }}</span>
             }
@@ -78,6 +108,9 @@ export class AlterarSenha {
   atual = '';
   nova = '';
   repetir = '';
+  mostrarAtual = false;
+  mostrarNova = false;
+  mostrarRepetir = false;
   readonly erroNova = signal('');
   readonly erro = signal('');
   readonly salvando = signal(false);

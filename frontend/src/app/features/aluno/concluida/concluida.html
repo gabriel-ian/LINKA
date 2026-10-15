@@ -1,0 +1,52 @@
+<div class="pagina">
+  <header class="cabecalho">
+    <h1>Missão cumprida!</h1>
+    @if (titulo()) {
+      <p>{{ titulo() }}</p>
+    }
+  </header>
+
+  <app-adm-resultado
+    [forte]="true"
+    titulo="Você terminou a tarefa!"
+    [texto]="
+      resultado()?.comecouSozinho
+        ? 'Começou sozinho e foi até o fim. Isso é autonomia!'
+        : 'Você foi até o fim. Muito bem!'
+    "
+  >
+    <div extra class="extras">
+      <ul class="placar">
+        @if (resultado()?.ganhos; as g) {
+          <li class="roxo">
+            <strong>+{{ g }}</strong> pontos
+          </li>
+        }
+        <li class="laranja">
+          <strong>{{ sequencia() }} {{ sequencia() === 1 ? 'dia' : 'dias' }}</strong> de sequência
+        </li>
+        <li class="azul">
+          <strong>{{ pontosTotal() }}</strong> pontos no total
+        </li>
+      </ul>
+
+      @if (resultado()?.quaseLa; as c) {
+        <div class="quase">
+          <span class="medalha" [style.background]="corBloqueada">{{
+            medalhas[c.chave].simbolo
+          }}</span>
+          <div>
+            <strong>Conquista quase lá: {{ c.titulo }}</strong>
+            <small
+              >{{ c.atual }} de {{ c.meta }} - falta{{ c.meta - c.atual === 1 ? '' : 'm' }} só
+              {{ c.meta - c.atual }}!</small
+            >
+          </div>
+        </div>
+      }
+    </div>
+
+    <a class="bt bt-secundario" routerLink="/aluno">Voltar ao início</a>
+    <a class="bt bt-primario" routerLink="/aluno/tarefas">Ver próximas tarefas</a>
+  </app-adm-resultado>
+</div>

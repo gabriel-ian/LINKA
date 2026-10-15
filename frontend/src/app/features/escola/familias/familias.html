@@ -1,0 +1,102 @@
+<div class="pagina">
+  <header class="topo">
+    <div class="painel-cabecalho">
+      <h1>Famílias</h1>
+      <p>Responsáveis cadastrados e os filhos de cada família na escola</p>
+    </div>
+    <a class="bt bt-primario" routerLink="/escola/cadastro/familia">+ Cadastrar família</a>
+  </header>
+
+  <label class="campo-p busca">
+    <input
+      aria-label="Buscar família"
+      placeholder="Buscar por nome, e-mail ou telefone do responsável..."
+      (input)="buscar($any($event.target).value)"
+    />
+  </label>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (familias(); as lista) {
+    <section class="cartao tabela-cartao">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Responsável</th>
+            <th>Filhos na escola</th>
+            <th style="width: 120px">Acesso</th>
+            <th style="width: 230px">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (f of lista; track f.id) {
+            <tr>
+              <td>
+                <span class="pessoa">
+                  <span class="avatar" style="--tam: 36px; --fonte-avatar: 13px">{{
+                    iniciais(f.nome)
+                  }}</span>
+                  <span>
+                    <strong>{{ f.nome }}</strong>
+                    <small
+                      >{{ f.email ?? 'Sem e-mail' }}{{ f.parentesco ? ' - ' + f.parentesco : ''
+                      }}{{ f.telefone ? ' - ' + f.telefone : '' }}</small
+                    >
+                  </span>
+                </span>
+              </td>
+              <td>
+                <span class="filhos">
+                  @for (x of f.filhos; track x.id) {
+                    <a class="pilula-cor c-azul" [routerLink]="['/escola/alunos', x.id]"
+                      >{{ x.nome.split(' ')[0] }}{{ x.turma ? ' - ' + x.turma : '' }}</a
+                    >
+                  } @empty {
+                    <span class="sem">Nenhum filho vinculado ainda</span>
+                  }
+                </span>
+              </td>
+              <td>
+                <span class="pilula" [class.ativa]="f.acessou" [class.pendente]="!f.acessou">{{
+                  f.acessou ? 'Já acessou' : 'Pendente'
+                }}</span>
+              </td>
+              <td>
+                <span class="acoes-linha">
+                  <a
+                    class="link-acao"
+                    routerLink="/escola/cadastro/aluno"
+                    [queryParams]="{ responsavelId: f.id }"
+                    >+ Filho(a)</a
+                  >
+                  @if (f.email) {
+                    <button type="button" class="link-acao" (click)="novaSenha(f)">
+                      Nova senha
+                    </button>
+                  }
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="vazio">Nenhuma família encontrada.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  } @else if (!erro()) {
+    <p class="vazio">Carregando...</p>
+  }
+</div>
+
+@if (senha(); as s) {
+  <app-senha-provisoria
+    [nome]="s.nome"
+    [email]="s.email"
+    [senha]="s.senhaProvisoria"
+    (fechar)="senha.set(null)"
+  />
+}

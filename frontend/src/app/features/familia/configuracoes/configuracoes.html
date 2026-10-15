@@ -1,0 +1,127 @@
+@if (contexto.dados(); as d) {
+  <div class="pagina">
+    <header class="cabecalho">
+      <h1>Configurações</h1>
+      <p>Escolha como e quando a Linka avisa você</p>
+    </header>
+
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    <div class="grade">
+      <section class="bloco cartao-cfg" aria-labelledby="titulo-notificacoes">
+        <h2 class="titulo-cfg" id="titulo-notificacoes">Notificações</h2>
+        <ul class="opcoes">
+          @for (o of opcoes; track o.chave) {
+            <li>
+              <div>
+                <strong [id]="'op-' + o.chave">{{ o.titulo }}</strong>
+                <small>{{ o.texto }}</small>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                class="chave"
+                [attr.aria-checked]="d.responsavel.preferencias[o.chave]"
+                [attr.aria-labelledby]="'op-' + o.chave"
+                (click)="alternar(o.chave)"
+              >
+                <span></span>
+              </button>
+            </li>
+          }
+        </ul>
+        <label class="campo-cfg">
+          <span>Horário preferido para lembretes</span>
+          <select
+            class="campo"
+            [value]="d.responsavel.preferencias.horario"
+            (change)="escolherHorario($any($event.target).value)"
+          >
+            @for (h of horarios; track h) {
+              <option [value]="h" [selected]="h === d.responsavel.preferencias.horario">
+                {{ h }}
+              </option>
+            }
+          </select>
+        </label>
+        <p class="nota">
+          Suas escolhas ficam salvas. O envio por e-mail e por WhatsApp chega em uma próxima versão;
+          por enquanto os avisos aparecem no sino da Linka.
+        </p>
+      </section>
+
+      <div class="direita">
+        <form class="bloco cartao-cfg" (submit)="$event.preventDefault(); salvarDados()">
+          <h2 class="titulo-cfg">Dados do responsável</h2>
+          <label class="campo-cfg">
+            <span>Nome completo</span>
+            <input
+              class="campo"
+              name="nome"
+              autocomplete="name"
+              maxlength="255"
+              [(ngModel)]="nome"
+            />
+          </label>
+          <label class="campo-cfg">
+            <span>E-mail</span>
+            <input
+              class="campo"
+              type="email"
+              name="email"
+              autocomplete="email"
+              [(ngModel)]="email"
+            />
+          </label>
+          <label class="campo-cfg">
+            <span>Telefone</span>
+            <input
+              class="campo"
+              type="tel"
+              name="telefone"
+              autocomplete="tel"
+              maxlength="20"
+              placeholder="(46) 99912-3456"
+              [(ngModel)]="telefone"
+            />
+          </label>
+          @if (mensagem()) {
+            <p class="ok-msg" role="status">{{ mensagem() }}</p>
+          }
+          <button type="submit" class="botao primario largo" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
+          </button>
+        </form>
+
+        <section class="bloco cartao-cfg" aria-labelledby="titulo-filhos">
+          <h2 class="titulo-cfg" id="titulo-filhos">Filhos vinculados</h2>
+          <ul class="filhos">
+            @for (f of d.filhos; track f.id) {
+              <li>
+                <span class="avatar-filho">{{ f.iniciais }}</span>
+                <div>
+                  <strong>{{ f.nome }}</strong>
+                  <small>{{ f.turma ?? 'Sem turma' }} - {{ f.escola }}</small>
+                </div>
+                <span class="ativo">Ativo</span>
+              </li>
+            } @empty {
+              <li class="vazio-lista">Nenhum filho vinculado ainda.</li>
+            }
+          </ul>
+          <button type="button" class="botao largo" (click)="pedirVinculo.set(!pedirVinculo())">
+            + Vincular filho(a)
+          </button>
+          @if (pedirVinculo()) {
+            <p class="nota" role="status">
+              Para vincular outro filho(a), peça à secretaria da escola. Por segurança, só a escola
+              pode ligar um aluno à sua conta.
+            </p>
+          }
+        </section>
+      </div>
+    </div>
+  </div>
+}

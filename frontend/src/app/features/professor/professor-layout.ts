@@ -113,6 +113,19 @@ export class ProfessorLayout {
     const visao = this.contexto.visao();
     if (!visao) return [];
 
+    const pedidos: Notificacao[] = visao.pedidosAjuda.map((p) => ({
+      chave: `ajuda-${p.id}`,
+      cor: 'laranja',
+      titulo: `${p.aluno.split(' ')[0]} pediu ajuda`,
+      texto: `${p.tarefa}${p.passo ? ' - passo ' + p.passo : ''}.`,
+      quando: new Date(p.criadoEm).toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }));
+
     const lista: Notificacao[] = visao.alunosNee
       .filter((a) => a.situacao === 'atencao' && a.resumo.includes('atrasad'))
       .map((a) => ({
@@ -138,6 +151,6 @@ export class ProfessorLayout {
       });
     }
 
-    return lista;
+    return [...pedidos, ...lista];
   });
 }

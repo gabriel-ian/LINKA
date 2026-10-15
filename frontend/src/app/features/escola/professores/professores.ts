@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { ProfessorResumo, StatusProfessor } from '../../../core/model/painel-escola.model';
@@ -30,6 +30,8 @@ export class EscolaProfessores {
   readonly erro = signal('');
   readonly alterando = signal<number | null>(null);
   readonly senha = signal<{ nome: string; email: string; senha: string } | null>(null);
+  /** Volta da tela "Editar professor" com ?salvo=id. */
+  readonly salvo = signal(!!inject(ActivatedRoute).snapshot.queryParamMap.get('salvo'));
 
   readonly professores = this.contexto.professores;
 

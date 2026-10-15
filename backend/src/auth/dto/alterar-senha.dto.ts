@@ -11,3 +11,11 @@ export class AlterarSenhaDto {
   @MinLength(8)
   novaSenha!: string;
 }
+
+/** Primeiro acesso: so a nova senha (a provisoria acabou de ser usada no login). */
+export class CriarSenhaDto {
+  @ApiProperty({ minLength: 8 })
+  @IsString()
+  @MinLength(8)
+  novaSenha!: string;
+}

@@ -28,6 +28,16 @@ export class AuthService {
     return this.http.post(`${this.api}/senha`, { senhaAtual, novaSenha });
   }
 
+  /** Primeiro acesso: troca a senha recebida sem pedir a atual. */
+  criarSenha(novaSenha: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/primeiro-acesso`, { novaSenha });
+  }
+
+  /** Primeiro acesso: continua com a senha recebida. */
+  manterSenha(): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/manter`, {});
+  }
+
   guardarSessao(res: LoginResponse): void {
     localStorage.setItem('token', res.access_token);
     localStorage.setItem('perfil', res.perfil);

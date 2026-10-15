@@ -4,7 +4,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
-import { AlunoDetalhe } from '../../../core/model/painel-escola.model';
+import { AlunoDetalhe, FamiliaCriada } from '../../../core/model/painel-escola.model';
+import { VincularFamilia } from './vincular-familia';
 import { dataBr } from '../../adm/escola-ui';
 import {
   ROTULO_SITUACAO,
@@ -18,7 +19,7 @@ import {
 /** "Escola - Perfil do aluno" do Figma. */
 @Component({
   selector: 'app-escola-aluno-perfil',
-  imports: [RouterLink, SenhaProvisoria],
+  imports: [RouterLink, SenhaProvisoria, VincularFamilia],
   templateUrl: './aluno-perfil.html',
   styleUrl: './aluno-perfil.css',
 })
@@ -39,25 +40,60 @@ export class EscolaAlunoPerfil {
   readonly salvo = signal<string | null>(null);
   readonly senha = signal<{ nome: string; email: string; senha: string } | null>(null);
   readonly gerando = signal<string | null>(null);
+  readonly vinculando = signal(false);
+  readonly avisoFamilia = signal('');
 
   constructor() {
     const rota = inject(ActivatedRoute);
     this.salvo.set(rota.snapshot.queryParamMap.get('salvo'));
-    rota.paramMap.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe((p) =>
-      this.service.aluno(Number(p.get('id'))).subscribe({
-        next: (res) => this.aluno.set(res.data),
-        error: (e: HttpErrorResponse) =>
-          this.erro.set(
-            e.status === 404 ? 'Aluno não encontrado.' : 'Não foi possível carregar o aluno.',
-          ),
-      }),
-    );
+    rota.paramMap
+      .pipe(takeUntilDestroyed(inject(DestroyRef)))
+      .subscribe((p) => this.carregar(Number(p.get('id'))));
+  }
+
+  private carregar(id: number): void {
+    this.service.aluno(id).subscribe({
+      next: (res) => this.aluno.set(res.data),
+      error: (e: HttpErrorResponse) =>
+        this.erro.set(
+          e.status === 404 ? 'Aluno não encontrado.' : 'Não foi possível carregar o aluno.',
+        ),
+    });
+  }
+
+  fecharVinculo(a: AlunoDetalhe, resultado: FamiliaCriada | null): void {
+    this.vinculando.set(false);
+    if (!resultado) return;
+    this.avisoFamilia.set(`${resultado.nome} agora acompanha ${a.nome.split(' ')[0]}.`);
+    if (resultado.senhaProvisoria && resultado.email)
+      this.senha.set({
+        nome: resultado.nome,
+        email: resultado.email,
+        senha: resultado.senhaProvisoria,
+      });
+    this.carregar(a.id);
+  }
+
+  desvincular(a: AlunoDetalhe, responsavelId: number, nome: string): void {
+    if (!confirm(`Desvincular ${nome} de ${a.nome}? A família continua cadastrada na escola.`))
+      return;
+    this.service.desvincularFamilia(a.id, responsavelId).subscribe({
+      next: () => {
+        this.avisoFamilia.set(`${nome} não acompanha mais ${a.nome.split(' ')[0]}.`);
+        this.carregar(a.id);
+      },
+      error: () => this.erro.set('Não foi possível desvincular a família.'),
+    });
   }
 
   subtitulo(a: AlunoDetalhe): string {
     return [
       a.turma?.nome,
-      a.diagnosticos.length ? a.diagnosticos.join(', ') : 'Diagnóstico não informado',
+      !a.neurodivergente
+        ? 'Sem NEE'
+        : a.diagnosticos.length
+          ? a.diagnosticos.join(', ')
+          : 'NEE - diagnóstico não informado',
       a.idade !== null ? `${a.idade} anos` : null,
       a.cgm ? `CGM ${a.cgm}` : null,
     ]

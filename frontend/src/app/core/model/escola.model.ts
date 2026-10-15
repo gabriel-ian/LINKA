@@ -76,4 +76,6 @@ export interface LoginResponse {
   access_token: string;
   perfil: PerfilUsuario;
   escolaId: number | null;
+  /** Entrou com a senha recebida: oferecer criar uma propria ou manter. */
+  trocarSenha?: boolean;
 }

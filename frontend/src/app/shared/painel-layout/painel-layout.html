@@ -3,6 +3,11 @@
     <a [routerLink]="config().secoes[0].itens[0].rota" aria-label="Linka - início">
       <img src="assets/adm/logo.svg" alt="Linka" />
     </a>
+    @if (config().avatar) {
+      <button type="button" class="avatar-topo" aria-label="Conta" (click)="alternar('conta')">
+        {{ config().avatar }}
+      </button>
+    }
   </header>
 
   <div class="barra">
@@ -16,12 +21,28 @@
     >
       <span></span><span></span><span></span>
     </button>
-    <p class="barra-titulo" [class.pequeno]="config().tituloPequeno">
-      {{ config().titulo }}
-      @if (config().detalhe) {
-        <small>{{ config().detalhe }}</small>
-      }
-    </p>
+    @if (config().fala; as fala) {
+      <div class="fala">
+        <img class="mascote" src="assets/aluno/dino.svg" alt="" />
+        <button
+          type="button"
+          class="balao"
+          [class.falando]="voz.falando() === fala"
+          [attr.aria-label]="'Ouvir: ' + fala"
+          (click)="voz.falar(fala)"
+        >
+          <img src="assets/aluno/icone-som.svg" alt="" />
+          <span aria-live="polite">{{ fala }}</span>
+        </button>
+      </div>
+    } @else {
+      <p class="barra-titulo" [class.pequeno]="config().tituloPequeno">
+        {{ config().titulo }}
+        @if (config().detalhe) {
+          <small>{{ config().detalhe }}</small>
+        }
+      </p>
+    }
     <div class="barra-icones">
       <button
         type="button"
@@ -54,31 +75,62 @@
       @for (secao of config().secoes; track secao.titulo; let primeira = $first) {
         <p class="menu-titulo" [class.seguinte]="!primeira">{{ secao.titulo }}</p>
         @for (item of secao.itens; track item.rota) {
-          <a
-            class="menu-item"
-            [routerLink]="item.rota"
-            routerLinkActive=""
-            [routerLinkActiveOptions]="opcoesAtivo(item)"
-            #rla="routerLinkActive"
-            [class.ativo]="item.selecionado || rla.isActive"
-          >
-            <span class="icone">
-              @if (item.icone === 'visao') {
-                <i class="v1"></i><i class="v2"></i><i class="v3"></i><i class="v4"></i>
+          @if (item.aoClicar) {
+            <button
+              type="button"
+              class="menu-item"
+              [class.filho]="item.tom === 'filho'"
+              [class.ativo]="item.selecionado"
+              [attr.aria-pressed]="!!item.selecionado"
+              (click)="item.aoClicar(); menuAberto.set(false)"
+            >
+              <span class="icone">
+                @for (c of camadas(item); track c.src + c.left) {
+                  <img
+                    [src]="c.src + (item.selecionado ? '-ativo' : '') + '.svg'"
+                    alt=""
+                    [style.left.px]="c.left"
+                    [style.top.px]="c.top"
+                  />
+                }
+              </span>
+              {{ item.rotulo }}
+            </button>
+          } @else {
+            <a
+              class="menu-item"
+              [routerLink]="item.rota"
+              routerLinkActive=""
+              [routerLinkActiveOptions]="opcoesAtivo(item)"
+              #rla="routerLinkActive"
+              [class.ativo]="item.selecionado || rla.isActive"
+            >
+              <span class="icone">
+                @if (item.icone === 'visao') {
+                  <i class="v1"></i><i class="v2"></i><i class="v3"></i><i class="v4"></i>
+                }
+                @for (c of camadas(item); track c.src + c.left) {
+                  <img
+                    [src]="c.src + (rla.isActive || item.selecionado ? '-ativo' : '') + '.svg'"
+                    alt=""
+                    [style.left.px]="c.left"
+                    [style.top.px]="c.top"
+                    [style.scale]="c.espelhar ? '-1 1' : null"
+                    [style.rotate.deg]="c.girar ?? null"
+                  />
+                }
+              </span>
+              {{ item.rotulo }}
+              @if (item.contador) {
+                <span
+                  class="menu-contador"
+                  [class.canto]="item.contadorNoCanto"
+                  [attr.aria-label]="item.contador + ' pendentes'"
+                  >{{ item.contador }}</span
+                >
               }
-              @for (c of camadas(item); track c.src + c.left) {
-                <img
-                  [src]="c.src + (rla.isActive || item.selecionado ? '-ativo' : '') + '.svg'"
-                  alt=""
-                  [style.left.px]="c.left"
-                  [style.top.px]="c.top"
-                  [style.scale]="c.espelhar ? '-1 1' : null"
-                  [style.rotate.deg]="c.girar ?? null"
-                />
-              }
-            </span>
-            {{ item.rotulo }}
-          </a>
+            </a>
+          }
         }
       }
     </nav>

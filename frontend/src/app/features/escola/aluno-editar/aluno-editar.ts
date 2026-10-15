@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { forkJoin } from 'rxjs';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { AlunoDetalhe, Opcoes } from '../../../core/model/painel-escola.model';
@@ -36,6 +37,7 @@ export class EscolaAlunoEditar {
   readonly opcoes = signal<Opcoes | null>(null);
   readonly diagnosticos = signal<Set<number>>(new Set());
   readonly prefiroNaoInformar = signal(false);
+  readonly nee = signal(false);
   readonly laudo = signal<File | null>(null);
   readonly erroLaudo = signal('');
   readonly erroNome = signal(false);
@@ -66,6 +68,7 @@ export class EscolaAlunoEditar {
           ),
         );
         this.prefiroNaoInformar.set(aluno.neurodivergente && aluno.diagnosticos.length === 0);
+        this.nee.set(aluno.neurodivergente);
         this.dificuldades.set(aluno.dificuldades ?? '');
         this.pontosFortes.set(aluno.pontosFortes ?? '');
         this.interesses.set(aluno.interesses);
@@ -75,6 +78,16 @@ export class EscolaAlunoEditar {
           e.status === 404 ? 'Aluno não encontrado.' : 'Não foi possível carregar o aluno.',
         ),
     });
+  }
+
+  /** Desmarcar NEE limpa os diagnosticos (o laudo ja enviado continua guardado). */
+  alternarNee(): void {
+    this.nee.update((v) => !v);
+    if (!this.nee()) {
+      this.diagnosticos.set(new Set());
+      this.prefiroNaoInformar.set(false);
+      this.laudo.set(null);
+    }
   }
 
   alternarDiagnostico(id: number): void {
@@ -106,6 +119,10 @@ export class EscolaAlunoEditar {
       this.erro.set('A data de nascimento não pode ser no futuro.');
       return;
     }
+    if (this.nee() && !this.diagnosticos().size && !this.prefiroNaoInformar()) {
+      this.erro.set('Selecione um diagnóstico ou "Prefiro não informar".');
+      return;
+    }
 
     this.salvando.set(true);
     this.erro.set('');
@@ -115,8 +132,8 @@ export class EscolaAlunoEditar {
         dataNascimento: this.nascimento || null,
         cgm: this.cgm.trim() || null,
         turmaId: this.turmaId,
-        diagnosticoIds: [...this.diagnosticos()],
-        prefiroNaoInformar: this.prefiroNaoInformar(),
+        diagnosticoIds: this.nee() ? [...this.diagnosticos()] : [],
+        prefiroNaoInformar: this.nee() && this.prefiroNaoInformar(),
         dificuldades: this.dificuldades().trim() || null,
         pontosFortes: this.pontosFortes().trim() || null,
         interesses: this.interesses(),
@@ -132,9 +149,7 @@ export class EscolaAlunoEditar {
         },
         error: (e: HttpErrorResponse) => {
           this.salvando.set(false);
-          this.erro.set(
-            [e.error?.message].flat().join(' ') || 'Não foi possível salvar as alterações.',
-          );
+          this.erro.set(mensagemDeErro(e, 'Não foi possível salvar as alterações.'));
         },
       });
   }

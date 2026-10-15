@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { EscolaService } from '../../../core/services/escola.service';
 import { Escola } from '../../../core/model/escola.model';
 import {
@@ -98,7 +99,7 @@ export class BuscarId {
       },
       error: (err: HttpErrorResponse) => {
         this.redefinindo.set(false);
-        this.erro.set(err.error?.message ?? 'Não foi possível redefinir a senha.');
+        this.erro.set(mensagemDeErro(err, 'Não foi possível redefinir a senha.'));
       },
     });
   }

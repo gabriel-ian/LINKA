@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
 import { AlunoDaTurma } from '../../../core/model/painel-professor.model';
 import { ProfessorContexto } from '../professor-contexto';
@@ -92,9 +93,7 @@ export class ProfessorTarefaNova {
         },
         error: (err: HttpErrorResponse) => {
           this.salvando.set(false);
-          this.erroGeral.set(
-            [err.error?.message].flat().join(' ') || 'Não foi possível criar a tarefa.',
-          );
+          this.erroGeral.set(mensagemDeErro(err, 'Não foi possível criar a tarefa.'));
         },
       });
   }

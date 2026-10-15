@@ -52,6 +52,18 @@ export interface VisaoTurma {
     resumo: string;
   }[];
   tarefasRecentes: TarefaRecente[];
+  pedidosAjuda: PedidoAjuda[];
+}
+
+/** "Avisar a professora" na tela de ajuda do aluno (ainda nao visto). */
+export interface PedidoAjuda {
+  id: number;
+  passo: number | null;
+  criadoEm: string;
+  alunoId: number;
+  aluno: string;
+  tarefaId: number;
+  tarefa: string;
 }
 
 export interface AlunoDaTurma {
@@ -110,6 +122,8 @@ export interface TarefaProfessor {
   totalAlunos: number;
   iaDisponivel: boolean;
   adaptacoes: Adaptacao[];
+  /** Pedidos de ajuda desta tarefa (abrir a tarefa marca como vistos). */
+  pedidosAjuda: PedidoAjuda[];
 }
 
 export interface NovaTarefa {

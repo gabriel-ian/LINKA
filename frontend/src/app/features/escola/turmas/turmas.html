@@ -2,7 +2,8 @@
   <header class="painel-cabecalho">
     <h1>Turmas</h1>
     <p>
-      {{ contexto.escola()?.nome }} - {{ turmas().length }} turmas cadastradas - ano letivo
+      {{ contexto.escola()?.nome }} -
+      {{ turmas().length | plural: 'turma cadastrada' : 'turmas cadastradas' }} - ano letivo
       {{ ano }}
     </p>
   </header>
@@ -37,7 +38,9 @@
             <p>{{ t.professores[0]?.nome ?? 'Sem professor vinculado' }}</p>
           </div>
         </div>
-        <p class="totais">{{ t.totalAlunos }} alunos · {{ t.totalNee }} NEE</p>
+        <p class="totais">
+          {{ t.totalAlunos | plural: 'aluno' : 'alunos' }} · {{ t.totalNee }} NEE
+        </p>
         <div class="barra-linha">
           <span class="progresso"><span [style.width.%]="t.desempenho ?? 0"></span></span>
           <span class="pilula-cor">{{ pct(t.desempenho) }}</span>

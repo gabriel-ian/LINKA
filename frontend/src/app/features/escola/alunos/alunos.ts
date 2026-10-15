@@ -1,3 +1,4 @@
+import { PluralPipe } from '../../../shared/plural.pipe';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EscolaContexto } from '../escola-contexto';
@@ -6,10 +7,10 @@ import { ROTULO_SITUACAO, corDaSituacao, iniciaisPessoa, percentual } from '../e
 const POR_PAGINA = 6;
 const DESTAQUES = ['TDAH', 'TEA', 'Dislexia'];
 
-/** "Escola - Alunos NEE" do Figma. */
+/** "Escola - Alunos NEE" do Figma, agora com todos os alunos (filtro NEE). */
 @Component({
   selector: 'app-escola-alunos',
-  imports: [RouterLink],
+  imports: [RouterLink, PluralPipe],
   templateUrl: './alunos.html',
   styleUrl: './alunos.css',
 })
@@ -26,14 +27,20 @@ export class EscolaAlunos {
   readonly busca = signal('');
   readonly turma = signal(inject(ActivatedRoute).snapshot.queryParamMap.get('turma') ?? '');
   readonly diagnostico = signal('');
+  /** '' = todos, 'nee' = com NEE, 'sem' = sem NEE. */
+  readonly grupo = signal<'' | 'nee' | 'sem'>('');
   readonly pagina = signal(0);
 
   readonly alunosNee = computed(() => this.contexto.alunos().filter((a) => a.neurodivergente));
 
+  readonly semTurma = computed(() => this.contexto.alunos().filter((a) => !a.turma).length);
+
   readonly turmas = computed(() => {
     const mapa = new Map<number, string>();
-    for (const a of this.alunosNee()) if (a.turma) mapa.set(a.turma.id, a.turma.nome);
-    return [...mapa].map(([id, nome]) => ({ id, nome }));
+    for (const a of this.contexto.alunos()) if (a.turma) mapa.set(a.turma.id, a.turma.nome);
+    return [...mapa]
+      .map(([id, nome]) => ({ id, nome }))
+      .sort((x, y) => x.nome.localeCompare(y.nome));
   });
 
   readonly diagnosticos = computed(() =>
@@ -60,12 +67,16 @@ export class EscolaAlunos {
 
   readonly filtrados = computed(() => {
     const termo = this.busca().trim().toLowerCase();
-    return this.alunosNee().filter(
-      (a) =>
-        (!this.turma() || String(a.turma?.id) === this.turma()) &&
-        (!this.diagnostico() || a.diagnosticos.includes(this.diagnostico())) &&
-        (!termo || a.nome.toLowerCase().includes(termo) || (a.cgm ?? '').includes(termo)),
-    );
+    return this.contexto
+      .alunos()
+      .filter(
+        (a) =>
+          (!this.grupo() || a.neurodivergente === (this.grupo() === 'nee')) &&
+          (!this.turma() ||
+            (this.turma() === 'sem' ? !a.turma : String(a.turma?.id) === this.turma())) &&
+          (!this.diagnostico() || a.diagnosticos.includes(this.diagnostico())) &&
+          (!termo || a.nome.toLowerCase().includes(termo) || (a.cgm ?? '').includes(termo)),
+      );
   });
 
   readonly totalPaginas = computed(() =>

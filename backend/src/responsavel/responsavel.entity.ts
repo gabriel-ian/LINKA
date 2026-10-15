@@ -10,8 +10,9 @@ import { Usuario } from '../usuario/usuario.entity';
 /**
  * Tabela `responsavel`. Email e senha ficam no `usuario` vinculado por
  * usuario_id (perfil = 'responsavel'), mesmo padrao do `professor`.
- * Nao tem escola_id: o responsavel pode acompanhar alunos de escolas
- * diferentes; o escopo de acesso vem de `aluno_responsavel`.
+ * escola_id e a escola que cadastrou a familia (para ela achar a familia
+ * antes de ter filho vinculado). O acesso continua vindo de
+ * `aluno_responsavel`: o responsavel pode ter filhos em outra escola.
  */
 @Entity('responsavel')
 export class Responsavel {
@@ -33,8 +34,15 @@ export class Responsavel {
   @Column({ type: 'varchar', length: 30, nullable: true })
   parentesco!: string | null;
 
+  /** Avisos escolhidos em "Configuracoes" (painel da familia). */
+  @Column({ type: 'json', nullable: true })
+  preferencias!: Record<string, unknown> | null;
+
   @Column({ name: 'usuario_id', nullable: true })
   usuarioId!: number | null;
+
+  @Column({ name: 'escola_id', type: 'int', unsigned: true, nullable: true })
+  escolaId!: number | null;
 
   @ManyToOne(() => Usuario, { nullable: true })
   @JoinColumn({ name: 'usuario_id' })

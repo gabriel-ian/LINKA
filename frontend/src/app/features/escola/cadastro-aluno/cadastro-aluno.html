@@ -27,7 +27,8 @@
       erro('senha') ||
       erro('nascimento') ||
       erro('respNome') ||
-      erro('respEmail')
+      erro('respEmail') ||
+      erro('familia')
     ) {
       <p class="alerta-erro" role="alert">
         Faltam algumas informações. Confira os campos em vermelho.
@@ -68,9 +69,12 @@
             <span class="msg-erro">{{ erro('nascimento') }}</span>
           }
         </label>
-        <label class="campo-p">
+        <label class="campo-p" [class.invalido]="erro('cgm')">
           CGM do aluno (ID)
           <input name="cgm" maxlength="50" [(ngModel)]="cgm" placeholder="Ex.: 3517439" />
+          @if (erro('cgm')) {
+            <span class="msg-erro">{{ erro('cgm') }}</span>
+          }
         </label>
         <label class="campo-p">
           Turma
@@ -92,8 +96,13 @@
               [disabled]="!email.trim()"
               [placeholder]="email.trim() ? 'Mínimo 8 caracteres' : 'Informe o e-mail primeiro'"
             />
-            <button type="button" (click)="mostrarSenha = !mostrarSenha">
-              {{ mostrarSenha ? 'ocultar' : 'mostrar' }}
+            <button
+              type="button"
+              [attr.aria-label]="mostrarSenha ? 'Esconder senha' : 'Mostrar senha'"
+              [attr.aria-pressed]="mostrarSenha"
+              (click)="mostrarSenha = !mostrarSenha"
+            >
+              <img src="assets/entrada/icone-olho.svg" alt="" />
             </button>
           </span>
           @if (erro('senha')) {
@@ -106,113 +115,101 @@
 
       <div>
         <h2 class="cartao-titulo">Necessidades educacionais</h2>
-        <p class="ajuda">
-          Selecione os diagnósticos que se aplicam - a Linka adapta as tarefas a partir deles
-        </p>
-        <div class="diagnosticos">
-          @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
+        <label class="marcar">
+          <input type="checkbox" name="nee" [checked]="nee()" (change)="alternarNee()" />
+          Este aluno tem necessidades educacionais especiais (NEE)
+        </label>
+      </div>
+
+      @if (nee()) {
+        <div [class.invalido]="erro('diagnostico')">
+          <p class="ajuda">
+            Selecione os diagnósticos que se aplicam - a Linka adapta as tarefas a partir deles
+          </p>
+          <div class="diagnosticos">
+            @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
+              <button
+                type="button"
+                class="diagnostico"
+                [attr.aria-pressed]="diagnosticos().has(d.id)"
+                (click)="alternarDiagnostico(d.id)"
+              >
+                {{ d.nome }}
+              </button>
+            }
             <button
               type="button"
               class="diagnostico"
-              [attr.aria-pressed]="diagnosticos().has(d.id)"
-              (click)="alternarDiagnostico(d.id)"
+              [attr.aria-pressed]="prefiroNaoInformar()"
+              (click)="alternarPrefiro()"
             >
-              {{ d.nome }}
+              Prefiro não informar
             </button>
+          </div>
+          @if (erro('diagnostico')) {
+            <span class="msg-erro">{{ erro('diagnostico') }}</span>
           }
-          <button
-            type="button"
-            class="diagnostico"
-            [attr.aria-pressed]="prefiroNaoInformar()"
-            (click)="alternarPrefiro()"
-          >
-            Prefiro não informar
-          </button>
         </div>
-      </div>
 
-      <div
-        class="laudo"
-        [class.arrastando]="arrastando()"
-        [class.invalido]="erro('laudo')"
-        (dragover)="$event.preventDefault(); arrastando.set(true)"
-        (dragleave)="arrastando.set(false)"
-        (drop)="soltar($event)"
-      >
-        <div>
-          <strong>Laudo clínico (opcional)</strong>
-          @if (laudo(); as l) {
-            <span>{{ l.name }} - {{ (l.size / 1024 / 1024).toFixed(1) }} MB</span>
+        <div
+          class="laudo"
+          [class.arrastando]="arrastando()"
+          [class.invalido]="erro('laudo')"
+          (dragover)="$event.preventDefault(); arrastando.set(true)"
+          (dragleave)="arrastando.set(false)"
+          (drop)="soltar($event)"
+        >
+          <div>
+            <strong>Laudo clínico (opcional)</strong>
+            @if (laudo(); as l) {
+              <span>{{ l.name }} - {{ (l.size / 1024 / 1024).toFixed(1) }} MB</span>
+            } @else {
+              <span>Arraste o arquivo aqui ou clique para anexar - PDF ou imagem, até 10 MB</span>
+            }
+            @if (erro('laudo')) {
+              <span class="msg-erro">{{ erro('laudo') }}</span>
+            }
+          </div>
+          @if (laudo()) {
+            <button type="button" class="bt bt-secundario" (click)="laudo.set(null)">
+              Remover
+            </button>
           } @else {
-            <span>Arraste o arquivo aqui ou clique para anexar - PDF ou imagem, até 10 MB</span>
-          }
-          @if (erro('laudo')) {
-            <span class="msg-erro">{{ erro('laudo') }}</span>
+            <label class="bt bt-secundario">
+              Anexar laudo
+              <input
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+                hidden
+                (change)="escolherLaudo($any($event.target).files)"
+              />
+            </label>
           }
         </div>
-        @if (laudo()) {
-          <button type="button" class="bt bt-secundario" (click)="laudo.set(null)">Remover</button>
-        } @else {
-          <label class="bt bt-secundario">
-            Anexar laudo
-            <input
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
-              hidden
-              (change)="escolherLaudo($any($event.target).files)"
-            />
-          </label>
-        }
-      </div>
+      }
 
       <hr class="divisor" />
 
       <div>
         <h2 class="cartao-titulo">Responsável</h2>
-        <p class="ajuda">A família recebe um acesso para acompanhar o aluno</p>
+        <p class="ajuda">
+          A família recebe um acesso para acompanhar o aluno. Irmãos usam a mesma família.
+        </p>
       </div>
 
-      <div class="grade-campos">
-        <label class="campo-p" [class.invalido]="erro('respNome')">
-          Nome completo do responsável
-          <input name="respNome" [(ngModel)]="respNome" placeholder="Nome do responsável" />
-          @if (erro('respNome')) {
-            <span class="msg-erro">{{ erro('respNome') }}</span>
-          }
-        </label>
-        <label class="campo-p" [class.invalido]="erro('respEmail')">
-          E-mail
-          <input
-            name="respEmail"
-            type="email"
-            autocomplete="off"
-            [(ngModel)]="respEmail"
-            placeholder="familiar@email.com"
-          />
-          @if (erro('respEmail')) {
-            <span class="msg-erro">{{ erro('respEmail') }}</span>
-          }
-        </label>
-        <label class="campo-p">
-          Telefone
-          <input
-            name="respTelefone"
-            type="tel"
-            maxlength="20"
-            [(ngModel)]="respTelefone"
-            placeholder="(00) 00000-0000"
-          />
-        </label>
-        <label class="campo-p">
-          Parentesco
-          <select name="respParentesco" [(ngModel)]="respParentesco">
-            <option value="">Selecione</option>
-            @for (p of parentescos; track p) {
-              <option [value]="p">{{ p }}</option>
-            }
-          </select>
-        </label>
-      </div>
+      <app-escolha-familia
+        [(modo)]="modoFamilia"
+        [(familia)]="familia"
+        [(nome)]="respNome"
+        [(email)]="respEmail"
+        [(telefone)]="respTelefone"
+        [(parentesco)]="respParentesco"
+        [erros]="{
+          respNome: erro('respNome'),
+          respEmail: erro('respEmail'),
+          familia: erro('familia'),
+        }"
+      />
 
       <div class="acoes">
         <a class="bt bt-secundario" routerLink="/escola/alunos">Cancelar</a>
@@ -261,9 +258,28 @@
         </div>
       </dl>
 
-      @if (respNome) {
+      @if (modoFamilia === 'existente' && familia; as f) {
         <hr class="divisor" />
-        <h2 class="cartao-titulo">Responsável</h2>
+        <h2 class="cartao-titulo">Responsável (família já cadastrada)</h2>
+        <dl class="dados-grade">
+          <div>
+            <dt>Nome completo</dt>
+            <dd>{{ f.nome }}</dd>
+          </div>
+          <div>
+            <dt>E-mail</dt>
+            <dd>{{ f.email || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Já tem na escola</dt>
+            <dd>
+              {{ f.filhos.length ? juntar(f.filhos.map((x) => x.nome)) : 'Nenhum filho ainda' }}
+            </dd>
+          </div>
+        </dl>
+      } @else if (modoFamilia === 'nova') {
+        <hr class="divisor" />
+        <h2 class="cartao-titulo">Responsável (nova família)</h2>
         <dl class="dados-grade">
           <div>
             <dt>Nome completo</dt>
@@ -277,14 +293,33 @@
             <dt>Parentesco</dt>
             <dd>{{ respParentesco || '—' }}</dd>
           </div>
+          <div>
+            <dt>Telefone</dt>
+            <dd>{{ respTelefone || '—' }}</dd>
+          </div>
         </dl>
       }
 
       <p class="aviso-caixa roxo">
-        A Linka vai montar o perfil de aprendizagem de {{ nome.split(' ')[0] }} a partir do
-        diagnóstico{{
-          respNome ? ', e ' + respNome + ' recebe um acesso para acompanhar a rotina.' : '.'
-        }}
+        <span>
+          @if (nomesDiagnosticos().length) {
+            A Linka vai montar o perfil de aprendizagem de {{ nome.split(' ')[0] }} a partir do
+            diagnóstico.
+          } @else if (prefiroNaoInformar()) {
+            {{ nome.split(' ')[0] }} entra como aluno(a) NEE sem diagnóstico informado.
+          } @else {
+            Nenhum diagnóstico marcado: {{ nome.split(' ')[0] }} fica cadastrado(a) sem NEE. Dá para
+            completar depois, em Editar aluno.
+          }
+          @if (nomeResponsavel()) {
+            {{ nomeResponsavel() }}
+            {{
+              modoFamilia === 'existente'
+                ? 'passa a acompanhar também este(a) filho(a).'
+                : 'recebe um acesso para acompanhar a rotina.'
+            }}
+          }
+        </span>
       </p>
 
       <div class="acoes">
@@ -329,10 +364,15 @@
       @if (avisoLaudo()) {
         <p extra class="alerta-erro centro">{{ avisoLaudo() }}</p>
       }
+      @if (c.responsavel) {
+        <button type="button" class="bt bt-secundario" (click)="cadastrarOutro(true)">
+          Cadastrar outro filho desta família
+        </button>
+      }
       <button type="button" class="bt bt-secundario" (click)="cadastrarOutro()">
-        Cadastrar outro
+        Cadastrar outro aluno
       </button>
-      <a class="bt bt-primario" routerLink="/escola/alunos">Ver alunos NEE</a>
+      <a class="bt bt-primario" routerLink="/escola/alunos">Ver alunos</a>
     </app-adm-resultado>
   }
 </div>

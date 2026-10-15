@@ -1,3 +1,4 @@
+import { PluralPipe } from '../../../shared/plural.pipe';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -14,7 +15,7 @@ const POR_PAGINA = 7;
 /** "Professor - Turma" do Figma. */
 @Component({
   selector: 'app-professor-turma',
-  imports: [RouterLink],
+  imports: [RouterLink, PluralPipe],
   templateUrl: './turma.html',
   styleUrl: './turma.css',
 })

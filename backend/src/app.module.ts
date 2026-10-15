@@ -22,6 +22,8 @@ import { TarefaAdaptadaModule } from './tarefa-adaptada/tarefa-adaptada.module';
 import { TarefaStatusModule } from './tarefa-status/tarefa-status.module';
 import { PainelEscolaModule } from './painel-escola/painel-escola.module';
 import { PainelProfessorModule } from './painel-professor/painel-professor.module';
+import { PainelAlunoModule } from './painel-aluno/painel-aluno.module';
+import { PainelFamiliaModule } from './painel-familia/painel-familia.module';
 
 @Module({
   imports: [
@@ -66,6 +68,8 @@ import { PainelProfessorModule } from './painel-professor/painel-professor.modul
     TarefaStatusModule,
     PainelEscolaModule,
     PainelProfessorModule,
+    PainelAlunoModule,
+    PainelFamiliaModule,
   ],
   controllers: [AdminController],
   providers: [],

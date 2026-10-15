@@ -1,0 +1,95 @@
+@if (dados(); as d) {
+  <div class="pagina larga">
+    <header class="cabecalho">
+      <h1>Avisos da escola</h1>
+      <p>{{ d.filho.nome }}{{ d.filho.turma ? ' - ' + d.filho.turma : '' }}</p>
+    </header>
+
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    @if (!naoLidos().length && !verAntigos()) {
+      <section class="bloco confirmacao">
+        <span class="ok" aria-hidden="true">ok</span>
+        <h2>Você está em dia!</h2>
+        <p>
+          Não há avisos novos da escola. Quando um professor ou a coordenação enviar algo, aparece
+          aqui e você recebe uma notificação.
+        </p>
+        <div class="botoes">
+          @if (lidos().length) {
+            <button type="button" class="botao" (click)="verAntigos.set(true)">
+              Ver avisos antigos
+            </button>
+          }
+          <a class="botao primario" routerLink="/familia">Voltar ao painel</a>
+        </div>
+      </section>
+    } @else {
+      <div class="colunas">
+        <section aria-labelledby="titulo-nao-lidos">
+          <h2 class="coluna-titulo" id="titulo-nao-lidos">NÃO LIDOS</h2>
+          <ul class="bloco lista">
+            @for (a of naoLidos(); track a.id) {
+              <ng-container *ngTemplateOutlet="item; context: { $implicit: a }"></ng-container>
+            } @empty {
+              <li class="vazio-lista">Nenhum aviso novo.</li>
+            }
+          </ul>
+        </section>
+
+        <section aria-labelledby="titulo-lidos">
+          <h2 class="coluna-titulo" id="titulo-lidos">LIDOS</h2>
+          <ul class="bloco lista">
+            @for (a of lidos(); track a.id) {
+              <ng-container *ngTemplateOutlet="item; context: { $implicit: a }"></ng-container>
+            } @empty {
+              <li class="vazio-lista">Nenhum aviso lido ainda.</li>
+            }
+          </ul>
+        </section>
+
+        <section class="bloco resumo" aria-labelledby="titulo-resumo">
+          <h2 id="titulo-resumo">
+            <img src="assets/familia/icone-relatorio.svg" alt="" width="20" height="20" />
+            Relatório semanal
+          </h2>
+          <p>
+            <img src="assets/familia/icone-resumo.svg" alt="" width="11" height="15" />
+            {{ d.resumoSemanal }}
+          </p>
+        </section>
+      </div>
+    }
+  </div>
+} @else if (erro()) {
+  <p class="alerta-erro" role="alert">{{ erro() }}</p>
+}
+
+<ng-template #item let-a>
+  <li class="aviso" [class.lido]="a.lido">
+    <span class="tipo-icone" [class]="'tipo-icone ' + a.tipo">
+      <img [src]="icone(a)" alt="" width="24" height="24" />
+    </span>
+    <div class="aviso-texto">
+      <h3>{{ a.titulo }}</h3>
+      <p>{{ simples().has(a.id) && a.simplificada ? a.simplificada : a.mensagem }}</p>
+      <div class="meta">
+        <span class="etiqueta" [class]="'etiqueta ' + a.tipo">{{ rotulo(a) }}</span>
+        <small>{{ quando(a) }}</small>
+      </div>
+      <strong class="autor">{{ a.autor }}</strong>
+      <div class="acoes-aviso">
+        @if (a.simplificada) {
+          <button type="button" class="link-acao" (click)="alternarSimples(a.id)">
+            {{ simples().has(a.id) ? 'Ver texto original' : 'Ver versão simplificada' }}
+          </button>
+        }
+        @if (!a.lido) {
+          <button type="button" class="link-acao" (click)="marcarLido(a)">Marcar como lido</button>
+        }
+      </div>
+    </div>
+  </li>
+</ng-template>

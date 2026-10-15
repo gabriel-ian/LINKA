@@ -12,6 +12,15 @@
       </p>
     </header>
 
+    @for (p of t.pedidosAjuda; track p.id) {
+      <p class="aviso-caixa laranja" role="status">
+        <span
+          ><strong>{{ p.aluno }}</strong> pediu ajuda{{ p.passo ? ' no passo ' + p.passo : '' }}.
+          Veja a versão adaptada dele abaixo.</span
+        >
+      </p>
+    }
+
     @if (gerando()) {
       <p class="aviso-caixa roxo" role="status">
         <span class="girando" aria-hidden="true">✦</span>
@@ -20,14 +29,17 @@
       </p>
     } @else {
       <p class="aviso-caixa verde forte">
-        Tarefa enviada para os {{ t.totalAlunos }} alunos.
-        @if (t.adaptacoes.length) {
-          {{
-            geradas() === t.adaptacoes.length
-              ? 'Todas as ' + geradas() + ' versões adaptadas para os alunos NEE estão prontas.'
-              : geradas() + ' de ' + t.adaptacoes.length + ' versões adaptadas prontas.'
-          }}
-        }
+        <span>
+          Tarefa enviada para
+          {{ t.totalAlunos === 1 ? '1 aluno' : 'os ' + t.totalAlunos + ' alunos' }}.
+          @if (t.adaptacoes.length) {
+            {{
+              geradas() === t.adaptacoes.length
+                ? 'Todas as ' + geradas() + ' versões adaptadas para os alunos NEE estão prontas.'
+                : geradas() + ' de ' + t.adaptacoes.length + ' versões adaptadas prontas.'
+            }}
+          }
+        </span>
       </p>
     }
 

@@ -1,0 +1,140 @@
+@if (contexto.painel(); as p) {
+  <div class="pagina">
+    <header class="cabecalho">
+      <h1>Painel familiar</h1>
+      <p>Acompanhe a rotina de {{ p.filho.primeiroNome }} em tempo real - {{ hoje }}</p>
+    </header>
+
+    @if (p.alerta; as a) {
+      <a
+        class="alerta"
+        routerLink="/familia/incentivo"
+        [queryParams]="{ tarefa: a.id }"
+        aria-label="Enviar um incentivo"
+      >
+        <img src="assets/aluno/icone-relogio.svg" alt="" width="26" height="26" />
+        <span>
+          {{ p.filho.primeiroNome }} tem uma tarefa
+          @if (a.disciplina) {
+            de <strong>{{ a.disciplina }}</strong>
+          } @else {
+            <strong>{{ a.titulo }}</strong>
+          }
+          com prazo <strong>{{ prazoAlerta() }}</strong> e ainda não começou. Que tal dar um
+          incentivo?
+        </span>
+      </a>
+    }
+
+    <div class="numeros">
+      <a class="numero vermelho" routerLink="/familia/avisos">
+        <span>Avisos da escola</span>
+        <strong>{{ p.avisosNaoLidos }}</strong>
+        <small>{{ p.avisosNaoLidos === 1 ? 'Não lido' : 'Não lidos' }}</small>
+      </a>
+
+      <div class="numero azul">
+        <span>Tarefas esta semana</span>
+        @if (p.semana !== null) {
+          <strong>{{ p.semana }}<small class="pct">%</small></strong>
+        } @else {
+          <strong>—</strong>
+        }
+        <span class="barra" aria-hidden="true"><i [style.width.%]="p.semana ?? 0"></i></span>
+      </div>
+
+      <div class="numero roxo">
+        <img class="estrela" src="assets/aluno/estrela.svg" alt="" />
+        <span>Pontos</span>
+        <strong>{{ p.pontos.total }}</strong>
+        <small>+{{ p.pontos.hoje }} hoje</small>
+      </div>
+    </div>
+
+    <div class="baixo">
+      <section class="bloco tarefas" aria-labelledby="titulo-tarefas">
+        <h2 id="titulo-tarefas">
+          <img src="assets/aluno/icone-lista.svg" alt="" width="16.5" height="16.5" />
+          Tarefas de {{ p.filho.primeiroNome }} hoje
+        </h2>
+        <ul>
+          @for (t of lista(); track t.id) {
+            <li><app-item-tarefa [tarefa]="t" /></li>
+          } @empty {
+            <li class="vazio-lista">Nenhuma tarefa para os próximos dias.</li>
+          }
+        </ul>
+
+        <h2 id="titulo-autonomia">
+          <img src="assets/familia/icone-autonomia.svg" alt="" width="16" height="16" />
+          Autonomia desta semana
+        </h2>
+        <div class="autonomia" aria-labelledby="titulo-autonomia">
+          <div>
+            <strong class="verde">{{ p.autonomia.sozinho }}</strong>
+            <span>Iniciou<br />sozinho</span>
+          </div>
+          <div>
+            <strong class="azul">{{ p.autonomia.comLembrete }}</strong>
+            <span>com<br />lembrete</span>
+          </div>
+          <div>
+            <strong class="laranja">{{ p.autonomia.naoIniciada }}</strong>
+            <span>Não<br />iniciada</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="direita">
+        <section class="bloco materias-bloco" aria-labelledby="titulo-materias">
+          <h2 id="titulo-materias">
+            <img src="assets/familia/icone-materias.svg" alt="" width="16" height="15" />
+            Progresso por matéria
+          </h2>
+          <ul class="materias">
+            @for (m of p.porMateria; track m.disciplina; let i = $index) {
+              <li class="materia">
+                <strong>{{ m.disciplina }}</strong>
+                <span [style.color]="cor(i).texto">{{
+                  m.taxa === null ? 'sem prazo' : m.taxa + '%'
+                }}</span>
+                <span class="trilho" aria-hidden="true"
+                  ><i [style.width.%]="m.taxa ?? 0" [style.background]="cor(i).barra"></i
+                ></span>
+              </li>
+            } @empty {
+              <li class="vazio-lista">Ainda não há tarefas neste mês.</li>
+            }
+          </ul>
+        </section>
+
+        <section class="bloco linha-bloco" aria-labelledby="titulo-linha">
+          <h2 id="titulo-linha">
+            <img src="assets/familia/icone-linha-tempo.svg" alt="" width="16" height="16" />
+            Linha do tempo hoje
+          </h2>
+          <ol class="linha">
+            @for (e of p.linhaDoTempo; track $index) {
+              <li>
+                <img
+                  [src]="'assets/familia/' + ponto[e.cor] + '.svg'"
+                  alt=""
+                  width="11"
+                  height="11"
+                />
+                <div>
+                  <strong>{{ e.titulo }}</strong>
+                  <span>{{ e.detalhe }}</span>
+                </div>
+              </li>
+            } @empty {
+              <li class="vazio-lista">Nada aconteceu hoje ainda.</li>
+            }
+          </ol>
+        </section>
+      </div>
+    </div>
+  </div>
+} @else if (!contexto.erro()) {
+  <p class="carregando">Carregando...</p>
+}

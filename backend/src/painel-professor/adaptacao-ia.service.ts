@@ -26,6 +26,7 @@ const AdaptacoesSchema = z.object({
       alunoId: z.number().int(),
       passos: z.array(z.string()),
       recursos: z.array(z.string()),
+      materiais: z.array(z.string()),
     }),
   ),
 });
@@ -42,7 +43,22 @@ Regras:
 - Ajuste ao perfil: para TDAH, o primeiro passo prepara o material e os passos dividem o trabalho em blocos pequenos; para TEA, linguagem literal e previsível, sem metáforas; para dislexia, frases ainda mais curtas e palavras simples; para discalculia, explicite cada operação numérica.
 - Quando fizer sentido, use um interesse do aluno em um exemplo, sem mudar a tarefa.
 - Em "recursos", liste de 1 a 3 etiquetas curtas descrevendo o que você usou, como "5 passos curtos", "Linguagem literal" ou "Exemplo com dinossauros".
+- Em "materiais", liste de 0 a 4 objetos que o aluno precisa ter em mãos, em poucas palavras ("Caderno de Matemática", "Lápis", "Régua"). Só o que a tarefa pede ou claramente exige.
 - Devolva uma adaptação para cada alunoId recebido, usando o mesmo alunoId.`;
+
+const AjudaSchema = z.object({ texto: z.string(), pergunta: z.string() });
+
+const INSTRUCOES_AJUDA = `Você é o mascote da Linka, que ajuda um aluno com necessidades educacionais especiais (TDAH, TEA, dislexia, discalculia...) a destravar um passo de uma tarefa escolar, em português do Brasil.
+
+Você recebe a tarefa, o passo em que o aluno travou, o perfil dele e o tipo de ajuda:
+- "explicar": explique o MESMO passo de outro jeito, com uma comparação usando um interesse do aluno (se houver).
+- "exemplo": mostre um exemplo PARECIDO, com outros números ou outro texto, resolvido passo a passo.
+
+Regras:
+- Nunca resolva o exercício da tarefa nem dê a resposta dele. O exemplo deve ser diferente do exercício real.
+- "texto": de 2 a 4 frases curtas, falando direto com o aluno, sem metáforas confusas para quem tem TEA.
+- "pergunta": uma pergunta curta que leva o aluno de volta ao passo (ex.: "Agora volte ao exercício 5: quantas partes você tem?").
+- O texto será lido em voz alta.`;
 
 const INSTRUCOES_COMUNICADO = `Você é a assistente pedagógica da Linka. Reescreva o aviso do professor em uma versão simplificada para alunos com necessidades educacionais especiais, em português do Brasil: frases curtas, linguagem literal, sem metáforas, mantendo todas as informações (datas, horários, o que levar ou estudar). Não acrescente nada que não esteja no aviso. O texto será lido em voz alta para o aluno.`;
 
@@ -92,6 +108,24 @@ export class AdaptacaoIaService {
       SimplificadoSchema,
     );
     return resposta.texto;
+  }
+
+  /** Tela "Precisa de ajuda?": explica o passo de outro jeito ou da um exemplo parecido. */
+  async ajudarPasso(dados: {
+    tipo: 'explicar' | 'exemplo';
+    tarefa: { titulo: string; disciplina: string | null; enunciado: string };
+    passo: string;
+    aluno: {
+      primeiroNome: string;
+      diagnosticos: string[];
+      interesses: string[];
+    };
+  }): Promise<z.infer<typeof AjudaSchema>> {
+    return this.chamar(
+      INSTRUCOES_AJUDA,
+      JSON.stringify(dados, null, 2),
+      AjudaSchema,
+    );
   }
 
   private async chamar<T extends z.ZodType>(

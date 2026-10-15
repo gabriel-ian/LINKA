@@ -50,6 +50,24 @@ describe('metricas do painel da escola', () => {
     ).toBe(33);
   });
 
+  it('taxaConclusao nao conta contra o aluno tarefa ainda no prazo', () => {
+    const hoje = new Date(2026, 6, 20, 12);
+    expect(
+      taxaConclusao(
+        [
+          linha({ dataEntrega: '2026-07-19', concluida: true }),
+          linha({ dataEntrega: '2026-07-19' }), // vencida e nao feita
+          linha({ dataEntrega: '2026-07-25' }), // ainda no prazo: fora da conta
+          linha({ dataEntrega: '2026-07-25', concluida: true }), // feita antes
+        ],
+        hoje,
+      ),
+    ).toBe(67);
+    expect(
+      taxaConclusao([linha({ dataEntrega: '2026-07-25' })], hoje),
+    ).toBeNull();
+  });
+
   it('taxaNoPrazo so conta tarefas vencidas e entregas ate o prazo', () => {
     const hoje = new Date(2026, 6, 20, 12);
     const linhas = [

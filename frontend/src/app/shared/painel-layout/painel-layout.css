@@ -91,6 +91,116 @@
   line-height: 16px;
 }
 
+/* ---------- Aluno: avatar no topo e fala do mascote ---------- */
+
+.topo {
+  position: relative;
+}
+
+.avatar-topo {
+  position: absolute;
+  top: 34px;
+  right: 32px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #20c0ed;
+  border-radius: 50%;
+  background: #d0f5ff;
+  color: #20c0ed;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.fala {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.mascote {
+  flex: none;
+  width: 33px;
+  height: 33px;
+}
+
+.balao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(693px, 100%);
+  min-height: 32px;
+  padding: 4px 16px;
+  border: 1px solid #00704d;
+  border-radius: 55px;
+  background: #b8d7cd;
+  color: #00704d;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.balao img {
+  flex: none;
+}
+
+.balao.falando {
+  box-shadow: 0 0 0 3px rgba(0, 112, 77, 0.25);
+}
+
+.menu-contador {
+  position: absolute;
+  top: 10px;
+  right: 13px;
+  min-width: 32px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 59px;
+  background: #f2620f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+}
+
+.menu-contador.canto {
+  top: -10px;
+  right: -10px;
+  min-width: 24px;
+  padding: 0 6px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* Modo calmo: menos cores na moldura. Letras maiores: conteudo ampliado. */
+:host(.calmo) .topo,
+:host(.calmo) .rodape {
+  filter: grayscale(1) brightness(0.9);
+}
+
+:host(.calmo) .painel {
+  --cor-fundo-painel: #f3f3f3;
+}
+
+:host(.calmo) .balao {
+  border-color: #6e6e6e;
+  background: #d9dbdb;
+  color: #3d3d3d;
+}
+
+:host(.calmo) .mascote {
+  filter: grayscale(1);
+}
+
+:host(.letras-maiores) .conteudo {
+  zoom: 1.15;
+}
+
 /* ---------- Menu lateral ---------- */
 
 .corpo {
@@ -141,6 +251,24 @@
   --b: 2px;
   border-color: var(--cor-primaria);
   color: var(--cor-primaria);
+}
+
+button.menu-item {
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+/* "FILHO (A)" da familia: o filho escolhido fica laranja. */
+.menu-item.filho {
+  padding-left: 34px;
+}
+
+.menu-item.filho.ativo {
+  --b: 1px;
+  border-color: #ffdfcc;
+  background: #fef0e8;
+  color: #f2620f;
 }
 
 .icone {
@@ -415,6 +543,34 @@
 
   .topo a {
     margin: 16px 0 0 16px;
+  }
+
+  .avatar-topo {
+    top: 15px;
+    right: 16px;
+  }
+
+  .fala {
+    gap: 8px;
+  }
+
+  .mascote {
+    width: 28px;
+    height: 28px;
+  }
+
+  .balao {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .balao span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .notificacoes,

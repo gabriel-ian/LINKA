@@ -25,6 +25,23 @@ export class TarefaStatusEntity {
   })
   status!: StatusTarefa;
 
+  /** Quando o aluno abriu a tarefa e comecou o primeiro passo. */
+  @Column({ type: 'datetime', nullable: true })
+  iniciado_em!: Date | null;
+
+  /** Comecou sem lembrete/incentivo da familia. null: ainda nao comecou. */
+  @Column({ name: 'iniciou_sozinho', type: 'tinyint', nullable: true })
+  iniciouSozinho!: boolean | null;
+
+  /** Passos da versao do aluno ja concluidos (sempre em ordem). */
+  @Column({
+    name: 'passos_feitos',
+    type: 'tinyint',
+    unsigned: true,
+    default: 0,
+  })
+  passosFeitos!: number;
+
   @Column({ type: 'datetime', nullable: true })
   concluido_em!: Date | null;
 

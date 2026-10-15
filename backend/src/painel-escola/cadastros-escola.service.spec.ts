@@ -38,6 +38,64 @@ describe('CadastrosEscolaService', () => {
     expect(new Set(senhas).size).toBe(50);
   });
 
+  describe('matricularAlunos', () => {
+    /** Transacao falsa: cada entidade tem seu repositorio de mentira. */
+    function servicoCom(ocupadas: number, limite: number | null) {
+      const repos = new Map<string, Record<string, jest.Mock>>([
+        [
+          'Turma',
+          {
+            find: jest
+              .fn()
+              .mockResolvedValue([
+                { id: 3, nome: '8º Ano A', limiteAlunos: limite },
+              ]),
+          },
+        ],
+        [
+          'Aluno',
+          {
+            find: jest.fn().mockResolvedValue([{ id: 10 }, { id: 11 }]),
+          },
+        ],
+        [
+          'Matricula',
+          {
+            find: jest.fn().mockResolvedValue([]),
+            count: jest.fn().mockResolvedValue(ocupadas),
+            delete: jest.fn(),
+            save: jest.fn(),
+          },
+        ],
+      ]);
+      const manager = {
+        getRepository: (e: { name: string }) => repos.get(e.name),
+      };
+      const dataSource = {
+        transaction: (fn: (m: typeof manager) => unknown) => fn(manager),
+      } as unknown as DataSource;
+      const status = {
+        seedParaAluno: jest.fn(),
+      } as unknown as TarefaStatusService;
+      return { svc: new CadastrosEscolaService(dataSource, status), repos };
+    }
+
+    it('recusa quando a turma nao tem vagas para todos', async () => {
+      const { svc, repos } = servicoCom(29, 30);
+      await expect(svc.matricularAlunos(3, [10, 11], 1)).rejects.toThrow(
+        'so tem 1 vaga',
+      );
+      expect(repos.get('Matricula')!.save).not.toHaveBeenCalled();
+    });
+
+    it('matricula todos quando cabe (ou sem limite)', async () => {
+      const { svc, repos } = servicoCom(5, null);
+      const r = await svc.matricularAlunos(3, [10, 11], 1);
+      expect(r.data.adicionados).toBe(2);
+      expect(repos.get('Matricula')!.save).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('salvarLaudo', () => {
     const PDF = [0x25, 0x50, 0x44, 0x46, 0x2d];
 

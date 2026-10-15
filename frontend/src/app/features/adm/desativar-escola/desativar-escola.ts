@@ -1,8 +1,10 @@
+import { PluralPipe } from '../../../shared/plural.pipe';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { EscolaService } from '../../../core/services/escola.service';
 import { Escola, MOTIVOS_DESATIVACAO, MotivoDesativacao } from '../../../core/model/escola.model';
 import { EscolasStore } from '../escolas.store';
@@ -13,7 +15,7 @@ import { ROTULO_STATUS, cidadeUf, hojeIso, iniciais, statusEscola } from '../esc
 /** "ADM - Desativar escola" do Figma. */
 @Component({
   selector: 'app-desativar-escola',
-  imports: [FormsModule, RouterLink, AdmResultado, EscolherEscola],
+  imports: [FormsModule, RouterLink, AdmResultado, EscolherEscola, PluralPipe],
   templateUrl: './desativar-escola.html',
   styleUrl: './desativar-escola.css',
 })
@@ -85,9 +87,7 @@ export class DesativarEscola {
         },
         error: (e: HttpErrorResponse) => {
           this.enviando.set(false);
-          this.erro.set(
-            [e.error?.message].flat().join(' ') || 'Não foi possível desativar a escola agora.',
-          );
+          this.erro.set(mensagemDeErro(e, 'Não foi possível desativar a escola agora.'));
         },
       });
   }

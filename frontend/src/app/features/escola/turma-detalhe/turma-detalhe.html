@@ -16,15 +16,27 @@
           </p>
         } @else {
           <p>
-            {{ t.totalAlunos }} alunos - {{ t.totalNee }} com acompanhamento NEE
+            {{ t.totalAlunos | plural: 'aluno' : 'alunos' }} - {{ t.totalNee }} com acompanhamento
+            NEE
             @if (t.anoLetivo) {
               - ano letivo {{ t.anoLetivo }}
             }
           </p>
         }
       </div>
-      <a class="bt bt-secundario" [routerLink]="['/escola/turmas', t.id, 'editar']">Editar turma</a>
+      <div class="acoes-topo">
+        <button type="button" class="bt bt-primario" (click)="adicionando.set(true)">
+          Adicionar alunos
+        </button>
+        <a class="bt bt-secundario" [routerLink]="['/escola/turmas', t.id, 'editar']"
+          >Editar turma</a
+        >
+      </div>
     </header>
+
+    @if (aviso()) {
+      <p class="aviso-caixa verde forte" role="status">{{ aviso() }}</p>
+    }
 
     @if (salva()) {
       <p class="aviso-caixa verde forte">Alterações da turma salvas.</p>
@@ -39,10 +51,13 @@
         <span class="mais">+</span>
         <h2>Esta turma ainda não tem alunos</h2>
         <p>
-          Cadastre os alunos um a um. Os alunos NEE recebem as tarefas adaptadas assim que forem
-          vinculados.
+          Adicione alunos já cadastrados (sem turma ou de outra turma) ou cadastre um novo. Os
+          alunos NEE recebem as tarefas adaptadas assim que entram na turma.
         </p>
         <div class="acoes centro">
+          <button type="button" class="bt bt-secundario" (click)="adicionando.set(true)">
+            Adicionar alunos já cadastrados
+          </button>
           <a
             class="bt bt-primario"
             routerLink="/escola/cadastro/aluno"
@@ -95,36 +110,49 @@
 
         <section class="cartao bloco alunos">
           <div class="bloco-topo">
-            <h2>Alunos NEE da turma</h2>
-            <a class="link-acao" routerLink="/escola/alunos" [queryParams]="{ turma: t.id }"
-              >Ver todos os {{ t.totalAlunos }} alunos</a
-            >
+            <h2>Alunos da turma ({{ alunosDaTurma().length }})</h2>
+            <button type="button" class="link-acao" (click)="adicionando.set(true)">
+              + Adicionar alunos
+            </button>
           </div>
-          @for (a of t.alunosNee; track a.id; let ultimo = $last) {
-            <a
-              class="aluno"
-              [class]="'c-' + corSituacao(a.situacao)"
-              [routerLink]="['/escola/alunos', a.id]"
-            >
-              <span
-                class="selo-cor c-cinza"
-                style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px"
-                >{{ iniciais(a.nome) }}</span
+          @for (a of alunosDaTurma(); track a.id) {
+            <div class="linha-aluno">
+              <a
+                class="aluno"
+                [class]="'aluno c-' + (a.neurodivergente ? corSituacao(a.situacao) : 'cinza')"
+                [routerLink]="['/escola/alunos', a.id]"
               >
-              <span class="nome">
-                <strong>{{ a.nome }}</strong>
-                <small
-                  >{{ a.diagnosticos[0] || 'NEE' }} - {{ pct(a.desempenhoSemana) }} esta
-                  semana</small
+                <span
+                  class="selo-cor c-cinza"
+                  style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px"
+                  >{{ iniciais(a.nome) }}</span
                 >
-              </span>
-              <span class="progresso mini"
-                ><span [style.width.%]="a.desempenhoSemana ?? 0"></span
-              ></span>
-              <span class="pilula-cor">{{ rotuloSituacao[a.situacao] }}</span>
-            </a>
+                <span class="nome">
+                  <strong>{{ a.nome }}</strong>
+                  <small>
+                    @if (a.neurodivergente) {
+                      {{ a.diagnosticos[0] || 'NEE' }} - {{ pct(a.desempenhoSemana) }} esta semana
+                    } @else {
+                      {{ a.cgm ? 'CGM ' + a.cgm : 'Sem NEE' }}
+                    }
+                  </small>
+                </span>
+                @if (a.neurodivergente) {
+                  <span class="pilula-cor">{{ rotuloSituacao[a.situacao] }}</span>
+                }
+              </a>
+              <button
+                type="button"
+                class="tirar"
+                [attr.aria-label]="'Tirar ' + a.nome + ' da turma'"
+                title="Tirar da turma"
+                (click)="remover(a)"
+              >
+                ×
+              </button>
+            </div>
           } @empty {
-            <p class="vazio">Nenhum aluno NEE nesta turma.</p>
+            <p class="vazio">Nenhum aluno nesta turma.</p>
           }
         </section>
       </div>
@@ -137,3 +165,7 @@
     }
   }
 </div>
+
+@if (adicionando() && turma(); as t) {
+  <app-adicionar-alunos [turma]="t" (fechar)="fecharAdicionar($event)" />
+}

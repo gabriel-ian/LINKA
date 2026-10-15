@@ -4,6 +4,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { EscolaService } from '../../../core/services/escola.service';
 import { Escola, EscolaDados, PlanoEscola } from '../../../core/model/escola.model';
 import { EscolasStore } from '../escolas.store';
@@ -189,9 +190,7 @@ export class EscolaForm {
           this.erros.set({ email: 'Este e-mail já está em uso por outro usuário.' });
         } else {
           this.erroGeral.set(
-            e.status === 400
-              ? `Dados recusados pelo servidor: ${msg}`
-              : 'Não foi possível salvar agora. Tente novamente.',
+            mensagemDeErro(e, 'Não foi possível salvar agora. Confira os dados e tente de novo.'),
           );
         }
       },

@@ -70,11 +70,94 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'inicio',
-    canActivate: [authGuard, perfilGuard('aluno', 'responsavel')],
-    loadComponent: () => import('./features/inicio/inicio').then((m) => m.Inicio),
+    path: 'primeiro-acesso',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/primeiro-acesso/primeiro-acesso').then((m) => m.PrimeiroAcesso),
   },
-  { path: 'dashboard', redirectTo: 'inicio', pathMatch: 'full' },
+  {
+    path: 'aluno',
+    canActivate: [authGuard, perfilGuard('aluno')],
+    loadComponent: () => import('./features/aluno/aluno-layout').then((m) => m.AlunoLayout),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/aluno/inicio/inicio').then((m) => m.AlunoInicio),
+      },
+      {
+        path: 'tarefas',
+        loadComponent: () => import('./features/aluno/tarefas/tarefas').then((m) => m.AlunoTarefas),
+      },
+      {
+        path: 'tarefas/:id/ajuda',
+        loadComponent: () => import('./features/aluno/ajuda/ajuda').then((m) => m.AlunoAjuda),
+      },
+      {
+        path: 'tarefas/:id/concluida',
+        loadComponent: () =>
+          import('./features/aluno/concluida/concluida').then((m) => m.AlunoConcluida),
+      },
+      {
+        path: 'tarefas/:id',
+        loadComponent: () => import('./features/aluno/tarefa/tarefa').then((m) => m.AlunoTarefa),
+      },
+      {
+        path: 'progresso',
+        loadComponent: () =>
+          import('./features/aluno/progresso/progresso').then((m) => m.AlunoProgresso),
+      },
+      {
+        path: 'conquistas',
+        loadComponent: () =>
+          import('./features/aluno/conquistas/conquistas').then((m) => m.AlunoConquistas),
+      },
+      {
+        path: 'agenda',
+        loadComponent: () => import('./features/aluno/agenda/agenda').then((m) => m.AlunoAgenda),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () => import('./features/aluno/perfil/perfil').then((m) => m.AlunoPerfil),
+      },
+    ],
+  },
+  {
+    path: 'familia',
+    canActivate: [authGuard, perfilGuard('responsavel')],
+    loadComponent: () => import('./features/familia/familia-layout').then((m) => m.FamiliaLayout),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/familia/painel/painel').then((m) => m.FamiliaPainel),
+      },
+      {
+        path: 'incentivo',
+        loadComponent: () =>
+          import('./features/familia/incentivo/incentivo').then((m) => m.FamiliaIncentivo),
+      },
+      {
+        path: 'avisos',
+        loadComponent: () =>
+          import('./features/familia/avisos/avisos').then((m) => m.FamiliaAvisos),
+      },
+      {
+        path: 'relatorios',
+        loadComponent: () =>
+          import('./features/familia/relatorios/relatorios').then((m) => m.FamiliaRelatorios),
+      },
+      {
+        path: 'configuracoes',
+        loadComponent: () =>
+          import('./features/familia/configuracoes/configuracoes').then(
+            (m) => m.FamiliaConfiguracoes,
+          ),
+      },
+    ],
+  },
+  // Enderecos antigos da pagina provisoria da familia.
+  { path: 'inicio', redirectTo: 'familia', pathMatch: 'full' },
+  { path: 'dashboard', redirectTo: 'familia', pathMatch: 'full' },
   {
     path: 'escola',
     canActivate: [authGuard, perfilGuard('escola')],
@@ -104,6 +187,13 @@ export const routes: Routes = [
           import('./features/escola/turma-detalhe/turma-detalhe').then((m) => m.EscolaTurmaDetalhe),
       },
       {
+        path: 'professores/:id/editar',
+        loadComponent: () =>
+          import('./features/escola/professor-editar/professor-editar').then(
+            (m) => m.EscolaProfessorEditar,
+          ),
+      },
+      {
         path: 'professores',
         loadComponent: () =>
           import('./features/escola/professores/professores').then((m) => m.EscolaProfessores),
@@ -126,6 +216,18 @@ export const routes: Routes = [
         path: 'relatorios',
         loadComponent: () =>
           import('./features/escola/relatorios/relatorios').then((m) => m.EscolaRelatorios),
+      },
+      {
+        path: 'familias',
+        loadComponent: () =>
+          import('./features/escola/familias/familias').then((m) => m.EscolaFamilias),
+      },
+      {
+        path: 'cadastro/familia',
+        loadComponent: () =>
+          import('./features/escola/cadastro-familia/cadastro-familia').then(
+            (m) => m.EscolaCadastroFamilia,
+          ),
       },
       {
         path: 'cadastro/professor',

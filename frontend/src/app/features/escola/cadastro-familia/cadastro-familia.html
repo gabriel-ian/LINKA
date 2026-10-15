@@ -1,0 +1,92 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Cadastrar família</h1>
+    <p>Cadastre o responsável uma vez e depois vincule cada filho a esta família</p>
+  </header>
+
+  @if (criada(); as c) {
+    <app-adm-resultado
+      titulo="Família cadastrada!"
+      [texto]="c.nome + ' já pode acompanhar os filhos assim que eles forem cadastrados.'"
+    >
+      @if (c.senhaProvisoria) {
+        <div extra class="senha-provisoria" role="note">
+          <strong>Acesso da família - anote agora</strong>
+          E-mail: {{ c.email }}
+          <span
+            >Senha provisória: <code>{{ c.senhaProvisoria }}</code></span
+          >
+          Entregue ao responsável. Por segurança, esta senha não será mostrada de novo.
+        </div>
+      }
+      <button type="button" class="bt bt-secundario" (click)="outra()">
+        Cadastrar outra família
+      </button>
+      <a
+        class="bt bt-primario"
+        routerLink="/escola/cadastro/aluno"
+        [queryParams]="{ responsavelId: c.id }"
+        >Cadastrar filho(a) desta família</a
+      >
+    </app-adm-resultado>
+  } @else {
+    <form class="cartao" (ngSubmit)="salvar()" novalidate>
+      <div>
+        <h2 class="cartao-titulo">Responsável</h2>
+        <p class="ajuda">A família recebe um acesso para acompanhar todos os filhos na escola</p>
+      </div>
+      <div class="grade-campos">
+        <label class="campo-p" [class.invalido]="erros().nome">
+          Nome completo do responsável
+          <input name="nome" maxlength="255" [(ngModel)]="nome" placeholder="Nome do responsável" />
+          @if (erros().nome) {
+            <span class="msg-erro">{{ erros().nome }}</span>
+          }
+        </label>
+        <label class="campo-p" [class.invalido]="erros().email">
+          E-mail
+          <input
+            name="email"
+            type="email"
+            autocomplete="off"
+            [(ngModel)]="email"
+            placeholder="familiar@email.com"
+          />
+          @if (erros().email) {
+            <span class="msg-erro">{{ erros().email }}</span>
+          }
+        </label>
+        <label class="campo-p">
+          Telefone
+          <input
+            name="telefone"
+            type="tel"
+            maxlength="20"
+            [(ngModel)]="telefone"
+            placeholder="(00) 00000-0000"
+          />
+        </label>
+        <label class="campo-p">
+          Parentesco
+          <select name="parentesco" [(ngModel)]="parentesco">
+            <option value="">Selecione</option>
+            @for (p of parentescos; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (erroGeral()) {
+        <p class="alerta-erro" role="alert">{{ erroGeral() }}</p>
+      }
+
+      <div class="acoes">
+        <a class="bt bt-secundario" routerLink="/escola/familias">Cancelar</a>
+        <button type="submit" class="bt bt-primario" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando...' : 'Cadastrar família' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

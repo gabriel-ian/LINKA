@@ -147,8 +147,13 @@
                   [(ngModel)]="senha"
                   placeholder="Mínimo 8 caracteres"
                 />
-                <button type="button" (click)="mostrarSenha = !mostrarSenha">
-                  {{ mostrarSenha ? 'ocultar' : 'mostrar' }}
+                <button
+                  type="button"
+                  [attr.aria-label]="mostrarSenha ? 'Esconder senha' : 'Mostrar senha'"
+                  [attr.aria-pressed]="mostrarSenha"
+                  (click)="mostrarSenha = !mostrarSenha"
+                >
+                  <img src="assets/entrada/icone-olho.svg" alt="" />
                 </button>
               </span>
               @if (erro('senha')) {
@@ -166,8 +171,13 @@
                   [(ngModel)]="confirmar"
                   placeholder="Confirmar senha"
                 />
-                <button type="button" (click)="mostrarConfirmar = !mostrarConfirmar">
-                  {{ mostrarConfirmar ? 'ocultar' : 'mostrar' }}
+                <button
+                  type="button"
+                  [attr.aria-label]="mostrarConfirmar ? 'Esconder senha' : 'Mostrar senha'"
+                  [attr.aria-pressed]="mostrarConfirmar"
+                  (click)="mostrarConfirmar = !mostrarConfirmar"
+                >
+                  <img src="assets/entrada/icone-olho.svg" alt="" />
                 </button>
               </span>
               @if (erro('confirmar')) {

@@ -1,0 +1,102 @@
+<div class="pagina">
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (agenda(); as a) {
+    <header class="topo">
+      <div class="painel-cabecalho">
+        <h1>Agenda</h1>
+        <p>{{ intervalo(a.inicio, a.fim) }}</p>
+      </div>
+      <div class="navegar">
+        <button type="button" class="bt bt-secundario bt-p" (click)="mudarSemana(-7)">
+          ‹ Semana anterior
+        </button>
+        <button type="button" class="bt bt-secundario bt-p" (click)="mudarSemana(7)">
+          Próxima ›
+        </button>
+      </div>
+    </header>
+
+    <ol class="dias">
+      @for (d of a.dias; track d.data) {
+        <li class="dia" [class.hoje]="d.data === hoje">
+          <div class="dia-topo">
+            <span>
+              <small>{{ d.rotulo }}</small>
+              <strong>{{ +d.data.slice(8) }}</strong>
+            </span>
+            @if (d.data === hoje) {
+              <span class="hoje-selo">Hoje</span>
+            }
+          </div>
+          @for (t of d.tarefas; track t.id; let i = $index) {
+            <a
+              class="evento"
+              [class]="'evento ' + cor(t, i)"
+              [routerLink]="['/aluno/tarefas', t.id]"
+            >
+              <b>{{ t.titulo }}</b>
+              <small>{{ detalhe(t) }}</small>
+            </a>
+          }
+        </li>
+      }
+    </ol>
+
+    <section class="cartao lembretes">
+      <h2>Meus lembretes</h2>
+      <ul>
+        @for (l of a.lembretes; track l.id; let i = $index) {
+          <li>
+            <span class="ponto" [class]="'ponto ' + corLembrete(i)"></span>
+            <b [class]="corLembrete(i)">{{ quandoLembrete(l) }}</b>
+            <span class="texto">{{ l.texto }}</span>
+            <button
+              type="button"
+              class="remover"
+              [attr.aria-label]="'Remover lembrete: ' + l.texto"
+              (click)="remover(l)"
+            >
+              ×
+            </button>
+          </li>
+        } @empty {
+          <li class="vazio-lembretes">Nenhum lembrete. Crie um para não esquecer nada!</li>
+        }
+      </ul>
+
+      @if (criando()) {
+        <form class="novo" (ngSubmit)="salvar()" novalidate>
+          <label class="campo-p">
+            O que lembrar
+            <input
+              name="texto"
+              maxlength="200"
+              [(ngModel)]="texto"
+              placeholder="Ex.: Colocar a régua na mochila"
+            />
+          </label>
+          <label class="campo-p">
+            Quando
+            <input name="quando" type="datetime-local" [(ngModel)]="quando" />
+          </label>
+          @if (erroLembrete()) {
+            <p class="alerta-erro" role="alert">{{ erroLembrete() }}</p>
+          }
+          <div class="acoes">
+            <button type="button" class="bt bt-secundario bt-p" (click)="criando.set(false)">
+              Cancelar
+            </button>
+            <button type="submit" class="bt bt-primario bt-p" [disabled]="salvando()">
+              {{ salvando() ? 'Salvando...' : 'Salvar lembrete' }}
+            </button>
+          </div>
+        </form>
+      } @else {
+        <button type="button" class="novo-lembrete" (click)="abrirNovo()">+ Novo lembrete</button>
+      }
+    </section>
+  }
+</div>

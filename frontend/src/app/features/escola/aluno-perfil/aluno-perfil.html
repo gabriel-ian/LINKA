@@ -1,5 +1,5 @@
 <div class="pagina">
-  <a class="voltar" routerLink="/escola/alunos">&lt; Voltar para alunos NEE</a>
+  <a class="voltar" routerLink="/escola/alunos">&lt; Voltar para alunos</a>
 
   @if (salvo()) {
     <p class="aviso-caixa verde forte" role="status">
@@ -30,7 +30,7 @@
         <strong>{{ pct(a.desempenhoSemana) }}</strong>
         <small>{{
           a.situacao === 'sem-dados'
-            ? 'sem tarefas na semana'
+            ? 'nenhuma entrega vencida na semana'
             : rotuloSituacao[a.situacao].toLowerCase()
         }}</small>
       </div>
@@ -93,9 +93,11 @@
         </dl>
         @if (!a.dificuldades && !a.pontosFortes && !a.interesses.length) {
           <p class="aviso-caixa roxo">
-            Preencha o perfil de aprendizagem em
-            <a [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>: a IA usa essas
-            informações para personalizar as tarefas.
+            <span>
+              Preencha o perfil de aprendizagem em
+              <a [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>: a IA usa essas
+              informações para personalizar as tarefas.
+            </span>
           </p>
         }
         @if (a.interesses.length) {
@@ -128,8 +130,16 @@
         </section>
 
         <section class="cartao bloco">
-          <h2>Responsável</h2>
-          @for (r of a.responsaveis; track r.email) {
+          <div class="topo-resp">
+            <h2>Responsável</h2>
+            <button type="button" class="link-acao" (click)="vinculando.set(true)">
+              + Vincular família
+            </button>
+          </div>
+          @if (avisoFamilia()) {
+            <p class="aviso-caixa verde" role="status">{{ avisoFamilia() }}</p>
+          }
+          @for (r of a.responsaveis; track r.id) {
             <div class="pessoa c-roxo">
               <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
                 iniciais(r.nome ?? '?')
@@ -159,6 +169,13 @@
                   Redefinir senha
                 </button>
               }
+              <button
+                type="button"
+                class="link-acao perigo"
+                (click)="desvincular(a, r.id, r.nome ?? 'o responsável')"
+              >
+                Desvincular
+              </button>
             </div>
           } @empty {
             <p class="vazio">Nenhum responsável vinculado.</p>
@@ -187,4 +204,8 @@
     [senha]="s.senha"
     (fechar)="senha.set(null)"
   />
+}
+
+@if (vinculando() && aluno(); as a) {
+  <app-vincular-familia [alunoId]="a.id" [alunoNome]="a.nome" (fechar)="fecharVinculo(a, $event)" />
 }

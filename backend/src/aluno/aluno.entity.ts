@@ -13,6 +13,22 @@ import { Usuario } from '../usuario/usuario.entity';
  * O login do aluno e opcional (usuario perfil 'aluno', via usuario_id);
  * a familia acompanha pelo responsavel (aluno_responsavel).
  */
+export interface PreferenciasAluno {
+  ouvirVoz: boolean;
+  passosCurtos: boolean;
+  letrasMaiores: boolean;
+  modoCalmo: boolean;
+  mascote: 'dino' | 'coruja' | 'robo';
+}
+
+export const PREFERENCIAS_PADRAO: PreferenciasAluno = {
+  ouvirVoz: true,
+  passosCurtos: true,
+  letrasMaiores: false,
+  modoCalmo: false,
+  mascote: 'dino',
+};
+
 @Entity('aluno')
 export class Aluno {
   @PrimaryGeneratedColumn()
@@ -66,6 +82,10 @@ export class Aluno {
   /** Separados por virgula: "Dinossauros, Futebol". */
   @Column({ type: 'varchar', length: 255, nullable: true })
   interesses!: string | null;
+
+  /** Como o aluno gosta de aprender (tela "Meu perfil"). */
+  @Column({ type: 'json', nullable: true })
+  preferencias!: PreferenciasAluno | null;
 
   @Column({ default: true })
   ativo!: boolean;

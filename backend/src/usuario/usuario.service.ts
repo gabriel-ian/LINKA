@@ -41,7 +41,7 @@ export class UsuarioService {
     );
   }
 
-  /** Troca a senha (ja em texto) gravando o hash; usada por redefinicoes. */
+  /** Grava a senha escolhida pelo proprio usuario (deixa de ser provisoria). */
   async definirSenha(
     id: number,
     senha: string,
@@ -49,7 +49,13 @@ export class UsuarioService {
   ): Promise<void> {
     await repository.update(id, {
       senha: await UsuarioService.hashSenha(senha),
+      senhaProvisoria: false,
     });
+  }
+
+  /** O usuario decidiu continuar com a senha que recebeu. */
+  async manterSenha(id: number): Promise<void> {
+    await this.usuarioRepository.update(id, { senhaProvisoria: false });
   }
 
   async registrarLogin(id: number): Promise<void> {

@@ -1,0 +1,94 @@
+@if (contexto.painel(); as p) {
+  <div class="pagina">
+    <header class="cabecalho">
+      <h1>Enviar incentivo</h1>
+      @if (enviada()) {
+        <p>{{ p.filho.nome }}{{ p.filho.turma ? ' - ' + p.filho.turma : '' }}</p>
+      } @else if (tarefa()?.disciplina) {
+        <p>
+          Uma mensagem curta ajuda {{ p.filho.primeiroNome }} a começar a tarefa de
+          {{ tarefa()!.disciplina }}
+        </p>
+      } @else {
+        <p>Uma mensagem curta ajuda {{ p.filho.primeiroNome }} a seguir firme nas tarefas</p>
+      }
+    </header>
+
+    @if (enviada(); as e) {
+      <section class="bloco confirmacao" aria-live="polite">
+        <span class="ok" aria-hidden="true">ok</span>
+        <h2>Incentivo enviado!</h2>
+        <p>
+          {{ p.filho.primeiroNome }} vai receber sua mensagem na Linka agora{{
+            e.voz ? ', com a voz do Dino' : ''
+          }}.<br />
+          O painel mostra quando {{ p.filho.primeiroNome }} começar a tarefa.
+        </p>
+        <q class="citacao">{{ e.mensagem }}</q>
+        <div class="botoes">
+          <a class="botao primario" routerLink="/familia">Voltar ao painel</a>
+        </div>
+      </section>
+    } @else {
+      @if (faixa()) {
+        <p class="faixa">{{ faixa() }}</p>
+      }
+
+      <form class="bloco formulario" (submit)="$event.preventDefault(); enviar()">
+        <fieldset>
+          <legend>Escolha uma mensagem</legend>
+          @for (s of sugestoes(); track $index) {
+            <label class="opcao" [class.marcada]="!propria().trim() && escolhida() === $index">
+              <input
+                type="radio"
+                name="sugestao"
+                [checked]="!propria().trim() && escolhida() === $index"
+                (change)="escolher($index)"
+              />
+              <span>{{ s }}</span>
+            </label>
+          }
+        </fieldset>
+
+        <label class="propria">
+          <span>Ou escreva a sua</span>
+          <textarea
+            rows="3"
+            maxlength="300"
+            [placeholder]="'Escreva uma mensagem para ' + p.filho.primeiroNome + '...'"
+            [value]="propria()"
+            (input)="escrever($any($event.target).value)"
+          ></textarea>
+        </label>
+
+        <div class="voz">
+          <div>
+            <strong id="rotulo-voz">Enviar com a voz do Dino</strong>
+            <small>O mascote lê a mensagem em voz alta para {{ p.filho.primeiroNome }}</small>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            class="chave"
+            [attr.aria-checked]="voz()"
+            aria-labelledby="rotulo-voz"
+            (click)="voz.set(!voz())"
+          >
+            <span></span>
+          </button>
+        </div>
+
+        @if (erro()) {
+          <p class="alerta-erro" role="alert">{{ erro() }}</p>
+        }
+
+        <div class="botoes">
+          <a class="botao" routerLink="/familia">Cancelar</a>
+          <button type="submit" class="botao primario" [disabled]="enviando() || !mensagem()">
+            {{ enviando() ? 'Enviando...' : 'Enviar incentivo' }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+}

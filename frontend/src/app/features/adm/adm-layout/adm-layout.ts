@@ -1,5 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, map, startWith } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import {
   ConfigPainel,
@@ -16,7 +18,7 @@ const ICONE = 'assets/adm/menu-';
   selector: 'app-adm-layout',
   imports: [RouterOutlet, PainelLayout],
   template: `
-    <app-painel-layout [config]="config" [notificacoes]="notificacoes()">
+    <app-painel-layout [config]="config()" [notificacoes]="notificacoes()">
       <router-outlet />
     </app-painel-layout>
   `,
@@ -24,8 +26,20 @@ const ICONE = 'assets/adm/menu-';
 })
 export class AdmLayout {
   private store = inject(EscolasStore);
+  private router = inject(Router);
+  private email = inject(AuthService).email ?? '';
 
-  readonly config: ConfigPainel = {
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => this.router.url),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  /** A busca por ID fica dentro de "Buscar Escola"; o detalhe acende esse item. */
+  readonly config = computed<ConfigPainel>(() => ({
     titulo: 'Painel administrativo',
     medidas: { rotuloX: 44, visaoX: 18, secaoTam: 36, gapItens: 16 },
     secoes: [
@@ -46,15 +60,8 @@ export class AdmLayout {
           {
             rota: '/adm/escolas/buscar',
             rotulo: 'Buscar Escola',
+            selecionado: this.url().startsWith('/adm/escolas/id'),
             icone: [{ src: ICONE + 'buscar', left: 17, top: 12 }],
-          },
-          {
-            rota: '/adm/escolas/id',
-            rotulo: 'Buscar ID Escola',
-            icone: [
-              { src: ICONE + 'buscar', left: 17, top: 13 },
-              { src: ICONE + 'id', left: 23.75, top: 19.75 },
-            ],
           },
           {
             rota: '/adm/escolas/atualizar',
@@ -80,13 +87,13 @@ export class AdmLayout {
     conta: {
       iniciais: 'AD',
       nome: 'Administrador Linka',
-      detalhe: inject(AuthService).email ?? '',
+      detalhe: this.email,
       links: [
         { rota: '/adm', rotulo: 'Visão geral' },
         { rota: '/adm/escolas', rotulo: 'Escolas cadastradas' },
       ],
     },
-  };
+  }));
 
   readonly notificacoes = computed<Notificacao[]>(() => [
     ...this.store.pendentes().map((e) => ({

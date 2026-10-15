@@ -1,8 +1,16 @@
 <div class="pagina">
   <header class="painel-cabecalho">
     <h1>Professores</h1>
-    <p>{{ contagem().ativo }} professores ativos de {{ contagem().todos }} cadastrados</p>
+    <p>
+      {{ contagem().ativo }}
+      {{ contagem().ativo === 1 ? 'professor ativo' : 'professores ativos' }} de
+      {{ contagem().todos }} {{ contagem().todos === 1 ? 'cadastrado' : 'cadastrados' }}
+    </p>
   </header>
+
+  @if (salvo()) {
+    <p class="aviso-caixa verde forte" role="status">Professor atualizado.</p>
+  }
 
   <div class="filtros">
     <label class="campo-p busca">
@@ -94,6 +102,9 @@
             </td>
             <td>
               <span class="acoes-linha">
+                <a class="link-acao" [routerLink]="['/escola/professores', p.id, 'editar']"
+                  >Editar</a
+                >
                 @if (p.status !== 'inativo') {
                   <button
                     type="button"

@@ -110,6 +110,22 @@ export interface NovoProfessor {
   senha: string;
   disciplinas: string[];
   turmaIds: number[];
+  /** Turmas com a disciplina de cada uma (tem prioridade sobre turmaIds). */
+  alocacoes?: Alocacao[];
+}
+
+/** Uma turma do professor e as disciplinas que ele da nela (por nome). */
+export interface Alocacao {
+  turmaId: number;
+  disciplinas: string[];
+}
+
+export interface ProfessorEdicao {
+  id: number;
+  nome: string;
+  email: string | null;
+  disciplinas: string[];
+  alocacoes: (Alocacao & { turma: string })[];
 }
 
 export interface NovoAluno {
@@ -127,13 +143,20 @@ export interface NovoAluno {
     telefone?: string;
     parentesco?: string;
   };
+  /** Familia ja cadastrada (no lugar de responsavel). */
+  responsavelId?: number;
 }
 
 export interface AlunoCriado {
   id: number;
   nome: string;
   turma: { id: number; nome: string } | null;
-  responsavel: { nome: string; email: string; senhaProvisoria: string | null } | null;
+  responsavel: {
+    id: number;
+    nome: string;
+    email: string | null;
+    senhaProvisoria: string | null;
+  } | null;
 }
 
 /** Senha provisoria gerada pela escola ou pelo ADM (mostrada uma vez). */
@@ -157,4 +180,30 @@ export interface EdicaoAluno extends PerfilAprendizagem {
   turmaId?: number | null;
   diagnosticoIds?: number[];
   prefiroNaoInformar?: boolean;
+}
+
+/** Familia (responsavel) da escola, com os filhos ja vinculados. */
+export interface Familia {
+  id: number;
+  nome: string;
+  email: string | null;
+  telefone: string | null;
+  parentesco: string | null;
+  acessou: boolean;
+  filhos: { id: number; nome: string; turma: string | null }[];
+}
+
+export interface NovaFamilia {
+  nomeCompleto: string;
+  email: string;
+  telefone?: string;
+  parentesco?: string;
+}
+
+/** Retorno de cadastrar/vincular familia; a senha so vem quando o login e novo. */
+export interface FamiliaCriada {
+  id: number;
+  nome: string;
+  email: string | null;
+  senhaProvisoria: string | null;
 }

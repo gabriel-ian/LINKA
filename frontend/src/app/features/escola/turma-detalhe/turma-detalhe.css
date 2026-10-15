@@ -113,3 +113,58 @@
   font-size: 16px;
   font-weight: 500;
 }
+
+.acoes-topo {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.linha-aluno {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.linha-aluno:last-of-type {
+  border-bottom: none;
+}
+
+.linha-aluno .aluno {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 12px;
+  border-bottom: none;
+}
+
+.tirar {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--cor-borda);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.tirar:hover {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro);
+}
+
+@media (max-width: 700px) {
+  .topo-turma {
+    flex-direction: column;
+  }
+
+  /* No celular a situacao fica no perfil do aluno; a linha mostra so o nome. */
+  .linha-aluno .pilula-cor {
+    display: none;
+  }
+}

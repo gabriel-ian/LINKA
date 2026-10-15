@@ -1,0 +1,137 @@
+<div class="modos" role="radiogroup" aria-label="Responsável do aluno">
+  <button
+    type="button"
+    role="radio"
+    class="chip"
+    [attr.aria-checked]="modo() === 'existente'"
+    [attr.aria-pressed]="modo() === 'existente'"
+    (click)="escolherModo('existente')"
+  >
+    Família já cadastrada
+  </button>
+  <button
+    type="button"
+    role="radio"
+    class="chip"
+    [attr.aria-checked]="modo() === 'nova'"
+    [attr.aria-pressed]="modo() === 'nova'"
+    (click)="escolherModo('nova')"
+  >
+    Nova família
+  </button>
+  @if (permitirNenhuma()) {
+    <button
+      type="button"
+      role="radio"
+      class="chip"
+      [attr.aria-checked]="modo() === 'nenhuma'"
+      [attr.aria-pressed]="modo() === 'nenhuma'"
+      (click)="escolherModo('nenhuma')"
+    >
+      Sem responsável agora
+    </button>
+  }
+</div>
+
+@if (modo() === 'existente') {
+  @if (familia(); as f) {
+    <div class="escolhida">
+      <div>
+        <strong>{{ f.nome }}</strong>
+        <small>{{ f.email ?? 'Sem e-mail' }}{{ f.parentesco ? ' - ' + f.parentesco : '' }}</small>
+        @if (f.filhos.length) {
+          <small>Já tem na escola: {{ nomesFilhos(f) }}</small>
+        }
+      </div>
+      <button type="button" class="link-acao" (click)="trocar()">Trocar</button>
+    </div>
+  } @else {
+    <label class="campo-p" [class.invalido]="erros().familia">
+      Buscar família
+      <input
+        name="buscaFamilia"
+        autocomplete="off"
+        [(ngModel)]="busca"
+        (ngModelChange)="buscar($event)"
+        placeholder="Nome, e-mail ou telefone do responsável"
+      />
+      @if (erros().familia) {
+        <span class="msg-erro">{{ erros().familia }}</span>
+      }
+    </label>
+    <ul class="resultados" aria-live="polite">
+      @for (f of resultados(); track f.id) {
+        <li>
+          <button type="button" (click)="selecionar(f)">
+            <strong>{{ f.nome }}</strong>
+            <small>
+              {{ f.email ?? 'Sem e-mail' }}
+              @if (f.filhos.length) {
+                - filhos: {{ nomesFilhos(f) }}
+              }
+            </small>
+          </button>
+        </li>
+      } @empty {
+        <li class="nada">
+          {{ buscando() ? 'Buscando...' : 'Nenhuma família encontrada. Use "Nova família".' }}
+        </li>
+      }
+    </ul>
+  }
+}
+
+@if (modo() === 'nova') {
+  <div class="grade-campos">
+    <label class="campo-p" [class.invalido]="erros().respNome">
+      Nome completo do responsável
+      <input
+        name="respNome"
+        [ngModel]="nome()"
+        (ngModelChange)="nome.set($event)"
+        placeholder="Nome do responsável"
+      />
+      @if (erros().respNome) {
+        <span class="msg-erro">{{ erros().respNome }}</span>
+      }
+    </label>
+    <label class="campo-p" [class.invalido]="erros().respEmail">
+      E-mail
+      <input
+        name="respEmail"
+        type="email"
+        autocomplete="off"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+        placeholder="familiar@email.com"
+      />
+      @if (erros().respEmail) {
+        <span class="msg-erro">{{ erros().respEmail }}</span>
+      }
+    </label>
+    <label class="campo-p">
+      Telefone
+      <input
+        name="respTelefone"
+        type="tel"
+        maxlength="20"
+        [ngModel]="telefone()"
+        (ngModelChange)="telefone.set($event)"
+        placeholder="(00) 00000-0000"
+      />
+    </label>
+    <label class="campo-p">
+      Parentesco
+      <select
+        name="respParentesco"
+        [ngModel]="parentesco()"
+        (ngModelChange)="parentesco.set($event)"
+      >
+        <option value="">Selecione</option>
+        @for (p of parentescos; track p) {
+          <option [value]="p">{{ p }}</option>
+        }
+      </select>
+    </label>
+  </div>
+}

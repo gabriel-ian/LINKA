@@ -32,6 +32,10 @@ export class TarefaAdaptada {
   @Column({ type: 'json', nullable: true })
   recursos!: string[] | null;
 
+  /** "O que voce vai precisar" na tela da tarefa do aluno. */
+  @Column({ type: 'json', nullable: true })
+  materiais!: string[] | null;
+
   @Column({ type: 'tinyint', default: 1 })
   gerado_por_ia!: boolean;
 

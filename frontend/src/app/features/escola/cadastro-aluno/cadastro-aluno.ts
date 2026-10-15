@@ -2,25 +2,35 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
-import { AlunoCriado, NovoAluno, Opcoes } from '../../../core/model/painel-escola.model';
+import { AlunoCriado, Familia, NovoAluno, Opcoes } from '../../../core/model/painel-escola.model';
+import { EscolhaFamilia, ModoFamilia } from '../escolha-familia/escolha-familia';
 import { EscolaContexto } from '../escola-contexto';
 import { AdmResultado } from '../../adm/resultado/resultado';
 import { dataBr, hojeIso } from '../../adm/escola-ui';
 import { Etapas } from '../etapas';
 import { alternado, juntar } from '../escola-ui';
 
-type Campo = 'nome' | 'email' | 'senha' | 'nascimento' | 'laudo' | 'respNome' | 'respEmail';
+type Campo =
+  | 'nome'
+  | 'email'
+  | 'senha'
+  | 'nascimento'
+  | 'cgm'
+  | 'diagnostico'
+  | 'laudo'
+  | 'respNome'
+  | 'respEmail'
+  | 'familia';
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const LAUDO_MAX = 10 * 1024 * 1024;
 const TIPOS_LAUDO = ['application/pdf', 'image/png', 'image/jpeg'];
 
-export const PARENTESCOS = ['Mãe', 'Pai', 'Avó', 'Avô', 'Tia', 'Tio', 'Responsável legal', 'Outro'];
-
 /** "Escola - Cadastro aluno" (dados, confirmacao, sucesso) do Figma. */
 @Component({
   selector: 'app-escola-cadastro-aluno',
-  imports: [FormsModule, RouterLink, AdmResultado, Etapas],
+  imports: [FormsModule, RouterLink, AdmResultado, Etapas, EscolhaFamilia],
   templateUrl: './cadastro-aluno.html',
   styleUrls: ['../cadastro-professor/cadastro.css', './cadastro-aluno.css'],
 })
@@ -28,7 +38,6 @@ export class EscolaCadastroAluno {
   private service = inject(PainelEscolaService);
   private contexto = inject(EscolaContexto);
 
-  readonly parentescos = PARENTESCOS;
   readonly juntar = juntar;
   readonly dataBr = dataBr;
 
@@ -38,8 +47,11 @@ export class EscolaCadastroAluno {
   mostrarSenha = false;
   nascimento = '';
   cgm = '';
-  turmaId: number | null =
-    Number(inject(ActivatedRoute).snapshot.queryParamMap.get('turmaId')) || null;
+  private rota = inject(ActivatedRoute).snapshot;
+  turmaId: number | null = Number(this.rota.queryParamMap.get('turmaId')) || null;
+  /** Familia cadastrada antes (Cadastro > Familia) ou escolhida na busca. */
+  modoFamilia: ModoFamilia = 'nenhuma';
+  familia: Familia | null = null;
   respNome = '';
   respEmail = '';
   respTelefone = '';
@@ -49,6 +61,8 @@ export class EscolaCadastroAluno {
   readonly opcoes = signal<Opcoes | null>(null);
   readonly diagnosticos = signal<Set<number>>(new Set());
   readonly prefiroNaoInformar = signal(false);
+  /** Marcado: mostra diagnosticos e laudo. Desmarcado: aluno sem NEE. */
+  readonly nee = signal(false);
   readonly laudo = signal<File | null>(null);
   readonly arrastando = signal(false);
   readonly erros = signal<Partial<Record<Campo, string>>>({});
@@ -67,12 +81,37 @@ export class EscolaCadastroAluno {
     () => this.opcoes()?.turmas.find((t) => t.id === Number(this.turmaId))?.nome ?? 'Sem turma',
   );
 
+  /** Nome do responsavel para a confirmacao e os avisos. */
+  nomeResponsavel(): string {
+    if (this.modoFamilia === 'existente') return this.familia?.nome ?? '';
+    return this.modoFamilia === 'nova' ? this.respNome.trim() : '';
+  }
+
   constructor() {
+    // Vindo de "Cadastrar filho desta familia": ja abre com a familia escolhida.
+    const responsavelId = Number(this.rota.queryParamMap.get('responsavelId'));
+    if (responsavelId) {
+      this.modoFamilia = 'existente';
+      this.service.familias().subscribe({
+        next: (res) => (this.familia = res.data.find((f) => f.id === responsavelId) ?? null),
+      });
+    }
+
     this.service.opcoes().subscribe({ next: (res) => this.opcoes.set(res.data) });
   }
 
   erro(c: Campo): string | undefined {
     return this.erros()[c];
+  }
+
+  alternarNee(): void {
+    this.nee.update((v) => !v);
+    if (!this.nee()) {
+      this.diagnosticos.set(new Set());
+      this.prefiroNaoInformar.set(false);
+      this.laudo.set(null);
+      this.erros.update((e) => ({ ...e, diagnostico: undefined, laudo: undefined }));
+    }
   }
 
   alternarDiagnostico(id: number): void {
@@ -113,15 +152,16 @@ export class EscolaCadastroAluno {
       e.senha = 'Com e-mail, a senha precisa de pelo menos 8 caracteres.';
     if (this.nascimento && this.nascimento > hojeIso())
       e.nascimento = 'A data não pode ser no futuro.';
+    if (this.nee() && !this.diagnosticos().size && !this.prefiroNaoInformar())
+      e.diagnostico = 'Selecione um diagnóstico ou "Prefiro não informar".';
 
-    const temResponsavel = !!(
-      this.respNome.trim() ||
-      this.respEmail.trim() ||
-      this.respTelefone.trim()
-    );
-    if (temResponsavel && !this.respNome.trim()) e.respNome = 'Informe o nome do responsável.';
-    if (temResponsavel && !EMAIL.test(this.respEmail.trim()))
-      e.respEmail = 'Informe um e-mail válido para o responsável.';
+    if (this.modoFamilia === 'nova') {
+      if (!this.respNome.trim()) e.respNome = 'Informe o nome do responsável.';
+      if (!EMAIL.test(this.respEmail.trim()))
+        e.respEmail = 'Informe um e-mail válido para o responsável.';
+    }
+    if (this.modoFamilia === 'existente' && !this.familia)
+      e.familia = 'Escolha a família na lista ou use "Nova família".';
 
     this.erros.set({ ...e, laudo: this.erros().laudo });
     this.erroGeral.set('');
@@ -136,16 +176,18 @@ export class EscolaCadastroAluno {
       turmaId: this.turmaId ? Number(this.turmaId) : undefined,
       email: this.email.trim() || undefined,
       senha: this.email.trim() ? this.senha : undefined,
-      diagnosticoIds: [...this.diagnosticos()],
-      prefiroNaoInformar: this.prefiroNaoInformar(),
-      responsavel: this.respNome.trim()
-        ? {
-            nomeCompleto: this.respNome.trim(),
-            email: this.respEmail.trim(),
-            telefone: this.respTelefone.trim() || undefined,
-            parentesco: this.respParentesco || undefined,
-          }
-        : undefined,
+      diagnosticoIds: this.nee() ? [...this.diagnosticos()] : [],
+      prefiroNaoInformar: this.nee() && this.prefiroNaoInformar(),
+      responsavelId: this.modoFamilia === 'existente' && this.familia ? this.familia.id : undefined,
+      responsavel:
+        this.modoFamilia === 'nova'
+          ? {
+              nomeCompleto: this.respNome.trim(),
+              email: this.respEmail.trim(),
+              telefone: this.respTelefone.trim() || undefined,
+              parentesco: this.respParentesco || undefined,
+            }
+          : undefined,
     };
   }
 
@@ -175,8 +217,10 @@ export class EscolaCadastroAluno {
         const msg = [err.error?.message].flat().join(' ');
         if (/responsavel/i.test(msg))
           this.erros.set({ respEmail: 'Este e-mail já é usado por outro tipo de conta.' });
-        else if (/email/i.test(msg)) this.erros.set({ email: 'Este e-mail já está em uso.' });
-        else this.erroGeral.set(msg || 'Não foi possível cadastrar o aluno.');
+        else if (/usuario com este email/i.test(msg))
+          this.erros.set({ email: 'Este e-mail já está em uso.' });
+        else if (/CGM/i.test(msg)) this.erros.set({ cgm: 'Já existe um aluno com este CGM.' });
+        else this.erroGeral.set(mensagemDeErro(err, 'Não foi possível cadastrar o aluno.'));
       },
     });
   }
@@ -186,11 +230,20 @@ export class EscolaCadastroAluno {
     this.etapa.set(3);
   }
 
-  cadastrarOutro(): void {
+  /** irmao = true: proximo filho da mesma familia (ela continua escolhida). */
+  cadastrarOutro(irmao = false): void {
+    const familia = irmao ? this.criado()?.responsavel : null;
     this.nome = this.email = this.senha = this.nascimento = this.cgm = '';
     this.respNome = this.respEmail = this.respTelefone = this.respParentesco = '';
+    this.modoFamilia = familia ? 'existente' : 'nenhuma';
+    this.familia = null;
+    if (familia)
+      this.service.familias().subscribe({
+        next: (res) => (this.familia = res.data.find((f) => f.id === familia.id) ?? null),
+      });
     this.diagnosticos.set(new Set());
     this.prefiroNaoInformar.set(false);
+    this.nee.set(false);
     this.laudo.set(null);
     this.criado.set(null);
     this.avisoLaudo.set('');

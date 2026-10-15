@@ -37,6 +37,33 @@ export class AuthService {
     return { data: true };
   }
 
+  /**
+   * Primeiro acesso: troca a senha provisoria sem pedir a atual (o usuario
+   * acabou de entrar com ela). So vale enquanto a senha for provisoria.
+   */
+  async criarSenha(usuarioId: number, novaSenha: string) {
+    const usuario = await this.usuarioService.findById(usuarioId);
+    if (!usuario?.senhaProvisoria) {
+      throw new BadRequestException(
+        'Use a opcao alterar senha, informando a senha atual',
+      );
+    }
+    if (await UsuarioService.conferirSenha(novaSenha, usuario.senha)) {
+      throw new BadRequestException(
+        'A nova senha precisa ser diferente da atual',
+      );
+    }
+
+    await this.usuarioService.definirSenha(usuario.id, novaSenha);
+    return { data: true };
+  }
+
+  /** Primeiro acesso: o usuario prefere continuar com a senha recebida. */
+  async manterSenha(usuarioId: number) {
+    await this.usuarioService.manterSenha(usuarioId);
+    return { data: true };
+  }
+
   async login(email: string, senha: string) {
     const usuario = await this.usuarioService.findByEmail(email);
 
@@ -79,6 +106,8 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       perfil: usuario.perfil,
       escolaId: usuario.escolaId ?? null,
+      /** Entrou com senha recebida: o front oferece trocar ou manter. */
+      trocarSenha: usuario.senhaProvisoria === true,
     };
   }
 }

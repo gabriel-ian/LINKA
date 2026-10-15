@@ -1,0 +1,113 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 892px;
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cabecalho p {
+  margin: 6px 0 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.extras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.placar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.placar li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 97px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.placar strong {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.placar .roxo {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.placar .laranja {
+  background: #fef0e8;
+  color: #ea6819;
+}
+
+.placar .azul {
+  background: #e8effe;
+  color: #1558d6;
+}
+
+.quase {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--cor-fundo-painel);
+  text-align: left;
+}
+
+.medalha {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.quase strong {
+  display: block;
+  font-size: 15px;
+  color: var(--cor-titulo);
+}
+
+.quase small {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 700px) {
+  .cabecalho h1 {
+    font-size: 32px;
+  }
+
+  .placar li {
+    min-width: 0;
+    padding: 10px 14px;
+  }
+}

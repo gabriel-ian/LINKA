@@ -10,8 +10,9 @@ export function rotaInicial(perfil: PerfilUsuario | null): string {
     case 'professor':
       return '/professor';
     case 'aluno':
+      return '/aluno';
     case 'responsavel':
-      return '/inicio';
+      return '/familia';
     default:
       return '/login';
   }

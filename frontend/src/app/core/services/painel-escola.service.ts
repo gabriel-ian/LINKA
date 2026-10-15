@@ -17,6 +17,11 @@ import {
   SenhaGerada,
   TurmaDetalhe,
   TurmaResumo,
+  Alocacao,
+  ProfessorEdicao,
+  Familia,
+  FamiliaCriada,
+  NovaFamilia,
 } from '../model/painel-escola.model';
 
 /** Rotas do perfil escola (/painel-escola). */
@@ -45,6 +50,22 @@ export class PainelEscolaService {
     return this.http.patch(`${this.api}/turmas/${id}`, dados);
   }
 
+  /** Coloca varios alunos na turma (respeita o limite de alunos). */
+  matricularAlunos(
+    turmaId: number,
+    alunoIds: number[],
+  ): Observable<ApiResponse<{ adicionados: number }>> {
+    return this.http.post<ApiResponse<{ adicionados: number }>>(
+      `${this.api}/turmas/${turmaId}/alunos`,
+      { alunoIds },
+    );
+  }
+
+  /** Tira o aluno da turma (ele fica sem turma). */
+  removerDaTurma(turmaId: number, alunoId: number): Observable<unknown> {
+    return this.http.delete(`${this.api}/turmas/${turmaId}/alunos/${alunoId}`);
+  }
+
   editarAluno(id: number, dados: EdicaoAluno): Observable<unknown> {
     return this.http.patch(`${this.api}/alunos/${id}`, dados);
   }
@@ -59,6 +80,45 @@ export class PainelEscolaService {
 
   professores(): Observable<ApiResponse<ProfessorResumo[]>> {
     return this.http.get<ApiResponse<ProfessorResumo[]>>(`${this.api}/professores`);
+  }
+
+  /** Professor com disciplinas e turmas, para a tela de edicao. */
+  professor(id: number): Observable<ApiResponse<ProfessorEdicao>> {
+    return this.http.get<ApiResponse<ProfessorEdicao>>(`${this.api}/professores/${id}`);
+  }
+
+  editarProfessor(
+    id: number,
+    dados: { nomeCompleto: string; disciplinas: string[]; alocacoes: Alocacao[] },
+  ): Observable<ApiResponse<ProfessorEdicao>> {
+    return this.http.put<ApiResponse<ProfessorEdicao>>(
+      `${this.api}/professores/${id}/dados`,
+      dados,
+    );
+  }
+
+  familias(busca?: string): Observable<ApiResponse<Familia[]>> {
+    const params = busca?.trim() ? new HttpParams().set('busca', busca.trim()) : undefined;
+    return this.http.get<ApiResponse<Familia[]>>(`${this.api}/familias`, { params });
+  }
+
+  criarFamilia(dados: NovaFamilia): Observable<ApiResponse<FamiliaCriada>> {
+    return this.http.post<ApiResponse<FamiliaCriada>>(`${this.api}/familias`, dados);
+  }
+
+  /** Vincula ao aluno uma familia ja cadastrada (id) ou uma nova (dados). */
+  vincularFamilia(
+    alunoId: number,
+    familia: { responsavelId: number } | { responsavel: NovaFamilia },
+  ): Observable<ApiResponse<FamiliaCriada>> {
+    return this.http.post<ApiResponse<FamiliaCriada>>(
+      `${this.api}/alunos/${alunoId}/responsaveis`,
+      familia,
+    );
+  }
+
+  desvincularFamilia(alunoId: number, responsavelId: number): Observable<unknown> {
+    return this.http.delete(`${this.api}/alunos/${alunoId}/responsaveis/${responsavelId}`);
   }
 
   criarProfessor(

@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { EscolasStore } from '../escolas.store';
 import { Escola, PlanoEscola } from '../../../core/model/escola.model';
 import {
@@ -27,6 +27,7 @@ function normalizar(texto: string): string {
 })
 export class BuscarEscola {
   readonly store = inject(EscolasStore);
+  private router = inject(Router);
 
   readonly iniciais = iniciais;
   readonly status = statusEscola;
@@ -36,6 +37,8 @@ export class BuscarEscola {
   readonly dataBr = dataBr;
 
   texto = '';
+  idDigitado = '';
+  readonly erroId = signal('');
   cidade = '';
   plano: PlanoEscola | '' = '';
   situacao: StatusEscola | '' = '';
@@ -55,7 +58,24 @@ export class BuscarEscola {
     ].sort(),
   );
 
+  /** O ID abre direto o detalhe da escola (antes era um item proprio do menu). */
+  abrirPorId(): void {
+    const id = this.idDigitado.trim().replace(/^#/, '');
+    if (!/^\d+$/.test(id)) {
+      this.erroId.set('Digite um ID numérico, por exemplo 1042.');
+      return;
+    }
+    this.erroId.set('');
+    this.router.navigate(['/adm/escolas/id'], { queryParams: { id } });
+  }
+
   buscar(): void {
+    // "#1042" ou so numeros no campo principal tambem vao direto para o ID.
+    if (/^#?\d+$/.test(this.texto.trim())) {
+      this.idDigitado = this.texto.trim();
+      this.abrirPorId();
+      return;
+    }
     const termo = normalizar(this.texto.trim());
 
     this.resultados.set(

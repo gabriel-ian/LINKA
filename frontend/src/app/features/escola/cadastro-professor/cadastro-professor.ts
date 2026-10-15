@@ -2,12 +2,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { Opcoes, TurmaResumo } from '../../../core/model/painel-escola.model';
 import { EscolaContexto } from '../escola-contexto';
 import { AdmResultado } from '../../adm/resultado/resultado';
 import { Etapas } from '../etapas';
 import { alternado, juntar } from '../escola-ui';
+import { EscolhaTurmas, limparAlocacoes, paraAlocacoes } from './escolha-turmas';
 
 type Campo = 'nome' | 'email' | 'senha' | 'confirmar';
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -15,7 +17,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /** "Escola - Cadastro professor" (dados, confirmacao, sucesso, erros) do Figma. */
 @Component({
   selector: 'app-escola-cadastro-professor',
-  imports: [FormsModule, RouterLink, AdmResultado, Etapas],
+  imports: [FormsModule, RouterLink, AdmResultado, Etapas, EscolhaTurmas],
   templateUrl: './cadastro-professor.html',
   styleUrl: './cadastro.css',
 })
@@ -39,7 +41,8 @@ export class EscolaCadastroProfessor {
   /** Disciplinas por nome: as do banco + as criadas no "+ Outra". */
   readonly extras = signal<string[]>([]);
   readonly disciplinas = signal<Set<string>>(new Set());
-  readonly turmas = signal<Set<number>>(new Set());
+  /** turmaId -> disciplinas que o professor da naquela turma. */
+  readonly alocacoes = signal<Map<number, Set<string>>>(new Map());
   readonly adicionando = signal(false);
   readonly erros = signal<Partial<Record<Campo, string>>>({});
   readonly erroGeral = signal('');
@@ -52,13 +55,21 @@ export class EscolaCadastroProfessor {
 
   readonly disciplinasEscolhidas = computed(() => [...this.disciplinas()]);
 
-  readonly nomesTurmas = computed(() =>
-    (this.opcoes()?.turmas ?? []).filter((t) => this.turmas().has(t.id)).map((t) => t.nome),
+  /** "8º Ano A (Matemática), 8º Ano B (Ciências)" para a confirmacao. */
+  readonly resumoTurmas = computed(() =>
+    juntar(
+      (this.opcoes()?.turmas ?? [])
+        .filter((t) => this.alocacoes().has(t.id))
+        .map((t) => {
+          const d = [...(this.alocacoes().get(t.id) ?? [])];
+          return d.length ? `${t.nome} (${d.join(', ')})` : t.nome;
+        }),
+    ),
   );
 
   readonly alunosNeeNasTurmas = computed(() =>
     this.turmasInfo()
-      .filter((t) => this.turmas().has(t.id))
+      .filter((t) => this.alocacoes().has(t.id))
       .reduce((soma, t) => soma + t.totalNee, 0),
   );
 
@@ -69,10 +80,7 @@ export class EscolaCadastroProfessor {
 
   alternarDisciplina(nome: string): void {
     this.disciplinas.update((s) => alternado(s, nome));
-  }
-
-  alternarTurma(id: number): void {
-    this.turmas.update((s) => alternado(s, id));
+    this.alocacoes.update((m) => limparAlocacoes(m, [...this.disciplinas()]));
   }
 
   adicionarDisciplina(): void {
@@ -111,7 +119,8 @@ export class EscolaCadastroProfessor {
         email: this.email.trim(),
         senha: this.senha,
         disciplinas: [...this.disciplinas()],
-        turmaIds: [...this.turmas()],
+        turmaIds: [...this.alocacoes().keys()],
+        alocacoes: paraAlocacoes(this.alocacoes()),
       })
       .subscribe({
         next: () => {
@@ -123,8 +132,9 @@ export class EscolaCadastroProfessor {
           this.salvando.set(false);
           this.etapa.set(1);
           const msg = [err.error?.message].flat().join(' ');
-          if (/email/i.test(msg)) this.erros.set({ email: 'Este e-mail já está em uso.' });
-          else this.erroGeral.set(msg || 'Não foi possível cadastrar o professor.');
+          if (/usuario com este email/i.test(msg))
+            this.erros.set({ email: 'Este e-mail já está em uso.' });
+          else this.erroGeral.set(mensagemDeErro(err, 'Não foi possível cadastrar o professor.'));
         },
       });
   }
@@ -132,7 +142,7 @@ export class EscolaCadastroProfessor {
   cadastrarOutro(): void {
     this.nome = this.email = this.senha = this.confirmacao = '';
     this.disciplinas.set(new Set());
-    this.turmas.set(new Set());
+    this.alocacoes.set(new Map());
     this.erros.set({});
     this.etapa.set(1);
   }

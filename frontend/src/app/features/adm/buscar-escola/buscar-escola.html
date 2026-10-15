@@ -1,7 +1,7 @@
 <div class="pagina">
   <header class="painel-cabecalho">
     <h1>Buscar escola</h1>
-    <p>Pesquise por nome, cidade ou e-mail institucional</p>
+    <p>Pesquise por nome, cidade, e-mail institucional ou pelo ID</p>
   </header>
 
   <form class="cartao filtros" (ngSubmit)="buscar()">
@@ -41,6 +41,17 @@
         </select>
       </label>
     </div>
+  </form>
+
+  <form class="cartao por-id" (ngSubmit)="abrirPorId()" novalidate>
+    <label class="campo-p" [class.invalido]="erroId()">
+      Buscar por ID
+      <input name="id" inputmode="numeric" [(ngModel)]="idDigitado" placeholder="Ex.: 1042" />
+      @if (erroId()) {
+        <span class="msg-erro">{{ erroId() }}</span>
+      }
+    </label>
+    <button type="submit" class="bt bt-secundario">Abrir escola</button>
   </form>
 
   @if (buscado() !== null) {

@@ -96,3 +96,14 @@ dd .link-acao {
 .bloco .pilula {
   align-self: flex-start;
 }
+
+.topo-resp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.link-acao.perigo {
+  color: var(--cor-erro);
+}

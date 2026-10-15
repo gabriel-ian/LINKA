@@ -1,0 +1,300 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 918px;
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 17px;
+}
+
+.cabecalho.coluna {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cabecalho.coluna h1 {
+  font-size: 48px;
+}
+
+.cabecalho p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.secao {
+  margin: 4px 0 -4px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.cartao-aluno {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista li {
+  padding: 16px 18px;
+}
+
+.lista li + li {
+  border-top: 1px solid var(--cor-linha);
+}
+
+.linha {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0 0 39px;
+}
+
+.ver-passos,
+.ouvir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 50px;
+  padding: 0 22px;
+  border-radius: 15px;
+  font-size: 24px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ver-passos {
+  border: 1px solid var(--cor-texto);
+  background: #fff;
+  color: var(--cor-texto);
+}
+
+.ver-passos img {
+  rotate: 90deg;
+}
+
+.ver-passos:hover {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.ouvir {
+  gap: 8px;
+  border: 1px solid #ffdcc8;
+  background: #fef0e8;
+  color: #b8420a;
+}
+
+.ouvir.falando {
+  box-shadow: 0 0 0 3px rgba(242, 98, 15, 0.25);
+}
+
+/* ---------- Hoje: lista a esquerda, Dino a direita ---------- */
+
+.hoje {
+  display: flex;
+  min-height: 251px;
+  background: linear-gradient(to right, #fff 59.86%, #f0fffa);
+}
+
+.hoje .lista {
+  flex: 1;
+  max-width: 616px;
+}
+
+.hoje .lista li:first-child {
+  padding-top: 22px;
+}
+
+.mascote {
+  position: relative;
+  flex: none;
+  width: 290px;
+}
+
+.balao {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 274px;
+  height: 80px;
+  border: 1px solid #00704d;
+  border-radius: 16px;
+  background: #b8d7cd;
+  color: #00704d;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ponta {
+  position: absolute;
+  top: 78px;
+  right: 38px;
+  rotate: 180deg;
+}
+
+.ponta-fundo {
+  position: absolute;
+  top: 78px;
+  right: 37px;
+  width: 42px;
+  height: 15px;
+  background: #b8d7cd;
+}
+
+.dino {
+  position: absolute;
+  right: 4px;
+  bottom: -16px;
+}
+
+/* ---------- Proximos dias ---------- */
+
+.proximos .lista li {
+  display: grid;
+  grid-template-columns: 349px auto;
+  align-items: center;
+  justify-content: start;
+  gap: 18px;
+}
+
+.compacto {
+  padding: 22px 24px 8px;
+}
+
+.compacto h2 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.compacto ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compacto li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+}
+
+.compacto li + li {
+  border-top: 1px solid var(--cor-linha);
+}
+
+.compacto a {
+  color: var(--cor-titulo);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.etiqueta {
+  padding: 3px 12px;
+  border-radius: 59px;
+  background: #e8effe;
+  color: #103ba6;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.etiqueta.roxo {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+@media (max-width: 1000px) {
+  .cabecalho h1,
+  .cabecalho.coluna h1 {
+    font-size: 32px;
+  }
+
+  .cabecalho p {
+    font-size: 16px;
+  }
+
+  .hoje {
+    flex-direction: column;
+  }
+
+  .mascote {
+    width: auto;
+    height: 150px;
+  }
+
+  .dino {
+    width: 120px;
+    height: 120px;
+  }
+
+  .balao {
+    left: 18px;
+    width: auto;
+    max-width: 274px;
+    height: 56px;
+  }
+
+  /* Com o balao mais estreito, a ponta nao alinha: fica so o balao. */
+  .ponta,
+  .ponta-fundo {
+    display: none;
+  }
+
+  .botoes {
+    margin-left: 0;
+  }
+
+  .ver-passos,
+  .ouvir {
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .proximos .lista li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .compacto li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,3 +1,4 @@
+import { PluralPipe } from '../../../shared/plural.pipe';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
@@ -8,7 +9,7 @@ import { corDoIndice, iniciaisPessoa, mesAtual, nomeMes, percentual } from '../e
 /** "Escola - Painel" do Figma. */
 @Component({
   selector: 'app-escola-painel',
-  imports: [RouterLink],
+  imports: [RouterLink, PluralPipe],
   templateUrl: './painel.html',
   styleUrl: './painel.css',
 })

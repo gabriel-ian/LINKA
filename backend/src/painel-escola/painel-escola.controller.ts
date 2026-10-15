@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
   StreamableFile,
   UploadedFile,
@@ -35,7 +37,11 @@ import {
   CriarProfessorDto,
   CriarTurmaDto,
   EditarAlunoDto,
+  EditarProfessorDto,
   EditarTurmaDto,
+  MatricularAlunosDto,
+  ResponsavelDto,
+  VincularResponsavelDto,
 } from './dto/cadastros.dto';
 
 /**
@@ -92,6 +98,63 @@ export class PainelEscolaController {
     return this.cadastros.editarTurma(id, dto, escolaId);
   }
 
+  @Post('turmas/:id/alunos')
+  @ApiOperation({
+    summary: 'Colocar alunos na turma (sem turma ou de outra turma)',
+    description: 'Respeita o limite de alunos da turma.',
+  })
+  matricularAlunos(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: MatricularAlunosDto,
+  ) {
+    return this.cadastros.matricularAlunos(id, dto.alunoIds, escolaId);
+  }
+
+  @Delete('turmas/:id/alunos/:alunoId')
+  @ApiOperation({ summary: 'Tirar o aluno da turma (fica sem turma)' })
+  removerDaTurma(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('alunoId', ParseIntPipe) alunoId: number,
+  ) {
+    return this.cadastros.removerDaTurma(id, alunoId, escolaId);
+  }
+
+  @Get('familias')
+  @ApiOperation({ summary: 'Familias da escola com os filhos (?busca=)' })
+  familias(@EscolaId() escolaId: number, @Query('busca') busca?: string) {
+    return this.cadastros.listarFamilias(escolaId, busca);
+  }
+
+  @Post('familias')
+  @ApiOperation({
+    summary: 'Cadastrar a familia antes dos filhos (senha provisoria)',
+  })
+  criarFamilia(@EscolaId() escolaId: number, @Body() dto: ResponsavelDto) {
+    return this.cadastros.criarFamilia(dto, escolaId);
+  }
+
+  @Post('alunos/:id/responsaveis')
+  @ApiOperation({ summary: 'Vincular familia (existente ou nova) ao aluno' })
+  vincularResponsavel(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: VincularResponsavelDto,
+  ) {
+    return this.cadastros.vincularAoAluno(id, dto, escolaId);
+  }
+
+  @Delete('alunos/:id/responsaveis/:responsavelId')
+  @ApiOperation({ summary: 'Desvincular a familia do aluno' })
+  desvincularResponsavel(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('responsavelId', ParseIntPipe) responsavelId: number,
+  ) {
+    return this.cadastros.desvincularDoAluno(id, responsavelId, escolaId);
+  }
+
   @Get('professores')
   @ApiOperation({ summary: 'Professores com disciplinas, turmas e status' })
   professores(@EscolaId() escolaId: number) {
@@ -102,6 +165,28 @@ export class PainelEscolaController {
   @ApiOperation({ summary: 'Cadastrar professor (cria o login)' })
   criarProfessor(@EscolaId() escolaId: number, @Body() dto: CriarProfessorDto) {
     return this.cadastros.criarProfessor(dto, escolaId);
+  }
+
+  @Get('professores/:id')
+  @ApiOperation({ summary: 'Professor com disciplinas e turmas (para editar)' })
+  professor(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.cadastros.professorParaEdicao(id, escolaId);
+  }
+
+  @Put('professores/:id/dados')
+  @ApiOperation({
+    summary:
+      'Editar nome, disciplinas e turmas (com a disciplina de cada turma)',
+  })
+  editarProfessor(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: EditarProfessorDto,
+  ) {
+    return this.cadastros.editarProfessor(id, dto, escolaId);
   }
 
   @Patch('professores/:id')

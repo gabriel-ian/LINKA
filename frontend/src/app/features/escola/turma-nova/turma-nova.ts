@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { NovaTurma, Opcoes, Turno } from '../../../core/model/painel-escola.model';
 import { EscolaContexto } from '../escola-contexto';
@@ -123,7 +124,7 @@ export class EscolaTurmaNova {
       },
       error: (e: HttpErrorResponse) => {
         this.salvando.set(false);
-        this.erro.set([e.error?.message].flat().join(' ') || 'Não foi possível salvar a turma.');
+        this.erro.set(mensagemDeErro(e, 'Não foi possível salvar a turma.'));
       },
     });
   }

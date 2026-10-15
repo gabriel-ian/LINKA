@@ -98,3 +98,25 @@
   font-size: 16px;
   font-weight: 500;
 }
+
+.por-id {
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 18px 24px;
+}
+
+.por-id .campo-p {
+  flex: 0 1 260px;
+}
+
+@media (max-width: 700px) {
+  .por-id {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .por-id .campo-p {
+    flex: none;
+  }
+}

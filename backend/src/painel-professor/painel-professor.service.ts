@@ -171,7 +171,7 @@ export class PainelProfessorService {
                     atencao: 'abaixo de 50% na semana',
                     melhorando: 'melhorando',
                     'em-dia': 'em dia com as tarefas',
-                    'sem-dados': 'sem tarefas na semana',
+                    'sem-dados': 'nenhuma entrega vencida na semana',
                   }[s],
             };
           })
@@ -186,8 +186,44 @@ export class PainelProfessorService {
           alunos.length,
           hoje,
         ),
+        // Pedido de ajuda e urgente: aparece qualquer que seja a turma aberta.
+        pedidosAjuda: await this.pedidosAjuda(professor.id, {}),
       },
     };
+  }
+
+  /** "Avisar a professora" do aluno, ainda nao vistos (ultimos 7 dias). */
+  private async pedidosAjuda(
+    professorId: number,
+    filtro: { turmaId?: number; tarefaId?: number },
+  ) {
+    const linhas: {
+      id: number;
+      passo: number | null;
+      criadoEm: Date;
+      alunoId: number;
+      aluno: string;
+      tarefaId: number;
+      tarefa: string;
+    }[] = await this.dataSource.query(
+      `SELECT pa.id, pa.passo, pa.criado_em criadoEm, a.id alunoId,
+              a.nome_completo aluno, t.id tarefaId, t.titulo tarefa
+         FROM pedido_ajuda pa
+         JOIN tarefa t ON t.id = pa.tarefa_id
+         JOIN aluno a ON a.id = pa.aluno_id
+        WHERE t.professor_id = ? AND pa.visto_em IS NULL
+          AND pa.criado_em >= NOW() - INTERVAL 7 DAY
+          AND (? IS NULL OR t.turma_id = ?) AND (? IS NULL OR t.id = ?)
+        ORDER BY pa.criado_em DESC LIMIT 20`,
+      [
+        professorId,
+        filtro.turmaId ?? null,
+        filtro.turmaId ?? null,
+        filtro.tarefaId ?? null,
+        filtro.tarefaId ?? null,
+      ],
+    );
+    return linhas;
   }
 
   // ------------------------------------------------------- turma/alunos
@@ -392,9 +428,18 @@ export class PainelProfessorService {
       .getRepository(TarefaAdaptada)
       .find({ where: { tarefaId } });
 
+    // Abrir a tarefa marca os pedidos de ajuda dela como vistos.
+    const pedidosAjuda = await this.pedidosAjuda(professor.id, { tarefaId });
+    if (pedidosAjuda.length)
+      await this.dataSource.query(
+        'UPDATE pedido_ajuda SET visto_em = NOW() WHERE tarefa_id = ? AND visto_em IS NULL',
+        [tarefaId],
+      );
+
     return {
       data: {
         ...tarefa,
+        pedidosAjuda,
         totalAlunos: alunos.length,
         iaDisponivel: this.ia.disponivel,
         adaptacoes: alunos
@@ -459,6 +504,7 @@ export class PainelProfessorService {
           ...(atual ?? { tarefaId, alunoId: g.alunoId }),
           passos: g.passos,
           recursos: g.recursos,
+          materiais: g.materiais,
           descricao_adaptada: g.passos
             .map((p, i) => `${i + 1}. ${p}`)
             .join('\n'),

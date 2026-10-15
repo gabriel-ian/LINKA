@@ -1,0 +1,87 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Meu progresso</h1>
+    <p>Olha só quanto você já avançou!</p>
+  </header>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (dados(); as d) {
+    <div class="indicadores">
+      <div class="indicador c-azul">
+        <span>Esta semana</span>
+        <strong>{{ d.semana === null ? '—' : d.semana + '%' }}</strong>
+        <small>das tarefas feitas</small>
+      </div>
+      <div class="indicador c-laranja">
+        <span>Sequência</span>
+        <strong>{{ d.sequencia.atual }} {{ d.sequencia.atual === 1 ? 'dia' : 'dias' }}</strong>
+        <small>{{
+          d.sequencia.atual && d.sequencia.atual >= d.sequencia.recorde
+            ? 'seu recorde!'
+            : 'recorde: ' + d.sequencia.recorde
+        }}</small>
+      </div>
+      <div class="indicador c-roxo">
+        <span>Pontos</span>
+        <strong>{{ d.pontos.total }}</strong>
+        <small>+{{ d.pontos.hoje }} hoje</small>
+      </div>
+      <div class="indicador c-verde">
+        <span>Concluídas</span>
+        <strong>{{ d.concluidasMes }}</strong>
+        <small>neste mês</small>
+      </div>
+    </div>
+
+    <section class="cartao">
+      <h2>Minha semana</h2>
+      <ol class="semana">
+        @for (dia of d.dias; track dia.data) {
+          <li [class]="'dia-' + dia.estado">
+            <span class="bola">{{
+              dia.estado === 'feito' ? 'ok' : dia.estado === 'hoje' ? '!' : ''
+            }}</span>
+            <strong>{{ dia.rotulo }}</strong>
+            <small>{{
+              dia.estado === 'feito' ? 'Feito' : dia.estado === 'hoje' ? 'Hoje' : '-'
+            }}</small>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <div class="colunas">
+      <section class="cartao">
+        <h2>Por matéria</h2>
+        <div class="materias">
+          @for (m of d.porMateria; track m.disciplina; let i = $index) {
+            <div class="materia" [class]="corMateria(i)">
+              <span class="rotulo"
+                >{{ m.disciplina }} <b>{{ m.taxa === null ? '—' : m.taxa + '%' }}</b></span
+              >
+              <span class="progresso"><span [style.width.%]="m.taxa ?? 0"></span></span>
+            </div>
+          } @empty {
+            <p class="vazio">Sem tarefas neste mês ainda.</p>
+          }
+        </div>
+      </section>
+
+      <section class="cartao">
+        <h2>Tarefas concluídas por semana</h2>
+        <div class="grafico" role="img" aria-label="Tarefas concluídas nas últimas 4 semanas">
+          @for (s of d.porSemana; track s.inicio; let ultima = $last) {
+            <div class="coluna-grafico" [class.atual]="ultima">
+              <span class="valor">{{ s.concluidas }}</span>
+              <span class="barra" [style.height.%]="(s.concluidas / maiorSemana()) * 100"></span>
+              <small>{{ s.rotulo }}</small>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</div>

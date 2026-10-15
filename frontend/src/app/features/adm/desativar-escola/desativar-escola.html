@@ -44,9 +44,10 @@
       } @else {
         <div class="aviso-caixa vermelho">
           <strong>Atenção: essa ação afeta toda a escola</strong>
-          {{ e.totalAlunosNee }} alunos, {{ e.totalProfessores }} professores e as famílias
-          vinculadas perdem o acesso imediatamente. Os dados ficam guardados e a escola pode ser
-          reativada depois.
+          {{ e.totalAlunosNee | plural: 'aluno' : 'alunos' }},
+          {{ e.totalProfessores | plural: 'professor' : 'professores' }} e as famílias vinculadas
+          perdem o acesso imediatamente. Os dados ficam guardados e a escola pode ser reativada
+          depois.
         </div>
 
         <div class="grade-campos">

@@ -85,7 +85,8 @@ export class LoginComponent {
         }
 
         this.auth.guardarSessao(res);
-        this.redirecionar(res.perfil);
+        if (res.trocarSenha) this.router.navigateByUrl('/primeiro-acesso');
+        else this.redirecionar(res.perfil);
       },
 
       error: (e: HttpErrorResponse) => {

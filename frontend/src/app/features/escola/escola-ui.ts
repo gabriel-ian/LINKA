@@ -6,7 +6,7 @@ export const ROTULO_SITUACAO: Record<Situacao, string> = {
   atencao: 'Atenção',
   melhorando: 'Melhorando',
   'em-dia': 'Em dia',
-  'sem-dados': 'Sem tarefas',
+  'sem-dados': 'Sem entregas ainda',
 };
 
 export const ROTULO_STATUS_PROFESSOR: Record<StatusProfessor, string> = {

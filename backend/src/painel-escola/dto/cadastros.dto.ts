@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
+  ArrayMinSize,
   ArrayUnique,
   IsArray,
   IsBoolean,
@@ -68,6 +69,25 @@ export class CriarTurmaDto {
   professorIds?: number[];
 }
 
+/** Uma turma do professor e as disciplinas que ele da nela. */
+export class AlocacaoDto {
+  @ApiProperty({ example: 7 })
+  @IsInt()
+  turmaId!: number;
+
+  @ApiProperty({
+    type: [String],
+    example: ['Matemática'],
+    description:
+      'Nomes, entre as disciplinas do professor; vazio = sem disciplina',
+  })
+  @IsArray()
+  @ArrayUnique()
+  @IsString({ each: true })
+  @MaxLength(100, { each: true })
+  disciplinas!: string[];
+}
+
 /** Cria usuario (perfil professor) + professor + disciplinas + turmas. */
 export class CriarProfessorDto {
   @ApiProperty({ example: 'Ana Beatriz Souza' })
@@ -103,6 +123,17 @@ export class CriarProfessorDto {
   @ArrayUnique()
   @IsInt({ each: true })
   turmaIds?: number[];
+
+  @ApiPropertyOptional({
+    type: [AlocacaoDto],
+    description: 'Turmas com a disciplina de cada uma (no lugar de turmaIds)',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => AlocacaoDto)
+  alocacoes?: AlocacaoDto[];
 }
 
 export class AtualizarProfessorDto {
@@ -190,6 +221,13 @@ export class CriarAlunoDto {
   @ValidateNested()
   @Type(() => ResponsavelDto)
   responsavel?: ResponsavelDto;
+
+  @ApiPropertyOptional({
+    description: 'Familia ja cadastrada (no lugar de "responsavel")',
+  })
+  @IsOptional()
+  @IsInt()
+  responsavelId?: number;
 }
 
 /**
@@ -260,3 +298,53 @@ export class EditarAlunoDto extends PerfilAprendizagemDto {
 
 /** Edicao da turma: mesmos campos do cadastro, todos opcionais. */
 export class EditarTurmaDto extends PartialType(CriarTurmaDto) {}
+
+/** Alunos para colocar na turma de uma vez. */
+export class MatricularAlunosDto {
+  @ApiProperty({ type: [Number], example: [12, 15] })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(200)
+  @ArrayUnique()
+  @IsInt({ each: true })
+  alunoIds!: number[];
+}
+
+/** Editar nome, disciplinas e turmas do professor (o login nao muda aqui). */
+export class EditarProfessorDto {
+  @ApiPropertyOptional({ example: 'Ana Beatriz Souza' })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  nomeCompleto?: string;
+
+  @ApiProperty({ type: [String], example: ['Matemática', 'Ciências'] })
+  @IsArray()
+  @ArrayUnique()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
+  @MaxLength(100, { each: true })
+  disciplinas!: string[];
+
+  @ApiProperty({ type: [AlocacaoDto] })
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => AlocacaoDto)
+  alocacoes!: AlocacaoDto[];
+}
+
+/** Vincula um responsavel ao aluno: um ja cadastrado OU um novo. */
+export class VincularResponsavelDto {
+  @ApiPropertyOptional()
+  @ValidateIf((o: VincularResponsavelDto) => !o.responsavel)
+  @IsInt()
+  responsavelId?: number;
+
+  @ApiPropertyOptional({ type: ResponsavelDto })
+  @ValidateIf((o: VincularResponsavelDto) => o.responsavelId === undefined)
+  @ValidateNested()
+  @Type(() => ResponsavelDto)
+  responsavel?: ResponsavelDto;
+}

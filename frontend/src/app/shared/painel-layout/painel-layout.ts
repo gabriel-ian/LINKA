@@ -2,6 +2,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { AlterarSenha } from '../senha/alterar-senha';
+import { VozService } from '../../core/services/voz.service';
 
 /** Uma camada de icone do menu, na posicao do Figma (relativa a borda externa do botao). */
 export interface CamadaIcone {
@@ -22,6 +23,14 @@ export interface ItemMenu {
   exato?: boolean;
   /** Destaca o item mesmo fora da rota dele (ex.: turma selecionada do professor). */
   selecionado?: boolean;
+  /** Bolinha laranja com um numero (ex.: tarefas pendentes do aluno). */
+  contador?: number;
+  /** Rotulo longo: a bolinha sai para o canto do botao para nao cobrir o texto. */
+  contadorNoCanto?: boolean;
+  /** Item sem rota (ex.: escolher o filho na familia): vira um botao. */
+  aoClicar?: () => void;
+  /** 'filho': estilo laranja do item "FILHO (A)" da familia. */
+  tom?: 'filho';
 }
 
 export interface ConfigPainel {
@@ -39,6 +48,13 @@ export interface ConfigPainel {
   };
   /** Medidas que mudam entre os paineis do Figma. */
   medidas: { rotuloX: number; visaoX: number; secaoTam: number; gapItens: number };
+  /** Aluno: o mascote fala na barra no lugar do titulo (com botao de ouvir). */
+  fala?: string;
+  /** Aluno/familia: iniciais no canto do topo, que abrem o menu da conta. */
+  avatar?: string;
+  /** Preferencias do aluno que mudam a moldura inteira. */
+  modoCalmo?: boolean;
+  letrasMaiores?: boolean;
 }
 
 export interface Notificacao {
@@ -64,11 +80,14 @@ export interface Notificacao {
     '[style.--visao-x.px]': 'config().medidas.visaoX',
     '[style.--secao-tam.px]': 'config().medidas.secaoTam',
     '[style.--gap-itens.px]': 'config().medidas.gapItens',
+    '[class.calmo]': 'config().modoCalmo',
+    '[class.letras-maiores]': 'config().letrasMaiores',
   },
 })
 export class PainelLayout {
   private auth = inject(AuthService);
   private router = inject(Router);
+  readonly voz = inject(VozService);
 
   config = input.required<ConfigPainel>();
   notificacoes = input<Notificacao[]>([]);

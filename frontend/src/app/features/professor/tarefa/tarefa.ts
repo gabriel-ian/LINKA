@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
 import { TarefaProfessor } from '../../../core/model/painel-professor.model';
 import { ProfessorContexto } from '../professor-contexto';
@@ -91,7 +92,7 @@ export class ProfessorTarefa {
       error: (e: HttpErrorResponse) => {
         this.gerando.set(false);
         this.erroIa.set(
-          `${[e.error?.message].flat().join(' ') || 'A IA não respondeu.'} Você pode escrever os passos manualmente em "Editar adaptação".`,
+          `${mensagemDeErro(e, 'A IA não respondeu.')} Você pode escrever os passos manualmente em "Editar adaptação".`,
         );
       },
     });

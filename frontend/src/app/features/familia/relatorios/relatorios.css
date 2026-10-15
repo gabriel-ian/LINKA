@@ -1,0 +1,181 @@
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.filtros select {
+  width: 219px;
+  height: 45px;
+  color: var(--cor-titulo);
+}
+
+.cartoes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.cartao-num {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 125px;
+  padding: 14px 16px;
+}
+
+.cartao-num span {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.cartao-num strong {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 44px;
+}
+
+.cartao-num small {
+  font-size: 14px;
+}
+
+.azul {
+  color: #1558d6;
+}
+
+.verde {
+  color: #0e996b;
+}
+
+.laranja {
+  color: #ea6819;
+}
+
+.roxo {
+  color: #7c3aed;
+}
+
+.resumo {
+  padding: 14px 18px 16px;
+  border-radius: 16px;
+  background: #e6f7f2;
+  color: #00704d;
+}
+
+.resumo h2 {
+  margin: 0 0 6px;
+  color: #004d35;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.resumo p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 19px;
+}
+
+.graficos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.grafico {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 268px;
+  padding: 16px 20px 20px;
+}
+
+.grafico h2 {
+  font-weight: 500;
+}
+
+.materias .materia {
+  gap: 6px 8px;
+}
+
+.barras {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barras li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 52px;
+}
+
+.barras .valor {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.barras .coluna {
+  width: 52px;
+  border-radius: 6px;
+  background: #e8effe;
+}
+
+.barras .coluna.maior {
+  background: #0e996b;
+}
+
+.barras li:has(.maior) .valor {
+  color: #0e996b;
+}
+
+.barras .rotulo {
+  font-size: 13px;
+}
+
+.vazio-lista {
+  font-size: 15px;
+}
+
+@media (max-width: 1000px) {
+  .cartoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .graficos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cartao-num strong {
+    font-size: 32px;
+  }
+}
+
+@media print {
+  .pagina {
+    max-width: none;
+  }
+
+  .bloco {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

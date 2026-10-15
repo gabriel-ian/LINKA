@@ -71,6 +71,7 @@ export class EscolaService {
         usuarioRepo.create({
           email,
           senha: await UsuarioService.hashSenha(senha),
+          senhaProvisoria: true,
           perfil: 'escola',
           escolaId: escola.id,
         }),
@@ -175,6 +176,7 @@ export class EscolaService {
     const senhaProvisoria = gerarSenhaProvisoria();
     await this.dataSource.getRepository(Usuario).update(login.id, {
       senha: await UsuarioService.hashSenha(senhaProvisoria),
+      senhaProvisoria: true,
     });
 
     return { data: { email: login.email, senhaProvisoria } };

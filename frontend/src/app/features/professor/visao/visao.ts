@@ -1,3 +1,4 @@
+import { PluralPipe } from '../../../shared/plural.pipe';
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProfessorContexto } from '../professor-contexto';
@@ -7,7 +8,7 @@ import { COR_STATUS, hojePorExtenso, nomeCurto, rotuloStatus } from '../professo
 /** "Professor - Visao geral" do Figma. */
 @Component({
   selector: 'app-professor-visao',
-  imports: [RouterLink],
+  imports: [RouterLink, PluralPipe],
   templateUrl: './visao.html',
   styleUrl: './visao.css',
 })

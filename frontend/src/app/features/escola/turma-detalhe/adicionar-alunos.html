@@ -1,0 +1,108 @@
+<div class="fundo" (click)="fechar.emit(0)">
+  <form
+    class="janela"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-adicionar"
+    (click)="$event.stopPropagation()"
+    (ngSubmit)="salvar()"
+  >
+    <header>
+      <h2 id="titulo-adicionar">Adicionar alunos à {{ turma().nome }}</h2>
+      <p class="vagas" [class.cheia]="vagas() === 0">
+        @if (vagas() === null) {
+          Turma sem limite de alunos - {{ turma().totalAlunos }} matriculados
+        } @else if (vagas() === 0) {
+          Turma cheia ({{ turma().limiteAlunos }} alunos). Aumente o limite em Editar turma.
+        } @else {
+          {{ vagas() }} {{ vagas() === 1 ? 'vaga' : 'vagas' }} de {{ turma().limiteAlunos }}
+        }
+      </p>
+    </header>
+
+    <div class="filtros-janela">
+      <label class="campo-p">
+        Trazer alunos de
+        <select name="origem" [(ngModel)]="origem" (ngModelChange)="trocarOrigem()">
+          <option [ngValue]="'sem'">Sem turma ({{ semTurma() }})</option>
+          @if (origens().length) {
+            <optgroup label="Outras turmas (mudar de turma)">
+              @for (o of origens(); track o.id) {
+                <option [ngValue]="o.id">{{ o.nome }} ({{ o.total }})</option>
+              }
+            </optgroup>
+          }
+        </select>
+      </label>
+      <label class="campo-p">
+        Buscar
+        <input
+          name="busca"
+          [(ngModel)]="busca"
+          (ngModelChange)="filtrar()"
+          placeholder="Nome ou CGM"
+        />
+      </label>
+    </div>
+
+    @if (lista().length) {
+      <label class="marcar todos">
+        <input type="checkbox" [checked]="todosMarcados()" (change)="alternarTodos()" />
+        Selecionar todos ({{ lista().length }})
+      </label>
+      <ul class="lista">
+        @for (a of lista(); track a.id) {
+          <li>
+            <label class="marcar">
+              <input type="checkbox" [checked]="marcados().has(a.id)" (change)="alternar(a.id)" />
+              <span>
+                <strong>{{ a.nome }}</strong>
+                <small>
+                  {{ a.cgm ? 'CGM ' + a.cgm : 'Sem CGM' }}
+                  @if (a.neurodivergente) {
+                    - NEE{{ a.diagnosticos.length ? ': ' + a.diagnosticos.join(', ') : '' }}
+                  }
+                </small>
+              </span>
+            </label>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="vazio-lista">
+        {{
+          filtro().origem === 'sem'
+            ? 'Todos os alunos da escola já estão em uma turma.'
+            : 'Nenhum aluno encontrado nesta turma.'
+        }}
+      </p>
+    }
+
+    @if (passouDoLimite()) {
+      <p class="alerta-erro" role="alert">
+        Você marcou {{ marcados().size }} alunos, mas a turma só tem {{ vagas() }}
+        {{ vagas() === 1 ? 'vaga' : 'vagas' }}.
+      </p>
+    }
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    <div class="acoes">
+      <button type="button" class="bt bt-secundario" (click)="fechar.emit(0)">Cancelar</button>
+      <button
+        type="submit"
+        class="bt bt-primario"
+        [disabled]="!marcados().size || passouDoLimite() || salvando()"
+      >
+        {{
+          salvando()
+            ? 'Adicionando...'
+            : marcados().size
+              ? 'Adicionar ' + marcados().size + (marcados().size === 1 ? ' aluno' : ' alunos')
+              : 'Adicionar alunos'
+        }}
+      </button>
+    </div>
+  </form>
+</div>

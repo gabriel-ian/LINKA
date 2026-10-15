@@ -178,6 +178,7 @@ describe('EscolaService', () => {
       expect(usuarioRepo.create).toHaveBeenCalledWith({
         email: 'nova@escola.com',
         senha: 'hash',
+        senhaProvisoria: true,
         perfil: 'escola',
         escolaId: 2,
       });

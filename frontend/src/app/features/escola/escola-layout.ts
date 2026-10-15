@@ -50,12 +50,17 @@ export class EscolaLayout {
             },
             {
               rota: '/escola/alunos',
-              rotulo: 'Alunos NEE',
+              rotulo: 'Alunos',
               exato: false,
               icone: [
                 { src: ICONE + 'alunos', left: 13.75, top: 14.75 },
                 { src: ICONE + 'alunos-check', left: 25, top: 21 },
               ],
+            },
+            {
+              rota: '/escola/familias',
+              rotulo: 'Famílias',
+              icone: [{ src: ICONE + 'professores', left: 11.9, top: 16 }],
             },
             {
               rota: '/escola/relatorios',
@@ -67,6 +72,11 @@ export class EscolaLayout {
         {
           titulo: 'CADASTRO',
           itens: [
+            {
+              rota: '/escola/cadastro/familia',
+              rotulo: 'Família',
+              icone: [{ src: ICONE + 'professores', left: 11.9, top: 16 }],
+            },
             {
               rota: '/escola/cadastro/aluno',
               rotulo: 'Aluno (a)',

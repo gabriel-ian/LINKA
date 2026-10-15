@@ -54,57 +54,68 @@
 
       <div>
         <h2 class="cartao-titulo">Necessidades educacionais</h2>
-        <p class="ajuda">Selecione os diagnósticos que se aplicam</p>
-        <div class="diagnosticos">
-          @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
+        <label class="marcar">
+          <input type="checkbox" name="nee" [checked]="nee()" (change)="alternarNee()" />
+          Este aluno tem necessidades educacionais especiais (NEE)
+        </label>
+      </div>
+
+      @if (nee()) {
+        <div>
+          <p class="ajuda">Selecione os diagnósticos que se aplicam</p>
+          <div class="diagnosticos">
+            @for (d of opcoes()?.diagnosticos ?? []; track d.id) {
+              <button
+                type="button"
+                class="diagnostico"
+                [attr.aria-pressed]="diagnosticos().has(d.id)"
+                (click)="alternarDiagnostico(d.id)"
+              >
+                {{ d.nome }}
+              </button>
+            }
             <button
               type="button"
               class="diagnostico"
-              [attr.aria-pressed]="diagnosticos().has(d.id)"
-              (click)="alternarDiagnostico(d.id)"
+              [attr.aria-pressed]="prefiroNaoInformar()"
+              (click)="alternarPrefiro()"
             >
-              {{ d.nome }}
+              Prefiro não informar
             </button>
-          }
-          <button
-            type="button"
-            class="diagnostico"
-            [attr.aria-pressed]="prefiroNaoInformar()"
-            (click)="alternarPrefiro()"
-          >
-            Prefiro não informar
-          </button>
+          </div>
         </div>
-      </div>
 
-      <div class="laudo" [class.invalido]="erroLaudo()">
-        <div>
-          <strong>Laudo clínico</strong>
-          @if (laudo(); as l) {
-            <span>Novo arquivo: {{ l.name }}</span>
-          } @else if (a.laudo) {
-            <span>Já existe um laudo anexado. Envie outro para substituir.</span>
+        <div class="laudo" [class.invalido]="erroLaudo()">
+          <div>
+            <strong>Laudo clínico</strong>
+            @if (laudo(); as l) {
+              <span>Novo arquivo: {{ l.name }}</span>
+            } @else if (a.laudo) {
+              <span>Já existe um laudo anexado. Envie outro para substituir.</span>
+            } @else {
+              <span>Nenhum laudo anexado - PDF ou imagem, até 10 MB</span>
+            }
+            @if (erroLaudo()) {
+              <span class="msg-erro">{{ erroLaudo() }}</span>
+            }
+          </div>
+          @if (laudo()) {
+            <button type="button" class="bt bt-secundario" (click)="laudo.set(null)">
+              Remover
+            </button>
           } @else {
-            <span>Nenhum laudo anexado - PDF ou imagem, até 10 MB</span>
-          }
-          @if (erroLaudo()) {
-            <span class="msg-erro">{{ erroLaudo() }}</span>
+            <label class="bt bt-secundario">
+              {{ a.laudo ? 'Substituir laudo' : 'Anexar laudo' }}
+              <input
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+                hidden
+                (change)="escolherLaudo($any($event.target).files)"
+              />
+            </label>
           }
         </div>
-        @if (laudo()) {
-          <button type="button" class="bt bt-secundario" (click)="laudo.set(null)">Remover</button>
-        } @else {
-          <label class="bt bt-secundario">
-            {{ a.laudo ? 'Substituir laudo' : 'Anexar laudo' }}
-            <input
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
-              hidden
-              (change)="escolherLaudo($any($event.target).files)"
-            />
-          </label>
-        }
-      </div>
+      }
 
       <hr class="divisor" />
 

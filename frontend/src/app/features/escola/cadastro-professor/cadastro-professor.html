@@ -55,8 +55,8 @@
       <hr class="divisor" />
 
       <div>
-        <h2 class="cartao-titulo">Disciplinas e turmas</h2>
-        <p class="ajuda">Selecione uma ou mais opções</p>
+        <h2 class="cartao-titulo">Disciplinas</h2>
+        <p class="ajuda">Tudo o que o professor pode lecionar</p>
         <div class="chips">
           @for (d of todasDisciplinas(); track d) {
             <button
@@ -84,22 +84,16 @@
             <button type="button" class="chip" (click)="adicionando.set(true)">+ Outra</button>
           }
         </div>
-        <div class="chips turmas">
-          @for (t of opcoes()?.turmas ?? []; track t.id) {
-            <button
-              type="button"
-              class="chip"
-              [attr.aria-pressed]="turmas().has(t.id)"
-              (click)="alternarTurma(t.id)"
-            >
-              {{ t.nome }}
-            </button>
-          } @empty {
-            <span class="ajuda"
-              >Nenhuma turma cadastrada ainda - o professor pode ser vinculado depois.</span
-            >
-          }
-        </div>
+      </div>
+
+      <div>
+        <h2 class="cartao-titulo">Turmas</h2>
+        <p class="ajuda">Marque as turmas e o que o professor dá em cada uma</p>
+        <app-escolha-turmas
+          [turmas]="opcoes()?.turmas ?? []"
+          [disciplinas]="disciplinasEscolhidas()"
+          [(alocacoes)]="alocacoes"
+        />
       </div>
 
       <hr class="divisor" />
@@ -116,8 +110,13 @@
               [(ngModel)]="senha"
               placeholder="Mínimo 8 caracteres"
             />
-            <button type="button" (click)="mostrarSenha = !mostrarSenha">
-              {{ mostrarSenha ? 'ocultar' : 'mostrar' }}
+            <button
+              type="button"
+              [attr.aria-label]="mostrarSenha ? 'Esconder senha' : 'Mostrar senha'"
+              [attr.aria-pressed]="mostrarSenha"
+              (click)="mostrarSenha = !mostrarSenha"
+            >
+              <img src="assets/entrada/icone-olho.svg" alt="" />
             </button>
           </span>
           @if (erro('senha')) {
@@ -134,8 +133,13 @@
               [(ngModel)]="confirmacao"
               placeholder="Repita a senha"
             />
-            <button type="button" (click)="mostrarConfirmar = !mostrarConfirmar">
-              {{ mostrarConfirmar ? 'ocultar' : 'mostrar' }}
+            <button
+              type="button"
+              [attr.aria-label]="mostrarConfirmar ? 'Esconder senha' : 'Mostrar senha'"
+              [attr.aria-pressed]="mostrarConfirmar"
+              (click)="mostrarConfirmar = !mostrarConfirmar"
+            >
+              <img src="assets/entrada/icone-olho.svg" alt="" />
             </button>
           </span>
           @if (erro('confirmar')) {
@@ -173,7 +177,7 @@
         </div>
         <div>
           <dt>Turmas</dt>
-          <dd>{{ juntar(nomesTurmas()) || 'Nenhuma' }}</dd>
+          <dd>{{ resumoTurmas() || 'Nenhuma' }}</dd>
         </div>
         <div>
           <dt>Alunos NEE nas turmas</dt>

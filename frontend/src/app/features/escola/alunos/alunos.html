@@ -1,7 +1,13 @@
 <div class="pagina">
   <header class="painel-cabecalho">
-    <h1>Alunos NEE</h1>
-    <p>{{ alunosNee().length }} alunos com necessidades educacionais especiais na plataforma</p>
+    <h1>Alunos</h1>
+    <p>
+      {{ contexto.alunos().length | plural: 'aluno' : 'alunos' }} na escola -
+      {{ alunosNee().length }} com necessidades educacionais especiais
+      @if (semTurma()) {
+        - {{ semTurma() }} sem turma
+      }
+    </p>
   </header>
 
   <div class="indicadores">
@@ -30,11 +36,23 @@
     </label>
     <label class="campo-p seletor">
       <select
+        aria-label="Grupo"
+        [value]="grupo()"
+        (change)="grupo.set($any($event.target).value); pagina.set(0)"
+      >
+        <option value="">Alunos: Todos</option>
+        <option value="nee">Com NEE</option>
+        <option value="sem">Sem NEE</option>
+      </select>
+    </label>
+    <label class="campo-p seletor">
+      <select
         aria-label="Turma"
         [value]="turma()"
         (change)="turma.set($any($event.target).value); pagina.set(0)"
       >
         <option value="">Turma: Todas</option>
+        <option value="sem">Sem turma ({{ semTurma() }})</option>
         @for (t of turmas(); track t.id) {
           <option [value]="t.id">{{ t.nome }}</option>
         }
@@ -80,9 +98,13 @@
                 </div>
               </a>
             </td>
-            <td>{{ a.turma?.codigo ?? '—' }}</td>
+            <td>{{ a.turma?.codigo ?? 'Sem turma' }}</td>
             <td>
-              <span class="pilula inativa">{{ a.diagnosticos[0] || 'Não informado' }}</span>
+              @if (a.neurodivergente) {
+                <span class="pilula pendente">{{ a.diagnosticos[0] || 'Não informado' }}</span>
+              } @else {
+                <span class="pilula inativa">Sem NEE</span>
+              }
             </td>
             <td>
               <span class="desempenho">
@@ -98,7 +120,7 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="vazio">Nenhum aluno NEE neste filtro.</td>
+            <td colspan="5" class="vazio">Nenhum aluno neste filtro.</td>
           </tr>
         }
       </tbody>

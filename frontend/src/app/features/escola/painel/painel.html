@@ -5,8 +5,11 @@
   </header>
 
   <p class="status">
-    A plataforma está operando normalmente. {{ alunosNee().length }} alunos NEE ativos e
-    {{ contexto.professores().length }} professores cadastrados.
+    A plataforma está operando normalmente.
+    {{ alunosNee().length | plural: 'aluno NEE ativo' : 'alunos NEE ativos' }} e
+    {{
+      contexto.professores().length | plural: 'professor cadastrado' : 'professores cadastrados'
+    }}.
   </p>
 
   <div class="indicadores grandes">
@@ -39,9 +42,8 @@
         <a class="linha" [class]="'c-' + cor(i)" [routerLink]="['/escola/turmas', t.id]">
           <span class="selo-cor">{{ t.codigo }}</span>
           <span class="texto">
-            <strong>{{ t.nome }}</strong> - {{ t.totalNee }} alunos NEE <br />{{
-              t.professores[0]?.nome ?? 'Sem professor vinculado'
-            }}
+            <strong>{{ t.nome }}</strong> - {{ t.totalNee | plural: 'aluno NEE' : 'alunos NEE' }}
+            <br />{{ t.professores[0]?.nome ?? 'Sem professor vinculado' }}
             <span class="barra-linha">
               <span class="progresso"><span [style.width.%]="t.desempenho ?? 0"></span></span>
               <span class="pilula-cor">{{ pct(t.desempenho) }}</span>

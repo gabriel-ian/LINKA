@@ -24,7 +24,9 @@ import { Component, input, output, signal } from '@angular/core';
             <code>{{ senha() }}</code>
           </dd>
         </dl>
-        <p class="dica">No primeiro acesso, peça para trocar a senha em "Alterar minha senha".</p>
+        <p class="dica">
+          No primeiro acesso, a Linka oferece criar uma senha própria ou manter esta.
+        </p>
         <div class="acoes">
           <button type="button" class="bt bt-secundario" (click)="copiar()">
             {{ copiado() ? 'Copiado!' : 'Copiar' }}

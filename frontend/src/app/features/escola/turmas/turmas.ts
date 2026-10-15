@@ -1,3 +1,4 @@
+import { PluralPipe } from '../../../shared/plural.pipe';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
@@ -10,7 +11,7 @@ const POR_PAGINA = 6;
 /** "Escola - Turmas" do Figma. */
 @Component({
   selector: 'app-escola-turmas',
-  imports: [RouterLink],
+  imports: [RouterLink, PluralPipe],
   templateUrl: './turmas.html',
   styleUrl: './turmas.css',
 })

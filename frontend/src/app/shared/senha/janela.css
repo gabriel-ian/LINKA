@@ -71,3 +71,15 @@ code {
 .aviso-caixa {
   margin: 0;
 }
+
+.caixa > input {
+  padding-right: 48px !important;
+}
+
+.olho {
+  display: flex;
+}
+
+.olho img {
+  width: 22px;
+}

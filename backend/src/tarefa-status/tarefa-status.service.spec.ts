@@ -122,7 +122,12 @@ describe('TarefaStatusService', () => {
 
       await service.seedParaAluno(3, 1);
 
-      expect(tarefaRepo.find).toHaveBeenCalledWith({ where: { turmaId: 1 } });
+      // Aluno novo so recebe tarefas que ainda vao vencer (ou sem data).
+      const { where } = tarefaRepo.find.mock.calls[0][0] as {
+        where: { turmaId: number; data_entrega: unknown }[];
+      };
+      expect(where).toHaveLength(2);
+      expect(where.every((w) => w.turmaId === 1)).toBe(true);
       expect(qb.values).toHaveBeenCalledWith([
         { alunoId: 3, tarefaId: 10, status: 'pendente' },
         { alunoId: 3, tarefaId: 11, status: 'pendente' },

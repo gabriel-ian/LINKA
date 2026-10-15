@@ -2,7 +2,9 @@
   <header class="painel-cabecalho">
     <h1>{{ saudacao() }}</h1>
     @if (contexto.visao(); as v) {
-      <p>{{ v.turma.nome }} - {{ v.turma.totalAlunos }} alunos - {{ hoje }}</p>
+      <p>
+        {{ v.turma.nome }} - {{ v.turma.totalAlunos | plural: 'aluno' : 'alunos' }} - {{ hoje }}
+      </p>
     }
   </header>
 

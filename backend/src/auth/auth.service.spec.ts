@@ -96,6 +96,7 @@ describe('AuthService', () => {
         access_token: 'token-assinado',
         perfil: 'escola',
         escolaId: 5,
+        trocarSenha: false,
       });
     });
 
@@ -184,6 +185,34 @@ describe('AuthService', () => {
       jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
 
       await service.alterarSenha(3, 'atual123', 'novaSenha1');
+
+      expect(usuarioService.definirSenha).toHaveBeenCalledWith(3, 'novaSenha1');
+    });
+  });
+
+  describe('criarSenha (primeiro acesso)', () => {
+    it('recusa quando a senha ja nao e provisoria', async () => {
+      usuarioService.findById.mockResolvedValue({
+        id: 3,
+        senha: 'hash',
+        senhaProvisoria: false,
+      } as Usuario);
+
+      await expect(service.criarSenha(3, 'novaSenha1')).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(usuarioService.definirSenha).not.toHaveBeenCalled();
+    });
+
+    it('troca a senha provisoria sem pedir a atual', async () => {
+      usuarioService.findById.mockResolvedValue({
+        id: 3,
+        senha: 'hash',
+        senhaProvisoria: true,
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(false);
+
+      await service.criarSenha(3, 'novaSenha1');
 
       expect(usuarioService.definirSenha).toHaveBeenCalledWith(3, 'novaSenha1');
     });

@@ -26,6 +26,10 @@ export class Usuario {
   @Column()
   senha!: string;
 
+  /** Senha definida por outra pessoa; o login convida a trocar ou manter. */
+  @Column({ name: 'senha_provisoria', default: false })
+  senhaProvisoria!: boolean;
+
   @Column({
     type: 'enum',
     enum: ['admin', 'escola', 'professor', 'responsavel', 'aluno'],

@@ -5,7 +5,7 @@ import { Component, input } from '@angular/core';
   selector: 'app-adm-resultado',
   template: `
     <section class="cartao resultado" role="status">
-      <span class="selo" [class.alerta]="tipo() === 'alerta'">{{
+      <span class="selo" [class.alerta]="tipo() === 'alerta'" [class.forte]="forte()">{{
         tipo() === 'ok' ? 'ok' : '!'
       }}</span>
       <h2>{{ titulo() }}</h2>
@@ -33,6 +33,13 @@ import { Component, input } from '@angular/core';
       font-size: 28px;
       font-weight: 800;
     }
+    .selo.forte {
+      width: 93px;
+      height: 93px;
+      background: #0e996b;
+      color: #fff;
+      font-size: 32px;
+    }
     .selo.alerta {
       background: var(--cor-alerta-fundo);
       color: var(--cor-alerta);
@@ -55,4 +62,6 @@ export class AdmResultado {
   tipo = input<'ok' | 'alerta'>('ok');
   titulo = input.required<string>();
   texto = input('');
+  /** Circulo verde cheio (telas do aluno). */
+  forte = input(false);
 }

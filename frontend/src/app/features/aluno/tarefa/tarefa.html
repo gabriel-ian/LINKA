@@ -1,0 +1,204 @@
+@if (erro() && !tarefa()) {
+  <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  <a class="voltar-botao" routerLink="/aluno/tarefas" aria-label="Voltar para as tarefas">
+    <img src="assets/aluno/botao-voltar.svg" alt="" width="100.901" height="49.8057" />
+  </a>
+}
+
+@if (tarefa(); as t) {
+  @if (calmo()) {
+    <!-- ---------------- Modo calmo: um passo por vez ---------------- -->
+    <div class="pagina calma">
+      <header class="calma-topo">
+        <h1>{{ t.titulo }}</h1>
+        <p>
+          {{ t.disciplina ? t.disciplina + ' - ' : '' }}passo
+          {{ atual() + 1 > total() ? total() : atual() + 1 }} de {{ total() }} -
+          {{ prazo().toLowerCase() }}
+        </p>
+      </header>
+
+      <div class="segmentos" aria-hidden="true">
+        @for (p of t.passos; track $index) {
+          <span [class.feito]="$index < atual()" [class.agora]="$index === atual()"></span>
+        }
+      </div>
+
+      @if (atual() < total()) {
+        <section class="calma-cartao" aria-live="polite">
+          <small>PASSO {{ atual() + 1 }}</small>
+          <p class="calma-texto">{{ t.passos[atual()] }}</p>
+          @if (erro()) {
+            <p class="alerta-erro" role="alert">{{ erro() }}</p>
+          }
+          <div class="calma-botoes">
+            <button type="button" class="calma-bt" (click)="ouvirPasso(atual())">
+              Ouvir este passo
+            </button>
+            <a
+              class="calma-bt"
+              [routerLink]="['/aluno/tarefas', t.id, 'ajuda']"
+              [queryParams]="{ passo: atual() + 1 }"
+              >Preciso de ajuda</a
+            >
+            <button
+              type="button"
+              class="calma-bt cheio"
+              [disabled]="salvando()"
+              (click)="concluirPasso()"
+            >
+              {{ salvando() ? 'Salvando...' : 'Concluir passo' }}
+            </button>
+          </div>
+        </section>
+        <p class="calma-nota">Os próximos passos aparecem quando você terminar este.</p>
+      } @else {
+        <section class="calma-cartao">
+          <p class="calma-texto">Todos os passos estão feitos. Muito bem!</p>
+        </section>
+      }
+
+      <footer class="calma-rodape">
+        <span>Modo calmo: menos cores, letras maiores e um passo por vez.</span>
+        <button type="button" class="link-acao" (click)="voltarAoNormal()">
+          Voltar ao modo normal
+        </button>
+      </footer>
+    </div>
+  } @else {
+    <!-- ---------------- Modo normal ---------------- -->
+    <div class="pagina">
+      <nav class="trilha" aria-label="Você está em">
+        <a class="voltar-botao" routerLink="/aluno/tarefas" aria-label="Voltar para as tarefas">
+          <img src="assets/aluno/botao-voltar.svg" alt="" width="100.901" height="49.8057" />
+        </a>
+        <span
+          >Tarefas / <strong>{{ titulo() }}</strong></span
+        >
+      </nav>
+
+      <section class="cartao-aluno resumo">
+        <div class="resumo-topo">
+          <h1>{{ titulo() }}</h1>
+          <span class="estado" [class]="'estado ' + situacao().cor">{{ situacao().texto }}</span>
+        </div>
+        <p class="meta">
+          <span><img src="assets/aluno/relogio-p.svg" alt="" /> {{ prazo() }}</span>
+          <span
+            ><img src="assets/aluno/icone-passos.svg" alt="" /> {{ feitos() }} de
+            {{ textoPassos(total()) }}</span
+          >
+          @if (t.professor) {
+            <span>Prof. {{ t.professor.split(' ')[0] }}</span>
+          }
+        </p>
+        <div class="barra" aria-hidden="true"><span [style.width.%]="pct()"></span></div>
+        <p class="rodape-barra">
+          <span>{{ feitos() }} de {{ textoPassos(total()) }} concluídos</span>
+          <span>{{ pct() }}%</span>
+        </p>
+      </section>
+
+      <section class="objetivo">
+        <div>
+          <h2><img src="assets/aluno/icone-objetivo.svg" alt="" /> Objetivo da tarefa</h2>
+          <p>{{ t.objetivo }}</p>
+        </div>
+        <button
+          type="button"
+          class="ouvir-dino"
+          aria-label="Ouvir o objetivo"
+          (click)="ouvirObjetivo()"
+        >
+          <img class="espelhar" src="assets/aluno/dino-azul-p.svg" alt="" />
+          <img src="assets/aluno/som-azul.svg" alt="" />
+        </button>
+      </section>
+
+      @if (t.materiais.length) {
+        <section class="cartao-aluno materiais">
+          <div>
+            <h2><img src="assets/aluno/icone-mochila.svg" alt="" /> O que você vai precisar</h2>
+            <ul>
+              @for (m of t.materiais; track m) {
+                <li><img [src]="iconeMaterial(m)" alt="" /> {{ m }}</li>
+              }
+            </ul>
+          </div>
+          <button
+            type="button"
+            class="ouvir-dino"
+            aria-label="Ouvir os materiais"
+            (click)="ouvirMateriais()"
+          >
+            <img class="espelhar" src="assets/aluno/dino-verde-p.svg" alt="" />
+            <img src="assets/aluno/som-verde-grande.svg" alt="" />
+          </button>
+        </section>
+      }
+
+      <hr class="separador" />
+
+      <h2 class="titulo-passos">
+        <img src="assets/aluno/icone-passo-a-passo.svg" alt="" /> Passo a Passo
+      </h2>
+
+      @if (erro()) {
+        <p class="alerta-erro" role="alert">{{ erro() }}</p>
+      }
+
+      <ol class="passos">
+        @for (p of t.passos; track $index; let i = $index) {
+          <li
+            class="passo"
+            [class.feito]="i < atual()"
+            [class.agora]="i === atual()"
+            [class.depois]="i > atual()"
+            [attr.aria-current]="i === atual() ? 'step' : null"
+          >
+            <span class="numero">
+              @if (i < atual()) {
+                <img src="assets/aluno/check-branco.svg" alt="Feito" />
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <div class="passo-corpo">
+              <h3>Passo {{ i + 1 }}</h3>
+              <p>{{ p }}</p>
+              @if (i < atual()) {
+                <small><img src="assets/aluno/relogio-p.svg" alt="" /> concluído</small>
+              }
+              @if (i === atual()) {
+                <div class="passo-botoes">
+                  <button type="button" class="passo-bt" (click)="ouvirPasso(i)">
+                    <img class="espelhar" src="assets/aluno/passo-ouvir-som.svg" alt="" />
+                    <img src="assets/aluno/passo-ouvir.svg" alt="" />
+                    Ouvir este passo
+                  </button>
+                  <a
+                    class="passo-bt"
+                    [routerLink]="['/aluno/tarefas', t.id, 'ajuda']"
+                    [queryParams]="{ passo: i + 1 }"
+                  >
+                    <img src="assets/aluno/passo-ajuda.svg" alt="" />
+                    Preciso de ajuda
+                  </a>
+                  <button
+                    type="button"
+                    class="passo-bt"
+                    [disabled]="salvando()"
+                    (click)="concluirPasso()"
+                  >
+                    <img src="assets/aluno/passo-concluir.svg" alt="" />
+                    {{ salvando() ? 'Salvando...' : 'Concluir passo' }}
+                  </button>
+                </div>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+  }
+}

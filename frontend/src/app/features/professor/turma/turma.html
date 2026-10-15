@@ -7,7 +7,8 @@
     <header class="painel-cabecalho">
       <h1>Turma {{ d.turma.nome }}</h1>
       <p>
-        {{ contagem().todos }} alunos - {{ contagem().nee }} com acompanhamento NEE
+        {{ contagem().todos | plural: 'aluno' : 'alunos' }} - {{ contagem().nee }} com
+        acompanhamento NEE
         @if (disciplinas(d)) {
           - {{ disciplinas(d) }}
         }

@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
 import {
   Comunicado,
@@ -112,9 +113,7 @@ export class ProfessorComunicados {
         },
         error: (err: HttpErrorResponse) => {
           this.salvando.set(false);
-          this.erro.set(
-            [err.error?.message].flat().join(' ') || 'Não foi possível salvar o comunicado.',
-          );
+          this.erro.set(mensagemDeErro(err, 'Não foi possível salvar o comunicado.'));
         },
       });
   }

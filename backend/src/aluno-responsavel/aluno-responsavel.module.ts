@@ -7,9 +7,7 @@ import { Aluno } from '../aluno/aluno.entity';
 import { Responsavel } from '../responsavel/responsavel.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([AlunoResponsavel, Aluno, Responsavel]),
-  ],
+  imports: [TypeOrmModule.forFeature([AlunoResponsavel, Aluno, Responsavel])],
   providers: [AlunoResponsavelService],
   controllers: [AlunoResponsavelController],
 })

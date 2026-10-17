@@ -31,10 +31,7 @@ export class AlunoNeurodivergenciaController {
     @Param('alunoId', ParseIntPipe) alunoId: number,
     @EscolaId() escolaId: number,
   ) {
-    return this.alunoNeurodivergenciaService.findAllByAluno(
-      alunoId,
-      escolaId,
-    );
+    return this.alunoNeurodivergenciaService.findAllByAluno(alunoId, escolaId);
   }
 
   @Post()

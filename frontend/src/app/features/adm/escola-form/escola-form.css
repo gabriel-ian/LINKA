@@ -1,0 +1,11 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.alerta-erro,
+.aviso-caixa {
+  margin: 0;
+}

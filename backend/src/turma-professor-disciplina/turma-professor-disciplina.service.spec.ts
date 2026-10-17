@@ -29,9 +29,18 @@ describe('TurmaProfessorDisciplinaService', () => {
             delete: jest.fn(),
           },
         },
-        { provide: getRepositoryToken(Turma), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Professor), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Disciplina), useValue: { findOne: jest.fn() } },
+        {
+          provide: getRepositoryToken(Turma),
+          useValue: { findOne: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Professor),
+          useValue: { findOne: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Disciplina),
+          useValue: { findOne: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -61,9 +70,7 @@ describe('TurmaProfessorDisciplinaService', () => {
       turmaRepo.findOne.mockResolvedValue({ id: 1 } as Turma);
       professorRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.create(dto, 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto, 1)).rejects.toThrow(BadRequestException);
     });
 
     it('rejeita se a disciplina nao existe', async () => {
@@ -71,9 +78,7 @@ describe('TurmaProfessorDisciplinaService', () => {
       professorRepo.findOne.mockResolvedValue({ id: 2 } as Professor);
       disciplinaRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.create(dto, 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto, 1)).rejects.toThrow(BadRequestException);
     });
 
     it('rejeita alocacao duplicada', async () => {
@@ -94,7 +99,12 @@ describe('TurmaProfessorDisciplinaService', () => {
       professorRepo.findOne.mockResolvedValue({ id: 2 } as Professor);
       disciplinaRepo.findOne.mockResolvedValue({ id: 3 } as Disciplina);
       alocacaoRepo.findOne.mockResolvedValue(null);
-      const criada = { id: 10, turmaId: 1, professorId: 2, disciplinaId: 3 } as TurmaProfessorDisciplina;
+      const criada = {
+        id: 10,
+        turmaId: 1,
+        professorId: 2,
+        disciplinaId: 3,
+      } as TurmaProfessorDisciplina;
       alocacaoRepo.create.mockReturnValue(criada);
       alocacaoRepo.save.mockResolvedValue(criada);
 
@@ -123,14 +133,14 @@ describe('TurmaProfessorDisciplinaService', () => {
     it('rejeita se a alocacao nao e da escola logada', async () => {
       alocacaoRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.remove(1, 99)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.remove(1, 99)).rejects.toThrow(BadRequestException);
       expect(alocacaoRepo.delete).not.toHaveBeenCalled();
     });
 
     it('remove a alocacao quando e da escola', async () => {
-      alocacaoRepo.findOne.mockResolvedValue({ id: 1 } as TurmaProfessorDisciplina);
+      alocacaoRepo.findOne.mockResolvedValue({
+        id: 1,
+      } as TurmaProfessorDisciplina);
 
       const resultado = await service.remove(1, 1);
 

@@ -42,7 +42,7 @@ describe('NeurodivergenciaService', () => {
   describe('create', () => {
     it('cria a neurodivergencia', async () => {
       const criada = { nome: 'TEA' } as Neurodivergencia;
-      const salva = { ...criada, id: 1 } as Neurodivergencia;
+      const salva = { ...criada, id: 1 };
       repository.create.mockReturnValue(criada);
       repository.save.mockResolvedValue(salva);
 

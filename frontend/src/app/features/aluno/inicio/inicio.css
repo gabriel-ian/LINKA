@@ -1,0 +1,395 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  max-width: 919px;
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 17px;
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cabecalho p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/* ---------- Recado da familia ---------- */
+
+.recado {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid #c4b5fd;
+  border-radius: 16px;
+  background: #f0ebfe;
+  box-shadow: var(--sombra-cartao);
+}
+
+.recado-dino {
+  flex: none;
+  width: 54px;
+}
+
+.recado-de {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6d28d9;
+}
+
+.recado p {
+  margin: 4px 0 10px;
+  color: #4c1d95;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 25px;
+}
+
+.recado-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.recado-botoes button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recado-ouvir {
+  border: 1px solid #7c3aed;
+  background: #fff;
+  color: #6d28d9;
+}
+
+.recado-ouvir.falando {
+  background: #ede9fe;
+}
+
+.recado-ok {
+  border: 1px solid #7c3aed;
+  background: #7c3aed;
+  color: #fff;
+}
+
+.recado-ok:hover {
+  background: #6d28d9;
+}
+
+/* ---------- Missao urgente ---------- */
+
+.alerta {
+  display: flex;
+  gap: 14px;
+  min-height: 98px;
+  padding: 12px 18px 14px;
+  border: 1px solid #f3742a;
+  border-radius: 16px;
+  background: #fef0e8;
+  box-shadow: 0 4px 3.8px -1px rgba(242, 98, 15, 0.36);
+}
+
+.relogio {
+  flex: none;
+  margin-top: 1px;
+}
+
+.alerta p {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #b8420a;
+}
+
+.alerta strong {
+  font-weight: 600;
+}
+
+.comecar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 18px 0 13px;
+  border-radius: 15px;
+  background: #f3742a;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.comecar img {
+  rotate: 90deg;
+}
+
+.comecar:hover {
+  background: #e0621a;
+}
+
+/* ---------- Numeros ---------- */
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.numero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 118px;
+  overflow: hidden;
+  padding: 14px 14px 0;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  box-shadow: var(--sombra-cartao);
+}
+
+.numero > span:first-of-type {
+  position: relative;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.numero strong {
+  position: relative;
+  margin-top: 10px;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 40px;
+}
+
+.numero strong .pct {
+  font-size: 32px;
+}
+
+.numero small {
+  position: relative;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.numero.verde {
+  background: #e6f7f2;
+  color: #00704d;
+}
+
+.numero.verde strong {
+  font-weight: 700;
+}
+
+.numero.azul {
+  background: #d8e9ff;
+}
+
+.numero.azul strong {
+  color: #2277e5;
+}
+
+.numero.roxo {
+  background: #e2ddf7;
+  color: #7c3aed;
+}
+
+.numero > span:first-of-type {
+  color: var(--cor-texto);
+}
+
+.decoracao {
+  position: absolute;
+  pointer-events: none;
+}
+
+.dino {
+  top: 24px;
+  left: 63px;
+  width: 110px;
+}
+
+.estrela {
+  top: -31px;
+  left: 209px;
+  width: 136px;
+}
+
+.barra {
+  position: absolute;
+  right: 14px;
+  bottom: 15px;
+  left: 14px;
+  height: 8px;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.barra span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: #2277e5;
+}
+
+/* ---------- Tarefas de hoje e foto ---------- */
+
+.baixo {
+  display: grid;
+  grid-template-columns: 368px minmax(0, 1fr);
+  gap: 30px;
+}
+
+.cartao-aluno {
+  position: relative;
+  min-height: 350px;
+  overflow: hidden;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.tarefas {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px 22px;
+}
+
+.tarefas h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 20px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+ul {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  padding: 0 0 9px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+li + li {
+  padding-top: 9px;
+}
+
+li a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.vazio-lista {
+  font-size: 15px;
+  border: none;
+}
+
+.ver-todas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  margin-top: 18px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 15px;
+  color: var(--cor-texto);
+  font-size: 24px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ver-todas:hover {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.foto {
+  border-color: #00704d;
+}
+
+.imagem {
+  position: absolute;
+  top: -242px;
+  left: -35px;
+  width: 589px;
+  height: 785px;
+  object-fit: cover;
+}
+
+.editar {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  border: 1px solid #00704d;
+  border-radius: 10px;
+  background: #f1f5f9;
+}
+
+@media (max-width: 1000px) {
+  .cabecalho h1 {
+    font-size: 34px;
+  }
+
+  .cabecalho p,
+  .alerta p {
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .comecar {
+    font-size: 18px;
+  }
+
+  .numeros,
+  .baixo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .foto {
+    min-height: 240px;
+  }
+
+  .imagem {
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    translate: -50% -50%;
+    object-position: 60% 35%;
+  }
+}

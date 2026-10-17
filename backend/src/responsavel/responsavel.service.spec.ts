@@ -11,7 +11,11 @@ import { CreateResponsavelDto } from './dto/create-responsavel.dto';
 describe('ResponsavelService', () => {
   let service: ResponsavelService;
   let responsavelRepo: jest.Mocked<Repository<Responsavel>>;
-  let usuarioRepoMock: { findOne: jest.Mock; create: jest.Mock; save: jest.Mock };
+  let usuarioRepoMock: {
+    findOne: jest.Mock;
+    create: jest.Mock;
+    save: jest.Mock;
+  };
   let responsavelRepoMock: { create: jest.Mock; save: jest.Mock };
   let dataSource: { transaction: jest.Mock };
 
@@ -117,7 +121,14 @@ describe('ResponsavelService', () => {
 
   describe('findAllByEscola', () => {
     it('monta a query com joins ate aluno.escola_id e devolve os dados', async () => {
-      const linhas = [{ id: 1, nomeCompleto: 'Carla', telefone: null, email: 'carla@familia.com' }];
+      const linhas = [
+        {
+          id: 1,
+          nomeCompleto: 'Carla',
+          telefone: null,
+          email: 'carla@familia.com',
+        },
+      ];
       const qb = {
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),

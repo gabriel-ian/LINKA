@@ -1,0 +1,111 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.filtros {
+  display: grid;
+  grid-template-columns: 200px 200px 200px 1fr;
+  align-items: end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.exportar {
+  justify-self: end;
+}
+
+.alerta-erro {
+  margin: 0;
+}
+
+.blocos {
+  display: grid;
+  grid-template-columns: 448px 1fr;
+  align-items: start;
+  gap: 20px;
+}
+
+.bloco {
+  gap: 16px;
+  padding: 18px 20px 24px;
+}
+
+.bloco h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.turma {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.turma .progresso {
+  flex: none;
+}
+
+.rotulo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.rotulo b {
+  color: var(--c-texto);
+  font-weight: 600;
+}
+
+.grafico {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px;
+  padding: 0 10px;
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 46px;
+  height: 100%;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.barra {
+  width: 100%;
+  min-height: 4px;
+  max-height: calc(100% - 50px);
+  border-radius: 8px;
+  background: var(--cor-primaria-clara);
+}
+
+.atual .barra {
+  background: var(--cor-primaria);
+}
+
+.atual .valor {
+  color: var(--cor-azul-forte);
+  font-weight: 600;
+}
+
+.aviso-caixa {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media print {
+  .filtros {
+    display: none;
+  }
+}

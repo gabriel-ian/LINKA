@@ -27,7 +27,7 @@ describe('TarefaAdaptadaController', () => {
 
   it('findAllByTarefa delega usando o escolaId do token', async () => {
     const resposta = { data: [] };
-    service.findAllByTarefa.mockResolvedValue(resposta as never);
+    service.findAllByTarefa.mockResolvedValue(resposta);
 
     expect(await controller.findAllByTarefa(1, 2)).toBe(resposta);
     expect(service.findAllByTarefa).toHaveBeenCalledWith(1, 2);

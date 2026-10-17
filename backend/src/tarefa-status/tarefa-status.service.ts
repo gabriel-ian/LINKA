@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, IsNull, MoreThanOrEqual, Repository } from 'typeorm';
+import { iso } from '../painel-escola/metricas';
 import { TarefaStatusEntity } from './tarefa-status.entity';
 import { Aluno } from '../aluno/aluno.entity';
 import { Tarefa } from '../tarefa/tarefa.entity';
@@ -67,7 +68,14 @@ export class TarefaStatusService {
       ? manager.getRepository(Tarefa)
       : this.tarefaRepository;
 
-    const tarefas = await tarefaRepository.find({ where: { turmaId } });
+    // So as tarefas que ainda vao vencer: o aluno que chega na turma nao
+    // herda como atrasadas as tarefas passadas.
+    const tarefas = await tarefaRepository.find({
+      where: [
+        { turmaId, data_entrega: MoreThanOrEqual(iso(new Date())) },
+        { turmaId, data_entrega: IsNull() },
+      ],
+    });
 
     await this.inserirPendentes(
       tarefas.map((t) => ({ alunoId, tarefaId: t.id })),

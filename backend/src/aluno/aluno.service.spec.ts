@@ -51,7 +51,7 @@ describe('AlunoService', () => {
     it('preenche campos opcionais ausentes com o default e vincula a escola', async () => {
       const dto: CreateAlunoDto = { nomeCompleto: 'Lucas' };
       const criado = { ...dto, escolaId: 1 } as unknown as Aluno;
-      const salvo = { ...criado, id: 5 } as Aluno;
+      const salvo = { ...criado, id: 5 };
 
       repository.create.mockReturnValue(criado);
       repository.save.mockResolvedValue(salvo);

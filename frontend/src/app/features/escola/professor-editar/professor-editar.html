@@ -1,0 +1,79 @@
+<div class="pagina">
+  <a class="voltar" routerLink="/escola/professores">&lt; Voltar para professores</a>
+
+  @if (erro() && !professor()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (professor(); as p) {
+    <header class="painel-cabecalho">
+      <h1>Editar professor(a)</h1>
+      <p>{{ p.nome }}{{ p.email ? ' - ' + p.email : '' }}</p>
+    </header>
+
+    <form class="cartao" (ngSubmit)="salvar()" novalidate>
+      <label class="campo-p" [class.invalido]="erroNome()">
+        Nome completo
+        <input name="nome" maxlength="255" [(ngModel)]="nome" />
+        @if (erroNome()) {
+          <span class="msg-erro">Informe o nome completo.</span>
+        }
+      </label>
+
+      <hr class="divisor" />
+
+      <div>
+        <h2 class="cartao-titulo">Disciplinas</h2>
+        <p class="ajuda">Tudo o que o professor pode lecionar</p>
+        <div class="chips">
+          @for (d of todasDisciplinas(); track d) {
+            <button
+              type="button"
+              class="chip"
+              [attr.aria-pressed]="disciplinas().has(d)"
+              (click)="alternarDisciplina(d)"
+            >
+              {{ d }}
+            </button>
+          }
+          @if (adicionando()) {
+            <span class="nova">
+              <input
+                name="novaDisciplina"
+                [(ngModel)]="novaDisciplina"
+                placeholder="Nome da disciplina"
+                (keydown.enter)="$event.preventDefault(); adicionarDisciplina()"
+              />
+              <button type="button" class="link-acao" (click)="adicionarDisciplina()">
+                Adicionar
+              </button>
+            </span>
+          } @else {
+            <button type="button" class="chip" (click)="adicionando.set(true)">+ Outra</button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <h2 class="cartao-titulo">Turmas</h2>
+        <p class="ajuda">Marque as turmas e o que o professor dá em cada uma</p>
+        <app-escolha-turmas
+          [turmas]="opcoes()?.turmas ?? []"
+          [disciplinas]="disciplinasEscolhidas()"
+          [(alocacoes)]="alocacoes"
+        />
+      </div>
+
+      @if (erro()) {
+        <p class="alerta-erro" role="alert">{{ erro() }}</p>
+      }
+
+      <div class="acoes">
+        <a class="bt bt-secundario" routerLink="/escola/professores">Cancelar</a>
+        <button type="submit" class="bt bt-primario" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

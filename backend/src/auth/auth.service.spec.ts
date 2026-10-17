@@ -1,4 +1,8 @@
-import { UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
@@ -16,7 +20,12 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: UsuarioService,
-          useValue: { findByEmail: jest.fn() },
+          useValue: {
+            findByEmail: jest.fn(),
+            registrarLogin: jest.fn(),
+            findById: jest.fn(),
+            definirSenha: jest.fn(),
+          },
         },
         {
           provide: JwtService,
@@ -87,6 +96,7 @@ describe('AuthService', () => {
         access_token: 'token-assinado',
         perfil: 'escola',
         escolaId: 5,
+        trocarSenha: false,
       });
     });
 
@@ -104,6 +114,107 @@ describe('AuthService', () => {
       const resultado = await service.login('admin@linka.com', 'linka123');
 
       expect(resultado.escolaId).toBeNull();
+    });
+
+    it('registra o horario do login quando as credenciais conferem', async () => {
+      usuarioService.findByEmail.mockResolvedValue({
+        id: 7,
+        email: 'escola@linka.com',
+        senha: 'hash-correto',
+        perfil: 'escola',
+        escolaId: 5,
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await service.login('escola@linka.com', 'linka123');
+
+      expect(usuarioService.registrarLogin).toHaveBeenCalledWith(7);
+    });
+
+    it('lanca 403 quando a conta do usuario foi desativada', async () => {
+      usuarioService.findByEmail.mockResolvedValue({
+        id: 8,
+        email: 'prof@linka.com',
+        senha: 'hash-correto',
+        perfil: 'professor',
+        escolaId: 5,
+        ativo: false,
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await expect(service.login('prof@linka.com', 'linka123')).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(usuarioService.registrarLogin).not.toHaveBeenCalled();
+    });
+
+    it('lanca 403 quando a escola do usuario esta desativada', async () => {
+      usuarioService.findByEmail.mockResolvedValue({
+        id: 7,
+        email: 'escola@linka.com',
+        senha: 'hash-correto',
+        perfil: 'escola',
+        escolaId: 5,
+        escola: { id: 5, ativo: false },
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await expect(
+        service.login('escola@linka.com', 'linka123'),
+      ).rejects.toThrow(ForbiddenException);
+      expect(usuarioService.registrarLogin).not.toHaveBeenCalled();
+      expect(jwtService.sign).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('alterarSenha', () => {
+    const usuario = { id: 3, senha: 'hash' } as Usuario;
+
+    it('recusa senha atual errada', async () => {
+      usuarioService.findById.mockResolvedValue(usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(false);
+
+      await expect(
+        service.alterarSenha(3, 'errada', 'novaSenha1'),
+      ).rejects.toThrow(BadRequestException);
+      expect(usuarioService.definirSenha).not.toHaveBeenCalled();
+    });
+
+    it('grava a nova senha quando a atual confere', async () => {
+      usuarioService.findById.mockResolvedValue(usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(true);
+
+      await service.alterarSenha(3, 'atual123', 'novaSenha1');
+
+      expect(usuarioService.definirSenha).toHaveBeenCalledWith(3, 'novaSenha1');
+    });
+  });
+
+  describe('criarSenha (primeiro acesso)', () => {
+    it('recusa quando a senha ja nao e provisoria', async () => {
+      usuarioService.findById.mockResolvedValue({
+        id: 3,
+        senha: 'hash',
+        senhaProvisoria: false,
+      } as Usuario);
+
+      await expect(service.criarSenha(3, 'novaSenha1')).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(usuarioService.definirSenha).not.toHaveBeenCalled();
+    });
+
+    it('troca a senha provisoria sem pedir a atual', async () => {
+      usuarioService.findById.mockResolvedValue({
+        id: 3,
+        senha: 'hash',
+        senhaProvisoria: true,
+      } as Usuario);
+      jest.spyOn(UsuarioService, 'conferirSenha').mockResolvedValue(false);
+
+      await service.criarSenha(3, 'novaSenha1');
+
+      expect(usuarioService.definirSenha).toHaveBeenCalledWith(3, 'novaSenha1');
     });
   });
 });

@@ -17,7 +17,12 @@ export class Professor {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'nome_completo', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'nome_completo',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   nomeCompleto!: string | null;
 
   @Column({ name: 'usuario_id', nullable: true })

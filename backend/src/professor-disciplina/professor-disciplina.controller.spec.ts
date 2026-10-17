@@ -31,7 +31,7 @@ describe('ProfessorDisciplinaController', () => {
 
   it('findAll delega usando o escolaId do token', async () => {
     const resposta = { data: [] };
-    service.findAllByEscola.mockResolvedValue(resposta as never);
+    service.findAllByEscola.mockResolvedValue(resposta);
 
     expect(await controller.findAll(1)).toBe(resposta);
     expect(service.findAllByEscola).toHaveBeenCalledWith(1);
@@ -48,7 +48,7 @@ describe('ProfessorDisciplinaController', () => {
 
   it('remove delega para o service', async () => {
     const resposta = { data: true };
-    service.remove.mockResolvedValue(resposta as never);
+    service.remove.mockResolvedValue(resposta);
 
     expect(await controller.remove(1, 2, 3)).toBe(resposta);
     expect(service.remove).toHaveBeenCalledWith(1, 2, 3);

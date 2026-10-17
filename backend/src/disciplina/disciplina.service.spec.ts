@@ -42,7 +42,7 @@ describe('DisciplinaService', () => {
   describe('create', () => {
     it('cria a disciplina', async () => {
       const criada = { nome: 'Portugues' } as Disciplina;
-      const salva = { ...criada, id: 1 } as Disciplina;
+      const salva = { ...criada, id: 1 };
       repository.create.mockReturnValue(criada);
       repository.save.mockResolvedValue(salva);
 

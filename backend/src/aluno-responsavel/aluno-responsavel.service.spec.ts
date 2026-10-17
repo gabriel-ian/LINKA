@@ -19,10 +19,21 @@ describe('AlunoResponsavelService', () => {
         AlunoResponsavelService,
         {
           provide: getRepositoryToken(AlunoResponsavel),
-          useValue: { findOne: jest.fn(), create: jest.fn(), save: jest.fn(), find: jest.fn() },
+          useValue: {
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            find: jest.fn(),
+          },
         },
-        { provide: getRepositoryToken(Aluno), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Responsavel), useValue: { findOne: jest.fn() } },
+        {
+          provide: getRepositoryToken(Aluno),
+          useValue: { findOne: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Responsavel),
+          useValue: { findOne: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -51,9 +62,7 @@ describe('AlunoResponsavelService', () => {
       alunoRepo.findOne.mockResolvedValue({ id: 1 } as Aluno);
       responsavelRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.create(dto, 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto, 1)).rejects.toThrow(BadRequestException);
     });
 
     it('rejeita vinculo duplicado', async () => {

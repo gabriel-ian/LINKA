@@ -1,0 +1,92 @@
+@if (dados(); as r) {
+  <div class="pagina">
+    <header class="cabecalho">
+      <h1>Relatórios</h1>
+      <p>{{ r.filho.nome }}{{ r.filho.turma ? ' - ' + r.filho.turma : '' }} - {{ r.rotuloMes }}</p>
+    </header>
+
+    <div class="filtros nao-imprimir">
+      <label>
+        <span>Período</span>
+        <select class="campo" [value]="r.mes" (change)="mes.set($any($event.target).value)">
+          @for (m of r.meses; track m.valor) {
+            <option [value]="m.valor" [selected]="m.valor === r.mes">{{ m.rotulo }}</option>
+          }
+        </select>
+      </label>
+      <button type="button" class="botao" (click)="baixarPdf()">Baixar PDF</button>
+    </div>
+
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    <div class="cartoes">
+      <div class="bloco cartao-num">
+        <span>Tarefas concluídas</span>
+        <strong class="azul">{{ r.concluidas === null ? '—' : r.concluidas + '%' }}</strong>
+        <small>no mês</small>
+      </div>
+      <div class="bloco cartao-num">
+        <span>Iniciou sozinho</span>
+        <strong class="verde">{{ r.iniciouSozinho }}</strong>
+        <small>{{ r.iniciouSozinho === 1 ? 'tarefa sem lembrete' : 'tarefas sem lembrete' }}</small>
+      </div>
+      <div class="bloco cartao-num">
+        <span>Sequência</span>
+        <strong class="laranja">{{ r.recorde }} {{ r.recorde === 1 ? 'dia' : 'dias' }}</strong>
+        <small>maior do mês</small>
+      </div>
+      <div class="bloco cartao-num">
+        <span>Pontos</span>
+        <strong class="roxo">{{ r.pontos.total }}</strong>
+        <small>+{{ r.pontos.hoje }} hoje</small>
+      </div>
+    </div>
+
+    <section class="resumo" aria-labelledby="titulo-resumo">
+      <h2 id="titulo-resumo">Resumo da semana - gerado pela Linka</h2>
+      <p>{{ r.resumo }}</p>
+    </section>
+
+    <div class="graficos">
+      <section class="bloco grafico" aria-labelledby="titulo-materias">
+        <h2 id="titulo-materias">Progresso por matéria</h2>
+        <ul class="materias coluna">
+          @for (m of r.porMateria; track m.disciplina; let i = $index) {
+            <li class="materia">
+              <strong>{{ m.disciplina }}</strong>
+              <span [style.color]="cor(i).texto">{{
+                m.taxa === null ? 'sem prazo' : m.taxa + '%'
+              }}</span>
+              <span class="trilho" aria-hidden="true"
+                ><i [style.width.%]="m.taxa ?? 0" [style.background]="cor(i).barra"></i
+              ></span>
+            </li>
+          } @empty {
+            <li class="vazio-lista">Nenhuma tarefa neste mês.</li>
+          }
+        </ul>
+      </section>
+
+      <section class="bloco grafico" aria-labelledby="titulo-semanas">
+        <h2 id="titulo-semanas">Tarefas iniciadas sozinho</h2>
+        <ol class="barras">
+          @for (s of r.iniciadasPorSemana; track s.rotulo) {
+            <li [attr.aria-label]="s.rotulo + ': ' + s.sozinho">
+              <span class="valor">{{ s.sozinho }}</span>
+              <span
+                class="coluna"
+                [class.maior]="ehMaior(s.sozinho)"
+                [style.height.px]="20 + (s.sozinho / maiorSemana()) * 130"
+              ></span>
+              <span class="rotulo">{{ s.rotulo }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+    </div>
+  </div>
+} @else if (erro()) {
+  <p class="alerta-erro" role="alert">{{ erro() }}</p>
+}

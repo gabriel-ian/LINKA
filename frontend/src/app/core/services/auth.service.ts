@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { LoginResponse, PerfilUsuario } from '../model/escola.model';
 
 @Injectable({
@@ -9,7 +10,7 @@ import { LoginResponse, PerfilUsuario } from '../model/escola.model';
 export class AuthService {
   private http = inject(HttpClient);
 
-  private readonly api = 'http://localhost:3000/auth';
+  private readonly api = `${environment.apiUrl}/auth`;
 
   /**
    * O perfil nao e mais enviado: quem define o perfil e o backend,
@@ -20,6 +21,21 @@ export class AuthService {
       email,
       senha,
     });
+  }
+
+  /** Troca a senha do usuario logado. */
+  alterarSenha(senhaAtual: string, novaSenha: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha`, { senhaAtual, novaSenha });
+  }
+
+  /** Primeiro acesso: troca a senha recebida sem pedir a atual. */
+  criarSenha(novaSenha: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/primeiro-acesso`, { novaSenha });
+  }
+
+  /** Primeiro acesso: continua com a senha recebida. */
+  manterSenha(): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/manter`, {});
   }
 
   guardarSessao(res: LoginResponse): void {
@@ -33,8 +49,31 @@ export class AuthService {
     }
   }
 
+  /** Ha token salvo e ele ainda nao expirou (a validade real e do backend). */
+  get logado(): boolean {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    try {
+      const { exp } = JSON.parse(atob(token.split('.')[1]));
+      return !exp || exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  }
+
   get perfil(): PerfilUsuario | null {
     return localStorage.getItem('perfil') as PerfilUsuario | null;
+  }
+
+  /** E-mail lido do payload do token (so para exibir; nao e verificado aqui). */
+  get email(): string | null {
+    const token = localStorage.getItem('token');
+
+    try {
+      return token ? (JSON.parse(atob(token.split('.')[1])).email ?? null) : null;
+    } catch {
+      return null;
+    }
   }
 
   logout(): void {

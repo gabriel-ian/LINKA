@@ -27,7 +27,7 @@ describe('ResponsavelController', () => {
 
   it('findAll delega usando o escolaId do token', async () => {
     const resposta = { data: [] };
-    service.findAllByEscola.mockResolvedValue(resposta as never);
+    service.findAllByEscola.mockResolvedValue(resposta);
 
     expect(await controller.findAll(1)).toBe(resposta);
     expect(service.findAllByEscola).toHaveBeenCalledWith(1);

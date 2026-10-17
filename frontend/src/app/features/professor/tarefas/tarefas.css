@@ -1,0 +1,79 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.busca {
+  flex: 1;
+}
+
+.turma {
+  width: 170px;
+}
+
+.alerta-erro {
+  margin: 0;
+}
+
+.tabela-cartao {
+  padding: 14px 20px;
+  overflow-x: auto;
+}
+
+.titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: inherit;
+  text-decoration: none;
+  white-space: normal;
+}
+
+.titulo strong {
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.titulo small {
+  font-size: 12px;
+}
+
+.entregas {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.entregas b {
+  min-width: 40px;
+  font-weight: 600;
+}
+
+.sem-nee {
+  font-size: 13px;
+  color: var(--cor-borda);
+}
+
+.rodape-lista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

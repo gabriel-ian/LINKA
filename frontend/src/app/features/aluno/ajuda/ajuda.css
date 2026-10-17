@@ -1,0 +1,166 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 892px;
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cabecalho p {
+  margin: 6px 0 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.opcoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 20px;
+}
+
+.opcao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 170px;
+  padding: 20px 14px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+  text-align: center;
+  cursor: pointer;
+}
+
+.opcao.escolhida {
+  border: 2px solid #7c3aed;
+}
+
+.opcao strong {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cor-titulo);
+}
+
+.opcao small {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cor-texto);
+}
+
+.selo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.selo.roxo {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.selo.azul {
+  background: #e8effe;
+  color: #1558d6;
+}
+
+.selo.verde {
+  background: #e6f7f2;
+  color: #0e996b;
+}
+
+.selo.laranja {
+  background: #fef0e8;
+  color: #ea6819;
+}
+
+.pensando {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.dica {
+  padding: 18px 20px 20px;
+  border: 1px solid #7c3aed;
+  border-radius: 16px;
+  background: #faf8ff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.dica h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cor-titulo);
+}
+
+.dica h2 .link-acao {
+  margin-left: auto;
+}
+
+.selo-d {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #0e996b;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.dica p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 21px;
+  color: var(--cor-titulo);
+}
+
+.dica .pergunta {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.acoes {
+  justify-content: flex-end;
+}
+
+@media (max-width: 700px) {
+  .cabecalho h1 {
+    font-size: 32px;
+  }
+
+  .cabecalho p {
+    font-size: 16px;
+  }
+
+  .opcoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .opcao {
+    min-height: 150px;
+  }
+}

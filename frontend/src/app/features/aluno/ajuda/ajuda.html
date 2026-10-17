@@ -1,0 +1,88 @@
+@if (tarefa(); as t) {
+  <div class="pagina">
+    <header class="cabecalho">
+      <h1>Precisa de ajuda?</h1>
+      <p>{{ titulo() }} - passo {{ passo }} de {{ t.totalPassos }}</p>
+    </header>
+
+    <div class="opcoes" role="group" aria-label="Tipos de ajuda">
+      @if (t.iaDisponivel) {
+        <button
+          type="button"
+          class="opcao"
+          [class.escolhida]="escolhida() === 'explicar'"
+          [attr.aria-pressed]="escolhida() === 'explicar'"
+          (click)="escolher('explicar')"
+        >
+          <span class="selo roxo">A</span>
+          <strong>Explicar de outro jeito</strong>
+          <small>Com um exemplo do seu interesse</small>
+        </button>
+      }
+      <button
+        type="button"
+        class="opcao"
+        [class.escolhida]="escolhida() === 'ouvir'"
+        [attr.aria-pressed]="escolhida() === 'ouvir'"
+        (click)="escolher('ouvir')"
+      >
+        <span class="selo azul">&gt;</span>
+        <strong>Ouvir o passo de novo</strong>
+        <small>O Dino lê bem devagar</small>
+      </button>
+      @if (t.iaDisponivel) {
+        <button
+          type="button"
+          class="opcao"
+          [class.escolhida]="escolhida() === 'exemplo'"
+          [attr.aria-pressed]="escolhida() === 'exemplo'"
+          (click)="escolher('exemplo')"
+        >
+          <span class="selo verde">?</span>
+          <strong>Ver um exemplo resolvido</strong>
+          <small>Um exercício parecido, passo a passo</small>
+        </button>
+      }
+      <button
+        type="button"
+        class="opcao"
+        [class.escolhida]="escolhida() === 'professora'"
+        [attr.aria-pressed]="escolhida() === 'professora'"
+        (click)="escolher('professora')"
+      >
+        <span class="selo laranja">!</span>
+        <strong>Avisar a professora</strong>
+        <small>{{ professora() }} recebe seu pedido</small>
+      </button>
+    </div>
+
+    @if (pensando()) {
+      <p class="pensando" role="status">O Dino está pensando...</p>
+    }
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    @if (dica(); as d) {
+      <section class="dica" aria-live="polite">
+        <h2>
+          <span class="selo-d">D</span> {{ d.titulo }}
+          <button type="button" class="link-acao" (click)="ouvirDica()">Ouvir</button>
+        </h2>
+        <p>{{ d.texto }}</p>
+        @if (d.pergunta) {
+          <p class="pergunta">{{ d.pergunta }}</p>
+        }
+      </section>
+    }
+
+    <div class="acoes">
+      <button type="button" class="bt bt-secundario" (click)="aindaNaoEntendi()">
+        Ainda não entendi
+      </button>
+      <a class="bt bt-primario" [routerLink]="['/aluno/tarefas', t.id]">Voltar para a tarefa</a>
+    </div>
+  </div>
+} @else if (erro()) {
+  <p class="alerta-erro" role="alert">{{ erro() }}</p>
+}

@@ -13,9 +13,53 @@ export class UsuarioService {
     private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
-  /** Usado pelo login: precisa trazer a senha, entao nao seleciona campos parciais. */
+  /**
+   * Usado pelo login: precisa trazer a senha, entao nao seleciona campos parciais.
+   * Traz a escola junto para o login barrar escola desativada.
+   */
   async findByEmail(email: string): Promise<Usuario | null> {
-    return this.usuarioRepository.findOne({ where: { email } });
+    return this.usuarioRepository.findOne({
+      where: { email },
+      relations: { escola: true },
+    });
+  }
+
+  /**
+   * Conta existe, esta ativa e (se tiver escola) a escola esta ativa.
+   * Conferido a cada requisicao: desativar alguem corta o acesso na hora,
+   * sem esperar o token expirar.
+   */
+  async acessoLiberado(id: number): Promise<boolean> {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { id },
+      relations: { escola: true },
+    });
+    return (
+      !!usuario &&
+      usuario.ativo !== false &&
+      (!usuario.escola || usuario.escola.ativo)
+    );
+  }
+
+  /** Grava a senha escolhida pelo proprio usuario (deixa de ser provisoria). */
+  async definirSenha(
+    id: number,
+    senha: string,
+    repository: Repository<Usuario> = this.usuarioRepository,
+  ): Promise<void> {
+    await repository.update(id, {
+      senha: await UsuarioService.hashSenha(senha),
+      senhaProvisoria: false,
+    });
+  }
+
+  /** O usuario decidiu continuar com a senha que recebeu. */
+  async manterSenha(id: number): Promise<void> {
+    await this.usuarioRepository.update(id, { senhaProvisoria: false });
+  }
+
+  async registrarLogin(id: number): Promise<void> {
+    await this.usuarioRepository.update(id, { ultimoLogin: new Date() });
   }
 
   async findById(id: number): Promise<Usuario | null> {

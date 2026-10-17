@@ -1,0 +1,55 @@
+<div class="adm">
+  <a class="botao-canto" routerLink="/login" aria-label="Voltar">
+    <img src="assets/entrada/icone-voltar.svg" alt="" />
+  </a>
+
+  <main class="cartao">
+    <img class="logo" src="assets/entrada/logo.svg" alt="Linka" />
+    <h1 class="titulo">Acesso Restrito</h1>
+
+    <form class="formulario" (ngSubmit)="login()">
+      <label class="campo-grupo">
+        <span class="campo-rotulo">E-mail</span>
+        <input
+          class="campo"
+          [class.campo--erro]="erroCredenciais"
+          type="email"
+          name="email"
+          autocomplete="username"
+          placeholder="seu@email.com"
+          [(ngModel)]="email"
+        />
+      </label>
+
+      <label class="campo-grupo senha">
+        <span class="campo-rotulo">Senha</span>
+        <span class="senha-caixa">
+          <input
+            class="campo"
+            [class.campo--erro]="erroCredenciais"
+            [type]="mostrarSenha ? 'text' : 'password'"
+            name="senha"
+            autocomplete="current-password"
+            [(ngModel)]="senha"
+          />
+          <button
+            type="button"
+            class="olho"
+            [attr.aria-label]="mostrarSenha ? 'Esconder senha' : 'Mostrar senha'"
+            (click)="mostrarSenha = !mostrarSenha"
+          >
+            <img src="assets/entrada/icone-olho.svg" alt="" />
+          </button>
+        </span>
+      </label>
+
+      <button type="submit" class="btn btn-primario btn-bloco entrar" [disabled]="carregando">
+        {{ carregando ? 'Entrando...' : 'Fazer Login' }}
+      </button>
+
+      @if (erro) {
+        <p class="alerta-erro" role="alert">{{ erro }}</p>
+      }
+    </form>
+  </main>
+</div>

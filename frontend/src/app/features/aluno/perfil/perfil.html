@@ -1,0 +1,109 @@
+@if (contexto.resumo(); as r) {
+  <div class="pagina">
+    <header class="painel-cabecalho">
+      <h1>Meu perfil</h1>
+      <p>Deixe a Linka do seu jeito</p>
+    </header>
+
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    <div class="colunas">
+      <section class="cartao eu">
+        <span class="foto">{{ r.aluno.iniciais }}</span>
+        <h2>{{ r.aluno.nome }}</h2>
+        <p class="turma">
+          {{ r.aluno.turma ?? 'Sem turma'
+          }}{{ r.aluno.idade !== null ? ' - ' + r.aluno.idade + ' anos' : '' }}
+        </p>
+        <div class="selos">
+          <span class="pilula-cor c-roxo">Nível {{ r.nivel.numero }}</span>
+          <span class="pilula-cor c-azul">{{ r.pontos.total }} pontos</span>
+        </div>
+
+        <hr class="divisor" />
+
+        <p class="rotulo-mascote">Meu mascote</p>
+        <span class="mascote-selo">{{ mascote(r.preferencias.mascote).letra }}</span>
+        <p class="mascote-nome">
+          {{ mascote(r.preferencias.mascote).nome }} - {{ mascote(r.preferencias.mascote).jeito }}
+        </p>
+        <div class="mascotes" role="radiogroup" aria-label="Escolher mascote">
+          @for (m of mascotes; track m.id) {
+            <button
+              type="button"
+              role="radio"
+              [attr.aria-checked]="r.preferencias.mascote === m.id"
+              [class.ativo]="r.preferencias.mascote === m.id"
+              (click)="escolherMascote(m.id)"
+            >
+              {{ m.nome }}
+            </button>
+          }
+        </div>
+      </section>
+
+      <div class="direita">
+        <section class="cartao">
+          <h2>Como eu gosto de aprender</h2>
+          <ul class="opcoes">
+            @for (o of opcoes; track o.chave) {
+              <li>
+                <div>
+                  <strong [id]="'op-' + o.chave">{{ o.titulo }}</strong>
+                  <small>{{ o.texto }}</small>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  class="chave"
+                  [attr.aria-checked]="r.preferencias[o.chave]"
+                  [attr.aria-labelledby]="'op-' + o.chave"
+                  (click)="alternar(o.chave)"
+                >
+                  <span></span>
+                </button>
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="cartao">
+          <h2>Meus interesses</h2>
+          <p class="explica">A Linka usa seus interesses para criar exemplos nas tarefas.</p>
+          <div class="interesses">
+            @for (i of r.interesses; track i; let n = $index) {
+              <span class="interesse" [class]="'interesse ' + corInteresse(n)">
+                {{ i }}
+                <button
+                  type="button"
+                  [attr.aria-label]="'Remover ' + i"
+                  (click)="removerInteresse(i)"
+                >
+                  ×
+                </button>
+              </span>
+            }
+            @if (adicionando()) {
+              <form class="novo" (ngSubmit)="adicionarInteresse()">
+                <input
+                  name="novo"
+                  maxlength="40"
+                  [(ngModel)]="novoInteresse"
+                  placeholder="Ex.: Música"
+                  aria-label="Novo interesse"
+                />
+                <button type="submit" class="bt bt-primario bt-p">Adicionar</button>
+              </form>
+            } @else {
+              <button type="button" class="adicionar" (click)="adicionando.set(true)">
+                + Adicionar
+              </button>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+}

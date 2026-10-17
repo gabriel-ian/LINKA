@@ -1,0 +1,82 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.status {
+  margin: 0;
+  padding: 16px 22px;
+  border-radius: 16px;
+  background: var(--cor-sucesso-fundo);
+  color: #065f5c;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+/* No painel os numeros ficam grandes e alinhados a direita. */
+.grandes strong {
+  align-self: flex-end;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.blocos {
+  display: grid;
+  grid-template-columns: 368px 1fr;
+  align-items: start;
+  gap: 29px;
+}
+
+.bloco {
+  gap: 0;
+  padding: 18px 19px 30px;
+}
+
+.bloco h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.linha {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cor-linha);
+  color: var(--cor-texto);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.texto {
+  flex: 1;
+}
+
+.texto strong {
+  font-weight: 800;
+}
+
+.atencao .texto strong {
+  color: var(--cor-texto);
+}
+
+.barra-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.atencao .linha {
+  align-items: center;
+  padding: 18px 0 30px;
+}

@@ -1,0 +1,103 @@
+@if (contexto.resumo()) {
+  <div class="pagina">
+    @if (atual(); as a) {
+      <header class="cabecalho">
+        <h1>Minhas tarefas</h1>
+        <p>Vamos com calma - uma de cada vez</p>
+      </header>
+
+      <h2 class="secao">HOJE</h2>
+      <section class="cartao-aluno hoje">
+        <ul class="lista">
+          @for (t of contexto.deHoje(); track t.id) {
+            <li [class.atual]="t.id === a.id">
+              <a class="linha" [routerLink]="['/aluno/tarefas', t.id]"
+                ><app-item-tarefa [tarefa]="t"
+              /></a>
+              @if (t.id === a.id) {
+                <div class="botoes">
+                  <a class="ver-passos" [routerLink]="['/aluno/tarefas', t.id]">
+                    <img src="assets/aluno/icone-play-cinza.svg" alt="" width="13" height="10" />
+                    {{ t.situacao === 'em-andamento' ? 'Continuar' : 'Ver passos' }}
+                  </a>
+                  <button
+                    type="button"
+                    class="ouvir"
+                    [class.falando]="voz.falando() !== null"
+                    (click)="ouvir(t)"
+                  >
+                    <img src="assets/aluno/icone-ouvir.svg" alt="" width="15" height="13" />
+                    Ouvir
+                  </button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+
+        <div class="mascote">
+          <button type="button" class="balao" (click)="animar()">
+            <img src="assets/aluno/icone-som-verde.svg" alt="" width="15" height="13" />
+            Vamos começar
+          </button>
+          <img class="ponta" src="assets/aluno/balao-ponta.svg" alt="" width="41" height="32" />
+          <span class="ponta-fundo"></span>
+          <img class="dino" src="assets/aluno/dino-grande.svg" alt="" width="162" height="162" />
+        </div>
+      </section>
+    } @else {
+      <header class="cabecalho coluna">
+        <h1>Minhas tarefas</h1>
+        <p>{{ hoje }}</p>
+      </header>
+
+      <app-adm-resultado
+        [forte]="true"
+        [titulo]="fezAlgoHoje() ? 'Nenhuma missão para hoje!' : 'Hoje não tem missão!'"
+        [texto]="
+          fezAlgoHoje()
+            ? 'Você terminou tudo o que tinha para hoje. Pode descansar - ou dar uma olhada no que vem amanhã.'
+            : 'Pode descansar - ou dar uma olhada no que vem por aí.'
+        "
+      >
+        <a class="bt bt-secundario" routerLink="/aluno/conquistas">Ver conquistas</a>
+        @if (contexto.proximas()[0]; as p) {
+          <a class="bt bt-primario" [routerLink]="['/aluno/tarefas', p.id]">Adiantar a próxima</a>
+        }
+      </app-adm-resultado>
+    }
+
+    @if (contexto.proximas().length) {
+      @if (atual()) {
+        <h2 class="secao">PRÓXIMOS DIAS</h2>
+        <section class="cartao-aluno proximos">
+          <ul class="lista">
+            @for (t of contexto.proximas(); track t.id) {
+              <li>
+                <a class="linha" [routerLink]="['/aluno/tarefas', t.id]"
+                  ><app-item-tarefa [tarefa]="t"
+                /></a>
+                <a class="ver-passos" [routerLink]="['/aluno/tarefas', t.id]">
+                  <img src="assets/aluno/icone-play-cinza.svg" alt="" width="13" height="10" />
+                  Ver passos
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+      } @else {
+        <section class="cartao-aluno compacto" aria-labelledby="titulo-proximos">
+          <h2 id="titulo-proximos">PRÓXIMOS DIAS</h2>
+          <ul>
+            @for (t of contexto.proximas(); track t.id) {
+              <li>
+                <a [routerLink]="['/aluno/tarefas', t.id]">{{ t.titulo }}</a>
+                <span class="etiqueta" [class.roxo]="$index % 2 === 1">{{ prazo(t).texto }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+  </div>
+}

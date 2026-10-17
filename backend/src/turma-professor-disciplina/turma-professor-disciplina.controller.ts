@@ -45,10 +45,7 @@ export class TurmaProfessorDisciplinaController {
   @Delete(':id')
   @Roles('escola')
   @ApiOperation({ summary: 'Remover alocacao' })
-  remove(
-    @Param('id', ParseIntPipe) id: number,
-    @EscolaId() escolaId: number,
-  ) {
+  remove(@Param('id', ParseIntPipe) id: number, @EscolaId() escolaId: number) {
     return this.alocacaoService.remove(id, escolaId);
   }
 }

@@ -1,0 +1,57 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../model/escola.model';
+import {
+  AvisosFamilia,
+  ContextoFamilia,
+  NovoIncentivo,
+  PainelFamilia,
+  PerfilFamilia,
+  RelatorioFamilia,
+} from '../model/painel-familia.model';
+
+/** Rotas do perfil responsavel (/painel-familia). So os filhos do token. */
+@Injectable({ providedIn: 'root' })
+export class PainelFamiliaService {
+  private http = inject(HttpClient);
+  private readonly api = `${environment.apiUrl}/painel-familia`;
+
+  contexto(): Observable<ApiResponse<ContextoFamilia>> {
+    return this.http.get<ApiResponse<ContextoFamilia>>(`${this.api}/contexto`);
+  }
+
+  painel(filhoId: number): Observable<ApiResponse<PainelFamilia>> {
+    return this.http.get<ApiResponse<PainelFamilia>>(`${this.api}/filhos/${filhoId}/painel`);
+  }
+
+  enviarIncentivo(
+    filhoId: number,
+    dados: NovoIncentivo,
+  ): Observable<ApiResponse<{ id: number; mensagem: string; voz: boolean }>> {
+    return this.http.post<ApiResponse<{ id: number; mensagem: string; voz: boolean }>>(
+      `${this.api}/filhos/${filhoId}/incentivos`,
+      dados,
+    );
+  }
+
+  avisos(filhoId: number): Observable<ApiResponse<AvisosFamilia>> {
+    return this.http.get<ApiResponse<AvisosFamilia>>(`${this.api}/filhos/${filhoId}/avisos`);
+  }
+
+  marcarAvisoLido(avisoId: number): Observable<unknown> {
+    return this.http.post(`${this.api}/avisos/${avisoId}/lido`, {});
+  }
+
+  relatorio(filhoId: number, mes?: string): Observable<ApiResponse<RelatorioFamilia>> {
+    const params = mes ? new HttpParams().set('mes', mes) : undefined;
+    return this.http.get<ApiResponse<RelatorioFamilia>>(`${this.api}/filhos/${filhoId}/relatorio`, {
+      params,
+    });
+  }
+
+  salvarPerfil(dados: PerfilFamilia): Observable<ApiResponse<ContextoFamilia>> {
+    return this.http.patch<ApiResponse<ContextoFamilia>>(`${this.api}/perfil`, dados);
+  }
+}

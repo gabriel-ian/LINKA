@@ -1,0 +1,55 @@
+<div class="pagina">
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (dados(); as d) {
+    <header class="painel-cabecalho">
+      <h1>Conquistas</h1>
+      <p>
+        {{ d.desbloqueadas }} de {{ d.conquistas.length }} desbloqueadas{{
+          d.desbloqueadas ? ' - você é incrível!' : ' - a primeira está logo ali!'
+        }}
+      </p>
+    </header>
+
+    <section class="cartao nivel">
+      <div class="nivel-topo">
+        <span class="nivel-selo">{{ d.nivel.numero }}</span>
+        <div>
+          <strong>Nível {{ d.nivel.numero }} - {{ d.nivel.nome }}</strong>
+          <small>
+            @if (d.nivel.proximo) {
+              Faltam {{ d.nivel.proximo - d.pontos.total }} pontos para o nível
+              {{ d.nivel.numero + 1 }}
+            } @else {
+              Você chegou ao nível máximo!
+            }
+          </small>
+        </div>
+        <b class="nivel-pontos"
+          >{{ d.pontos.total }}{{ d.nivel.proximo ? ' / ' + d.nivel.proximo : '' }}</b
+        >
+      </div>
+      <div class="nivel-barra" aria-hidden="true"><span [style.width.%]="pctNivel()"></span></div>
+    </section>
+
+    <ul class="grade-conquistas">
+      @for (c of d.conquistas; track c.chave) {
+        <li [class.bloqueada]="!c.desbloqueada">
+          <span
+            class="medalha"
+            [style.background]="c.desbloqueada ? medalhas[c.chave].cor : corBloqueada"
+            >{{ medalhas[c.chave].simbolo }}</span
+          >
+          <strong>{{ c.titulo }}</strong>
+          <small
+            >{{ c.descricao
+            }}{{ c.desbloqueada || c.meta === 1 ? '' : ' - ' + c.atual + '/' + c.meta }}</small
+          >
+          <span class="estado">{{ c.desbloqueada ? 'Desbloqueada' : 'Bloqueada' }}</span>
+        </li>
+      }
+    </ul>
+  }
+</div>

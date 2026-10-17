@@ -31,13 +31,22 @@ describe('TarefaStatusService', () => {
             createQueryBuilder: jest.fn(),
           },
         },
-        { provide: getRepositoryToken(Aluno), useValue: { findOne: jest.fn() } },
+        {
+          provide: getRepositoryToken(Aluno),
+          useValue: { findOne: jest.fn() },
+        },
         {
           provide: getRepositoryToken(Tarefa),
           useValue: { find: jest.fn(), findOne: jest.fn() },
         },
-        { provide: getRepositoryToken(Matricula), useValue: { find: jest.fn() } },
-        { provide: getRepositoryToken(Responsavel), useValue: { findOne: jest.fn() } },
+        {
+          provide: getRepositoryToken(Matricula),
+          useValue: { find: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Responsavel),
+          useValue: { findOne: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -79,7 +88,9 @@ describe('TarefaStatusService', () => {
 
       await service.seedParaTurma(10, 1);
 
-      expect(matriculaRepo.find).toHaveBeenCalledWith({ where: { turmaId: 1 } });
+      expect(matriculaRepo.find).toHaveBeenCalledWith({
+        where: { turmaId: 1 },
+      });
       expect(qb.values).toHaveBeenCalledWith([
         { alunoId: 1, tarefaId: 10, status: 'pendente' },
         { alunoId: 2, tarefaId: 10, status: 'pendente' },
@@ -111,7 +122,12 @@ describe('TarefaStatusService', () => {
 
       await service.seedParaAluno(3, 1);
 
-      expect(tarefaRepo.find).toHaveBeenCalledWith({ where: { turmaId: 1 } });
+      // Aluno novo so recebe tarefas que ainda vao vencer (ou sem data).
+      const { where } = tarefaRepo.find.mock.calls[0][0] as {
+        where: { turmaId: number; data_entrega: unknown }[];
+      };
+      expect(where).toHaveLength(2);
+      expect(where.every((w) => w.turmaId === 1)).toBe(true);
       expect(qb.values).toHaveBeenCalledWith([
         { alunoId: 3, tarefaId: 10, status: 'pendente' },
         { alunoId: 3, tarefaId: 11, status: 'pendente' },
@@ -121,7 +137,9 @@ describe('TarefaStatusService', () => {
 
     it('usa os repositorios do manager quando chamado dentro de transacao', async () => {
       const tarefaRepoTx = { find: jest.fn().mockResolvedValue([]) };
-      const manager = { getRepository: jest.fn().mockReturnValue(tarefaRepoTx) };
+      const manager = {
+        getRepository: jest.fn().mockReturnValue(tarefaRepoTx),
+      };
 
       await service.seedParaAluno(3, 1, manager as never);
 
@@ -185,7 +203,9 @@ describe('TarefaStatusService', () => {
         concluido_em: null,
       } as TarefaStatusEntity;
       statusRepo.findOne.mockResolvedValue(existente);
-      statusRepo.save.mockImplementation((e) => Promise.resolve(e as TarefaStatusEntity));
+      statusRepo.save.mockImplementation((e) =>
+        Promise.resolve(e as TarefaStatusEntity),
+      );
 
       const resultado = await service.updateStatus(dto, 1);
 
@@ -203,7 +223,9 @@ describe('TarefaStatusService', () => {
         concluido_em: new Date(),
       } as TarefaStatusEntity;
       statusRepo.findOne.mockResolvedValue(existente);
-      statusRepo.save.mockImplementation((e) => Promise.resolve(e as TarefaStatusEntity));
+      statusRepo.save.mockImplementation((e) =>
+        Promise.resolve(e as TarefaStatusEntity),
+      );
 
       const resultado = await service.updateStatus(
         { ...dto, status: 'pendente' },
@@ -225,7 +247,11 @@ describe('TarefaStatusService', () => {
       const resultado = await service.updateStatus(dto, 1);
 
       expect(statusRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ alunoId: 1, tarefaId: 10, status: 'concluida' }),
+        expect.objectContaining({
+          alunoId: 1,
+          tarefaId: 10,
+          status: 'concluida',
+        }),
       );
       expect(resultado).toEqual({ data: nova });
     });
@@ -235,9 +261,9 @@ describe('TarefaStatusService', () => {
     it('rejeita se o usuario logado nao e um responsavel', async () => {
       responsavelRepo.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.findAllByResponsavelUsuarioId(10),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.findAllByResponsavelUsuarioId(10)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('lista o status das tarefas dos alunos vinculados ao responsavel', async () => {

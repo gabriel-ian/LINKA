@@ -1,0 +1,170 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.topo-turma {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.forte {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.alerta-erro {
+  margin: 0;
+}
+
+.blocos {
+  display: grid;
+  grid-template-columns: 378px 1fr;
+  align-items: start;
+  gap: 20px;
+}
+
+.bloco {
+  gap: 14px;
+  padding: 18px 20px;
+}
+
+.bloco h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.bloco-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aluno {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cor-linha);
+  color: inherit;
+  text-decoration: none;
+}
+
+.aluno:last-child {
+  border-bottom: none;
+}
+
+.nome {
+  flex: 1;
+}
+
+.nome strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.nome small {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.mini {
+  flex: 0 0 90px;
+}
+
+.vazio-turma {
+  align-items: center;
+  gap: 0;
+  padding: 44px 24px;
+  text-align: center;
+}
+
+.mais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--cor-primaria-clara);
+  color: var(--cor-azul-forte);
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.vazio-turma h2 {
+  margin: 22px 0 14px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cor-titulo);
+}
+
+.vazio-turma p {
+  max-width: 580px;
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.acoes-topo {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.linha-aluno {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.linha-aluno:last-of-type {
+  border-bottom: none;
+}
+
+.linha-aluno .aluno {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 12px;
+  border-bottom: none;
+}
+
+.tirar {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--cor-borda);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.tirar:hover {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro);
+}
+
+@media (max-width: 700px) {
+  .topo-turma {
+    flex-direction: column;
+  }
+
+  /* No celular a situacao fica no perfil do aluno; a linha mostra so o nome. */
+  .linha-aluno .pilula-cor {
+    display: none;
+  }
+}

@@ -1,0 +1,211 @@
+<div class="pagina">
+  <a class="voltar" routerLink="/escola/alunos">&lt; Voltar para alunos</a>
+
+  @if (salvo()) {
+    <p class="aviso-caixa verde forte" role="status">
+      {{
+        salvo() === 'laudo'
+          ? 'Alterações salvas, mas o laudo não foi enviado. Tente anexar de novo.'
+          : 'Alterações salvas.'
+      }}
+    </p>
+  }
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (aluno(); as a) {
+    <header class="topo-perfil">
+      <div class="painel-cabecalho">
+        <h1>{{ a.nome }}</h1>
+        <p>{{ subtitulo(a) }}</p>
+      </div>
+      <a class="bt bt-secundario" [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>
+    </header>
+
+    <div class="indicadores">
+      <div class="indicador" [class]="'c-' + corSituacao(a.situacao)">
+        <span>Desempenho semana</span>
+        <strong>{{ pct(a.desempenhoSemana) }}</strong>
+        <small>{{
+          a.situacao === 'sem-dados'
+            ? 'nenhuma entrega vencida na semana'
+            : rotuloSituacao[a.situacao].toLowerCase()
+        }}</small>
+      </div>
+      <div class="indicador c-azul">
+        <span>Tarefas no mês</span>
+        <strong>{{ a.tarefasMes.concluidas }}/{{ a.tarefasMes.total }}</strong>
+        <small>concluídas</small>
+      </div>
+      <div class="indicador c-verde">
+        <span>Tarefas adaptadas</span>
+        <strong>{{ a.tarefasAdaptadasNoMes }}</strong>
+        <small>pela IA no mês</small>
+      </div>
+      <div class="indicador c-roxo">
+        <span>Sequência</span>
+        <strong>{{ a.maiorSequencia }} {{ a.maiorSequencia === 1 ? 'dia' : 'dias' }}</strong>
+        <small>maior do mês</small>
+      </div>
+    </div>
+
+    <div class="blocos">
+      <section class="cartao bloco">
+        <h2>Perfil de aprendizagem</h2>
+        <dl>
+          <dt>Diagnóstico</dt>
+          <dd>
+            {{ a.diagnosticos.length ? juntar(a.diagnosticos) : 'Não informado' }}
+            @if (a.laudo) {
+              - laudo anexado em {{ dataBr(a.laudo.enviadoEm) }}
+              <button
+                type="button"
+                class="link-acao"
+                [disabled]="baixando()"
+                (click)="baixarLaudo(a)"
+              >
+                {{ baixando() ? 'Baixando...' : 'Baixar laudo' }}
+              </button>
+            }
+          </dd>
+          <dt>Maiores dificuldades</dt>
+          <dd>{{ a.dificuldades || 'Ainda não preenchido.' }}</dd>
+          <dt>Pontos fortes</dt>
+          <dd>{{ a.pontosFortes || 'Ainda não preenchido.' }}</dd>
+          <dt>Acesso do aluno</dt>
+          <dd>
+            @if (a.email) {
+              {{ a.email }}
+              <button
+                type="button"
+                class="link-acao"
+                [disabled]="gerando() === 'alunos-' + a.id"
+                (click)="redefinirSenha('alunos', a.id, a.nome)"
+              >
+                Redefinir senha
+              </button>
+            } @else {
+              Sem login próprio
+            }
+          </dd>
+        </dl>
+        @if (!a.dificuldades && !a.pontosFortes && !a.interesses.length) {
+          <p class="aviso-caixa roxo">
+            <span>
+              Preencha o perfil de aprendizagem em
+              <a [routerLink]="['/escola/alunos', a.id, 'editar']">Editar aluno</a>: a IA usa essas
+              informações para personalizar as tarefas.
+            </span>
+          </p>
+        }
+        @if (a.interesses.length) {
+          <div class="interesses">
+            @for (i of a.interesses; track i; let n = $index) {
+              <span class="pilula-cor" [class]="'c-' + cor(n + 1)">{{ i }}</span>
+            }
+          </div>
+        }
+      </section>
+
+      <div class="coluna">
+        <section class="cartao bloco">
+          <h2>Professores</h2>
+          @for (p of a.professores; track p.id; let i = $index) {
+            <div class="pessoa" [class]="'c-' + cor(i)">
+              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
+                iniciais(p.nome)
+              }}</span>
+              <div>
+                <strong>{{ p.nome }}</strong>
+                <small>{{ juntar(p.disciplinas) || 'Sem disciplina' }}</small>
+              </div>
+            </div>
+          } @empty {
+            <p class="vazio">
+              {{ a.turma ? 'A turma ainda não tem professores.' : 'Aluno sem turma.' }}
+            </p>
+          }
+        </section>
+
+        <section class="cartao bloco">
+          <div class="topo-resp">
+            <h2>Responsável</h2>
+            <button type="button" class="link-acao" (click)="vinculando.set(true)">
+              + Vincular família
+            </button>
+          </div>
+          @if (avisoFamilia()) {
+            <p class="aviso-caixa verde" role="status">{{ avisoFamilia() }}</p>
+          }
+          @for (r of a.responsaveis; track r.id) {
+            <div class="pessoa c-roxo">
+              <span class="selo-cor" style="--tam: 36px; --raio-selo: 50%; --fonte-selo: 13px">{{
+                iniciais(r.nome ?? '?')
+              }}</span>
+              <div>
+                <strong>{{ r.nome }}</strong>
+                <small>{{ r.parentesco ? r.parentesco + ' - ' : '' }}{{ r.email }}</small>
+              </div>
+            </div>
+            @if (r.telefone) {
+              <dl>
+                <dt>Telefone</dt>
+                <dd>{{ r.telefone }}</dd>
+              </dl>
+            }
+            <div class="linha-resp">
+              <span class="pilula" [class]="r.acessou ? 'ativa' : 'pendente'">
+                {{ r.acessou ? 'Acompanha pela Linka' : 'Aguardando primeiro acesso' }}
+              </span>
+              @if (r.email) {
+                <button
+                  type="button"
+                  class="link-acao"
+                  [disabled]="gerando() === 'responsaveis-' + r.id"
+                  (click)="redefinirSenha('responsaveis', r.id, r.nome ?? 'o responsável')"
+                >
+                  Redefinir senha
+                </button>
+              }
+              <button
+                type="button"
+                class="link-acao perigo"
+                (click)="desvincular(a, r.id, r.nome ?? 'o responsável')"
+              >
+                Desvincular
+              </button>
+            </div>
+          } @empty {
+            <p class="vazio">Nenhum responsável vinculado.</p>
+          }
+        </section>
+      </div>
+    </div>
+
+    @if (a.turma) {
+      <div class="acoes">
+        <a
+          class="bt bt-primario"
+          routerLink="/escola/relatorios"
+          [queryParams]="{ turmaId: a.turma.id }"
+          >Ver relatório da turma</a
+        >
+      </div>
+    }
+  }
+</div>
+
+@if (senha(); as s) {
+  <app-senha-provisoria
+    [nome]="s.nome"
+    [email]="s.email"
+    [senha]="s.senha"
+    (fechar)="senha.set(null)"
+  />
+}
+
+@if (vinculando() && aluno(); as a) {
+  <app-vincular-familia [alunoId]="a.id" [alunoNome]="a.nome" (fechar)="fecharVinculo(a, $event)" />
+}

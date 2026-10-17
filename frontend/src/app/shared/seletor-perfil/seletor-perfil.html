@@ -1,0 +1,4 @@
+@for (c of camadas(); track c.arquivo) {
+  <img [src]="c.src" alt="" [style.left.px]="c.left" [style.top.px]="c.top" />
+}
+<span class="rotulo">{{ rotulo() }}</span>

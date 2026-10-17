@@ -1,98 +1,121 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Linka
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Plataforma educacional de apoio a alunos com necessidades educacionais especiais
+(TDAH, TEA, dislexia, discalculia, deficiências visual e auditiva). O professor
+escreve a tarefa uma vez e a Linka adapta para cada aluno, em passos curtos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+| Perfil      | O que faz                                                                 |
+| ----------- | ------------------------------------------------------------------------- |
+| ADM         | Cadastra, atualiza, desativa e reativa escolas                            |
+| Escola      | Cadastra professores, turmas, alunos e famílias; acompanha relatórios     |
+| Professor   | Cria tarefas (adaptadas por IA), envia comunicados, acompanha a turma     |
+| Aluno       | Segue as tarefas passo a passo, pede ajuda, vê progresso e conquistas     |
+| Família     | Acompanha os filhos, recebe avisos e o resumo da semana, envia incentivos |
 
-## Description
+## Estrutura
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```
+backend/    API em NestJS + TypeORM (MySQL)        -> http://localhost:3000
+frontend/   Angular                                -> http://localhost:4200
+backend/sql Estrutura do banco, dados base e migrações
 ```
 
-## Compile and run the project
+## Pré-requisitos
+
+- Node.js 22 ou mais novo
+- MySQL 8
+
+## Como rodar
+
+### 1. Banco de dados
+
+Em uma instalação nova, crie o banco com a estrutura completa e os dados iniciais:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+mysql -u root -p < backend/sql/schema.sql
+mysql -u root -p bancolinka < backend/sql/dados-base.sql
+mysql -u root -p bancolinka < backend/sql/seed-admin.sql
 ```
 
-## Run tests
+`schema.sql` já inclui todas as migrações da pasta `backend/sql`. As migrações
+avulsas (`painel-escola.sql`, `familias.sql`...) só servem para atualizar um banco
+antigo.
+
+### 2. Backend
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cd backend
+cp .env.example .env     # preencha DB_PASSWORD e JWT_SECRET
+npm install
+npm run start
 ```
 
-## Deployment
+> No Windows, prefira `npm run start` a `npm run start:dev`: o modo watch às vezes
+> deixa a porta 3000 presa com o código antigo.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+A documentação da API (Swagger) fica em http://localhost:3000/api.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 3. Frontend
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+cd frontend
+npm install
+npm start
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Abra http://localhost:4200.
 
-## Resources
+## Acessos de teste
 
-Check out a few resources that may come in handy when working with NestJS:
+Criados pelo `seed-admin.sql`, todos com a senha `linka123`:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Perfil | E-mail           | Entrada                            |
+| ------ | ---------------- | ---------------------------------- |
+| ADM    | admin@linka.com  | http://localhost:4200/adm/login    |
+| Escola | escola@linka.com | http://localhost:4200/login        |
 
-## Support
+Professores, alunos e famílias são cadastrados pela escola e recebem uma senha
+provisória, trocada no primeiro acesso.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Para encher a escola com dados fictícios (famílias e alunos gerados com Faker):
 
-## Stay in touch
+```bash
+cd backend
+npm run seed:faker                          # 150 alunos na escola 1
+npm run seed:faker -- --alunos=200 --escola=1
+npm run seed:faker -- --limpar              # apaga só o que a carga criou
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+As famílias geradas entram com a senha `linka123`.
 
-## License
+## Variáveis de ambiente (backend/.env)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Variável            | Para que serve                                         |
+| ------------------- | ------------------------------------------------------ |
+| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Conexão com o MySQL |
+| `DB_LOGGING`        | `true` mostra as consultas SQL no terminal             |
+| `JWT_SECRET`        | Segredo dos tokens de login (use um valor longo)       |
+| `JWT_EXPIRES_IN`    | Validade do login (ex.: `1d`)                          |
+| `FRONTEND_URL`      | Origem liberada no CORS                                |
+| `PORT`              | Porta da API (padrão 3000)                             |
+| `ANTHROPIC_API_KEY` | Opcional. Liga a adaptação de tarefas e comunicados por IA (Claude). Sem ela, o professor adapta manualmente |
+
+O endereço da API usado pelo frontend fica em
+`frontend/src/environments/environment*.ts`.
+
+## Testes e qualidade
+
+```bash
+cd backend
+npm test          # testes unitários (Jest)
+npm run lint
+
+cd frontend
+npm run build
+```
+
+## Privacidade
+
+- Laudos enviados ficam em `backend/uploads/`, fora do git, porque contêm dados de saúde.
+- A IA recebe só o primeiro nome, a idade, os diagnósticos e os interesses do aluno.
+  Nunca recebe CGM, laudo ou e-mail.

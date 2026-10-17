@@ -43,9 +43,7 @@ export class ProfessorDisciplinaService {
     });
 
     if (existente) {
-      throw new BadRequestException(
-        'Professor ja habilitado nesta disciplina',
-      );
+      throw new BadRequestException('Professor ja habilitado nesta disciplina');
     }
 
     const vinculo = this.vinculoRepository.create({

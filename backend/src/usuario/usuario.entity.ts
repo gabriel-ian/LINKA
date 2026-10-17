@@ -7,11 +7,12 @@ import {
 } from 'typeorm';
 import { Escola } from '../escola/escola.entity';
 
-export type PerfilUsuario = 'admin' | 'escola' | 'professor' | 'responsavel';
+export type PerfilUsuario =
+  'admin' | 'escola' | 'professor' | 'responsavel' | 'aluno';
 
 /**
  * Tabela `usuario` — centraliza o login de todos os perfis.
- * Aluno NAO loga: o enum do banco so tem admin, escola, professor e responsavel.
+ * O aluno passou a ter login proprio (sql/painel-escola.sql).
  */
 @Entity('usuario')
 export class Usuario {
@@ -25,9 +26,13 @@ export class Usuario {
   @Column()
   senha!: string;
 
+  /** Senha definida por outra pessoa; o login convida a trocar ou manter. */
+  @Column({ name: 'senha_provisoria', default: false })
+  senhaProvisoria!: boolean;
+
   @Column({
     type: 'enum',
-    enum: ['admin', 'escola', 'professor', 'responsavel'],
+    enum: ['admin', 'escola', 'professor', 'responsavel', 'aluno'],
   })
   perfil!: PerfilUsuario;
 
@@ -35,10 +40,18 @@ export class Usuario {
   @Column({ name: 'escola_id', nullable: true })
   escolaId!: number | null;
 
+  /** false bloqueia o login (ex.: professor desativado pela escola). */
+  @Column({ default: true })
+  ativo!: boolean;
+
   @ManyToOne(() => Escola, { nullable: true })
   @JoinColumn({ name: 'escola_id' })
   escola!: Escola | null;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   criado_em!: Date;
+
+  /** Null ate o primeiro login: a escola aparece como "Pendente" no ADM. */
+  @Column({ name: 'ultimo_login', type: 'datetime', nullable: true })
+  ultimoLogin!: Date | null;
 }

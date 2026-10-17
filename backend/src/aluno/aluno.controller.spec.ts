@@ -32,7 +32,7 @@ describe('AlunoController', () => {
   describe('findAll', () => {
     it('delega para o service usando o escolaId do token', async () => {
       const resposta = { data: [] };
-      service.findAllByEscola.mockResolvedValue(resposta as never);
+      service.findAllByEscola.mockResolvedValue(resposta);
 
       const resultado = await controller.findAll(1);
 

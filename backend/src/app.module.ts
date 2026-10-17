@@ -20,6 +20,10 @@ import { AlunoResponsavelModule } from './aluno-responsavel/aluno-responsavel.mo
 import { TarefaModule } from './tarefa/tarefa.module';
 import { TarefaAdaptadaModule } from './tarefa-adaptada/tarefa-adaptada.module';
 import { TarefaStatusModule } from './tarefa-status/tarefa-status.module';
+import { PainelEscolaModule } from './painel-escola/painel-escola.module';
+import { PainelProfessorModule } from './painel-professor/painel-professor.module';
+import { PainelAlunoModule } from './painel-aluno/painel-aluno.module';
+import { PainelFamiliaModule } from './painel-familia/painel-familia.module';
 
 @Module({
   imports: [
@@ -62,6 +66,10 @@ import { TarefaStatusModule } from './tarefa-status/tarefa-status.module';
     TarefaModule,
     TarefaAdaptadaModule,
     TarefaStatusModule,
+    PainelEscolaModule,
+    PainelProfessorModule,
+    PainelAlunoModule,
+    PainelFamiliaModule,
   ],
   controllers: [AdminController],
   providers: [],

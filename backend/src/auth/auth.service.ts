@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../usuario/usuario.service';
 
@@ -13,6 +18,52 @@ export class AuthService {
    * O perfil NAO vem mais do formulario: ele e lido da tabela `usuario`.
    * Deixar o cliente escolher o proprio perfil era uma falha de autorizacao.
    */
+  /** Qualquer perfil troca a propria senha (ex.: depois de uma provisoria). */
+  async alterarSenha(usuarioId: number, senhaAtual: string, novaSenha: string) {
+    const usuario = await this.usuarioService.findById(usuarioId);
+    if (
+      !usuario ||
+      !(await UsuarioService.conferirSenha(senhaAtual, usuario.senha))
+    ) {
+      throw new BadRequestException('Senha atual incorreta');
+    }
+    if (senhaAtual === novaSenha) {
+      throw new BadRequestException(
+        'A nova senha precisa ser diferente da atual',
+      );
+    }
+
+    await this.usuarioService.definirSenha(usuario.id, novaSenha);
+    return { data: true };
+  }
+
+  /**
+   * Primeiro acesso: troca a senha provisoria sem pedir a atual (o usuario
+   * acabou de entrar com ela). So vale enquanto a senha for provisoria.
+   */
+  async criarSenha(usuarioId: number, novaSenha: string) {
+    const usuario = await this.usuarioService.findById(usuarioId);
+    if (!usuario?.senhaProvisoria) {
+      throw new BadRequestException(
+        'Use a opcao alterar senha, informando a senha atual',
+      );
+    }
+    if (await UsuarioService.conferirSenha(novaSenha, usuario.senha)) {
+      throw new BadRequestException(
+        'A nova senha precisa ser diferente da atual',
+      );
+    }
+
+    await this.usuarioService.definirSenha(usuario.id, novaSenha);
+    return { data: true };
+  }
+
+  /** Primeiro acesso: o usuario prefere continuar com a senha recebida. */
+  async manterSenha(usuarioId: number) {
+    await this.usuarioService.manterSenha(usuarioId);
+    return { data: true };
+  }
+
   async login(email: string, senha: string) {
     const usuario = await this.usuarioService.findByEmail(email);
 
@@ -31,6 +82,19 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais invalidas');
     }
 
+    // Conta desativada (ex.: professor desligado pela escola).
+    if (usuario.ativo === false) {
+      throw new ForbiddenException('Conta desativada');
+    }
+
+    // Escola desativada: todos os logins vinculados a ela ficam suspensos.
+    // So depois de conferir a senha, para nao revelar o status a terceiros.
+    if (usuario.escola && !usuario.escola.ativo) {
+      throw new ForbiddenException('Escola desativada');
+    }
+
+    await this.usuarioService.registrarLogin(usuario.id);
+
     const payload = {
       sub: usuario.id,
       email: usuario.email,
@@ -42,6 +106,8 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       perfil: usuario.perfil,
       escolaId: usuario.escolaId ?? null,
+      /** Entrou com senha recebida: o front oferece trocar ou manter. */
+      trocarSenha: usuario.senhaProvisoria === true,
     };
   }
 }

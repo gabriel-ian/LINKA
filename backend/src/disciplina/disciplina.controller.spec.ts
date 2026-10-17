@@ -27,7 +27,7 @@ describe('DisciplinaController', () => {
 
   it('findAll delega para o service', async () => {
     const resposta = { data: [] };
-    service.findAll.mockResolvedValue(resposta as never);
+    service.findAll.mockResolvedValue(resposta);
 
     expect(await controller.findAll()).toBe(resposta);
   });
@@ -35,7 +35,7 @@ describe('DisciplinaController', () => {
   it('create delega para o service', async () => {
     const dto = { nome: 'Matematica' };
     const resposta = { data: { id: 1, ...dto } };
-    service.create.mockResolvedValue(resposta as never);
+    service.create.mockResolvedValue(resposta);
 
     expect(await controller.create(dto)).toBe(resposta);
     expect(service.create).toHaveBeenCalledWith(dto);

@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UsuarioService } from '../usuario/usuario.service';
 
 export interface UsuarioAutenticado {
   userId: number;
@@ -12,14 +13,23 @@ export interface UsuarioAutenticado {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private readonly usuarios: UsuarioService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: config.getOrThrow<string>('JWT_SECRET'),
     });
   }
 
-  validate(payload: any): UsuarioAutenticado {
+  async validate(payload: any): Promise<UsuarioAutenticado> {
+    // Token valido nao basta: a conta ou a escola podem ter sido desativadas
+    // depois do login.
+    if (!(await this.usuarios.acessoLiberado(Number(payload.sub)))) {
+      throw new UnauthorizedException('Acesso encerrado');
+    }
+
     return {
       userId: payload.sub,
       email: payload.email,

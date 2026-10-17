@@ -1,0 +1,588 @@
+.painel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--cor-fundo-painel);
+}
+
+.topo,
+.rodape {
+  flex: none;
+  height: 111px;
+  /* As imagens ja vem recortadas do Figma para preencher a faixa inteira. */
+  background: url('/assets/adm/topo.png') 0 0 / 100% 100% no-repeat;
+}
+
+.rodape {
+  background-image: url('/assets/adm/rodape.png');
+}
+
+.topo a {
+  display: inline-block;
+  margin: 35px 0 0 32px;
+}
+
+.topo img {
+  display: block;
+}
+
+/* ---------- Barra "Painel administrativo" ---------- */
+
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 62px;
+  padding: 0 24px 0 32px;
+  border-bottom: 1px solid var(--cor-linha);
+  background: #fff;
+}
+
+.barra-titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin: 0;
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.barra-titulo.pequeno {
+  font-size: 32px;
+  text-transform: uppercase;
+}
+
+.barra-titulo small {
+  font-size: 15px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.barra-icones {
+  display: flex;
+  gap: 13px;
+}
+
+.icone-botao {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.contador {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--cor-erro);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+/* ---------- Aluno: avatar no topo e fala do mascote ---------- */
+
+.topo {
+  position: relative;
+}
+
+.avatar-topo {
+  position: absolute;
+  top: 34px;
+  right: 32px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #20c0ed;
+  border-radius: 50%;
+  background: #d0f5ff;
+  color: #20c0ed;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.fala {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.mascote {
+  flex: none;
+  width: 33px;
+  height: 33px;
+}
+
+.balao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(693px, 100%);
+  min-height: 32px;
+  padding: 4px 16px;
+  border: 1px solid #00704d;
+  border-radius: 55px;
+  background: #b8d7cd;
+  color: #00704d;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.balao img {
+  flex: none;
+}
+
+.balao.falando {
+  box-shadow: 0 0 0 3px rgba(0, 112, 77, 0.25);
+}
+
+.menu-contador {
+  position: absolute;
+  top: 10px;
+  right: 13px;
+  min-width: 32px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 59px;
+  background: #f2620f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+}
+
+.menu-contador.canto {
+  top: -10px;
+  right: -10px;
+  min-width: 24px;
+  padding: 0 6px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* Modo calmo: menos cores na moldura. Letras maiores: conteudo ampliado. */
+:host(.calmo) .topo,
+:host(.calmo) .rodape {
+  filter: grayscale(1) brightness(0.9);
+}
+
+:host(.calmo) .painel {
+  --cor-fundo-painel: #f3f3f3;
+}
+
+:host(.calmo) .balao {
+  border-color: #6e6e6e;
+  background: #d9dbdb;
+  color: #3d3d3d;
+}
+
+:host(.calmo) .mascote {
+  filter: grayscale(1);
+}
+
+:host(.letras-maiores) .conteudo {
+  zoom: 1.15;
+}
+
+/* ---------- Menu lateral ---------- */
+
+.corpo {
+  display: flex;
+  flex: 1;
+}
+
+.menu {
+  flex: none;
+  width: 349px;
+  padding: 27px 0 40px 34px;
+  border-right: 1px solid var(--cor-linha);
+  background: #fff;
+}
+
+.menu-titulo {
+  margin: 0 0 6px;
+  font-size: var(--secao-tam);
+  font-weight: 600;
+  line-height: 40px;
+}
+
+/* A margem do item anterior colapsa com esta: 55px = 15 do item + 40 do Figma. */
+.menu-titulo.seguinte {
+  margin-top: 55px;
+}
+
+/* As posicoes dos icones vem do Figma (borda externa); --b desconta a borda. */
+.menu-item {
+  --b: 1px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 280px;
+  height: 45px;
+  margin-bottom: var(--gap-itens);
+  padding-left: calc(var(--rotulo-x) - var(--b));
+  border: var(--b) solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: #fff;
+  color: var(--cor-texto);
+  font-size: 24px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.menu-item.ativo {
+  --b: 2px;
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+button.menu-item {
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+/* "FILHO (A)" da familia: o filho escolhido fica laranja. */
+.menu-item.filho {
+  padding-left: 34px;
+}
+
+.menu-item.filho.ativo {
+  --b: 1px;
+  border-color: #ffdfcc;
+  background: #fef0e8;
+  color: #f2620f;
+}
+
+.icone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.icone > * {
+  position: absolute;
+  translate: calc(-1 * var(--b)) calc(-1 * var(--b));
+}
+
+.icone img {
+  display: block;
+}
+
+/* "Visao geral": quatro retangulos desenhados como no Figma. */
+.icone i {
+  width: 5.625px;
+  border: 2px solid currentColor;
+}
+
+.icone .v1 {
+  left: var(--visao-x);
+  top: 27.19px;
+  height: 2.813px;
+}
+.icone .v2 {
+  left: var(--visao-x);
+  top: 15px;
+  height: 9.375px;
+}
+.icone .v3 {
+  left: calc(var(--visao-x) + 9.38px);
+  top: 15px;
+  height: 2.813px;
+}
+.icone .v4 {
+  left: calc(var(--visao-x) + 9.38px);
+  top: 20.63px;
+  height: 9.375px;
+}
+
+.conteudo {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 30px 40px;
+}
+
+/* ---------- Overlays (conta e notificacoes) ---------- */
+
+.sobreposicao {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.flutuante {
+  position: absolute;
+  top: 168px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.conta {
+  right: 20px;
+  width: 270px;
+}
+
+.conta-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.conta-topo strong,
+.notif strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cor-titulo);
+}
+
+.conta-topo small {
+  font-size: 13px;
+}
+
+.conta a,
+.conta .opcao,
+.conta .sair {
+  display: block;
+  width: 100%;
+  padding: 12px 18px;
+  border: none;
+  background: none;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--cor-titulo);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.conta .sair {
+  margin-top: 4px;
+  padding-bottom: 20px;
+  border-top: 1px solid var(--cor-linha);
+  color: var(--cor-erro);
+}
+
+.notificacoes {
+  right: 30px;
+  width: 410px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.notif-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.notif-topo strong {
+  font-size: 18px;
+  color: var(--cor-titulo);
+}
+
+.notif {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.notif.nova {
+  background: var(--cor-primaria-clara);
+}
+
+.notif p {
+  margin: 3px 0;
+  font-size: 13px;
+}
+
+.notif small {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ponto {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+
+.ponto.laranja {
+  background: #ea6819;
+}
+.ponto.cinza {
+  background: var(--cor-texto);
+}
+.ponto.vermelho {
+  background: var(--cor-erro);
+}
+.ponto.verde {
+  background: var(--cor-sucesso);
+}
+
+/* ---------- Telas estreitas: menu em gaveta ---------- */
+
+.abrir-menu,
+.fundo-menu {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .barra {
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .abrir-menu {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 0 9px;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .abrir-menu span {
+    height: 2px;
+    border-radius: 1px;
+    background: var(--cor-texto);
+  }
+
+  .barra-titulo {
+    flex: 1;
+    min-width: 0;
+    font-size: 24px;
+  }
+
+  .barra-titulo,
+  .barra-titulo.pequeno {
+    overflow: hidden;
+    font-size: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .barra-titulo small {
+    display: none;
+  }
+
+  .menu {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    width: min(349px, 88vw);
+    overflow-y: auto;
+    padding-right: 24px;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 0.2s ease,
+      visibility 0.2s;
+  }
+
+  .menu.aberto {
+    transform: none;
+    visibility: visible;
+    box-shadow: var(--sombra-cartao);
+  }
+
+  .menu-item {
+    width: 100%;
+  }
+
+  .fundo-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 29;
+    display: block;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .conteudo {
+    padding: 14px 16px 32px;
+  }
+
+  .topo,
+  .rodape {
+    height: 72px;
+  }
+
+  .topo a {
+    margin: 16px 0 0 16px;
+  }
+
+  .avatar-topo {
+    top: 15px;
+    right: 16px;
+  }
+
+  .fala {
+    gap: 8px;
+  }
+
+  .mascote {
+    width: 28px;
+    height: 28px;
+  }
+
+  .balao {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .balao span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .notificacoes,
+  .conta {
+    right: 8px;
+    left: 8px;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu {
+    transition: none;
+  }
+}

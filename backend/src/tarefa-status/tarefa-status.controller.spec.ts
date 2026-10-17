@@ -31,7 +31,7 @@ describe('TarefaStatusController', () => {
 
   it('findAllByAluno delega usando o escolaId do token', async () => {
     const resposta = { data: [] };
-    service.findAllByAluno.mockResolvedValue(resposta as never);
+    service.findAllByAluno.mockResolvedValue(resposta);
 
     expect(await controller.findAllByAluno(1, 2)).toBe(resposta);
     expect(service.findAllByAluno).toHaveBeenCalledWith(1, 2);
@@ -48,7 +48,7 @@ describe('TarefaStatusController', () => {
 
   it('findAllByResponsavel usa o usuarioId do token, nunca um id do corpo', async () => {
     const resposta = { data: [] };
-    service.findAllByResponsavelUsuarioId.mockResolvedValue(resposta as never);
+    service.findAllByResponsavelUsuarioId.mockResolvedValue(resposta);
 
     expect(await controller.findAllByResponsavel(7)).toBe(resposta);
     expect(service.findAllByResponsavelUsuarioId).toHaveBeenCalledWith(7);

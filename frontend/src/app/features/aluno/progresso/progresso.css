@@ -1,0 +1,167 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 893px;
+}
+
+.indicador strong {
+  font-size: 40px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---------- Minha semana ---------- */
+
+.semana {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+}
+
+.semana li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bola {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: #eef1f5;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.dia-feito .bola {
+  background: #0e996b;
+  color: #fff;
+}
+
+.dia-hoje .bola {
+  border: 2px solid #ea6819;
+  background: #fef0e8;
+  color: #ea6819;
+}
+
+.semana strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.semana small {
+  font-size: 12px;
+}
+
+/* ---------- Materias e grafico ---------- */
+
+.colunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.materias {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.materia {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.materia .progresso {
+  flex: none;
+}
+
+.rotulo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.rotulo b {
+  color: var(--c-texto);
+  font-weight: 600;
+}
+
+.grafico {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 200px;
+  padding-top: 10px;
+}
+
+.coluna-grafico {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: 50px;
+  height: 100%;
+}
+
+.valor {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.barra {
+  width: 50px;
+  min-height: 6px;
+  max-height: 150px;
+  border-radius: 6px;
+  background: #e8effe;
+}
+
+.atual .barra {
+  background: #2277e5;
+}
+
+.atual .valor {
+  color: #2277e5;
+  font-weight: 700;
+}
+
+.coluna-grafico small {
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .semana {
+    gap: 2px;
+  }
+
+  .bola {
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .colunas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

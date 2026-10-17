@@ -1,0 +1,22 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.ajuda {
+  margin: 12px 0 14px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.aviso-caixa {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.alerta-erro {
+  margin: 0;
+}

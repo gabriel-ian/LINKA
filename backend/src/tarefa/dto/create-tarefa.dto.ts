@@ -16,7 +16,9 @@ export class CreateTarefaDto {
   @MaxLength(255)
   titulo!: string;
 
-  @ApiPropertyOptional({ example: 'Resolver os exercicios 1 a 10 da pagina 42' })
+  @ApiPropertyOptional({
+    example: 'Resolver os exercicios 1 a 10 da pagina 42',
+  })
   @IsOptional()
   @IsString()
   descricao?: string;

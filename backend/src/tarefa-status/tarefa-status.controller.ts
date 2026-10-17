@@ -35,7 +35,9 @@ export class TarefaStatusController {
 
   @Patch()
   @Roles('escola', 'professor')
-  @ApiOperation({ summary: 'Marcar tarefa como concluida/pendente para um aluno' })
+  @ApiOperation({
+    summary: 'Marcar tarefa como concluida/pendente para um aluno',
+  })
   updateStatus(
     @Body() body: UpdateTarefaStatusDto,
     @EscolaId() escolaId: number,

@@ -1,0 +1,183 @@
+/* Pecas repetidas nas telas "Familia - ..." do Figma. */
+
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cabecalho p {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.bloco {
+  position: relative;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--sombra-cartao);
+}
+
+.bloco h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+/* Barras de "Progresso por materia". */
+.materias {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.materias.coluna {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.materia {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 8px;
+  font-size: 15px;
+  line-height: 13px;
+}
+
+.materia strong {
+  font-weight: 600;
+}
+
+.materia span {
+  font-weight: 500;
+}
+
+.materia .trilho {
+  flex-basis: 100%;
+  height: 8px;
+  border-radius: 6px;
+  background: var(--cor-fundo-painel);
+}
+
+.materia .trilho i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+}
+
+/* Cartao de confirmacao com o selo "ok" (incentivo enviado, avisos em dia). */
+.confirmacao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 44px 24px 46px;
+  text-align: center;
+}
+
+.confirmacao .ok {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--cor-sucesso-fundo);
+  color: #059669;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.confirmacao h2 {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+}
+
+.confirmacao p {
+  max-width: 600px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.confirmacao .botoes {
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 22px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--cor-texto);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao:hover {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.botao.primario {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+.botao.primario:hover {
+  background: var(--cor-primaria-escura);
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1000px) {
+  .cabecalho h1 {
+    font-size: 34px;
+  }
+
+  .cabecalho p {
+    font-size: 16px;
+  }
+
+  .materias {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -49,7 +49,7 @@ describe('TurmaService', () => {
   describe('create', () => {
     it('cria a turma vinculada a escola logada', async () => {
       const criada = { nome: 'Turma B', escolaId: 3 } as Turma;
-      const salva = { ...criada, id: 9 } as Turma;
+      const salva = { ...criada, id: 9 };
       repository.create.mockReturnValue(criada);
       repository.save.mockResolvedValue(salva);
 

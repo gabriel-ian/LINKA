@@ -21,8 +21,14 @@ describe('TarefaAdaptadaService', () => {
           provide: getRepositoryToken(TarefaAdaptada),
           useValue: { create: jest.fn(), save: jest.fn(), find: jest.fn() },
         },
-        { provide: getRepositoryToken(Tarefa), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Aluno), useValue: { findOne: jest.fn() } },
+        {
+          provide: getRepositoryToken(Tarefa),
+          useValue: { findOne: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Aluno),
+          useValue: { findOne: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -58,9 +64,7 @@ describe('TarefaAdaptadaService', () => {
       tarefaRepo.findOne.mockResolvedValue({ id: 1 } as Tarefa);
       alunoRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.create(dto, 1)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto, 1)).rejects.toThrow(BadRequestException);
     });
 
     it('usa gerado_por_ia = true por default', async () => {

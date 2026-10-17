@@ -9,3 +9,6 @@ dist
 frontend/.angular
 # Arquivos enviados (laudos tem dados de saude)
 backend/uploads
+
+# Configuracao local do Claude Code (MCP)
+.mcp.json

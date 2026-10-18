@@ -13,19 +13,23 @@
 
 .filtros {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
 }
 
+/* A busca fica numa linha propria: ao lado dos filtros ela era espremida. */
 .busca {
-  flex: 1;
+  flex: 1 1 100%;
 }
 
 .seletor {
-  width: 180px;
+  flex: 0 0 180px;
 }
 
-.seletor:nth-of-type(3) {
-  width: 220px;
+/* Turma e Diagnostico tem rotulos mais longos ("Diagnóstico: Todos"). */
+.seletor:nth-of-type(3),
+.seletor:nth-of-type(4) {
+  flex-basis: 220px;
 }
 
 .tabela-cartao {

@@ -1,0 +1,65 @@
+# Linka completa: MySQL + API + site.
+#
+#   cp .env.docker.example .env.docker   # preencha as senhas
+#   docker compose --env-file .env.docker up -d --build
+#
+# Site em http://localhost:8080 (a API fica em /api).
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?defina DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: bancolinka
+      MYSQL_USER: linka
+      MYSQL_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD}
+    volumes:
+      - mysql-dados:/var/lib/mysql
+      # Na primeira subida (volume vazio) cria as tabelas e os dados iniciais.
+      - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./backend/sql/dados-base.sql:/docker-entrypoint-initdb.d/02-dados-base.sql:ro
+      - ./backend/sql/seed-admin.sql:/docker-entrypoint-initdb.d/03-seed-admin.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -u root -p"$$MYSQL_ROOT_PASSWORD" --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: linka
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: bancolinka
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      FRONTEND_URL: ${SITE_URL:-http://localhost:8080}
+      # Atras do nginx: o IP real do usuario vem no X-Forwarded-For.
+      TRUST_PROXY: 'true'
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-Linka <nao-responda@linka.app>}
+    volumes:
+      # Laudos (dados de saude): fora do container, entram no backup.
+      - laudos:/app/uploads
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '${SITE_PORTA:-8080}:80'
+
+volumes:
+  mysql-dados:
+  laudos:

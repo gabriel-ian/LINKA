@@ -71,6 +71,28 @@ npm start
 
 Abra http://localhost:4200.
 
+## Rodar com Docker
+
+Sobe o MySQL, a API e o site de uma vez (precisa do Docker Desktop):
+
+```bash
+cp .env.docker.example .env.docker      # preencha as senhas e o JWT_SECRET
+docker compose --env-file .env.docker up -d --build
+```
+
+- Site em http://localhost:8080; a API fica em `/api` (Swagger em `/api/api`).
+- Na primeira subida o banco é criado com `schema.sql`, `dados-base.sql` e
+  `seed-admin.sql` (acessos de teste abaixo).
+- Os dados do MySQL e os laudos ficam nos volumes `mysql-dados` e `laudos`:
+  inclua os dois no backup.
+- Em produção, coloque um HTTPS na frente (Caddy, Traefik ou o proxy da
+  hospedagem) e ajuste `SITE_URL` para o endereço público, que vai nos links
+  dos e-mails.
+
+O build de produção do site (`npx ng build`) chama a API em `/api` no mesmo
+endereço; o `frontend/nginx.conf` faz esse repasse. No `npm start` (ng serve)
+a API continua em http://localhost:3000.
+
 ## Acessos de teste
 
 Criados pelo `seed-admin.sql`, todos com a senha `linka123`:
@@ -108,7 +130,7 @@ As famílias geradas entram com a senha `linka123`.
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Opcionais. Ligam os e-mails: senha de acesso, "Esqueci minha senha" e o resumo semanal das famílias (domingo às 18h). Sem `SMTP_HOST`, nada é enviado e o conteúdo aparece no terminal |
 
 O endereço da API usado pelo frontend fica em
-`frontend/src/environments/environment*.ts`.
+`frontend/src/environments/environment*.ts` (`/api` no build de produção).
 
 ## Testes e qualidade
 

@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -6,8 +7,12 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = app.get(ConfigService);
+
+  // Atras de um proxy (nginx no Docker), o IP real vem no X-Forwarded-For;
+  // o limite de tentativas do login depende dele.
+  if (config.get<string>('TRUST_PROXY') === 'true') app.set('trust proxy', 1);
 
   // Cabecalhos de seguranca. A API so devolve JSON e arquivos, entao o CSP
   // fica desligado (ele quebraria a pagina do Swagger em /api).

@@ -4,6 +4,7 @@ frontend/node_modules
 
 dist
 .env
+.env.docker
 
 .angular
 frontend/.angular

@@ -54,6 +54,8 @@ export class AdmLogin {
           this.erro = 'E-mail ou senha incorretos. Confira os dados e tente de novo.';
         } else if (e.status === 403) {
           this.erro = 'O acesso desta escola está suspenso. Fale com a equipe Linka.';
+        } else if (e.status === 429) {
+          this.erro = 'Muitas tentativas seguidas. Espere um minuto e tente de novo.';
         } else {
           this.erro = 'Erro ao conectar com o servidor.';
         }

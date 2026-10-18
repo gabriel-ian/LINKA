@@ -1,10 +1,19 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+  ApiTooManyRequestsResponse,
+} from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { UsuarioId } from './usuario-id.decorator';
 import { AlterarSenhaDto, CriarSenhaDto } from './dto/alterar-senha.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+
+/** 10 tentativas por minuto: no login conta por IP + e-mail, na senha por usuario. */
+const LIMITE_SENHA = { geral: { limit: 10, ttl: 60_000 } };
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -12,6 +21,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @Throttle(LIMITE_SENHA)
+  @ApiTooManyRequestsResponse({ description: 'Muitas tentativas seguidas' })
   @ApiOperation({
     summary: 'Autenticar usuario',
     description:
@@ -23,6 +34,7 @@ export class AuthController {
   }
 
   @Post('senha')
+  @Throttle(LIMITE_SENHA)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Trocar a propria senha (qualquer perfil logado)' })
@@ -35,6 +47,7 @@ export class AuthController {
   }
 
   @Post('senha/primeiro-acesso')
+  @Throttle(LIMITE_SENHA)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
@@ -46,6 +59,7 @@ export class AuthController {
   }
 
   @Post('senha/manter')
+  @Throttle(LIMITE_SENHA)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Continuar com a senha provisoria recebida' })

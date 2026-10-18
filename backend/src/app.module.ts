@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { LimiteGuard } from './auth/limite.guard';
 
 import { AlunoModule } from './aluno/aluno.module';
 import { EscolaModule } from './escola/escola.module';
@@ -49,6 +52,9 @@ import { PainelFamiliaModule } from './painel-familia/painel-familia.module';
         logging: config.get<string>('DB_LOGGING') === 'true',
       }),
     }),
+    // Limite geral contra abuso da API (por usuario ou IP, ver LimiteGuard).
+    // Login e senha tem limites proprios, bem menores (ver AuthController).
+    ThrottlerModule.forRoot([{ name: 'geral', ttl: 60_000, limit: 300 }]),
     UsuarioModule,
     AlunoModule,
     EscolaModule,
@@ -72,6 +78,6 @@ import { PainelFamiliaModule } from './painel-familia/painel-familia.module';
     PainelFamiliaModule,
   ],
   controllers: [AdminController],
-  providers: [],
+  providers: [{ provide: APP_GUARD, useClass: LimiteGuard }],
 })
 export class AppModule {}

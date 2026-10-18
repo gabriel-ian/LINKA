@@ -1,4 +1,50 @@
-@if (contexto.resumo(); as r) {
+@if (contexto.resumo() && contexto.semConexao()) {
+  <!-- "Aluno - Sem conexão" do Figma -->
+  <div class="pagina">
+    <header class="cabecalho coluna">
+      <h1>Olá, {{ contexto.resumo()!.aluno.primeiroNome }}!</h1>
+      <p>{{ hoje }}</p>
+    </header>
+
+    <section class="sem-internet" role="status">
+      <div>
+        <strong>Você está sem internet</strong>
+        <p>
+          Pode continuar fazendo as missões. A Linka envia suas respostas para a professora quando a
+          conexão voltar.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="bt-tentar"
+        [disabled]="contexto.tentando()"
+        (click)="contexto.sincronizar()"
+      >
+        {{ contexto.tentando() ? 'Tentando...' : 'Tentar de novo' }}
+      </button>
+    </section>
+
+    <section class="cartao-aluno missoes-offline" aria-labelledby="titulo-offline">
+      <h2 id="titulo-offline">Missões de hoje</h2>
+      <ul>
+        @for (t of missoesOffline(); track t.id) {
+          <li>
+            <a [routerLink]="['/aluno/tarefas', t.id]">{{ titulo(t) }}</a>
+            <span class="selo" [class]="'selo ' + seloOffline(t).cor">{{
+              seloOffline(t).texto
+            }}</span>
+          </li>
+        } @empty {
+          <li class="vazio-lista">Nenhuma missão para hoje.</li>
+        }
+      </ul>
+    </section>
+
+    <p class="nota-offline">
+      Áudio dos passos e dicas do Dino precisam de internet. O resto funciona normalmente.
+    </p>
+  </div>
+} @else if (contexto.resumo(); as r) {
   <div class="pagina">
     <header class="cabecalho">
       <h1>Olá, {{ r.aluno.primeiroNome }}!</h1>

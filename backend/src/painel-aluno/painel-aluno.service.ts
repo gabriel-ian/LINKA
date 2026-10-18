@@ -353,7 +353,12 @@ export class PainelAlunoService {
   }
 
   /** Conclui o passo `passo` (1..n), sempre em ordem. O ultimo conclui a tarefa. */
-  async concluirPasso(usuarioId: number, tarefaId: number, passo: number) {
+  async concluirPasso(
+    usuarioId: number,
+    tarefaId: number,
+    passo: number,
+    feitoEm?: string,
+  ) {
     const { aluno, tarefa, tarefas } = await this.tarefaDoAluno(
       usuarioId,
       tarefaId,
@@ -363,21 +368,22 @@ export class PainelAlunoService {
     if (passo !== tarefa.passosFeitos + 1 || passo > tarefa.totalPassos)
       throw new BadRequestException('Conclua os passos na ordem');
 
-    const agora = new Date();
+    // Hora real do passo (pode ter sido feito sem internet).
+    const quando = momentoDoPasso(feitoEm);
     const ultimo = passo === tarefa.totalPassos;
     // O primeiro passo marca o inicio; incentivo antes dele = "com lembrete".
     const sozinho = tarefa.iniciadoEm
       ? tarefa.iniciouSozinho
-      : await this.comecouSemIncentivo(aluno.id, tarefaId, agora);
+      : await this.comecouSemIncentivo(aluno.id, tarefaId, quando);
     await this.dataSource.getRepository(TarefaStatusEntity).update(
       { alunoId: aluno.id, tarefaId },
       {
         passosFeitos: passo,
         ...(tarefa.iniciadoEm
           ? {}
-          : { iniciado_em: agora, iniciouSozinho: sozinho }),
+          : { iniciado_em: quando, iniciouSozinho: sozinho }),
         ...(ultimo
-          ? { status: 'concluida' as const, concluido_em: agora }
+          ? { status: 'concluida' as const, concluido_em: quando }
           : {}),
       },
     );
@@ -387,8 +393,8 @@ export class PainelAlunoService {
     const atualizada: TarefaDoAluno = {
       ...tarefa,
       concluida: true,
-      concluidoEm: agora,
-      iniciadoEm: tarefa.iniciadoEm ?? agora,
+      concluidoEm: quando,
+      iniciadoEm: tarefa.iniciadoEm ?? quando,
       iniciouSozinho: sozinho,
       passosFeitos: passo,
     };
@@ -399,7 +405,7 @@ export class PainelAlunoService {
         concluida: true,
         ganhos: pontosDaTarefa(atualizada),
         comecouSozinho: atualizada.iniciouSozinho === true,
-        ...this.placar(todas, agora),
+        ...this.placar(todas, new Date()),
         quaseLa: conquistaQuaseLa(conquistas(todas)),
       },
     };
@@ -628,4 +634,21 @@ export class PainelAlunoService {
     });
     return this.resumo(usuarioId);
   }
+}
+
+/** Ate quanto tempo atras um passo feito sem internet ainda vale. */
+const LIMITE_OFFLINE_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Hora do passo: a que o aluno informou (feito sem internet) se for dos
+ * ultimos 7 dias e nao estiver no futuro; senao, a hora de agora.
+ */
+export function momentoDoPasso(feitoEm?: string, agora = new Date()): Date {
+  const quando = feitoEm ? new Date(feitoEm) : null;
+  return quando &&
+    !Number.isNaN(quando.getTime()) &&
+    quando <= agora &&
+    agora.getTime() - quando.getTime() <= LIMITE_OFFLINE_MS
+    ? quando
+    : agora;
 }

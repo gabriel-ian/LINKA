@@ -42,7 +42,9 @@ export class AlunoLayout {
 
     return {
       titulo: r?.aluno.nome ?? 'Aluno',
-      fala: this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),
+      fala: this.contexto.semConexao()
+        ? 'Sem internet agora - mas suas missões estão salvas.'
+        : this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),
       avatar: r?.aluno.iniciais ?? '',
       modoCalmo: r?.preferencias.modoCalmo,
       letrasMaiores: r?.preferencias.letrasMaiores,

@@ -91,9 +91,24 @@ export class AuthService {
     }
   }
 
+  /** Id do usuario (sub do token), para separar dados guardados no navegador. */
+  get usuarioId(): number | null {
+    const token = localStorage.getItem('token');
+    try {
+      const sub = token ? JSON.parse(atob(token.split('.')[1])).sub : null;
+      return typeof sub === 'number' ? sub : null;
+    } catch {
+      return null;
+    }
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('perfil');
     localStorage.removeItem('escolaId');
+    // Copias offline do aluno: o computador da escola e compartilhado.
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith('linka-copia:'))
+      .forEach((k) => localStorage.removeItem(k));
   }
 }

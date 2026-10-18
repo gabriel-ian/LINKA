@@ -58,6 +58,12 @@
         </section>
       }
 
+      @if (aguardandoEnvio()) {
+        <p class="aviso-caixa verde" role="status">
+          Missão concluída! A Linka envia para a professora quando a internet voltar.
+        </p>
+      }
+
       <footer class="calma-rodape">
         <span>Modo calmo: menos cores, letras maiores e um passo por vez.</span>
         <button type="button" class="link-acao" (click)="voltarAoNormal()">
@@ -145,6 +151,11 @@
 
       @if (erro()) {
         <p class="alerta-erro" role="alert">{{ erro() }}</p>
+      }
+      @if (aguardandoEnvio()) {
+        <p class="aviso-caixa verde" role="status">
+          Missão concluída! A Linka envia para a professora quando a internet voltar.
+        </p>
       }
 
       <ol class="passos">

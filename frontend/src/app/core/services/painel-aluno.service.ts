@@ -30,9 +30,15 @@ export class PainelAlunoService {
     return this.http.get<ApiResponse<TarefaAluno>>(`${this.api}/tarefas/${id}`);
   }
 
-  concluirPasso(id: number, passo: number): Observable<ApiResponse<PassoConcluido>> {
+  /** feitoEm: hora real de um passo feito sem internet (enviado depois). */
+  concluirPasso(
+    id: number,
+    passo: number,
+    feitoEm?: string,
+  ): Observable<ApiResponse<PassoConcluido>> {
     return this.http.post<ApiResponse<PassoConcluido>>(`${this.api}/tarefas/${id}/passos`, {
       passo,
+      ...(feitoEm && { feitoEm }),
     });
   }
 

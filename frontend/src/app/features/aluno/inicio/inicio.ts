@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject } from '@angular/core';
-import { IncentivoAluno } from '../../../core/model/painel-aluno.model';
+import { IncentivoAluno, TarefaResumoAluno } from '../../../core/model/painel-aluno.model';
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
 import { VozService } from '../../../core/services/voz.service';
 import { RouterLink } from '@angular/router';
@@ -7,7 +7,7 @@ import { AlunoContexto } from '../aluno-contexto';
 import { ItemTarefa } from '../item-tarefa';
 import { dataLonga, hojeIso, horaCurta, plural, tituloCompleto } from '../aluno-ui';
 
-/** "Aluno - Início" do Figma. */
+/** "Aluno - Início" do Figma, e a versão "Aluno - Sem conexão". */
 @Component({
   selector: 'app-aluno-inicio',
   imports: [RouterLink, ItemTarefa],
@@ -48,6 +48,31 @@ export class AlunoInicio {
         : ' Ainda não começou.';
     return quando + andamento;
   });
+
+  /**
+   * Sem internet: o que ainda espera envio (mesmo atrasada, ela sai de "hoje"
+   * ao ser concluida), depois as de hoje; sem nenhuma, as proximas.
+   */
+  readonly missoesOffline = computed(() => {
+    const offline = this.contexto.offline;
+    const enviando = (this.contexto.resumo()?.tarefas ?? []).filter((t) =>
+      offline.aguardandoEnvio(t),
+    );
+    const hoje = this.contexto.deHoje().filter((t) => !offline.aguardandoEnvio(t));
+    const lista = [...enviando, ...hoje];
+    return lista.length ? lista : this.contexto.proximas().slice(0, 3);
+  });
+
+  /** Selo de cada missao no modo sem internet (Figma "Sem conexão"). */
+  seloOffline(t: TarefaResumoAluno): { texto: string; cor: string } {
+    const offline = this.contexto.offline;
+    if (offline.aguardandoEnvio(t))
+      return { texto: 'Concluída - aguardando envio', cor: 'laranja' };
+    if (t.situacao === 'concluida') return { texto: 'Concluída', cor: 'cinza' };
+    return offline.disponivel(t.id)
+      ? { texto: 'Disponível offline', cor: 'verde' }
+      : { texto: 'Precisa de internet', cor: 'cinza' };
+  }
 
   /** Recado mais novo da familia (some quando o aluno agradece). */
   readonly incentivo = computed(() => this.contexto.resumo()?.incentivos[0] ?? null);

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
+import { RedefinirSenhaService } from './redefinir-senha.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { UsuarioModule } from '../usuario/usuario.module';
@@ -24,7 +25,7 @@ import { UsuarioModule } from '../usuario/usuario.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, RedefinirSenhaService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

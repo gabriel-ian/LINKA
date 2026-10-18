@@ -18,6 +18,12 @@
   font-weight: 500;
 }
 
+.etapa-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .caminhos {
   display: flex;
   flex-direction: column;

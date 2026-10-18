@@ -28,6 +28,21 @@ export class AuthService {
     return this.http.post(`${this.api}/senha`, { senhaAtual, novaSenha });
   }
 
+  /** A Linka envia link de nova senha por e-mail? (depende do SMTP no backend) */
+  esqueciDisponivel(): Observable<{ data: { porEmail: boolean } }> {
+    return this.http.get<{ data: { porEmail: boolean } }>(`${this.api}/senha/esqueci`);
+  }
+
+  /** "Esqueci minha senha": pede o link por e-mail. */
+  pedirLinkSenha(email: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/esqueci`, { email });
+  }
+
+  /** Cria a nova senha com o codigo do link recebido por e-mail. */
+  redefinirSenha(token: string, novaSenha: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/redefinir`, { token, novaSenha });
+  }
+
   /** Primeiro acesso: troca a senha recebida sem pedir a atual. */
   criarSenha(novaSenha: string): Observable<unknown> {
     return this.http.post(`${this.api}/senha/primeiro-acesso`, { novaSenha });

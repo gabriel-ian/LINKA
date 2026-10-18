@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -8,7 +8,13 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { UsuarioId } from './usuario-id.decorator';
-import { AlterarSenhaDto, CriarSenhaDto } from './dto/alterar-senha.dto';
+import {
+  AlterarSenhaDto,
+  CriarSenhaDto,
+  EsqueciSenhaDto,
+  RedefinirSenhaDto,
+} from './dto/alterar-senha.dto';
+import { RedefinirSenhaService } from './redefinir-senha.service';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
@@ -18,7 +24,10 @@ const LIMITE_SENHA = { geral: { limit: 10, ttl: 60_000 } };
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly redefinicao: RedefinirSenhaService,
+  ) {}
 
   @Post('login')
   @Throttle(LIMITE_SENHA)
@@ -65,5 +74,32 @@ export class AuthController {
   @ApiOperation({ summary: 'Continuar com a senha provisoria recebida' })
   manterSenha(@UsuarioId() usuarioId: number) {
     return this.authService.manterSenha(usuarioId);
+  }
+
+  @Get('senha/esqueci')
+  @ApiOperation({
+    summary: 'A Linka envia link de nova senha por e-mail?',
+    description: 'porEmail=false quando o SMTP nao esta configurado.',
+  })
+  esqueciDisponivel() {
+    return this.redefinicao.disponivel();
+  }
+
+  @Post('senha/esqueci')
+  @Throttle(LIMITE_SENHA)
+  @ApiOperation({
+    summary: 'Pedir link para criar uma nova senha',
+    description:
+      'Responde sempre igual, exista ou nao a conta, para nao revelar e-mails cadastrados.',
+  })
+  esqueci(@Body() dto: EsqueciSenhaDto) {
+    return this.redefinicao.pedir(dto.email);
+  }
+
+  @Post('senha/redefinir')
+  @Throttle(LIMITE_SENHA)
+  @ApiOperation({ summary: 'Criar a nova senha com o link do e-mail' })
+  redefinir(@Body() dto: RedefinirSenhaDto) {
+    return this.redefinicao.redefinir(dto.token, dto.novaSenha);
   }
 }

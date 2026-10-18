@@ -422,6 +422,25 @@ export class PainelFamiliaService {
     return { data: true };
   }
 
+  /**
+   * Resumo da semana de cada filho, para o e-mail de domingo. Respeita a
+   * preferencia "Relatorio semanal por e-mail" (ligada por padrao).
+   */
+  async resumosParaEmail(
+    responsavelId: number,
+    preferencias: Record<string, unknown> | null,
+  ): Promise<{ nome: string; resumo: string }[]> {
+    const prefs = { ...PREFERENCIAS_PADRAO, ...(preferencias ?? {}) };
+    if (!prefs.relatorioSemanal) return [];
+    const filhos = await this.filhos(responsavelId);
+    return Promise.all(
+      filhos.map(async (f) => ({
+        nome: f.nome,
+        resumo: await this.resumoDoFilho(f.id, f.primeiroNome),
+      })),
+    );
+  }
+
   private async resumoDoFilho(alunoId: number, primeiroNome: string) {
     const tarefas = await this.aluno.tarefasDoAluno(alunoId);
     const linhas = this.aluno.paraLinhas(alunoId, tarefas);

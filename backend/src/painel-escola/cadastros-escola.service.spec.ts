@@ -7,10 +7,14 @@ import {
 } from './cadastros-escola.service';
 import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
 import { TarefaStatusService } from '../tarefa-status/tarefa-status.service';
+import { EmailService } from '../email/email.service';
 
 function arquivo(bytes: number[], size = bytes.length) {
   return { buffer: Buffer.from(bytes), size } as Express.Multer.File;
 }
+
+/** E-mail de mentira: os testes so conferem os cadastros. */
+const email = { enviarAcesso: jest.fn() } as unknown as EmailService;
 
 describe('CadastrosEscolaService', () => {
   let service: CadastrosEscolaService;
@@ -21,7 +25,11 @@ describe('CadastrosEscolaService', () => {
     const dataSource = {
       getRepository: jest.fn(() => alunoRepo),
     } as unknown as DataSource;
-    service = new CadastrosEscolaService(dataSource, {} as TarefaStatusService);
+    service = new CadastrosEscolaService(
+      dataSource,
+      {} as TarefaStatusService,
+      email,
+    );
     jest.spyOn(fs, 'mkdir').mockResolvedValue(undefined);
     jest.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
     jest.spyOn(fs, 'rm').mockResolvedValue(undefined);
@@ -77,7 +85,10 @@ describe('CadastrosEscolaService', () => {
       const status = {
         seedParaAluno: jest.fn(),
       } as unknown as TarefaStatusService;
-      return { svc: new CadastrosEscolaService(dataSource, status), repos };
+      return {
+        svc: new CadastrosEscolaService(dataSource, status, email),
+        repos,
+      };
     }
 
     it('recusa quando a turma nao tem vagas para todos', async () => {
@@ -174,6 +185,7 @@ describe('CadastrosEscolaService.redefinirSenha', () => {
     const service = new CadastrosEscolaService(
       dataSource,
       {} as TarefaStatusService,
+      email,
     );
 
     await expect(service.redefinirSenha('professor', 9, 5)).rejects.toThrow(

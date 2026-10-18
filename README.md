@@ -41,6 +41,12 @@ mysql -u root -p bancolinka < backend/sql/seed-admin.sql
 avulsas (`painel-escola.sql`, `familias.sql`...) só servem para atualizar um banco
 antigo.
 
+Banco que já existia antes do "Esqueci minha senha"? Rode também:
+
+```bash
+mysql -u root -p bancolinka < backend/sql/senha-reset.sql
+```
+
 ### 2. Backend
 
 ```bash
@@ -99,6 +105,7 @@ As famílias geradas entram com a senha `linka123`.
 | `FRONTEND_URL`      | Origem liberada no CORS                                |
 | `PORT`              | Porta da API (padrão 3000)                             |
 | `ANTHROPIC_API_KEY` | Opcional. Liga a adaptação de tarefas e comunicados por IA (Claude). Sem ela, o professor adapta manualmente |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Opcionais. Ligam os e-mails: senha de acesso, "Esqueci minha senha" e o resumo semanal das famílias (domingo às 18h). Sem `SMTP_HOST`, nada é enviado e o conteúdo aparece no terminal |
 
 O endereço da API usado pelo frontend fica em
 `frontend/src/environments/environment*.ts`.

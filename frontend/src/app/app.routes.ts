@@ -22,6 +22,12 @@ export const routes: Routes = [
       import('./features/recuperar-senha/recuperar-senha').then((m) => m.RecuperarSenha),
   },
   {
+    // Link do e-mail de nova senha: sem guard, abre mesmo com alguem logado.
+    path: 'redefinir-senha',
+    loadComponent: () =>
+      import('./features/redefinir-senha/redefinir-senha').then((m) => m.RedefinirSenha),
+  },
+  {
     path: 'adm',
     canActivate: [authGuard, perfilGuard('admin')],
     loadComponent: () => import('./features/adm/adm-layout/adm-layout').then((m) => m.AdmLayout),

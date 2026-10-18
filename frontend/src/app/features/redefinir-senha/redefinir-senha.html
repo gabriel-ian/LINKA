@@ -1,0 +1,79 @@
+<app-entrada-layout>
+  @if (!token) {
+    <div class="etapa">
+      <h1 class="titulo">Link incompleto</h1>
+      <p class="descricao">Abra o link direto do e-mail ou peça um link novo.</p>
+      <a class="btn btn-primario btn-bloco" routerLink="/recuperar-senha">Pedir link novo</a>
+    </div>
+  } @else if (concluido()) {
+    <div class="etapa">
+      <h1 class="titulo">Senha criada!</h1>
+      <p class="descricao">Agora é só entrar na Linka com a sua nova senha.</p>
+      <a class="btn btn-primario btn-bloco" routerLink="/login">Ir para o login</a>
+    </div>
+  } @else {
+    <form class="etapa" (ngSubmit)="salvar()" novalidate>
+      <h1 class="titulo">Criar nova senha</h1>
+      <p class="descricao">Escolha uma senha com pelo menos 8 caracteres.</p>
+
+      <label class="campo-grupo">
+        <span class="campo-rotulo">Nova senha</span>
+        <span class="senha-caixa">
+          <input
+            class="campo"
+            [class.campo--erro]="erroNova()"
+            [type]="mostrarNova ? 'text' : 'password'"
+            name="nova"
+            autocomplete="new-password"
+            placeholder="Mínimo 8 caracteres"
+            [(ngModel)]="nova"
+          />
+          <button
+            type="button"
+            class="olho"
+            [attr.aria-label]="mostrarNova ? 'Esconder senha' : 'Mostrar senha'"
+            (click)="mostrarNova = !mostrarNova"
+          >
+            <img src="assets/entrada/icone-olho.svg" alt="" />
+          </button>
+        </span>
+      </label>
+
+      <label class="campo-grupo">
+        <span class="campo-rotulo">Repita a nova senha</span>
+        <span class="senha-caixa">
+          <input
+            class="campo"
+            [class.campo--erro]="erroNova()"
+            [type]="mostrarRepetir ? 'text' : 'password'"
+            name="repetir"
+            autocomplete="new-password"
+            [(ngModel)]="repetir"
+          />
+          <button
+            type="button"
+            class="olho"
+            [attr.aria-label]="mostrarRepetir ? 'Esconder senha' : 'Mostrar senha'"
+            (click)="mostrarRepetir = !mostrarRepetir"
+          >
+            <img src="assets/entrada/icone-olho.svg" alt="" />
+          </button>
+        </span>
+        @if (erroNova()) {
+          <span class="msg-erro" role="alert">{{ erroNova() }}</span>
+        }
+      </label>
+
+      @if (erro()) {
+        <p class="alerta-erro" role="alert">{{ erro() }}</p>
+      }
+
+      <div class="acoes">
+        <button type="submit" class="btn btn-primario btn-bloco" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando...' : 'Salvar nova senha' }}
+        </button>
+        <a class="btn btn-secundario btn-bloco" routerLink="/login">Voltar para o login</a>
+      </div>
+    </form>
+  }
+</app-entrada-layout>

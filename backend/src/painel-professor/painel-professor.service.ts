@@ -11,6 +11,7 @@ import { Aluno } from '../aluno/aluno.entity';
 import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import { AdaptacaoIaService, PerfilParaIa } from './adaptacao-ia.service';
+import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
 import {
   CriarTarefaProfessorDto,
   EditarAdaptacaoDto,
@@ -81,6 +82,7 @@ export class PainelProfessorService {
     private readonly dataSource: DataSource,
     private readonly tarefas: TarefaService,
     private readonly ia: AdaptacaoIaService,
+    private readonly avisos: AvisosFamiliaService,
   ) {}
 
   // ---------------------------------------------------------- contexto
@@ -656,6 +658,8 @@ export class PainelProfessorService {
       );
       id = Number(resultado.insertId);
     }
+
+    if (!dto.rascunho) this.avisos.comunicado(id);
 
     const alunos = await this.alunosDaTurma(dto.turmaId);
     const [{ familias }] = await this.dataSource.query(

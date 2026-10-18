@@ -12,6 +12,7 @@ import {
 } from '../aluno/aluno.entity';
 import { TarefaStatusEntity } from '../tarefa-status/tarefa-status.entity';
 import { TarefaAdaptada } from '../tarefa-adaptada/tarefa-adaptada.entity';
+import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
 import { AdaptacaoIaService } from '../painel-professor/adaptacao-ia.service';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import {
@@ -103,6 +104,7 @@ export class PainelAlunoService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly ia: AdaptacaoIaService,
+    private readonly avisos: AvisosFamiliaService,
   ) {}
 
   // ------------------------------------------------------------ leitura
@@ -389,6 +391,7 @@ export class PainelAlunoService {
     );
 
     if (!ultimo) return { data: { passosFeitos: passo, concluida: false } };
+    this.avisos.tarefaConcluida(aluno.id, tarefaId);
 
     const atualizada: TarefaDoAluno = {
       ...tarefa,

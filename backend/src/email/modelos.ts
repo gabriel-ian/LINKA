@@ -136,3 +136,99 @@ export function mensagemResumoSemanal(d: {
     ),
   };
 }
+
+const RODAPE_AVISOS =
+  'Para não receber este aviso, desligue a opção em Configurações, no painel da família.';
+
+/** "Tarefa concluída - para você comemorar junto". */
+export function mensagemTarefaConcluida(d: {
+  nome: string | null;
+  filho: string;
+  tarefa: string;
+  urlPainel: string;
+}): Mensagem {
+  return {
+    assunto: `${d.filho} concluiu uma tarefa`,
+    texto: [
+      ola(d.nome),
+      '',
+      `${d.filho} acabou de concluir "${d.tarefa}". Que tal comemorar junto?`,
+      '',
+      `Veja no painel: ${d.urlPainel}`,
+      RODAPE_AVISOS,
+    ].join('\n'),
+    html: moldura(
+      [
+        h(ola(d.nome)),
+        `<b>${h(d.filho)}</b> acabou de concluir <b>${h(d.tarefa)}</b>. Que tal comemorar junto?`,
+        `<span style="font-size:13px;color:#666">${RODAPE_AVISOS}</span>`,
+      ],
+      { texto: 'Mandar um incentivo', url: d.urlPainel },
+    ),
+  };
+}
+
+/** Comunicado da escola enviado por um professor. */
+export function mensagemComunicado(d: {
+  nome: string | null;
+  turma: string;
+  titulo: string;
+  mensagem: string;
+  urlAvisos: string;
+}): Mensagem {
+  return {
+    assunto: `Aviso da escola: ${d.titulo}`,
+    texto: [
+      ola(d.nome),
+      '',
+      `Novo aviso para a turma ${d.turma}:`,
+      '',
+      d.titulo,
+      d.mensagem,
+      '',
+      `Veja todos os avisos: ${d.urlAvisos}`,
+      RODAPE_AVISOS,
+    ].join('\n'),
+    html: moldura(
+      [
+        h(ola(d.nome)),
+        `Novo aviso para a turma <b>${h(d.turma)}</b>:`,
+        `<b>${h(d.titulo)}</b><br>${h(d.mensagem).replace(/\n/g, '<br>')}`,
+        `<span style="font-size:13px;color:#666">${RODAPE_AVISOS}</span>`,
+      ],
+      { texto: 'Ver avisos da escola', url: d.urlAvisos },
+    ),
+  };
+}
+
+/** "Tarefa com prazo hoje não iniciada". */
+export function mensagemLembreteTarefa(d: {
+  nome: string | null;
+  filho: string;
+  tarefa: string;
+  /** 'hoje às 18h' ou 'hoje'. */
+  prazo: string;
+  urlPainel: string;
+}): Mensagem {
+  return {
+    assunto: `${d.filho} ainda não começou uma tarefa de hoje`,
+    texto: [
+      ola(d.nome),
+      '',
+      `A tarefa "${d.tarefa}" vence ${d.prazo} e ${d.filho} ainda não começou.`,
+      'Um lembrete carinhoso pode ajudar.',
+      '',
+      `Abrir o painel: ${d.urlPainel}`,
+      RODAPE_AVISOS,
+    ].join('\n'),
+    html: moldura(
+      [
+        h(ola(d.nome)),
+        `A tarefa <b>${h(d.tarefa)}</b> vence ${h(d.prazo)} e <b>${h(d.filho)}</b> ainda não começou.`,
+        'Um lembrete carinhoso pode ajudar.',
+        `<span style="font-size:13px;color:#666">${RODAPE_AVISOS}</span>`,
+      ],
+      { texto: 'Abrir o painel', url: d.urlPainel },
+    ),
+  };
+}

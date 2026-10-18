@@ -26,7 +26,7 @@ export class ResumoEmailService {
       id: number;
       nome: string | null;
       email: string;
-      preferencias: Record<string, unknown> | string | null;
+      preferencias: unknown;
     }[] = await this.dataSource.query(
       `SELECT r.id, r.nome_completo nome, u.email, r.preferencias
          FROM responsavel r
@@ -43,9 +43,7 @@ export class ResumoEmailService {
       try {
         const filhos = await this.familia.resumosParaEmail(
           Number(f.id),
-          typeof f.preferencias === 'string'
-            ? (JSON.parse(f.preferencias) as Record<string, unknown>)
-            : f.preferencias,
+          f.preferencias,
         );
         if (!filhos.length) continue;
         const ok = await this.email.enviar(

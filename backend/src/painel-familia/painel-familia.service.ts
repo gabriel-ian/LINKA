@@ -25,25 +25,8 @@ import { semanasDoMes } from '../painel-professor/painel-professor.service';
 import { sequenciaAtual } from '../painel-aluno/gamificacao';
 import { Incentivo } from './incentivo.entity';
 import { resumoSemanal } from './resumo-semanal';
+import { PREFERENCIAS_PADRAO, preferenciasDe } from './preferencias';
 import { EnviarIncentivoDto, PerfilFamiliaDto } from './dto/painel-familia.dto';
-
-export interface PreferenciasFamilia {
-  tarefaNaoIniciada: boolean;
-  tarefaConcluida: boolean;
-  avisosEscola: boolean;
-  relatorioSemanal: boolean;
-  resumoWhatsapp: boolean;
-  horario: string;
-}
-
-const PREFERENCIAS_PADRAO: PreferenciasFamilia = {
-  tarefaNaoIniciada: true,
-  tarefaConcluida: true,
-  avisosEscola: true,
-  relatorioSemanal: true,
-  resumoWhatsapp: false,
-  horario: '14h às 18h',
-};
 
 const MESES = [
   'Janeiro',
@@ -428,10 +411,9 @@ export class PainelFamiliaService {
    */
   async resumosParaEmail(
     responsavelId: number,
-    preferencias: Record<string, unknown> | null,
+    preferencias: unknown,
   ): Promise<{ nome: string; resumo: string }[]> {
-    const prefs = { ...PREFERENCIAS_PADRAO, ...(preferencias ?? {}) };
-    if (!prefs.relatorioSemanal) return [];
+    if (!preferenciasDe(preferencias).relatorioSemanal) return [];
     const filhos = await this.filhos(responsavelId);
     return Promise.all(
       filhos.map(async (f) => ({

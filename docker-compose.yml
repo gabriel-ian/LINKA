@@ -32,6 +32,8 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      # Datas e lembretes no horario de Brasilia (o container vem em UTC).
+      TZ: America/Sao_Paulo
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: linka

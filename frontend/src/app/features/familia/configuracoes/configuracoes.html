@@ -23,8 +23,9 @@
                 type="button"
                 role="switch"
                 class="chave"
-                [attr.aria-checked]="d.responsavel.preferencias[o.chave]"
+                [attr.aria-checked]="!o.emBreve && d.responsavel.preferencias[o.chave]"
                 [attr.aria-labelledby]="'op-' + o.chave"
+                [disabled]="o.emBreve"
                 (click)="alternar(o.chave)"
               >
                 <span></span>
@@ -47,8 +48,8 @@
           </select>
         </label>
         <p class="nota">
-          Suas escolhas ficam salvas. O envio por e-mail e por WhatsApp chega em uma próxima versão;
-          por enquanto os avisos aparecem no sino da Linka.
+          Os e-mails vão para {{ d.responsavel.email || 'o e-mail da sua conta' }}. Os avisos também
+          aparecem no sino da Linka.
         </p>
       </section>
 

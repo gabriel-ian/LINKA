@@ -18,17 +18,22 @@ export class FamiliaConfiguracoes {
   readonly contexto = inject(FamiliaContexto);
   private service = inject(PainelFamiliaService);
 
-  readonly opcoes: { chave: Chave; titulo: string; texto: string }[] = [
+  /** emBreve: ainda nao existe envio (o botao fica desligado). */
+  readonly opcoes: { chave: Chave; titulo: string; texto: string; emBreve?: boolean }[] = [
     {
       chave: 'tarefaNaoIniciada',
       titulo: 'Tarefa com prazo hoje não iniciada',
-      texto: 'Aviso até 3h antes do prazo',
+      texto: 'Aviso por e-mail até 3h antes do prazo (sem horário: no horário preferido)',
     },
-    { chave: 'tarefaConcluida', titulo: 'Tarefa concluída', texto: 'Para você comemorar junto' },
+    {
+      chave: 'tarefaConcluida',
+      titulo: 'Tarefa concluída',
+      texto: 'Aviso por e-mail, para você comemorar junto',
+    },
     {
       chave: 'avisosEscola',
       titulo: 'Avisos da escola',
-      texto: 'Comunicados de professores e coordenação',
+      texto: 'Comunicados de professores e coordenação, por e-mail',
     },
     {
       chave: 'relatorioSemanal',
@@ -38,7 +43,8 @@ export class FamiliaConfiguracoes {
     {
       chave: 'resumoWhatsapp',
       titulo: 'Resumo diário por WhatsApp',
-      texto: 'Um resumo curto no fim do dia',
+      texto: 'Em breve',
+      emBreve: true,
     },
   ];
 

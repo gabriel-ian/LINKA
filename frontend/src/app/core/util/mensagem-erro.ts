@@ -44,6 +44,15 @@ const TRADUCOES: [RegExp, string | ((m: RegExpMatchArray) => string)][] = [
   [/ANTHROPIC_API_KEY|nao configurada/i, 'A adaptação por IA ainda não foi configurada.'],
   [/IA ocupada/i, 'A IA está ocupada no momento. Tente de novo em instantes.'],
   [/IA nao conseguiu|falar com a IA/i, 'A IA não conseguiu gerar a adaptação agora.'],
+  [/virada ja foi feita/i, 'A virada já foi feita ou o ano mudou. Recarregue a tela.'],
+  [
+    /(.+) esta no (.+), que nao tem serie seguinte/i,
+    (m) => `${m[1]} está no ${m[2]}, que não tem série seguinte. Escolha "Repete" ou "Sem turma".`,
+  ],
+  [
+    /Sem vagas: (.+)\. Aumente/i,
+    (m) => `Sem vagas: ${m[1]}. Aumente o limite da turma ou mude alguns alunos.`,
+  ],
 ];
 
 /**

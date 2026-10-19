@@ -3,8 +3,12 @@
     <h1>Turmas</h1>
     <p>
       {{ contexto.escola()?.nome }} -
-      {{ turmas().length | plural: 'turma cadastrada' : 'turmas cadastradas' }} - ano letivo
-      {{ ano }}
+      @if (anteriores()) {
+        {{ doFiltro().length | plural: 'turma encerrada' : 'turmas encerradas' }} de anos anteriores
+      } @else {
+        {{ doFiltro().length | plural: 'turma cadastrada' : 'turmas cadastradas' }} - ano letivo
+        {{ ano() }}
+      }
     </p>
   </header>
 
@@ -25,6 +29,19 @@
         }
       </select>
     </label>
+    @if (temEncerradas()) {
+      <label class="campo-p serie">
+        <select
+          aria-label="Ano letivo"
+          [value]="anteriores() ? 'anteriores' : 'atual'"
+          (change)="anteriores.set($any($event.target).value === 'anteriores'); serie.set('')"
+        >
+          <option value="atual">Ano letivo {{ ano() }}</option>
+          <option value="anteriores">Anos anteriores</option>
+        </select>
+      </label>
+    }
+    <a class="bt bt-secundario" routerLink="/escola/turmas/virada">Virada do ano letivo</a>
     <a class="bt bt-primario" routerLink="/escola/turmas/nova">+ Nova turma</a>
   </div>
 
@@ -34,7 +51,12 @@
         <div class="topo">
           <span class="selo-cor">{{ t.codigo }}</span>
           <div>
-            <h2>{{ t.nome }}</h2>
+            <h2>
+              {{ t.nome }}
+              @if (t.encerrada) {
+                <small class="encerrada">{{ t.anoLetivo }} · encerrada</small>
+              }
+            </h2>
             <p>{{ t.professores[0]?.nome ?? 'Sem professor vinculado' }}</p>
           </div>
         </div>

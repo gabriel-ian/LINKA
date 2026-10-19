@@ -345,6 +345,7 @@ CREATE TABLE `turma` (
   `ano_letivo` smallint unsigned DEFAULT NULL,
   `sala` varchar(50) DEFAULT NULL,
   `limite_alunos` int unsigned DEFAULT NULL,
+  `encerrada` tinyint(1) NOT NULL DEFAULT '0',
   `escola_id` bigint unsigned DEFAULT NULL,
   `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

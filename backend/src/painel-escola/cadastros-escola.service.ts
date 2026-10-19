@@ -322,7 +322,7 @@ export class CadastrosEscolaService {
     }[] = await this.dataSource.query(
       `SELECT t.id turmaId, t.nome turma, d.nome disciplina
          FROM turma_professor_disciplina tpd
-         JOIN turma t ON t.id = tpd.turma_id
+         JOIN turma t ON t.id = tpd.turma_id AND t.encerrada = 0
          LEFT JOIN disciplina d ON d.id = tpd.disciplina_id
         WHERE tpd.professor_id = ? ORDER BY t.nome, d.nome`,
       [professorId],
@@ -1113,7 +1113,8 @@ export class CadastrosEscolaService {
     if (!ids.length) return [];
     const turmas = await manager
       .getRepository(Turma)
-      .find({ where: { id: In(ids), escolaId } });
+      .find({ where: { id: In(ids), escolaId, encerrada: false } });
+    // Turma encerrada (ano que ja virou) nao recebe aluno nem professor.
     if (turmas.length !== ids.length)
       throw new BadRequestException('Turma invalida');
     return turmas;

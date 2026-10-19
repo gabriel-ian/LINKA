@@ -20,11 +20,41 @@ export interface TurmaResumo {
   anoLetivo: number | null;
   sala: string | null;
   limiteAlunos: number | null;
+  /** Turma de um ano que ja virou: so consulta. */
+  encerrada: boolean;
   criadoEm: string;
   totalAlunos: number;
   totalNee: number;
   professores: ProfessorDaTurma[];
   desempenho: number | null;
+}
+
+/** promover: proxima serie; reter: repete a serie; sair: fica sem turma. */
+export type AcaoVirada = 'promover' | 'reter' | 'sair';
+
+/** Previa da virada do ano letivo (GET /painel-escola/virada). */
+export interface PreviaVirada {
+  anoOrigem: number;
+  anoDestino: number;
+  turmas: {
+    id: number;
+    nome: string;
+    serie: string | null;
+    letra: string | null;
+    limiteAlunos: number | null;
+    acaoPadrao: AcaoVirada;
+    /** Para onde vai quem sobe; null quando nao ha serie seguinte. */
+    destino: { nome: string; jaExiste: boolean } | null;
+    alunos: { id: number; nome: string }[];
+  }[];
+}
+
+export interface ResultadoVirada {
+  anoDestino: number;
+  turmasCriadas: number;
+  promovidos: number;
+  retidos: number;
+  semTurma: number;
 }
 
 export interface AlunoResumo {

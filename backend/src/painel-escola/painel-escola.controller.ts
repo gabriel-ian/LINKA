@@ -43,6 +43,8 @@ import {
   ResponsavelDto,
   VincularResponsavelDto,
 } from './dto/cadastros.dto';
+import { ViradaAnoDto } from './dto/virada.dto';
+import { ViradaAnoService } from './virada-ano.service';
 
 /**
  * Rotas das telas "Escola - ..." do Figma. Exclusivo do perfil escola;
@@ -57,7 +59,28 @@ export class PainelEscolaController {
   constructor(
     private readonly painel: PainelEscolaService,
     private readonly cadastros: CadastrosEscolaService,
+    private readonly virada: ViradaAnoService,
   ) {}
+
+  @Get('virada')
+  @ApiOperation({
+    summary: 'Previa da virada do ano letivo',
+    description:
+      'Turmas do ano que termina, alunos de cada uma e para onde vao por padrao.',
+  })
+  previaVirada(@EscolaId() escolaId: number) {
+    return this.virada.previa(escolaId);
+  }
+
+  @Post('virada')
+  @ApiOperation({
+    summary: 'Fazer a virada do ano letivo',
+    description:
+      'Cria as turmas do novo ano, move os alunos e encerra as turmas antigas. Tudo ou nada.',
+  })
+  fazerVirada(@EscolaId() escolaId: number, @Body() dto: ViradaAnoDto) {
+    return this.virada.executar(dto, escolaId);
+  }
 
   @Get('opcoes')
   @ApiOperation({

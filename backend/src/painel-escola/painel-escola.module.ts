@@ -3,11 +3,12 @@ import { TarefaStatusModule } from '../tarefa-status/tarefa-status.module';
 import { PainelEscolaController } from './painel-escola.controller';
 import { PainelEscolaService } from './painel-escola.service';
 import { CadastrosEscolaService } from './cadastros-escola.service';
+import { ViradaAnoService } from './virada-ano.service';
 
 /** Telas do perfil escola: leituras agregadas e cadastros compostos. */
 @Module({
   imports: [TarefaStatusModule],
   controllers: [PainelEscolaController],
-  providers: [PainelEscolaService, CadastrosEscolaService],
+  providers: [PainelEscolaService, CadastrosEscolaService, ViradaAnoService],
 })
 export class PainelEscolaModule {}

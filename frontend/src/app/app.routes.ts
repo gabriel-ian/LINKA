@@ -178,6 +178,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/escola/turmas/turmas').then((m) => m.EscolaTurmas),
       },
       {
+        path: 'turmas/virada',
+        loadComponent: () => import('./features/escola/virada/virada').then((m) => m.EscolaVirada),
+      },
+      {
         path: 'turmas/nova',
         loadComponent: () =>
           import('./features/escola/turma-nova/turma-nova').then((m) => m.EscolaTurmaNova),

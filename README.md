@@ -41,11 +41,12 @@ mysql -u root -p bancolinka < backend/sql/seed-admin.sql
 avulsas (`painel-escola.sql`, `familias.sql`...) só servem para atualizar um banco
 antigo.
 
-Banco que já existia antes do "Esqueci minha senha" e dos avisos por e-mail? Rode também:
+Banco que já existia antes do "Esqueci minha senha", dos avisos por e-mail e da virada do ano letivo? Rode também:
 
 ```bash
 mysql -u root -p bancolinka < backend/sql/senha-reset.sql
 mysql -u root -p bancolinka < backend/sql/notificacoes.sql
+mysql -u root -p bancolinka < backend/sql/virada-ano.sql
 ```
 
 ### 2. Backend

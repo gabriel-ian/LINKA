@@ -830,7 +830,7 @@ export class PainelProfessorService {
   private async turmasDoProfessor(professorId: number) {
     const linhas = await this.dataSource.query(
       `SELECT DISTINCT t.id, t.nome, t.serie, t.letra FROM turma_professor_disciplina tpd
-         JOIN turma t ON t.id = tpd.turma_id
+         JOIN turma t ON t.id = tpd.turma_id AND t.encerrada = 0
         WHERE tpd.professor_id = ? ORDER BY t.serie, t.letra, t.nome`,
       [professorId],
     );

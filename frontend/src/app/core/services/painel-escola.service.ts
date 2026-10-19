@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../model/escola.model';
 import {
+  AcaoVirada,
+  PreviaVirada,
+  ResultadoVirada,
   AlunoCriado,
   AlunoDetalhe,
   AlunoResumo,
@@ -36,6 +39,19 @@ export class PainelEscolaService {
 
   turmas(): Observable<ApiResponse<TurmaResumo[]>> {
     return this.http.get<ApiResponse<TurmaResumo[]>>(`${this.api}/turmas`);
+  }
+
+  /** null quando a escola ainda nao tem turmas com ano letivo. */
+  previaVirada(): Observable<ApiResponse<PreviaVirada | null>> {
+    return this.http.get<ApiResponse<PreviaVirada | null>>(`${this.api}/virada`);
+  }
+
+  fazerVirada(dados: {
+    anoOrigem: number;
+    copiarProfessores: boolean;
+    decisoes: { alunoId: number; acao: AcaoVirada }[];
+  }): Observable<ApiResponse<ResultadoVirada>> {
+    return this.http.post<ApiResponse<ResultadoVirada>>(`${this.api}/virada`, dados);
   }
 
   turma(id: number): Observable<ApiResponse<TurmaDetalhe>> {

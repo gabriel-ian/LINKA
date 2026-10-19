@@ -142,8 +142,32 @@ npm test          # testes unitários (Jest)
 npm run lint
 
 cd frontend
+npx ng test --watch=false   # testes unitários (Vitest)
 npm run build
 ```
+
+### Testes de navegador (e2e)
+
+Fluxos completos com o Playwright: login de cada perfil, cadastro de família,
+adicionar aluno à turma, professor vendo a turma, aluno fazendo a tarefa e o
+modo sem internet.
+
+```bash
+cd e2e
+npm install
+npx playwright test     # sobe backend e frontend sozinho (ou usa os que já estão rodando)
+```
+
+Cada execução cria uma escola própria ("Escola E2E ...") e apaga tudo dela no
+fim; os dados reais não são tocados. Se sobrar alguma, `npm run limpar`.
+No Windows usa o Edge; para usar o Chromium do Playwright, defina
+`E2E_CHROMIUM=1` e rode `npx playwright install chromium`.
+
+### CI
+
+O GitHub Actions (`.github/workflows/ci.yml`) roda em cada PR e na `main`:
+lint, formatação, testes e build do backend e do frontend e, se passarem, os
+testes de navegador com um MySQL novo.
 
 ## Privacidade
 

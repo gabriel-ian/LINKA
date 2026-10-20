@@ -122,6 +122,36 @@
             </p>
           }
         </section>
+
+        <section class="bloco cartao-cfg" aria-labelledby="titulo-dados">
+          <h2 class="titulo-cfg" id="titulo-dados">Seus dados (LGPD)</h2>
+          <p class="nota">
+            Baixe uma cópia de tudo o que a Linka guarda sobre seu filho(a) ou peça a exclusão. Leia
+            a <a class="link-acao" routerLink="/privacidade">política de privacidade</a>.
+          </p>
+          <ul class="dados-filhos">
+            @for (f of d.filhos; track f.id) {
+              <li>
+                <strong>{{ f.nome }}</strong>
+                <div class="dados-acoes">
+                  <button type="button" class="link-acao" (click)="baixarDados(f.id, f.nome)">
+                    Baixar dados
+                  </button>
+                  <button
+                    type="button"
+                    class="link-acao perigo"
+                    (click)="pedirExclusao(f.id, f.nome)"
+                  >
+                    Pedir exclusão
+                  </button>
+                </div>
+                @if (avisoDados()[f.id]; as aviso) {
+                  <small class="nota" role="status">{{ aviso }}</small>
+                }
+              </li>
+            }
+          </ul>
+        </section>
       </div>
     </div>
   </div>

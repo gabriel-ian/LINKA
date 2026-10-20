@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PainelAlunoModule } from '../painel-aluno/painel-aluno.module';
+import { LgpdModule } from '../lgpd/lgpd.module';
 import { Incentivo } from './incentivo.entity';
 import { PainelFamiliaController } from './painel-familia.controller';
 import { PainelFamiliaService } from './painel-familia.service';
@@ -11,7 +12,11 @@ import { ResumoEmailService } from './resumo-email.service';
  * configuracoes; e o resumo semanal por e-mail.
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Incentivo]), PainelAlunoModule],
+  imports: [
+    TypeOrmModule.forFeature([Incentivo]),
+    PainelAlunoModule,
+    LgpdModule,
+  ],
   controllers: [PainelFamiliaController],
   providers: [PainelFamiliaService, ResumoEmailService],
 })

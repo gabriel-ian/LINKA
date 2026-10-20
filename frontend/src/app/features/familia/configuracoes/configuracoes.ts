@@ -1,8 +1,10 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PreferenciasFamilia } from '../../../core/model/painel-familia.model';
 import { PainelFamiliaService } from '../../../core/services/painel-familia.service';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
+import { baixarJson, nomeDeArquivo } from '../../../core/util/baixar-json';
 import { FamiliaContexto } from '../familia-contexto';
 
 type Chave = Exclude<keyof PreferenciasFamilia, 'horario'>;
@@ -10,7 +12,7 @@ type Chave = Exclude<keyof PreferenciasFamilia, 'horario'>;
 /** "Familia - Configuracoes" do Figma. */
 @Component({
   selector: 'app-familia-configuracoes',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './configuracoes.html',
   styleUrls: ['../familia-comum.css', './configuracoes.css'],
 })
@@ -57,6 +59,8 @@ export class FamiliaConfiguracoes {
   readonly mensagem = signal('');
   readonly erro = signal('');
   readonly pedirVinculo = signal(false);
+  /** Mensagem por filho na secao "Seus dados (LGPD)". */
+  readonly avisoDados = signal<Record<number, string>>({});
 
   constructor() {
     // Preenche o formulario quando os dados chegam (uma vez).
@@ -69,6 +73,33 @@ export class FamiliaConfiguracoes {
       this.email.set(r.email ?? '');
       this.telefone.set(r.telefone ?? '');
     });
+  }
+
+  baixarDados(filhoId: number, nome: string): void {
+    this.service.dadosDoFilho(filhoId).subscribe({
+      next: (res) => baixarJson(`dados-${nomeDeArquivo(nome)}.json`, res.data),
+      error: () => this.avisar(filhoId, 'Não foi possível baixar os dados agora.'),
+    });
+  }
+
+  pedirExclusao(filhoId: number, nome: string): void {
+    if (
+      !confirm(
+        `Pedir a exclusão dos dados de ${nome}?
+
+A escola recebe o pedido e apaga os dados ` +
+          'pessoais e de saúde. Depois disso o acompanhamento pela Linka termina.',
+      )
+    )
+      return;
+    this.service.pedirExclusao(filhoId).subscribe({
+      next: () => this.avisar(filhoId, 'Pedido enviado. A escola vai atender e avisar você.'),
+      error: () => this.avisar(filhoId, 'Não foi possível enviar o pedido agora.'),
+    });
+  }
+
+  private avisar(filhoId: number, texto: string): void {
+    this.avisoDados.update((a) => ({ ...a, [filhoId]: texto }));
   }
 
   alternar(chave: Chave): void {

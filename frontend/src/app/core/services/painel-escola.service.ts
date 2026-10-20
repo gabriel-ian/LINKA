@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../model/escola.model';
 import {
   AcaoVirada,
+  SituacaoLgpd,
   PreviaVirada,
   ResultadoVirada,
   AlunoCriado,
@@ -39,6 +40,20 @@ export class PainelEscolaService {
 
   turmas(): Observable<ApiResponse<TurmaResumo[]>> {
     return this.http.get<ApiResponse<TurmaResumo[]>>(`${this.api}/turmas`);
+  }
+
+  lgpdDoAluno(id: number): Observable<ApiResponse<SituacaoLgpd>> {
+    return this.http.get<ApiResponse<SituacaoLgpd>>(`${this.api}/alunos/${id}/lgpd`);
+  }
+
+  /** Copia de todos os dados do aluno (LGPD), em JSON. */
+  dadosDoAluno(id: number): Observable<ApiResponse<unknown>> {
+    return this.http.get<ApiResponse<unknown>>(`${this.api}/alunos/${id}/dados`);
+  }
+
+  /** Apaga os dados pessoais e de saude (confirmacao = nome completo). */
+  anonimizarAluno(id: number, confirmacao: string): Observable<unknown> {
+    return this.http.post(`${this.api}/alunos/${id}/anonimizar`, { confirmacao });
   }
 
   /** null quando a escola ainda nao tem turmas com ano letivo. */

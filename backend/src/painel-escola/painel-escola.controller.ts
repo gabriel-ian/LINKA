@@ -44,6 +44,9 @@ import {
   VincularResponsavelDto,
 } from './dto/cadastros.dto';
 import { ViradaAnoDto } from './dto/virada.dto';
+import { LgpdService } from '../lgpd/lgpd.service';
+import { AnonimizarAlunoDto } from '../lgpd/dto/lgpd.dto';
+import { UsuarioId } from '../auth/usuario-id.decorator';
 import { ViradaAnoService } from './virada-ano.service';
 
 /**
@@ -60,6 +63,7 @@ export class PainelEscolaController {
     private readonly painel: PainelEscolaService,
     private readonly cadastros: CadastrosEscolaService,
     private readonly virada: ViradaAnoService,
+    private readonly lgpd: LgpdService,
   ) {}
 
   @Get('virada')
@@ -292,21 +296,60 @@ export class PainelEscolaController {
   @UseInterceptors(
     FileInterceptor('arquivo', { limits: { fileSize: LAUDO_TAMANHO_MAXIMO } }),
   )
-  enviarLaudo(
+  async enviarLaudo(
     @EscolaId() escolaId: number,
+    @UsuarioId() usuarioId: number,
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() arquivo: Express.Multer.File,
   ) {
-    return this.cadastros.salvarLaudo(id, escolaId, arquivo);
+    const salvo = await this.cadastros.salvarLaudo(id, escolaId, arquivo);
+    this.lgpd.registrarLaudo(id, usuarioId, 'envio');
+    return salvo;
+  }
+
+  @Get('alunos/:id/dados')
+  @ApiOperation({ summary: 'Copia de todos os dados do aluno (LGPD)' })
+  dadosDoAluno(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.lgpd.dadosParaEscola(id, escolaId);
+  }
+
+  @Get('alunos/:id/lgpd')
+  @ApiOperation({
+    summary: 'Pedido de exclusao em aberto e quem acessou o laudo',
+  })
+  lgpdDoAluno(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.lgpd.situacao(id, escolaId);
+  }
+
+  @Post('alunos/:id/anonimizar')
+  @ApiOperation({
+    summary: 'Apagar os dados pessoais e de saude do aluno (LGPD)',
+    description:
+      'Fica so um registro anonimo com o andamento das tarefas. Nao da para desfazer.',
+  })
+  anonimizar(
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AnonimizarAlunoDto,
+  ) {
+    return this.lgpd.anonimizar(id, escolaId, dto.confirmacao);
   }
 
   @Get('alunos/:id/laudo')
   @ApiOperation({ summary: 'Baixar o laudo do aluno' })
   async baixarLaudo(
     @EscolaId() escolaId: number,
+    @UsuarioId() usuarioId: number,
     @Param('id', ParseIntPipe) id: number,
   ) {
     const laudo = await this.cadastros.caminhoLaudo(id, escolaId);
+    this.lgpd.registrarLaudo(id, usuarioId, 'download');
     return new StreamableFile(createReadStream(laudo.caminho), {
       type: laudo.mime,
       disposition: `attachment; filename="${laudo.nomeDownload}"`,

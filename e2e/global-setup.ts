@@ -1,5 +1,5 @@
 import { writeFileSync } from 'fs';
-import { ADMIN, ARQUIVO_ESTADO, Estado, api, entrar } from './api';
+import { ADMIN, API, ARQUIVO_ESTADO, Estado, api, entrar } from './api';
 
 /**
  * Cria uma escola so para esta execucao, com uma turma, um professor, um
@@ -62,6 +62,38 @@ export default async function globalSetup(): Promise<void> {
     { nomeCompleto: 'Carla Sem Turma E2E' },
   );
 
+  // Aluno com familia (login com senha provisoria) e um laudo anexado.
+  const familia = { email: `familia.${marca}@${dominio}` };
+  const opcoes = await api<{ data: { diagnosticos: { id: number }[] } }>(
+    'GET',
+    '/painel-escola/opcoes',
+    tokenEscola,
+  );
+  const comFamilia = await api<{
+    data: { id: number; responsavel: { senhaProvisoria: string } };
+  }>('POST', '/painel-escola/alunos', tokenEscola, {
+    nomeCompleto: 'Davi Com Familia E2E',
+    turmaId: turma.data.id,
+    diagnosticoIds: [opcoes.data.diagnosticos[0].id],
+    responsavel: {
+      nomeCompleto: 'Helena Familia E2E',
+      email: familia.email,
+      parentesco: 'Mãe',
+    },
+  });
+  // Basta comecar com "%PDF": o backend confere o tipo pelos primeiros bytes.
+  const pdf = new Blob([Buffer.from('%PDF-1.4 laudo de teste %%EOF')], {
+    type: 'application/pdf',
+  });
+  const form = new FormData();
+  form.append('arquivo', pdf, 'laudo.pdf');
+  const envio = await fetch(`${API}/painel-escola/alunos/${comFamilia.data.id}/laudo`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenEscola}` },
+    body: form,
+  });
+  if (!envio.ok) throw new Error(`laudo: ${envio.status} ${await envio.text()}`);
+
   // O professor cria uma tarefa para hoje na turma.
   const tokenProf = await entrar(professor.email, senha);
   await api('POST', '/auth/senha/manter', tokenProf, {});
@@ -86,6 +118,8 @@ export default async function globalSetup(): Promise<void> {
     aluno: { id: alunoCriado.data.id, ...aluno },
     alunoSemTurma: { id: semTurma.data.id, nome: 'Carla Sem Turma E2E' },
     tarefa: { id: tarefa.data.id, titulo: 'Frações E2E' },
+    alunoComFamilia: { id: comFamilia.data.id, nome: 'Davi Com Familia E2E' },
+    familia: { email: familia.email, senha: comFamilia.data.responsavel.senhaProvisoria },
   };
   writeFileSync(ARQUIVO_ESTADO, JSON.stringify(estado, null, 2));
 }

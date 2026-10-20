@@ -22,6 +22,10 @@ export const routes: Routes = [
       import('./features/recuperar-senha/recuperar-senha').then((m) => m.RecuperarSenha),
   },
   {
+    path: 'privacidade',
+    loadComponent: () => import('./features/privacidade/privacidade').then((m) => m.Privacidade),
+  },
+  {
     // Link do e-mail de nova senha: sem guard, abre mesmo com alguem logado.
     path: 'redefinir-senha',
     loadComponent: () =>

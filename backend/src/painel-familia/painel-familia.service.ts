@@ -25,6 +25,7 @@ import { semanasDoMes } from '../painel-professor/painel-professor.service';
 import { sequenciaAtual } from '../painel-aluno/gamificacao';
 import { Incentivo } from './incentivo.entity';
 import { resumoSemanal } from './resumo-semanal';
+import { LgpdService, TERMO_VERSAO } from '../lgpd/lgpd.service';
 import { PREFERENCIAS_PADRAO, preferenciasDe } from './preferencias';
 import { EnviarIncentivoDto, PerfilFamiliaDto } from './dto/painel-familia.dto';
 
@@ -69,6 +70,7 @@ export class PainelFamiliaService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly aluno: PainelAlunoService,
+    private readonly lgpd: LgpdService,
   ) {}
 
   // ------------------------------------------------------------ acesso
@@ -141,6 +143,11 @@ export class PainelFamiliaService {
           preferencias: { ...PREFERENCIAS_PADRAO, ...(r.preferencias ?? {}) },
         },
         filhos: await this.filhos(r.id),
+        /** Precisa aceitar o termo (versao atual) antes de usar o painel. */
+        termo: {
+          versao: TERMO_VERSAO,
+          pendente: await this.lgpd.termoPendente(Number(r.id)),
+        },
       },
     };
   }

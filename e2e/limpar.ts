@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import { join } from 'path';
+import { rm } from 'fs/promises';
 import { createConnection } from 'mysql2/promise';
 
 /**
@@ -26,34 +27,71 @@ export async function limparEscolasDeTeste(): Promise<number> {
     if (!ids.length) return 0;
 
     const ids_ = async (sql: string) =>
-      ((await c.query<any[]>(sql, [ids]))[0] as { id: number }[]).map((r) => r.id);
+      ((await c.query<any[]>(sql, [ids]))[0] as { id: number }[]).map(
+        (r) => r.id,
+      );
     const alunos = await ids_('SELECT id FROM aluno WHERE escola_id IN (?)');
     const turmas = await ids_('SELECT id FROM turma WHERE escola_id IN (?)');
-    const professores = await ids_('SELECT id FROM professor WHERE escola_id IN (?)');
-    const responsaveis = await ids_('SELECT id FROM responsavel WHERE escola_id IN (?)');
+    const professores = await ids_(
+      'SELECT id FROM professor WHERE escola_id IN (?)',
+    );
+    const responsaveis = await ids_(
+      'SELECT id FROM responsavel WHERE escola_id IN (?)',
+    );
     const tarefas = turmas.length
-      ? ((await c.query<any[]>('SELECT id FROM tarefa WHERE turma_id IN (?)', [turmas]))[0] as {
-          id: number;
-        }[]).map((r) => r.id)
+      ? (
+          (
+            await c.query<any[]>(
+              'SELECT id FROM tarefa WHERE turma_id IN (?)',
+              [turmas],
+            )
+          )[0] as {
+            id: number;
+          }[]
+        ).map((r) => r.id)
       : [];
-    const comunicados = await ids_('SELECT id FROM comunicado WHERE escola_id IN (?)');
+    const comunicados = await ids_(
+      'SELECT id FROM comunicado WHERE escola_id IN (?)',
+    );
     const usuarios = [
       ...(await ids_('SELECT id FROM usuario WHERE escola_id IN (?)')),
       ...(responsaveis.length
-        ? ((await c.query<any[]>('SELECT usuario_id id FROM responsavel WHERE id IN (?)', [
-            responsaveis,
-          ]))[0] as { id: number | null }[])
+        ? (
+            (
+              await c.query<any[]>(
+                'SELECT usuario_id id FROM responsavel WHERE id IN (?)',
+                [responsaveis],
+              )
+            )[0] as { id: number | null }[]
+          )
             .map((r) => r.id)
             .filter((id): id is number => id !== null)
         : []),
     ];
 
+    const laudos = alunos.length
+      ? (
+          (
+            await c.query<any[]>(
+              'SELECT laudo FROM aluno WHERE id IN (?) AND laudo IS NOT NULL',
+              [alunos],
+            )
+          )[0] as { laudo: string }[]
+        ).map((r) => r.laudo)
+      : [];
+
     const apagar = async (tabela: string, coluna: string, lista: number[]) => {
-      if (lista.length) await c.query(`DELETE FROM ${tabela} WHERE ${coluna} IN (?)`, [lista]);
+      if (lista.length)
+        await c.query(`DELETE FROM ${tabela} WHERE ${coluna} IN (?)`, [lista]);
     };
 
     await c.beginTransaction();
-    for (const t of ['tarefa_status', 'tarefa_adaptada', 'pedido_ajuda', 'incentivo'])
+    for (const t of [
+      'tarefa_status',
+      'tarefa_adaptada',
+      'pedido_ajuda',
+      'incentivo',
+    ])
       await apagar(t, 'tarefa_id', tarefas);
     for (const t of [
       'tarefa_status',
@@ -79,6 +117,13 @@ export async function limparEscolasDeTeste(): Promise<number> {
     await apagar('usuario', 'id', usuarios);
     await apagar('escola', 'id', ids);
     await c.commit();
+
+    // Laudos de teste que ficaram no disco (o aluno saiu do banco acima).
+    for (const arquivo of laudos) {
+      await rm(join(__dirname, '..', 'backend', 'uploads', 'laudos', arquivo), {
+        force: true,
+      });
+    }
     return ids.length;
   } catch (erro) {
     await c.rollback().catch(() => undefined);

@@ -41,12 +41,13 @@ mysql -u root -p bancolinka < backend/sql/seed-admin.sql
 avulsas (`painel-escola.sql`, `familias.sql`...) só servem para atualizar um banco
 antigo.
 
-Banco que já existia antes do "Esqueci minha senha", dos avisos por e-mail e da virada do ano letivo? Rode também:
+Banco que já existia antes do "Esqueci minha senha", dos avisos por e-mail, da virada do ano letivo e da LGPD? Rode também:
 
 ```bash
 mysql -u root -p bancolinka < backend/sql/senha-reset.sql
 mysql -u root -p bancolinka < backend/sql/notificacoes.sql
 mysql -u root -p bancolinka < backend/sql/virada-ano.sql
+mysql -u root -p bancolinka < backend/sql/lgpd.sql
 ```
 
 ### 2. Backend
@@ -169,8 +170,20 @@ O GitHub Actions (`.github/workflows/ci.yml`) roda em cada PR e na `main`:
 lint, formatação, testes e build do backend e do frontend e, se passarem, os
 testes de navegador com um MySQL novo.
 
-## Privacidade
+## Privacidade (LGPD)
 
 - Laudos enviados ficam em `backend/uploads/`, fora do git, porque contêm dados de saúde.
+  Cada envio e download fica registrado (quem e quando) e aparece no perfil do aluno.
 - A IA recebe só o primeiro nome, a idade, os diagnósticos e os interesses do aluno.
   Nunca recebe CGM, laudo ou e-mail.
+- Termo de uso e privacidade em `/privacidade` (link no login). A família aceita no
+  primeiro acesso; o aceite fica gravado com a versão. Para publicar um texto novo,
+  mude o termo em `frontend/src/app/shared/termo/termo-texto.ts` e suba a versão
+  lá e em `backend/src/lgpd/lgpd.service.ts`: todas as famílias aceitam de novo.
+  **O texto atual é um rascunho e precisa de revisão jurídica.**
+- Direito de acesso: a escola (perfil do aluno) e a família (Configurações) baixam
+  uma cópia de todos os dados do aluno em JSON.
+- Exclusão: a família pede em Configurações; a escola recebe por e-mail e no perfil
+  do aluno e apaga os dados (nome, CGM, nascimento, diagnósticos, laudo, perfil de
+  aprendizagem, login, recados e vínculo com a família). Fica só um registro anônimo
+  com o andamento das tarefas, para os números da turma.

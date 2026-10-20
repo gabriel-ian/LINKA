@@ -232,3 +232,30 @@ export function mensagemLembreteTarefa(d: {
     ),
   };
 }
+
+/** A familia pediu a exclusao dos dados do filho (LGPD). */
+export function mensagemPedidoExclusao(d: {
+  escola: string;
+  aluno: string;
+  url: string;
+}): Mensagem {
+  return {
+    assunto: `Pedido de exclusão de dados: ${d.aluno}`,
+    texto: [
+      `${d.escola},`,
+      '',
+      `A família de ${d.aluno} pediu a exclusão dos dados do aluno na Linka (LGPD).`,
+      'Abra o perfil do aluno para atender o pedido.',
+      '',
+      d.url,
+    ].join('\n'),
+    html: moldura(
+      [
+        `${h(d.escola)},`,
+        `A família de <b>${h(d.aluno)}</b> pediu a exclusão dos dados do aluno na Linka (LGPD).`,
+        'Abra o perfil do aluno para atender o pedido.',
+      ],
+      { texto: 'Abrir o perfil do aluno', url: d.url },
+    ),
+  };
+}

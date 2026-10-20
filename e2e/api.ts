@@ -12,6 +12,9 @@ export interface Estado {
   aluno: { id: number; nome: string; email: string; senha: string };
   alunoSemTurma: { id: number; nome: string };
   tarefa: { id: number; titulo: string };
+  /** Aluno com familia e laudo, usado no teste de LGPD (tem os dados apagados no fim). */
+  alunoComFamilia: { id: number; nome: string };
+  familia: { email: string; senha: string };
 }
 
 export function lerEstado(): Estado {

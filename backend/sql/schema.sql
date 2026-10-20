@@ -37,6 +37,7 @@ CREATE TABLE `aluno` (
   `interesses` varchar(255) DEFAULT NULL,
   `preferencias` json DEFAULT NULL,
   `ativo` tinyint DEFAULT '1',
+  `anonimizado_em` datetime DEFAULT NULL,
   `criado_em` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `escola_id` (`escola_id`),
@@ -119,6 +120,19 @@ CREATE TABLE `comunicado_leitura` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `consentimento` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `responsavel_id` bigint unsigned NOT NULL,
+  `versao` varchar(20) NOT NULL,
+  `aceito_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ip` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_consentimento_responsavel` (`responsavel_id`),
+  CONSTRAINT `fk_consentimento_responsavel` FOREIGN KEY (`responsavel_id`) REFERENCES `responsavel` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `disciplina` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) NOT NULL,
@@ -168,6 +182,37 @@ CREATE TABLE `incentivo` (
   CONSTRAINT `fk_incentivo_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`),
   CONSTRAINT `fk_incentivo_responsavel` FOREIGN KEY (`responsavel_id`) REFERENCES `responsavel` (`id`),
   CONSTRAINT `fk_incentivo_tarefa` FOREIGN KEY (`tarefa_id`) REFERENCES `tarefa` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `laudo_acesso` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `aluno_id` bigint unsigned NOT NULL,
+  `usuario_id` bigint unsigned DEFAULT NULL,
+  `acao` varchar(20) NOT NULL,
+  `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_laudo_acesso_aluno` (`aluno_id`),
+  KEY `fk_laudo_acesso_usuario` (`usuario_id`),
+  CONSTRAINT `fk_laudo_acesso_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_laudo_acesso_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lgpd_pedido` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `aluno_id` bigint unsigned NOT NULL,
+  `responsavel_id` bigint unsigned DEFAULT NULL,
+  `tipo` varchar(20) NOT NULL,
+  `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `atendido_em` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_lgpd_pedido_aluno` (`aluno_id`),
+  KEY `fk_lgpd_pedido_responsavel` (`responsavel_id`),
+  CONSTRAINT `fk_lgpd_pedido_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_lgpd_pedido_responsavel` FOREIGN KEY (`responsavel_id`) REFERENCES `responsavel` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

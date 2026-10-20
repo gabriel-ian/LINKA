@@ -40,6 +40,11 @@ export class FamiliaContexto {
     });
   }
 
+  /** A familia aceitou o termo: libera o painel. */
+  termoAceito(): void {
+    this.dados.update((d) => (d ? { ...d, termo: { ...d.termo, pendente: false } } : d));
+  }
+
   selecionar(filhoId: number): void {
     if (this.dados()?.filhos.some((f) => f.id === filhoId)) this.filhoId.set(filhoId);
   }

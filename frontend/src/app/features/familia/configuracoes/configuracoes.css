@@ -165,3 +165,33 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+.dados-filhos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dados-filhos li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.dados-acoes {
+  display: flex;
+  gap: 14px;
+}
+
+.dados-filhos .nota {
+  flex-basis: 100%;
+}
+
+.link-acao.perigo {
+  color: var(--cor-erro);
+}

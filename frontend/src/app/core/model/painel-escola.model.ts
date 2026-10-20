@@ -49,6 +49,12 @@ export interface PreviaVirada {
   }[];
 }
 
+/** Situacao LGPD do aluno no perfil da escola. */
+export interface SituacaoLgpd {
+  pedidoExclusao: { criadoEm: string; quem: string | null } | null;
+  acessosAoLaudo: { acao: 'envio' | 'download'; criadoEm: string; quem: string | null }[];
+}
+
 export interface ResultadoVirada {
   anoDestino: number;
   turmasCriadas: number;

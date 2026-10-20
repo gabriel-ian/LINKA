@@ -1,11 +1,13 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { AlunoDetalhe, FamiliaCriada } from '../../../core/model/painel-escola.model';
 import { VincularFamilia } from './vincular-familia';
+import { PrivacidadeAluno } from './privacidade-aluno';
+import { EscolaContexto } from '../escola-contexto';
 import { dataBr } from '../../adm/escola-ui';
 import {
   ROTULO_SITUACAO,
@@ -19,12 +21,14 @@ import {
 /** "Escola - Perfil do aluno" do Figma. */
 @Component({
   selector: 'app-escola-aluno-perfil',
-  imports: [RouterLink, SenhaProvisoria, VincularFamilia],
+  imports: [RouterLink, SenhaProvisoria, VincularFamilia, PrivacidadeAluno],
   templateUrl: './aluno-perfil.html',
   styleUrl: './aluno-perfil.css',
 })
 export class EscolaAlunoPerfil {
   private service = inject(PainelEscolaService);
+  private router = inject(Router);
+  private contexto = inject(EscolaContexto);
 
   readonly pct = percentual;
   readonly iniciais = iniciaisPessoa;
@@ -49,6 +53,12 @@ export class EscolaAlunoPerfil {
     rota.paramMap
       .pipe(takeUntilDestroyed(inject(DestroyRef)))
       .subscribe((p) => this.carregar(Number(p.get('id'))));
+  }
+
+  /** Dados apagados (LGPD): o aluno some da lista; volta para Alunos. */
+  dadosApagados(): void {
+    this.contexto.recarregar();
+    void this.router.navigate(['/escola/alunos'], { queryParams: { apagado: 1 } });
   }
 
   private carregar(id: number): void {

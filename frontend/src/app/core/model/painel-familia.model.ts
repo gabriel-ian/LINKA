@@ -32,6 +32,8 @@ export interface ContextoFamilia {
     preferencias: PreferenciasFamilia;
   };
   filhos: Filho[];
+  /** Termo de uso e privacidade (LGPD): pendente = ainda nao aceitou esta versao. */
+  termo: { versao: string; pendente: boolean };
 }
 
 export interface EventoDia {

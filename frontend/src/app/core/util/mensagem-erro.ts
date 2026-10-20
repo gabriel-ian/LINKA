@@ -44,6 +44,8 @@ const TRADUCOES: [RegExp, string | ((m: RegExpMatchArray) => string)][] = [
   [/ANTHROPIC_API_KEY|nao configurada/i, 'A adaptação por IA ainda não foi configurada.'],
   [/IA ocupada/i, 'A IA está ocupada no momento. Tente de novo em instantes.'],
   [/IA nao conseguiu|falar com a IA/i, 'A IA não conseguiu gerar a adaptação agora.'],
+  [/nome completo do aluno para confirmar/i, 'Digite o nome completo do aluno para confirmar.'],
+  [/dados deste aluno ja foram apagados/i, 'Os dados deste aluno já foram apagados.'],
   [/virada ja foi feita/i, 'A virada já foi feita ou o ano mudou. Recarregue a tela.'],
   [
     /(.+) esta no (.+), que nao tem serie seguinte/i,

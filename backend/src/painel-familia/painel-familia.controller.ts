@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Ip,
   Param,
   ParseIntPipe,
   Patch,
@@ -16,6 +17,8 @@ import { Roles } from '../auth/roles.decorator';
 import { UsuarioId } from '../auth/usuario-id.decorator';
 import { PainelFamiliaService } from './painel-familia.service';
 import { EnviarIncentivoDto, PerfilFamiliaDto } from './dto/painel-familia.dto';
+import { LgpdService } from '../lgpd/lgpd.service';
+import { AceitarTermoDto } from '../lgpd/dto/lgpd.dto';
 
 /** Rotas das telas "Familia - ..." do Figma. So os filhos do responsavel logado. */
 @ApiTags('Painel da familia')
@@ -24,7 +27,41 @@ import { EnviarIncentivoDto, PerfilFamiliaDto } from './dto/painel-familia.dto';
 @Roles('responsavel')
 @Controller('painel-familia')
 export class PainelFamiliaController {
-  constructor(private readonly painel: PainelFamiliaService) {}
+  constructor(
+    private readonly painel: PainelFamiliaService,
+    private readonly lgpd: LgpdService,
+  ) {}
+
+  @Post('termo')
+  @ApiOperation({ summary: 'Aceitar o termo de uso e privacidade (LGPD)' })
+  aceitarTermo(
+    @UsuarioId() usuarioId: number,
+    @Body() dto: AceitarTermoDto,
+    @Ip() ip: string,
+  ) {
+    return this.lgpd.aceitarTermo(usuarioId, dto.versao, ip ?? null);
+  }
+
+  @Get('filhos/:id/dados')
+  @ApiOperation({ summary: 'Copia de todos os dados do filho (LGPD)' })
+  dadosDoFilho(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.lgpd.dadosParaFamilia(usuarioId, id);
+  }
+
+  @Post('filhos/:id/exclusao')
+  @ApiOperation({
+    summary: 'Pedir a exclusao dos dados do filho (LGPD)',
+    description: 'A escola recebe o pedido e faz a exclusao.',
+  })
+  pedirExclusao(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.lgpd.pedirExclusao(usuarioId, id);
+  }
 
   @Get('contexto')
   @ApiOperation({ summary: 'Responsavel, preferencias e filhos' })

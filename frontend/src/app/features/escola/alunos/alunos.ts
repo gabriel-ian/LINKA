@@ -25,6 +25,8 @@ export class EscolaAlunos {
   readonly coresDestaque = ['azul', 'verde', 'laranja'];
 
   readonly busca = signal('');
+  /** Voltou do perfil depois de apagar os dados de um aluno (LGPD). */
+  readonly apagado = inject(ActivatedRoute).snapshot.queryParamMap.has('apagado');
   readonly turma = signal(inject(ActivatedRoute).snapshot.queryParamMap.get('turma') ?? '');
   readonly diagnostico = signal('');
   /** '' = todos, 'nee' = com NEE, 'sem' = sem NEE. */

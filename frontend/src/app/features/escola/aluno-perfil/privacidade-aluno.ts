@@ -43,7 +43,7 @@ import { mensagemDeErro } from '../../../core/util/mensagem-erro';
             {{ h.quem ?? 'usuário removido' }} em {{ data(h.criadoEm) }}
           </li>
         } @empty {
-          <li class="vazio">Nenhum registro ainda.</li>
+          <li class="sem-registro">Nenhum registro ainda.</li>
         }
       </ul>
 

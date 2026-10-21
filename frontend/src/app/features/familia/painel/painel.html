@@ -23,18 +23,19 @@
           com prazo <strong>{{ prazoAlerta() }}</strong> e ainda não começou. Que tal dar um
           incentivo?
         </span>
+        <span class="bt-incentivo" aria-hidden="true">Enviar incentivo</span>
       </a>
     }
 
     <div class="numeros">
       <a class="numero vermelho" routerLink="/familia/avisos">
-        <span>Avisos da escola</span>
+        <span><b class="longo">Avisos da escola</b><b class="curto">Avisos</b></span>
         <strong>{{ p.avisosNaoLidos }}</strong>
         <small>{{ p.avisosNaoLidos === 1 ? 'Não lido' : 'Não lidos' }}</small>
       </a>
 
       <div class="numero azul">
-        <span>Tarefas esta semana</span>
+        <span><b class="longo">Tarefas esta semana</b><b class="curto">Semana</b></span>
         @if (p.semana !== null) {
           <strong>{{ p.semana }}<small class="pct">%</small></strong>
         } @else {

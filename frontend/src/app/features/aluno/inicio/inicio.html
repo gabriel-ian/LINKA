@@ -92,7 +92,7 @@
     <div class="numeros">
       <div class="numero verde">
         <img class="decoracao dino" src="assets/aluno/dino-marca.svg" alt="" />
-        <span>Tarefas hoje</span>
+        <span><b class="longo">Tarefas hoje</b><b class="curto">Hoje</b></span>
         <strong>{{ contexto.deHoje().length }}</strong>
         <small
           >{{ contexto.deHoje().length - abertasHoje().length }}
@@ -103,7 +103,7 @@
       </div>
 
       <div class="numero azul">
-        <span>Esta semana</span>
+        <span><b class="longo">Esta semana</b><b class="curto">Semana</b></span>
         @if (r.semana !== null) {
           <strong>{{ r.semana }}<small class="pct">%</small></strong>
         } @else {

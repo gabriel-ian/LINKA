@@ -37,4 +37,30 @@ test.describe.serial('Aluno', () => {
     await expect(page.getByText('Sem internet agora - mas suas missões estão salvas.')).toBeVisible();
     await context.setOffline(false);
   });
+
+  test('no celular, navega pelas abas do rodapé', async ({ browser }) => {
+    const { aluno, tarefa } = lerEstado();
+    const contexto = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
+    });
+    const page = await contexto.newPage();
+    await entrarComo(page, 'Aluno', aluno.email, aluno.senha);
+
+    const abas = page.getByRole('navigation', { name: 'Atalhos' });
+    await expect(abas).toBeVisible();
+    await abas.getByRole('link', { name: 'Progresso' }).click();
+    await expect(page).toHaveURL(/\/aluno\/progresso/);
+    await abas.getByRole('link', { name: 'Início' }).click();
+    await expect(page).toHaveURL(/\/aluno$/);
+
+    // Dentro de uma tarefa, a aba Tarefas continua marcada.
+    await page.goto(`/aluno/tarefas/${tarefa.id}`);
+    await expect(abas.getByRole('link', { name: 'Tarefas' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    await contexto.close();
+  });
 });

@@ -49,6 +49,12 @@ export class AlunoLayout {
       modoCalmo: r?.preferencias.modoCalmo,
       letrasMaiores: r?.preferencias.letrasMaiores,
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
+      abas: [
+        { rota: '/aluno', rotulo: 'Início', icone: 'inicio' },
+        { rota: '/aluno/tarefas', rotulo: 'Tarefas', icone: 'tarefas', exato: false },
+        { rota: '/aluno/progresso', rotulo: 'Progresso', icone: 'progresso' },
+        { rota: '/aluno/perfil', rotulo: 'Perfil', icone: 'perfil' },
+      ],
       secoes: [
         {
           titulo: 'MENU',

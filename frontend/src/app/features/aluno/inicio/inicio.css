@@ -510,3 +510,74 @@ li a {
     align-items: flex-start;
   }
 }
+
+/* Rotulo curto dos numeros, so no celular. */
+.numero b {
+  font-weight: inherit;
+}
+
+.curto {
+  display: none;
+}
+
+/* ---------- Celular (Figma "Mobile - Aluno início") ---------- */
+
+@media (max-width: 600px) {
+  .pagina {
+    gap: 18px;
+  }
+
+  .cabecalho h1 {
+    font-size: 30px;
+  }
+
+  .alerta {
+    padding: 16px;
+  }
+
+  .alerta > div {
+    flex: 1;
+  }
+
+  .comecar {
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Vence a regra global de 2 colunas (styles.css, ate 700px): aqui sao 3. */
+  .numeros {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .numero {
+    height: auto;
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .numero strong {
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .numero small,
+  .numero .barra,
+  .decoracao {
+    display: none;
+  }
+
+  .longo {
+    display: none;
+  }
+
+  .curto {
+    display: inline;
+  }
+
+  /* A foto do tema fica so no computador. */
+  .foto {
+    display: none;
+  }
+}

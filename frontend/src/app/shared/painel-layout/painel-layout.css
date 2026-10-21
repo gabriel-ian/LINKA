@@ -586,3 +586,55 @@ button.menu-item {
     transition: none;
   }
 }
+
+/* ---------- Abas do celular (Figma "Mobile - ...") ---------- */
+
+.abas {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .abas {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 15;
+    display: grid;
+    grid-template-columns: repeat(var(--n-abas), 1fr);
+    height: 64px;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid #e2e4e8;
+    background: #fff;
+  }
+
+  .aba {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8a8d93;
+    text-decoration: none;
+  }
+
+  .aba-icone {
+    width: 24px;
+    height: 24px;
+  }
+
+  .aba.ativa {
+    color: var(--cor-primaria);
+  }
+
+  /* O conteudo e o rodape com a foto nao ficam escondidos atras das abas. */
+  .conteudo.com-abas {
+    padding-bottom: 88px;
+  }
+
+  :host:has(.abas) .rodape {
+    margin-bottom: 64px;
+  }
+}

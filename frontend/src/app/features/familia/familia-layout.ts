@@ -74,6 +74,12 @@ export class FamiliaLayout {
       tituloPequeno: true,
       avatar: resp?.iniciais ?? '',
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
+      abas: [
+        { rota: '/familia', rotulo: 'Painel', icone: 'inicio' },
+        { rota: '/familia/avisos', rotulo: 'Avisos', icone: 'avisos' },
+        { rota: '/familia/relatorios', rotulo: 'Relatórios', icone: 'relatorios' },
+        { rota: '/familia/configuracoes', rotulo: 'Ajustes', icone: 'ajustes' },
+      ],
       secoes: [
         {
           titulo: 'MENU',

@@ -9,6 +9,7 @@ import { Escola } from './escola.entity';
 import { Usuario } from '../usuario/usuario.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
+import { EmailService } from '../email/email.service';
 import { Aluno } from '../aluno/aluno.entity';
 import { Professor } from '../professor/professor.entity';
 import { Turma } from '../turma/turma.entity';
@@ -32,6 +33,7 @@ export class EscolaService {
     @InjectRepository(Escola)
     private readonly escolaRepository: Repository<Escola>,
     private readonly dataSource: DataSource,
+    private readonly email: EmailService,
   ) {}
 
   async findAll() {
@@ -80,6 +82,12 @@ export class EscolaService {
       return escola.id;
     });
 
+    this.email.enviarAcesso({
+      nome: data.nome,
+      email: data.email,
+      senha: data.senha,
+      perfil: 'escola',
+    });
     return this.findOne(id);
   }
 
@@ -162,7 +170,7 @@ export class EscolaService {
 
   /** Senha provisoria para o login da coordenacao; devolvida UMA vez. */
   async redefinirSenha(id: number) {
-    await this.buscarOuFalhar(id);
+    const escola = await this.buscarOuFalhar(id);
     const login = await this.dataSource.getRepository(Usuario).findOne({
       where: { escolaId: id, perfil: 'escola' },
       order: { id: 'ASC' },
@@ -179,6 +187,12 @@ export class EscolaService {
       senhaProvisoria: true,
     });
 
+    this.email.enviarAcesso({
+      nome: escola.nome,
+      email: login.email,
+      senha: senhaProvisoria,
+      perfil: 'escola',
+    });
     return { data: { email: login.email, senhaProvisoria } };
   }
 

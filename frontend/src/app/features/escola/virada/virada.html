@@ -1,0 +1,159 @@
+<div class="pagina">
+  <a class="voltar" routerLink="/escola/turmas">&lt; Voltar para turmas</a>
+
+  @if (resultado(); as r) {
+    <header class="painel-cabecalho">
+      <h1>Virada feita!</h1>
+      <p>O ano letivo de {{ r.anoDestino }} já começou na Linka</p>
+    </header>
+
+    <section class="cartao resultado">
+      <ul>
+        <li>
+          <strong>{{ r.promovidos }}</strong>
+          {{ r.promovidos === 1 ? 'aluno subiu' : 'alunos subiram' }}
+          de série
+        </li>
+        <li>
+          <strong>{{ r.retidos }}</strong>
+          {{ r.retidos === 1 ? 'aluno repete' : 'alunos repetem' }} a série
+        </li>
+        <li>
+          <strong>{{ r.semTurma }}</strong>
+          {{ r.semTurma === 1 ? 'aluno ficou' : 'alunos ficaram' }} sem turma
+        </li>
+        <li>
+          <strong>{{ r.turmasCriadas }}</strong>
+          {{ r.turmasCriadas === 1 ? 'turma criada' : 'turmas criadas' }} para {{ r.anoDestino }}
+        </li>
+      </ul>
+      <p class="ajuda">
+        As turmas do ano anterior ficaram encerradas: aparecem em Turmas, no filtro "Anos
+        anteriores".
+      </p>
+      <div class="acoes">
+        <a class="bt bt-secundario" routerLink="/escola/alunos">Ver alunos</a>
+        <a class="bt bt-primario" routerLink="/escola/turmas">Ver turmas de {{ r.anoDestino }}</a>
+      </div>
+    </section>
+  } @else {
+    <header class="painel-cabecalho">
+      <h1>Virada do ano letivo</h1>
+      @if (previa(); as p) {
+        <p>De {{ p.anoOrigem }} para {{ p.anoDestino }}: confira para onde vai cada turma</p>
+      }
+    </header>
+
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    @if (carregando()) {
+      <p class="vazio">Carregando...</p>
+    } @else if (!previa()) {
+      <section class="cartao">
+        <p>
+          Nenhuma turma com ano letivo para virar. Cadastre as turmas do ano em
+          <a routerLink="/escola/turmas/nova">Nova turma</a>.
+        </p>
+      </section>
+    } @else if (previa(); as p) {
+      <p class="aviso-caixa azul">
+        <span>
+          Por padrão, todos sobem uma série e vão para a turma de mesma letra em
+          {{ p.anoDestino }}. Abra a turma para marcar quem repete ou fica sem turma (concluiu ou
+          saiu da escola). As turmas que faltarem em {{ p.anoDestino }} são criadas com o mesmo
+          turno, sala e limite.
+        </span>
+      </p>
+
+      <div class="turmas">
+        @for (t of p.turmas; track t.id) {
+          <section class="cartao turma">
+            <button
+              type="button"
+              class="cabeca"
+              [attr.aria-expanded]="abertas().has(t.id)"
+              (click)="alternar(t.id)"
+            >
+              <span class="rota">
+                <strong>{{ t.nome }}</strong>
+                <span class="seta" aria-hidden="true">→</span>
+                @if (t.destino && t.acaoPadrao === 'promover') {
+                  <strong>{{ t.destino.nome }}</strong>
+                  <small>{{ p.anoDestino }}{{ t.destino.jaExiste ? '' : ' · nova' }}</small>
+                } @else {
+                  <strong>Concluem</strong>
+                  <small>{{
+                    t.destino ? 'a escola não tem a série seguinte' : 'última série'
+                  }}</small>
+                }
+              </span>
+              <span class="conta">{{ resumoTurma(t) }}</span>
+              <span class="abrir" aria-hidden="true">{{ abertas().has(t.id) ? '−' : '+' }}</span>
+            </button>
+
+            @if (abertas().has(t.id) && t.alunos.length) {
+              <div class="todos">
+                <span>Todos da turma:</span>
+                @if (t.destino) {
+                  <button type="button" class="link-acao" (click)="definirTurma(t, 'promover')">
+                    Sobem
+                  </button>
+                }
+                <button type="button" class="link-acao" (click)="definirTurma(t, 'reter')">
+                  Repetem
+                </button>
+                <button type="button" class="link-acao" (click)="definirTurma(t, 'sair')">
+                  Sem turma
+                </button>
+              </div>
+              <ul class="alunos">
+                @for (a of t.alunos; track a.id) {
+                  <li [class.mudou]="acao(a.id, t) !== t.acaoPadrao">
+                    <span>{{ a.nome }}</span>
+                    <select
+                      [attr.aria-label]="'Para onde vai ' + a.nome"
+                      [ngModel]="acao(a.id, t)"
+                      (ngModelChange)="definir(a.id, t, $event)"
+                    >
+                      @if (t.destino) {
+                        <option value="promover">Vai para o {{ t.destino.nome }}</option>
+                      }
+                      <option value="reter">{{ rotuloRepete(t) }}</option>
+                      <option value="sair">Sem turma (concluiu ou saiu)</option>
+                    </select>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+      </div>
+
+      <section class="cartao final">
+        <label class="marcar">
+          <input type="checkbox" name="copiar" [(ngModel)]="copiarProfessores" />
+          Manter os professores: cada turma nova recebe os professores da turma de mesma série e
+          letra
+        </label>
+        <p class="totais">
+          <b>{{ resumo().promover }}</b> sobem de série · <b>{{ resumo().reter }}</b>
+          {{ resumo().reter === 1 ? 'repete' : 'repetem' }} · <b>{{ resumo().sair }}</b> ficam sem
+          turma
+        </p>
+        <div class="acoes">
+          <a class="bt bt-secundario" routerLink="/escola/turmas">Cancelar</a>
+          <button
+            type="button"
+            class="bt bt-primario"
+            [disabled]="salvando()"
+            (click)="confirmar()"
+          >
+            {{ salvando() ? 'Fazendo a virada...' : 'Fazer a virada para ' + p.anoDestino }}
+          </button>
+        </div>
+      </section>
+    }
+  }
+</div>

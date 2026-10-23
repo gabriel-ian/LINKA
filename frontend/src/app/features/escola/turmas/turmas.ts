@@ -21,17 +21,34 @@ export class EscolaTurmas {
 
   readonly cor = corDoIndice;
   readonly pct = percentual;
-  readonly ano = new Date().getFullYear();
 
   readonly turmas = signal<TurmaResumo[]>([]);
   readonly carregando = signal(true);
   readonly busca = signal('');
   readonly serie = signal('');
   readonly todas = signal(false);
+  /** false: so as turmas abertas; true: as encerradas (anos anteriores). */
+  readonly anteriores = signal(false);
+
+  /** Ano das turmas abertas (o mais recente); sem turmas, o do calendario. */
+  readonly ano = computed(
+    () =>
+      Math.max(
+        0,
+        ...this.turmas()
+          .filter((t) => !t.encerrada && t.anoLetivo)
+          .map((t) => t.anoLetivo!),
+      ) || new Date().getFullYear(),
+  );
+
+  readonly temEncerradas = computed(() => this.turmas().some((t) => t.encerrada));
+  readonly doFiltro = computed(() =>
+    this.turmas().filter((t) => t.encerrada === this.anteriores()),
+  );
 
   readonly series = computed(() => [
     ...new Set(
-      this.turmas()
+      this.doFiltro()
         .map((t) => t.serie)
         .filter((s): s is string => !!s),
     ),
@@ -39,7 +56,7 @@ export class EscolaTurmas {
 
   readonly filtradas = computed(() => {
     const termo = this.busca().trim().toLowerCase();
-    return this.turmas().filter(
+    return this.doFiltro().filter(
       (t) =>
         (!this.serie() || t.serie === this.serie()) &&
         (!termo ||

@@ -1,0 +1,39 @@
+.privacidade {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.privacidade h2 {
+  font-size: 18px;
+}
+
+.privacidade h3 {
+  margin: 4px 0 0;
+  font-size: 15px;
+}
+
+.acoes-lgpd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.historico {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+}
+
+.historico .sem-registro {
+  list-style: none;
+  margin-left: -18px;
+}
+
+.janela {
+  width: 520px;
+}
+
+.janela .campo-p input {
+  width: 100%;
+}

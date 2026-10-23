@@ -498,3 +498,83 @@ h3 {
     transition: none;
   }
 }
+
+/* ---------- Celular (Figma "Mobile - Aluno passo da tarefa") ---------- */
+
+.de-total,
+.proximos,
+.passo-bt .curto {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  /* Um passo de cada vez: so o atual aparece; o resto vai para a lista curta. */
+  .passo.feito,
+  .passo.depois,
+  .objetivo,
+  .separador,
+  .titulo-passos {
+    display: none;
+  }
+
+  .de-total,
+  .passo-bt .curto {
+    display: inline;
+  }
+
+  .passo-bt .longo {
+    display: none;
+  }
+
+  .passo.agora h3 {
+    font-size: 16px;
+  }
+
+  .passo.agora p {
+    font-size: 19px;
+    line-height: 27px;
+  }
+
+  .passo-botoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .passo-bt {
+    justify-content: center;
+  }
+
+  .passo-bt:last-child {
+    grid-column: 1 / -1;
+    height: 48px;
+    border-color: #0f9d6b;
+    background: #0f9d6b;
+    color: #fff;
+  }
+
+  .passo-bt:last-child img {
+    filter: brightness(0) invert(1);
+  }
+
+  .proximos {
+    display: block;
+    padding: 16px;
+  }
+
+  .proximos h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: var(--cor-texto);
+  }
+
+  .proximos ol {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 15px;
+  }
+}

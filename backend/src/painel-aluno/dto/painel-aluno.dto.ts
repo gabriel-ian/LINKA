@@ -20,6 +20,16 @@ export class ConcluirPassoDto {
   @Min(1)
   @Max(30)
   passo!: number;
+
+  @ApiPropertyOptional({
+    example: '2026-10-18T14:05:00.000Z',
+    description:
+      'Quando o aluno fez o passo, se foi sem internet e so chegou agora. ' +
+      'Aceito so nos ultimos 7 dias; senao vale a hora do envio.',
+  })
+  @IsOptional()
+  @IsDateString()
+  feitoEm?: string;
 }
 
 export class AjudaDto {

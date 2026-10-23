@@ -10,6 +10,12 @@
     </p>
   </header>
 
+  @if (apagado) {
+    <p class="aviso-caixa verde" role="status">
+      Dados do aluno apagados. Ele saiu da lista; os números da turma continuam.
+    </p>
+  }
+
   <div class="indicadores">
     @for (d of destaques; track d; let i = $index) {
       <div class="indicador" [class]="'c-' + coresDestaque[i]">

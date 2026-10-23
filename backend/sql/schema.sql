@@ -37,6 +37,7 @@ CREATE TABLE `aluno` (
   `interesses` varchar(255) DEFAULT NULL,
   `preferencias` json DEFAULT NULL,
   `ativo` tinyint DEFAULT '1',
+  `anonimizado_em` datetime DEFAULT NULL,
   `criado_em` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `escola_id` (`escola_id`),
@@ -119,6 +120,19 @@ CREATE TABLE `comunicado_leitura` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `consentimento` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `responsavel_id` bigint unsigned NOT NULL,
+  `versao` varchar(20) NOT NULL,
+  `aceito_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ip` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_consentimento_responsavel` (`responsavel_id`),
+  CONSTRAINT `fk_consentimento_responsavel` FOREIGN KEY (`responsavel_id`) REFERENCES `responsavel` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `disciplina` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) NOT NULL,
@@ -172,6 +186,37 @@ CREATE TABLE `incentivo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `laudo_acesso` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `aluno_id` bigint unsigned NOT NULL,
+  `usuario_id` bigint unsigned DEFAULT NULL,
+  `acao` varchar(20) NOT NULL,
+  `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_laudo_acesso_aluno` (`aluno_id`),
+  KEY `fk_laudo_acesso_usuario` (`usuario_id`),
+  CONSTRAINT `fk_laudo_acesso_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_laudo_acesso_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lgpd_pedido` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `aluno_id` bigint unsigned NOT NULL,
+  `responsavel_id` bigint unsigned DEFAULT NULL,
+  `tipo` varchar(20) NOT NULL,
+  `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `atendido_em` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_lgpd_pedido_aluno` (`aluno_id`),
+  KEY `fk_lgpd_pedido_responsavel` (`responsavel_id`),
+  CONSTRAINT `fk_lgpd_pedido_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_lgpd_pedido_responsavel` FOREIGN KEY (`responsavel_id`) REFERENCES `responsavel` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `matricula` (
   `aluno_id` bigint unsigned NOT NULL,
   `turma_id` bigint unsigned NOT NULL,
@@ -187,6 +232,21 @@ CREATE TABLE `neurodivergencia` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `notificacao_enviada` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `responsavel_id` bigint unsigned NOT NULL,
+  `tipo` varchar(30) NOT NULL,
+  `aluno_id` bigint unsigned NOT NULL,
+  `tarefa_id` bigint unsigned NOT NULL,
+  `dia` date NOT NULL,
+  `enviado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_notificacao` (`responsavel_id`,`tipo`,`aluno_id`,`tarefa_id`,`dia`),
+  CONSTRAINT `fk_notificacao_responsavel` FOREIGN KEY (`responsavel_id`) REFERENCES `responsavel` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -245,6 +305,21 @@ CREATE TABLE `responsavel` (
   KEY `fk_responsavel_escola` (`escola_id`),
   CONSTRAINT `fk_responsavel_escola` FOREIGN KEY (`escola_id`) REFERENCES `escola` (`id`),
   CONSTRAINT `responsavel_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `senha_reset` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_id` bigint unsigned NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `expira_em` datetime NOT NULL,
+  `usado_em` datetime DEFAULT NULL,
+  `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_senha_reset_token` (`token_hash`),
+  KEY `fk_senha_reset_usuario` (`usuario_id`),
+  CONSTRAINT `fk_senha_reset_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -315,6 +390,7 @@ CREATE TABLE `turma` (
   `ano_letivo` smallint unsigned DEFAULT NULL,
   `sala` varchar(50) DEFAULT NULL,
   `limite_alunos` int unsigned DEFAULT NULL,
+  `encerrada` tinyint(1) NOT NULL DEFAULT '0',
   `escola_id` bigint unsigned DEFAULT NULL,
   `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

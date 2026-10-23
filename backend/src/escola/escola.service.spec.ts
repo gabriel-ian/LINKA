@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { EscolaService } from './escola.service';
+import { EmailService } from '../email/email.service';
 import { Escola } from './escola.entity';
 import { Usuario } from '../usuario/usuario.entity';
 import { UsuarioService } from '../usuario/usuario.service';
@@ -69,6 +70,7 @@ describe('EscolaService', () => {
           },
         },
         { provide: DataSource, useValue: dataSource },
+        { provide: EmailService, useValue: { enviarAcesso: jest.fn() } },
       ],
     }).compile();
 

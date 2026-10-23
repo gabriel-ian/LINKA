@@ -27,6 +27,8 @@ export interface TurmaResumo {
   anoLetivo: number | null;
   sala: string | null;
   limiteAlunos: number | null;
+  /** Ano que ja virou: so consulta. */
+  encerrada: boolean;
   criadoEm: Date;
   totalAlunos: number;
   totalNee: number;
@@ -72,7 +74,7 @@ export class PainelEscolaService {
         'SELECT id, nome FROM neurodivergencia ORDER BY id',
       ),
       this.dataSource.query(
-        'SELECT id, nome, serie, letra FROM turma WHERE escola_id = ? ORDER BY serie, letra, nome',
+        'SELECT id, nome, serie, letra FROM turma WHERE escola_id = ? AND encerrada = 0 ORDER BY serie, letra, nome',
         [escolaId],
       ),
       this.listarProfessores(escolaId),
@@ -103,13 +105,14 @@ export class PainelEscolaService {
   // ---------------------------------------------------------------- turmas
 
   async listarTurmas(escolaId: number): Promise<{ data: TurmaResumo[] }> {
-    const base = await this.carregarBase(escolaId, mesDe(mesAtual()));
+    // Inclui as encerradas (anos anteriores); a tela filtra.
+    const base = await this.carregarBase(escolaId, mesDe(mesAtual()), true);
     return { data: base.turmas.map((t) => this.resumoTurma(t, base)) };
   }
 
   async detalharTurma(escolaId: number, turmaId: number) {
     const mes = mesDe(mesAtual());
-    const base = await this.carregarBase(escolaId, mes);
+    const base = await this.carregarBase(escolaId, mes, true);
     const turma = base.turmas.find((t) => t.id === turmaId);
 
     if (!turma) throw new NotFoundException('Turma nao encontrada');
@@ -459,7 +462,7 @@ export class PainelEscolaService {
       `SELECT tpd.turma_id turmaId, t.nome turmaNome, t.serie, t.letra,
               p.id professorId, p.nome_completo professorNome, d.nome disciplina
          FROM turma_professor_disciplina tpd
-         JOIN turma t ON t.id = tpd.turma_id
+         JOIN turma t ON t.id = tpd.turma_id AND t.encerrada = 0
          JOIN professor p ON p.id = tpd.professor_id
          LEFT JOIN disciplina d ON d.id = tpd.disciplina_id
         WHERE t.escola_id = ? ORDER BY tpd.id`,
@@ -468,16 +471,19 @@ export class PainelEscolaService {
   }
 
   /** Carrega numa tacada o que as telas cruzam: turmas, alunos, alocacoes e tarefas. */
+  /** comEncerradas: inclui as turmas de anos que ja viraram (so consulta). */
   private async carregarBase(
     escolaId: number,
     intervalo: [string, string],
+    comEncerradas = false,
   ): Promise<Base> {
     const [turmas, alunos, matriculas, diagnosticos, alocacoes, linhas] =
       await Promise.all([
         this.dataSource.query(
           `SELECT id, nome, serie, letra, turno, ano_letivo anoLetivo, sala,
-                limite_alunos limiteAlunos, criado_em criadoEm
-           FROM turma WHERE escola_id = ? ORDER BY serie, letra, nome`,
+                limite_alunos limiteAlunos, encerrada, criado_em criadoEm
+           FROM turma WHERE escola_id = ? ${comEncerradas ? '' : 'AND encerrada = 0'}
+          ORDER BY ano_letivo DESC, serie, letra, nome`,
           [escolaId],
         ),
         this.dataSource.query(
@@ -523,6 +529,7 @@ export class PainelEscolaService {
         nome: t.nome ?? 'Turma sem nome',
         anoLetivo: t.anoLetivo === null ? null : Number(t.anoLetivo),
         limiteAlunos: t.limiteAlunos === null ? null : Number(t.limiteAlunos),
+        encerrada: !!Number(t.encerrada),
       })),
       alunos: alunos.map((a: any) => ({
         id: Number(a.id),
@@ -561,6 +568,7 @@ interface TurmaBase {
   anoLetivo: number | null;
   sala: string | null;
   limiteAlunos: number | null;
+  encerrada: boolean;
   criadoEm: Date;
 }
 

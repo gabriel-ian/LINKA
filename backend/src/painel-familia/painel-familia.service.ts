@@ -25,25 +25,9 @@ import { semanasDoMes } from '../painel-professor/painel-professor.service';
 import { sequenciaAtual } from '../painel-aluno/gamificacao';
 import { Incentivo } from './incentivo.entity';
 import { resumoSemanal } from './resumo-semanal';
+import { LgpdService, TERMO_VERSAO } from '../lgpd/lgpd.service';
+import { PREFERENCIAS_PADRAO, preferenciasDe } from './preferencias';
 import { EnviarIncentivoDto, PerfilFamiliaDto } from './dto/painel-familia.dto';
-
-export interface PreferenciasFamilia {
-  tarefaNaoIniciada: boolean;
-  tarefaConcluida: boolean;
-  avisosEscola: boolean;
-  relatorioSemanal: boolean;
-  resumoWhatsapp: boolean;
-  horario: string;
-}
-
-const PREFERENCIAS_PADRAO: PreferenciasFamilia = {
-  tarefaNaoIniciada: true,
-  tarefaConcluida: true,
-  avisosEscola: true,
-  relatorioSemanal: true,
-  resumoWhatsapp: false,
-  horario: '14h às 18h',
-};
 
 const MESES = [
   'Janeiro',
@@ -86,6 +70,7 @@ export class PainelFamiliaService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly aluno: PainelAlunoService,
+    private readonly lgpd: LgpdService,
   ) {}
 
   // ------------------------------------------------------------ acesso
@@ -158,6 +143,11 @@ export class PainelFamiliaService {
           preferencias: { ...PREFERENCIAS_PADRAO, ...(r.preferencias ?? {}) },
         },
         filhos: await this.filhos(r.id),
+        /** Precisa aceitar o termo (versao atual) antes de usar o painel. */
+        termo: {
+          versao: TERMO_VERSAO,
+          pendente: await this.lgpd.termoPendente(Number(r.id)),
+        },
       },
     };
   }
@@ -420,6 +410,24 @@ export class PainelFamiliaService {
       [comunicadoId, resp.id],
     );
     return { data: true };
+  }
+
+  /**
+   * Resumo da semana de cada filho, para o e-mail de domingo. Respeita a
+   * preferencia "Relatorio semanal por e-mail" (ligada por padrao).
+   */
+  async resumosParaEmail(
+    responsavelId: number,
+    preferencias: unknown,
+  ): Promise<{ nome: string; resumo: string }[]> {
+    if (!preferenciasDe(preferencias).relatorioSemanal) return [];
+    const filhos = await this.filhos(responsavelId);
+    return Promise.all(
+      filhos.map(async (f) => ({
+        nome: f.nome,
+        resumo: await this.resumoDoFilho(f.id, f.primeiroNome),
+      })),
+    );
   }
 
   private async resumoDoFilho(alunoId: number, primeiroNome: string) {

@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TarefaStatusModule } from '../tarefa-status/tarefa-status.module';
+import { LgpdModule } from '../lgpd/lgpd.module';
 import { PainelEscolaController } from './painel-escola.controller';
 import { PainelEscolaService } from './painel-escola.service';
 import { CadastrosEscolaService } from './cadastros-escola.service';
+import { ViradaAnoService } from './virada-ano.service';
 
 /** Telas do perfil escola: leituras agregadas e cadastros compostos. */
 @Module({
-  imports: [TarefaStatusModule],
+  imports: [TarefaStatusModule, LgpdModule],
   controllers: [PainelEscolaController],
-  providers: [PainelEscolaService, CadastrosEscolaService],
+  providers: [PainelEscolaService, CadastrosEscolaService, ViradaAnoService],
 })
 export class PainelEscolaModule {}

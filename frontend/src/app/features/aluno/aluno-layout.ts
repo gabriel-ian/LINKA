@@ -42,11 +42,19 @@ export class AlunoLayout {
 
     return {
       titulo: r?.aluno.nome ?? 'Aluno',
-      fala: this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),
+      fala: this.contexto.semConexao()
+        ? 'Sem internet agora - mas suas missões estão salvas.'
+        : this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),
       avatar: r?.aluno.iniciais ?? '',
       modoCalmo: r?.preferencias.modoCalmo,
       letrasMaiores: r?.preferencias.letrasMaiores,
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
+      abas: [
+        { rota: '/aluno', rotulo: 'Início', icone: 'inicio' },
+        { rota: '/aluno/tarefas', rotulo: 'Tarefas', icone: 'tarefas', exato: false },
+        { rota: '/aluno/progresso', rotulo: 'Progresso', icone: 'progresso' },
+        { rota: '/aluno/perfil', rotulo: 'Perfil', icone: 'perfil' },
+      ],
       secoes: [
         {
           titulo: 'MENU',

@@ -10,7 +10,7 @@ import { Escola } from '../escola/escola.entity';
 export type TurnoTurma = 'manha' | 'tarde' | 'noite' | 'integral';
 
 /**
- * Tabela `turma`. Nao existe coluna `ativo` no banco.
+ * Tabela `turma`. Nao existe coluna `ativo`: a do ano que virou fica `encerrada`.
  * `nome` continua sendo o nome exibido ("8º Ano A"); serie e letra
  * vem de sql/painel-escola.sql e podem ser nulas em turmas antigas.
  */
@@ -55,6 +55,10 @@ export class Turma {
     nullable: true,
   })
   limiteAlunos!: number | null;
+
+  /** Turma de um ano que ja virou: fica so para consulta (historico). */
+  @Column({ type: 'boolean', default: false })
+  encerrada!: boolean;
 
   @Column({ name: 'escola_id', nullable: true })
   escolaId!: number | null;

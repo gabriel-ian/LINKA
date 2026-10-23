@@ -135,9 +135,66 @@
       }
     </nav>
 
-    <main class="conteudo">
+    <main class="conteudo" [class.com-abas]="config().abas?.length">
       <ng-content />
     </main>
+
+    @if (config().abas; as abas) {
+      <nav class="abas" aria-label="Atalhos" [style.--n-abas]="abas.length">
+        @for (a of abas; track a.rota) {
+          <a
+            class="aba"
+            [routerLink]="a.rota"
+            routerLinkActive="ativa"
+            [routerLinkActiveOptions]="{ exact: a.exato ?? true }"
+            ariaCurrentWhenActive="page"
+          >
+            <svg
+              class="aba-icone"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              @switch (a.icone) {
+                @case ('inicio') {
+                  <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" />
+                }
+                @case ('tarefas') {
+                  <path d="M9 6h11M9 12h11M9 18h11" />
+                  <path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" />
+                }
+                @case ('progresso') {
+                  <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+                }
+                @case ('perfil') {
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
+                }
+                @case ('avisos') {
+                  <path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4z" />
+                  <path d="M10 21h4" />
+                }
+                @case ('relatorios') {
+                  <rect x="4" y="3" width="16" height="18" rx="2" />
+                  <path d="M8 15v2M12 11v6M16 8v9" />
+                }
+                @case ('ajustes') {
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11h.1a2 2 0 1 1 0 4z"
+                  />
+                }
+              }
+            </svg>
+            {{ a.rotulo }}
+          </a>
+        }
+      </nav>
+    }
   </div>
 
   <footer class="rodape"></footer>

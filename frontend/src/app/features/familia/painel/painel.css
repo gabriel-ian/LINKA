@@ -297,3 +297,94 @@ ol {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Rotulo curto dos numeros e botao do alerta, so no celular. */
+.numero b {
+  font-weight: inherit;
+}
+
+.curto,
+.bt-incentivo {
+  display: none;
+}
+
+/* ---------- Celular (Figma "Mobile - Família painel") ---------- */
+
+@media (max-width: 600px) {
+  .alerta {
+    flex-wrap: wrap;
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .alerta > span:first-of-type {
+    flex: 1;
+  }
+
+  .bt-incentivo {
+    display: block;
+    flex-basis: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: #ec6a1c;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Vence a regra global de 2 colunas (styles.css, ate 700px): aqui sao 3. */
+  .numeros {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .numero {
+    height: auto;
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .numero strong {
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .numero small,
+  .numero .barra,
+  .estrela,
+  .longo {
+    display: none;
+  }
+
+  .curto {
+    display: inline;
+  }
+
+  /* Ordem do Figma: linha do tempo e depois autonomia; o resto fica no computador. */
+  .baixo {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .direita {
+    display: contents;
+  }
+
+  .linha-bloco {
+    order: 1;
+  }
+
+  .tarefas {
+    order: 2;
+  }
+
+  .linha-bloco {
+    min-height: 0;
+  }
+
+  .materias-bloco,
+  #titulo-tarefas,
+  #titulo-tarefas + ul {
+    display: none;
+  }
+}

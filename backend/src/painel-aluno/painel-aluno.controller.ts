@@ -54,7 +54,7 @@ export class PainelAlunoController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ConcluirPassoDto,
   ) {
-    return this.painel.concluirPasso(usuarioId, id, dto.passo);
+    return this.painel.concluirPasso(usuarioId, id, dto.passo, dto.feitoEm);
   }
 
   @Post('tarefas/:id/ajuda')

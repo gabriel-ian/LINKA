@@ -1,0 +1,160 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 919px;
+}
+
+.voltar {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-primaria);
+  text-decoration: none;
+}
+
+.turmas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.turma {
+  padding: 0;
+  overflow: hidden;
+}
+
+.cabeca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rota {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  flex: 1 1 260px;
+  font-size: 17px;
+}
+
+.rota small {
+  font-size: 13px;
+  color: var(--cor-texto);
+}
+
+.seta {
+  color: var(--cor-primaria);
+  font-weight: 700;
+}
+
+.conta {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.abrir {
+  width: 24px;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--cor-primaria);
+}
+
+.todos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 10px 20px;
+  border-top: 1px solid #eceef2;
+  font-size: 14px;
+}
+
+.alunos {
+  margin: 0;
+  padding: 0 20px 12px;
+  list-style: none;
+}
+
+.alunos li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 8px 0;
+  border-top: 1px solid #f1f2f5;
+  font-size: 15px;
+}
+
+.alunos li.mudou span {
+  font-weight: 700;
+}
+
+.alunos select {
+  min-width: 240px;
+  padding: 6px 8px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+}
+
+.final {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.marcar {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.marcar input {
+  margin-top: 3px;
+}
+
+.totais {
+  margin: 0;
+  font-size: 16px;
+}
+
+.resultado ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+}
+
+.resultado strong {
+  font-size: 22px;
+  color: var(--cor-primaria);
+}
+
+.vazio {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .alunos select {
+    min-width: 0;
+    width: 100%;
+  }
+}

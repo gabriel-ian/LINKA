@@ -33,6 +33,19 @@ export interface ItemMenu {
   tom?: 'filho';
 }
 
+/** Icones da barra de abas do celular (desenhados em SVG no template). */
+export type IconeAba =
+  'inicio' | 'tarefas' | 'progresso' | 'perfil' | 'avisos' | 'relatorios' | 'ajustes';
+
+/** Aba da barra inferior que aparece so no celular (Figma "Mobile - ..."). */
+export interface Aba {
+  rota: string;
+  rotulo: string;
+  icone: IconeAba;
+  /** false: fica ativa tambem nas sub-rotas (ex.: Tarefas no passo da tarefa). */
+  exato?: boolean;
+}
+
 export interface ConfigPainel {
   titulo: string;
   /** Texto menor ao lado do titulo (ex.: "Plano Institucional - Ativo"). */
@@ -52,6 +65,8 @@ export interface ConfigPainel {
   fala?: string;
   /** Aluno/familia: iniciais no canto do topo, que abrem o menu da conta. */
   avatar?: string;
+  /** Aluno/familia: barra de abas no rodape, so no celular. */
+  abas?: Aba[];
   /** Preferencias do aluno que mudam a moldura inteira. */
   modoCalmo?: boolean;
   letrasMaiores?: boolean;

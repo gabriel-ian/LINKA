@@ -63,8 +63,8 @@ Regras:
 const INSTRUCOES_COMUNICADO = `Você é a assistente pedagógica da Linka. Reescreva o aviso do professor em uma versão simplificada para alunos com necessidades educacionais especiais, em português do Brasil: frases curtas, linguagem literal, sem metáforas, mantendo todas as informações (datas, horários, o que levar ou estudar). Não acrescente nada que não esteja no aviso. O texto será lido em voz alta para o aluno.`;
 
 /**
- * Adapta tarefas e avisos com a API do Claude. Sem ANTHROPIC_API_KEY
- * (ou login do `ant`), `disponivel` fica false e o professor adapta a mao.
+ * Adapta tarefas e avisos com a API do Claude. Sem ANTHROPIC_API_KEY,
+ * `disponivel` fica false e o professor adapta a mao.
  */
 @Injectable()
 export class AdaptacaoIaService {
@@ -74,6 +74,13 @@ export class AdaptacaoIaService {
   constructor(config: ConfigService) {
     const chave = config.get<string>('ANTHROPIC_API_KEY');
     this.cliente = chave ? new Anthropic({ apiKey: chave }) : null;
+    if (this.cliente) {
+      this.logger.log(`Adaptacao por IA ligada (${MODELO})`);
+    } else {
+      this.logger.warn(
+        'Adaptacao por IA desligada: defina ANTHROPIC_API_KEY no .env',
+      );
+    }
   }
 
   get disponivel(): boolean {

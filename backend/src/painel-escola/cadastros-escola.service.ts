@@ -9,6 +9,7 @@ import { DataSource, EntityManager, In, Not } from 'typeorm';
 import { Usuario } from '../usuario/usuario.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
+import { EmailService } from '../email/email.service';
 import { Turma } from '../turma/turma.entity';
 import { Professor } from '../professor/professor.entity';
 import { Aluno } from '../aluno/aluno.entity';
@@ -73,6 +74,7 @@ export class CadastrosEscolaService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly tarefaStatusService: TarefaStatusService,
+    private readonly email: EmailService,
   ) {}
 
   // ---------------------------------------------------------------- turma
@@ -201,7 +203,7 @@ export class CadastrosEscolaService {
   // ------------------------------------------------------------ professor
 
   async criarProfessor(dto: CriarProfessorDto, escolaId: number) {
-    return this.dataSource.transaction(async (manager) => {
+    const criado = await this.dataSource.transaction(async (manager) => {
       await this.garantirEmailLivre(manager, dto.email);
       const turmas = await this.turmasDaEscola(
         manager,
@@ -267,6 +269,12 @@ export class CadastrosEscolaService {
         },
       };
     });
+    this.email.enviarAcesso({
+      ...criado.data,
+      senha: dto.senha,
+      perfil: 'professor',
+    });
+    return criado;
   }
 
   async atualizarProfessor(
@@ -314,7 +322,7 @@ export class CadastrosEscolaService {
     }[] = await this.dataSource.query(
       `SELECT t.id turmaId, t.nome turma, d.nome disciplina
          FROM turma_professor_disciplina tpd
-         JOIN turma t ON t.id = tpd.turma_id
+         JOIN turma t ON t.id = tpd.turma_id AND t.encerrada = 0
          LEFT JOIN disciplina d ON d.id = tpd.disciplina_id
         WHERE tpd.professor_id = ? ORDER BY t.nome, d.nome`,
       [professorId],
@@ -438,7 +446,7 @@ export class CadastrosEscolaService {
   // ---------------------------------------------------------------- aluno
 
   async criarAluno(dto: CriarAlunoDto, escolaId: number) {
-    return this.dataSource.transaction(async (manager) => {
+    const criado = await this.dataSource.transaction(async (manager) => {
       const [turma] = dto.turmaId
         ? await this.turmasDaEscola(manager, [dto.turmaId], escolaId)
         : [];
@@ -521,6 +529,32 @@ export class CadastrosEscolaService {
         },
       };
     });
+    if (dto.email && dto.senha) {
+      this.email.enviarAcesso({
+        nome: criado.data.nome,
+        email: dto.email,
+        senha: dto.senha,
+        perfil: 'aluno',
+      });
+    }
+    if (criado.data.responsavel) this.avisarFamilia(criado.data.responsavel);
+    return criado;
+  }
+
+  /** Familia nova (com senha provisoria) recebe o acesso por e-mail. */
+  private avisarFamilia(r: {
+    nome: string | null;
+    email: string | null;
+    senhaProvisoria?: string | null;
+  }): void {
+    if (r.email && r.senhaProvisoria) {
+      this.email.enviarAcesso({
+        nome: r.nome,
+        email: r.email,
+        senha: r.senhaProvisoria,
+        perfil: 'responsavel',
+      });
+    }
   }
 
   /** O CGM identifica o aluno na rede: nao pode repetir dentro da escola. */
@@ -701,23 +735,24 @@ export class CadastrosEscolaService {
     escolaId: number,
   ) {
     let usuarioId: number | null | undefined;
+    let nome = '';
 
     if (tipo === 'aluno') {
-      usuarioId = (
-        await this.dataSource
-          .getRepository(Aluno)
-          .findOne({ where: { id, escolaId } })
-      )?.usuarioId;
+      const a = await this.dataSource
+        .getRepository(Aluno)
+        .findOne({ where: { id, escolaId } });
+      usuarioId = a?.usuarioId;
+      nome = a?.nomeCompleto ?? '';
     } else if (tipo === 'professor') {
-      usuarioId = (
-        await this.dataSource
-          .getRepository(Professor)
-          .findOne({ where: { id, escolaId } })
-      )?.usuarioId;
+      const p = await this.dataSource
+        .getRepository(Professor)
+        .findOne({ where: { id, escolaId } });
+      usuarioId = p?.usuarioId;
+      nome = p?.nomeCompleto ?? '';
     } else {
       // Familia da escola: cadastrada por ela ou com filho nela.
       const [r] = await this.dataSource.query(
-        `SELECT r.usuario_id usuarioId FROM responsavel r
+        `SELECT r.usuario_id usuarioId, r.nome_completo nome FROM responsavel r
           WHERE r.id = ? AND (r.escola_id = ? OR EXISTS (
             SELECT 1 FROM aluno_responsavel ar JOIN aluno a ON a.id = ar.aluno_id
              WHERE ar.responsavel_id = r.id AND a.escola_id = ?))
@@ -725,6 +760,7 @@ export class CadastrosEscolaService {
         [id, escolaId, escolaId],
       );
       usuarioId = r?.usuarioId ?? undefined;
+      nome = r?.nome ?? '';
     }
 
     if (usuarioId === undefined)
@@ -744,6 +780,12 @@ export class CadastrosEscolaService {
       senhaProvisoria: true,
     });
 
+    this.email.enviarAcesso({
+      nome,
+      email: usuario.email,
+      senha: senhaProvisoria,
+      perfil: tipo,
+    });
     return { data: { email: usuario.email, senhaProvisoria } };
   }
 
@@ -928,7 +970,7 @@ export class CadastrosEscolaService {
 
   /** Cadastra a familia sozinha (os filhos vem depois). */
   async criarFamilia(dto: ResponsavelDto, escolaId: number) {
-    return this.dataSource.transaction(async (manager) => {
+    const criada = await this.dataSource.transaction(async (manager) => {
       const existe = await manager
         .getRepository(Usuario)
         .findOne({ where: { email: dto.email } });
@@ -949,6 +991,8 @@ export class CadastrosEscolaService {
         },
       };
     });
+    this.avisarFamilia(criada.data);
+    return criada;
   }
 
   /** Liga ao aluno uma familia ja cadastrada ou uma nova. */
@@ -957,7 +1001,7 @@ export class CadastrosEscolaService {
     dto: VincularResponsavelDto,
     escolaId: number,
   ) {
-    return this.dataSource.transaction(async (manager) => {
+    const vinculo = await this.dataSource.transaction(async (manager) => {
       const aluno = await manager
         .getRepository(Aluno)
         .findOne({ where: { id: alunoId, escolaId } });
@@ -979,6 +1023,8 @@ export class CadastrosEscolaService {
             );
       return { data: resultado };
     });
+    this.avisarFamilia(vinculo.data);
+    return vinculo;
   }
 
   /** Desfaz o vinculo (a familia continua cadastrada). */
@@ -1067,7 +1113,8 @@ export class CadastrosEscolaService {
     if (!ids.length) return [];
     const turmas = await manager
       .getRepository(Turma)
-      .find({ where: { id: In(ids), escolaId } });
+      .find({ where: { id: In(ids), escolaId, encerrada: false } });
+    // Turma encerrada (ano que ja virou) nao recebe aluno nem professor.
     if (turmas.length !== ids.length)
       throw new BadRequestException('Turma invalida');
     return turmas;

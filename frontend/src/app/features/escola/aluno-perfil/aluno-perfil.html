@@ -184,6 +184,8 @@
       </div>
     </div>
 
+    <app-privacidade-aluno [alunoId]="a.id" [nome]="a.nome" (apagado)="dadosApagados()" />
+
     @if (a.turma) {
       <div class="acoes">
         <a

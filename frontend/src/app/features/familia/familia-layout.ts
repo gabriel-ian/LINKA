@@ -8,6 +8,7 @@ import {
 } from '../../shared/painel-layout/painel-layout';
 import { hojeIso, horaCurta, tituloCompleto } from '../aluno/aluno-ui';
 import { FamiliaContexto } from './familia-contexto';
+import { TermoAceite } from './termo-aceite';
 
 const ALUNO = 'assets/aluno/menu-';
 const ESCOLA = 'assets/escola/menu-';
@@ -15,14 +16,16 @@ const ESCOLA = 'assets/escola/menu-';
 /** Moldura das telas "Familia - ..." do Figma: menu e a lista "FILHO (A)". */
 @Component({
   selector: 'app-familia-layout',
-  imports: [RouterOutlet, PainelLayout],
+  imports: [RouterOutlet, PainelLayout, TermoAceite],
   template: `
     <app-painel-layout [config]="config()" [notificacoes]="notificacoes()">
       @if (contexto.erro()) {
         <p class="alerta-erro" role="alert">{{ contexto.erro() }}</p>
       }
       @if (contexto.dados(); as d) {
-        @if (d.filhos.length) {
+        @if (d.termo.pendente) {
+          <app-termo-aceite (aceito)="contexto.termoAceito()" />
+        } @else if (d.filhos.length) {
           <router-outlet />
         } @else {
           <div class="cartao sem-filho">
@@ -71,6 +74,12 @@ export class FamiliaLayout {
       tituloPequeno: true,
       avatar: resp?.iniciais ?? '',
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
+      abas: [
+        { rota: '/familia', rotulo: 'Painel', icone: 'inicio' },
+        { rota: '/familia/avisos', rotulo: 'Avisos', icone: 'avisos' },
+        { rota: '/familia/relatorios', rotulo: 'Relatórios', icone: 'relatorios' },
+        { rota: '/familia/configuracoes', rotulo: 'Ajustes', icone: 'ajustes' },
+      ],
       secoes: [
         {
           titulo: 'MENU',

@@ -58,6 +58,12 @@
         </section>
       }
 
+      @if (aguardandoEnvio()) {
+        <p class="aviso-caixa verde" role="status">
+          Missão concluída! A Linka envia para a professora quando a internet voltar.
+        </p>
+      }
+
       <footer class="calma-rodape">
         <span>Modo calmo: menos cores, letras maiores e um passo por vez.</span>
         <button type="button" class="link-acao" (click)="voltarAoNormal()">
@@ -146,6 +152,11 @@
       @if (erro()) {
         <p class="alerta-erro" role="alert">{{ erro() }}</p>
       }
+      @if (aguardandoEnvio()) {
+        <p class="aviso-caixa verde" role="status">
+          Missão concluída! A Linka envia para a professora quando a internet voltar.
+        </p>
+      }
 
       <ol class="passos">
         @for (p of t.passos; track $index; let i = $index) {
@@ -164,7 +175,9 @@
               }
             </span>
             <div class="passo-corpo">
-              <h3>Passo {{ i + 1 }}</h3>
+              <h3>
+                Passo {{ i + 1 }}<span class="de-total"> de {{ total() }}</span>
+              </h3>
               <p>{{ p }}</p>
               @if (i < atual()) {
                 <small><img src="assets/aluno/relogio-p.svg" alt="" /> concluído</small>
@@ -174,7 +187,7 @@
                   <button type="button" class="passo-bt" (click)="ouvirPasso(i)">
                     <img class="espelhar" src="assets/aluno/passo-ouvir-som.svg" alt="" />
                     <img src="assets/aluno/passo-ouvir.svg" alt="" />
-                    Ouvir este passo
+                    <span class="longo">Ouvir este passo</span><span class="curto">Ouvir</span>
                   </button>
                   <a
                     class="passo-bt"
@@ -182,7 +195,7 @@
                     [queryParams]="{ passo: i + 1 }"
                   >
                     <img src="assets/aluno/passo-ajuda.svg" alt="" />
-                    Preciso de ajuda
+                    <span class="longo">Preciso de ajuda</span><span class="curto">Ajuda</span>
                   </a>
                   <button
                     type="button"
@@ -199,6 +212,18 @@
           </li>
         }
       </ol>
+
+      <!-- So no celular: os passos que faltam, numa lista curta (Figma "Mobile"). -->
+      @if (atual() < total() - 1) {
+        <section class="cartao-aluno proximos" aria-labelledby="titulo-proximos">
+          <h3 id="titulo-proximos">Próximos passos</h3>
+          <ol>
+            @for (p of t.passos.slice(atual() + 1); track $index) {
+              <li>{{ atual() + 2 + $index }} - {{ p }}</li>
+            }
+          </ol>
+        </section>
+      }
     </div>
   }
 }

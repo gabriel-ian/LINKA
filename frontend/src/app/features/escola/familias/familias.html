@@ -31,7 +31,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (f of lista; track f.id) {
+          @for (f of visiveis(); track f.id) {
             <tr>
               <td>
                 <span class="pessoa">
@@ -87,6 +87,15 @@
         </tbody>
       </table>
     </section>
+
+    <div class="rodape-lista">
+      <span>Mostrando {{ visiveis().length }} de {{ lista.length }} famílias</span>
+      @if (totalPaginas() > 1) {
+        <button type="button" class="bt bt-secundario" (click)="proximaPagina()">
+          {{ pagina() + 1 < totalPaginas() ? 'Próxima página' : 'Voltar ao início' }}
+        </button>
+      }
+    </div>
   } @else if (!erro()) {
     <p class="vazio">Carregando...</p>
   }

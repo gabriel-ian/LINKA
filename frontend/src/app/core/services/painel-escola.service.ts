@@ -4,6 +4,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../model/escola.model';
 import {
+  AcaoVirada,
+  SituacaoLgpd,
+  PreviaVirada,
+  ResultadoVirada,
   AlunoCriado,
   AlunoDetalhe,
   AlunoResumo,
@@ -36,6 +40,33 @@ export class PainelEscolaService {
 
   turmas(): Observable<ApiResponse<TurmaResumo[]>> {
     return this.http.get<ApiResponse<TurmaResumo[]>>(`${this.api}/turmas`);
+  }
+
+  lgpdDoAluno(id: number): Observable<ApiResponse<SituacaoLgpd>> {
+    return this.http.get<ApiResponse<SituacaoLgpd>>(`${this.api}/alunos/${id}/lgpd`);
+  }
+
+  /** Copia de todos os dados do aluno (LGPD), em JSON. */
+  dadosDoAluno(id: number): Observable<ApiResponse<unknown>> {
+    return this.http.get<ApiResponse<unknown>>(`${this.api}/alunos/${id}/dados`);
+  }
+
+  /** Apaga os dados pessoais e de saude (confirmacao = nome completo). */
+  anonimizarAluno(id: number, confirmacao: string): Observable<unknown> {
+    return this.http.post(`${this.api}/alunos/${id}/anonimizar`, { confirmacao });
+  }
+
+  /** null quando a escola ainda nao tem turmas com ano letivo. */
+  previaVirada(): Observable<ApiResponse<PreviaVirada | null>> {
+    return this.http.get<ApiResponse<PreviaVirada | null>>(`${this.api}/virada`);
+  }
+
+  fazerVirada(dados: {
+    anoOrigem: number;
+    copiarProfessores: boolean;
+    decisoes: { alunoId: number; acao: AcaoVirada }[];
+  }): Observable<ApiResponse<ResultadoVirada>> {
+    return this.http.post<ApiResponse<ResultadoVirada>>(`${this.api}/virada`, dados);
   }
 
   turma(id: number): Observable<ApiResponse<TurmaDetalhe>> {

@@ -393,3 +393,191 @@ li a {
     object-position: 60% 35%;
   }
 }
+
+/* ---------- Sem conexão ---------- */
+
+.cabecalho.coluna {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sem-internet {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #3b3d42;
+  color: #fff;
+}
+
+.sem-internet strong {
+  font-size: 16px;
+}
+
+.sem-internet p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+.bt-tentar {
+  flex: none;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bt-tentar:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.missoes-offline {
+  padding: 18px;
+}
+
+.missoes-offline h2 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.missoes-offline ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.missoes-offline li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--cor-borda-suave, #eceef2);
+}
+
+.missoes-offline li:last-child {
+  border-bottom: none;
+}
+
+.missoes-offline a {
+  color: inherit;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.selo {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.selo.verde {
+  background: #e6f7f2;
+  color: #059669;
+}
+
+.selo.laranja {
+  background: #fef0e8;
+  color: #b8420a;
+}
+
+.selo.cinza {
+  background: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+}
+
+.nota-offline {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .sem-internet {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Rotulo curto dos numeros, so no celular. */
+.numero b {
+  font-weight: inherit;
+}
+
+.curto {
+  display: none;
+}
+
+/* ---------- Celular (Figma "Mobile - Aluno início") ---------- */
+
+@media (max-width: 600px) {
+  .pagina {
+    gap: 18px;
+  }
+
+  .cabecalho h1 {
+    font-size: 30px;
+  }
+
+  .alerta {
+    padding: 16px;
+  }
+
+  .alerta > div {
+    flex: 1;
+  }
+
+  .comecar {
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Vence a regra global de 2 colunas (styles.css, ate 700px): aqui sao 3. */
+  .numeros {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .numero {
+    height: auto;
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .numero strong {
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .numero small,
+  .numero .barra,
+  .decoracao {
+    display: none;
+  }
+
+  .longo {
+    display: none;
+  }
+
+  .curto {
+    display: inline;
+  }
+
+  /* A foto do tema fica so no computador. */
+  .foto {
+    display: none;
+  }
+}

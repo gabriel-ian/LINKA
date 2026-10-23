@@ -28,6 +28,21 @@ export class AuthService {
     return this.http.post(`${this.api}/senha`, { senhaAtual, novaSenha });
   }
 
+  /** A Linka envia link de nova senha por e-mail? (depende do SMTP no backend) */
+  esqueciDisponivel(): Observable<{ data: { porEmail: boolean } }> {
+    return this.http.get<{ data: { porEmail: boolean } }>(`${this.api}/senha/esqueci`);
+  }
+
+  /** "Esqueci minha senha": pede o link por e-mail. */
+  pedirLinkSenha(email: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/esqueci`, { email });
+  }
+
+  /** Cria a nova senha com o codigo do link recebido por e-mail. */
+  redefinirSenha(token: string, novaSenha: string): Observable<unknown> {
+    return this.http.post(`${this.api}/senha/redefinir`, { token, novaSenha });
+  }
+
   /** Primeiro acesso: troca a senha recebida sem pedir a atual. */
   criarSenha(novaSenha: string): Observable<unknown> {
     return this.http.post(`${this.api}/senha/primeiro-acesso`, { novaSenha });
@@ -76,9 +91,24 @@ export class AuthService {
     }
   }
 
+  /** Id do usuario (sub do token), para separar dados guardados no navegador. */
+  get usuarioId(): number | null {
+    const token = localStorage.getItem('token');
+    try {
+      const sub = token ? JSON.parse(atob(token.split('.')[1])).sub : null;
+      return typeof sub === 'number' ? sub : null;
+    } catch {
+      return null;
+    }
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('perfil');
     localStorage.removeItem('escolaId');
+    // Copias offline do aluno: o computador da escola e compartilhado.
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith('linka-copia:'))
+      .forEach((k) => localStorage.removeItem(k));
   }
 }

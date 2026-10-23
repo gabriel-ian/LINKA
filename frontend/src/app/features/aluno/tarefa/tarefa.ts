@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TarefaAluno } from '../../../core/model/painel-aluno.model';
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
+import { ConexaoService } from '../../../core/services/conexao.service';
 import { VozService } from '../../../core/services/voz.service';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { AlunoContexto } from '../aluno-contexto';
@@ -31,6 +32,7 @@ export class AlunoTarefa {
   private router = inject(Router);
   readonly contexto = inject(AlunoContexto);
   readonly voz = inject(VozService);
+  private conexao = inject(ConexaoService);
 
   readonly tarefa = signal<TarefaAluno | null>(null);
   readonly erro = signal('');
@@ -60,9 +62,16 @@ export class AlunoTarefa {
     return `Entrega em ${d}/${m}${hora}`;
   });
 
+  /** Concluida sem internet: falta enviar para a professora. */
+  readonly aguardandoEnvio = computed(() => {
+    const t = this.tarefa();
+    return !!t && this.contexto.offline.aguardandoEnvio(t);
+  });
+
   readonly situacao = computed(() => {
     const t = this.tarefa();
     if (!t) return { texto: '', cor: '' };
+    if (this.aguardandoEnvio()) return { texto: 'Concluída - aguardando envio', cor: 'laranja' };
     if (t.situacao === 'concluida') return { texto: 'Concluída', cor: 'verde' };
     return this.feitos() > 0
       ? { texto: 'Em andamento', cor: 'laranja' }
@@ -85,14 +94,28 @@ export class AlunoTarefa {
 
   private carregar(id: number): void {
     this.tarefa.set(null);
+    const offline = this.contexto.offline;
     this.service.tarefa(id).subscribe({
-      next: (res) => this.tarefa.set(res.data),
-      error: (e: HttpErrorResponse) =>
+      next: (res) => {
+        offline.guardarTarefa(res.data);
+        this.tarefa.set(offline.aplicar(res.data));
+      },
+      error: (e: HttpErrorResponse) => {
+        // Sem internet: abre a copia guardada, com os passos feitos offline.
+        const copia = ConexaoService.semRede(e) ? offline.lerTarefa(id) : null;
+        if (ConexaoService.semRede(e)) this.conexao.online.set(false);
+        if (copia) {
+          this.tarefa.set(offline.aplicar(copia));
+          return;
+        }
         this.erro.set(
           e.status === 404
             ? 'Tarefa não encontrada.'
-            : 'Não foi possível abrir a tarefa agora. Tente de novo.',
-        ),
+            : ConexaoService.semRede(e)
+              ? 'Esta missão ainda não foi salva para usar sem internet. Abra de novo quando a conexão voltar.'
+              : 'Não foi possível abrir a tarefa agora. Tente de novo.',
+        );
+      },
     });
   }
 
@@ -124,9 +147,15 @@ export class AlunoTarefa {
     const t = this.tarefa();
     if (!t || this.salvando()) return;
     const passo = this.feitos() + 1;
+    this.erro.set('');
+    // Com passos ja na fila, este tambem vai para a fila (a ordem importa).
+    const naFila = this.contexto.offline.fila().some((p) => p.tarefaId === t.id);
+    if (this.contexto.semConexao() || naFila) {
+      this.guardarOffline(t, passo);
+      return;
+    }
 
     this.salvando.set(true);
-    this.erro.set('');
     this.service.concluirPasso(t.id, passo).subscribe({
       next: (res) => {
         this.salvando.set(false);
@@ -143,10 +172,29 @@ export class AlunoTarefa {
       },
       error: (e: HttpErrorResponse) => {
         this.salvando.set(false);
+        if (ConexaoService.semRede(e)) {
+          this.conexao.online.set(false);
+          this.guardarOffline(t, passo);
+          return;
+        }
         this.erro.set(mensagemDeErro(e, 'Não foi possível salvar o passo. Tente de novo.'));
         if (e.status === 400) this.carregar(t.id);
       },
     });
+  }
+
+  /** Sem internet: o passo fica guardado e vai para o servidor depois. */
+  private guardarOffline(t: TarefaAluno, passo: number): void {
+    this.contexto.offline.adicionar({
+      tarefaId: t.id,
+      passo,
+      feitoEm: new Date().toISOString(),
+    });
+    this.contexto.aplicarPendentes();
+    this.tarefa.set(this.contexto.offline.aplicar(t));
+    if (passo < t.totalPassos && this.contexto.resumo()?.preferencias.ouvirVoz) {
+      this.ouvirPasso(passo);
+    }
   }
 
   voltarAoNormal(): void {

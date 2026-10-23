@@ -24,14 +24,16 @@
           </p>
         }
       </div>
-      <div class="acoes-topo">
-        <button type="button" class="bt bt-primario" (click)="adicionando.set(true)">
-          Adicionar alunos
-        </button>
-        <a class="bt bt-secundario" [routerLink]="['/escola/turmas', t.id, 'editar']"
-          >Editar turma</a
-        >
-      </div>
+      @if (!t.encerrada) {
+        <div class="acoes-topo">
+          <button type="button" class="bt bt-primario" (click)="adicionando.set(true)">
+            Adicionar alunos
+          </button>
+          <a class="bt bt-secundario" [routerLink]="['/escola/turmas', t.id, 'editar']"
+            >Editar turma</a
+          >
+        </div>
+      }
     </header>
 
     @if (aviso()) {
@@ -46,7 +48,13 @@
       <p class="aviso-caixa verde forte">Turma {{ t.nome }} criada com sucesso.</p>
     }
 
-    @if (t.totalAlunos === 0) {
+    @if (t.encerrada) {
+      <p class="aviso-caixa azul">
+        Turma encerrada na virada do ano letivo{{ t.anoLetivo ? ' de ' + t.anoLetivo : '' }}. Os
+        alunos agora estão nas turmas do novo ano; as tarefas antigas continuam no histórico de cada
+        aluno.
+      </p>
+    } @else if (t.totalAlunos === 0) {
       <section class="cartao vazio-turma">
         <span class="mais">+</span>
         <h2>Esta turma ainda não tem alunos</h2>

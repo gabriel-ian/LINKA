@@ -1,0 +1,110 @@
+# Confere cada PR e cada push na main: lint, formatacao, testes e build do
+# backend e do frontend, e depois os testes de navegador (e2e) com MySQL.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: Lint
+        run: npx eslint "{src,apps,libs,test}/**/*.ts"
+      - name: Formatacao
+        run: npx prettier --check "src/**/*.ts" "test/**/*.ts"
+      - name: Testes
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Formatacao
+        run: npx prettier --check "src/**/*.{ts,html,css}"
+      - name: Testes
+        run: npx ng test --watch=false
+      - name: Build
+        run: npx ng build
+
+  e2e:
+    name: Testes de navegador
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      CI: 'true'
+      TZ: America/Sao_Paulo
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: bancolinka
+      JWT_SECRET: segredo-so-para-a-ci-${{ github.run_id }}
+      FRONTEND_URL: http://localhost:4200
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Banco (estrutura, dados base e acessos de teste)
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot < backend/sql/schema.sql
+          mysql -h 127.0.0.1 -uroot -proot bancolinka < backend/sql/dados-base.sql
+          mysql -h 127.0.0.1 -uroot -proot bancolinka < backend/sql/seed-admin.sql
+      - run: npm ci
+        working-directory: backend
+      - run: npm ci
+        working-directory: frontend
+      - run: npm ci
+        working-directory: e2e
+      - name: Navegador
+        run: npx playwright install --with-deps chromium
+        working-directory: e2e
+      - name: Testes de navegador
+        run: npx playwright test
+        working-directory: e2e
+      - name: Relatorio (se falhar)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-e2e
+          path: e2e/playwright-report
+          retention-days: 7

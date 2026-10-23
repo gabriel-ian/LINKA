@@ -18,6 +18,19 @@ export class PainelFamiliaService {
   private http = inject(HttpClient);
   private readonly api = `${environment.apiUrl}/painel-familia`;
 
+  aceitarTermo(versao: string): Observable<unknown> {
+    return this.http.post(`${this.api}/termo`, { versao });
+  }
+
+  /** Copia de todos os dados do filho (LGPD), em JSON. */
+  dadosDoFilho(filhoId: number): Observable<ApiResponse<unknown>> {
+    return this.http.get<ApiResponse<unknown>>(`${this.api}/filhos/${filhoId}/dados`);
+  }
+
+  pedirExclusao(filhoId: number): Observable<unknown> {
+    return this.http.post(`${this.api}/filhos/${filhoId}/exclusao`, {});
+  }
+
   contexto(): Observable<ApiResponse<ContextoFamilia>> {
     return this.http.get<ApiResponse<ContextoFamilia>>(`${this.api}/contexto`);
   }

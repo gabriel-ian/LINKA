@@ -22,6 +22,16 @@ export const routes: Routes = [
       import('./features/recuperar-senha/recuperar-senha').then((m) => m.RecuperarSenha),
   },
   {
+    path: 'privacidade',
+    loadComponent: () => import('./features/privacidade/privacidade').then((m) => m.Privacidade),
+  },
+  {
+    // Link do e-mail de nova senha: sem guard, abre mesmo com alguem logado.
+    path: 'redefinir-senha',
+    loadComponent: () =>
+      import('./features/redefinir-senha/redefinir-senha').then((m) => m.RedefinirSenha),
+  },
+  {
     path: 'adm',
     canActivate: [authGuard, perfilGuard('admin')],
     loadComponent: () => import('./features/adm/adm-layout/adm-layout').then((m) => m.AdmLayout),
@@ -170,6 +180,10 @@ export const routes: Routes = [
       {
         path: 'turmas',
         loadComponent: () => import('./features/escola/turmas/turmas').then((m) => m.EscolaTurmas),
+      },
+      {
+        path: 'turmas/virada',
+        loadComponent: () => import('./features/escola/virada/virada').then((m) => m.EscolaVirada),
       },
       {
         path: 'turmas/nova',

@@ -129,7 +129,8 @@ As famílias geradas entram com a senha `linka123`.
 | `JWT_EXPIRES_IN`    | Validade do login (ex.: `1d`)                          |
 | `FRONTEND_URL`      | Origem liberada no CORS                                |
 | `PORT`              | Porta da API (padrão 3000)                             |
-| `ANTHROPIC_API_KEY` | Opcional. Liga a adaptação de tarefas e comunicados por IA (Claude). Sem ela, o professor adapta manualmente |
+| `ANTHROPIC_API_KEY` | Opcional. Liga a adaptação de tarefas e comunicados por IA (Claude). Sem IA, o professor adapta manualmente |
+| `IA_URL`, `IA_MODELO`, `IA_CHAVE` | Opcional, alternativa ao Claude: qualquer serviço no formato da OpenAI (Groq, Gemini, OpenRouter, Ollama). Exemplos no `backend/.env.example`. Antes de usar com dados reais, confira se o serviço não usa os dados para treinar modelos |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Opcionais. Ligam os e-mails: senha de acesso, "Esqueci minha senha", o resumo semanal das famílias (domingo às 18h) e os avisos que a família liga em Configurações (tarefa não iniciada, tarefa concluída e avisos da escola). Sem `SMTP_HOST`, nada é enviado e o conteúdo aparece no terminal |
 
 O endereço da API usado pelo frontend fica em

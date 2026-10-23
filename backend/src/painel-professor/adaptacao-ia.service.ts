@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import Anthropic from '@anthropic-ai/sdk';
 import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod';
 import { z } from 'zod';
+import { ConfigIaCompativel, chamarIaCompativel } from './ia-compativel';
 
 const MODELO = 'claude-opus-5-5';
 
@@ -63,28 +64,43 @@ Regras:
 const INSTRUCOES_COMUNICADO = `Você é a assistente pedagógica da Linka. Reescreva o aviso do professor em uma versão simplificada para alunos com necessidades educacionais especiais, em português do Brasil: frases curtas, linguagem literal, sem metáforas, mantendo todas as informações (datas, horários, o que levar ou estudar). Não acrescente nada que não esteja no aviso. O texto será lido em voz alta para o aluno.`;
 
 /**
- * Adapta tarefas e avisos com a API do Claude. Sem ANTHROPIC_API_KEY,
- * `disponivel` fica false e o professor adapta a mao.
+ * Adapta tarefas e avisos com IA. Usa o Claude (ANTHROPIC_API_KEY) ou, sem
+ * ele, um servico compativel com a OpenAI (IA_URL + IA_MODELO + IA_CHAVE:
+ * Groq, Gemini, OpenRouter, Ollama...). Sem nenhum, `disponivel` fica false
+ * e o professor adapta a mao.
  */
 @Injectable()
 export class AdaptacaoIaService {
   private readonly logger = new Logger(AdaptacaoIaService.name);
   private readonly cliente: Anthropic | null;
+  private readonly compativel: ConfigIaCompativel | null;
 
   constructor(config: ConfigService) {
     const chave = config.get<string>('ANTHROPIC_API_KEY');
     this.cliente = chave ? new Anthropic({ apiKey: chave }) : null;
+
+    const url = config.get<string>('IA_URL');
+    const modelo = config.get<string>('IA_MODELO');
+    this.compativel =
+      !this.cliente && url && modelo
+        ? { url, modelo, chave: config.get<string>('IA_CHAVE') || undefined }
+        : null;
+
     if (this.cliente) {
-      this.logger.log(`Adaptacao por IA ligada (${MODELO})`);
+      this.logger.log(`Adaptacao por IA ligada (Claude ${MODELO})`);
+    } else if (this.compativel) {
+      this.logger.log(
+        `Adaptacao por IA ligada (${this.compativel.modelo} em ${new URL(url!).host})`,
+      );
     } else {
       this.logger.warn(
-        'Adaptacao por IA desligada: defina ANTHROPIC_API_KEY no .env',
+        'Adaptacao por IA desligada: defina ANTHROPIC_API_KEY ou IA_URL + IA_MODELO no .env',
       );
     }
   }
 
   get disponivel(): boolean {
-    return this.cliente !== null;
+    return this.cliente !== null || this.compativel !== null;
   }
 
   async adaptarTarefa(
@@ -140,6 +156,9 @@ export class AdaptacaoIaService {
     conteudo: string,
     schema: T,
   ): Promise<z.infer<T>> {
+    if (!this.cliente && this.compativel) {
+      return chamarIaCompativel(this.compativel, sistema, conteudo, schema);
+    }
     if (!this.cliente) {
       throw new ServiceUnavailableException(
         'Adaptacao por IA nao configurada (ANTHROPIC_API_KEY)',

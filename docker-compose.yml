@@ -45,6 +45,9 @@ services:
       # Atras do nginx: o IP real do usuario vem no X-Forwarded-For.
       TRUST_PROXY: 'true'
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      IA_URL: ${IA_URL:-}
+      IA_MODELO: ${IA_MODELO:-}
+      IA_CHAVE: ${IA_CHAVE:-}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}

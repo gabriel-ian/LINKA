@@ -18,7 +18,12 @@ export default async function globalSetup(): Promise<void> {
     email: `escola.${marca}@${dominio}`,
     senha,
   };
-  const criada = await api<{ data: { id: number } }>('POST', '/admin/escolas', adm, escola);
+  const criada = await api<{ data: { id: number } }>(
+    'POST',
+    '/admin/escolas',
+    adm,
+    escola,
+  );
   const tokenEscola = await entrar(escola.email, senha);
   // Primeiro acesso da escola: segue com a senha recebida.
   await api('POST', '/auth/senha/manter', tokenEscola, {});
@@ -27,7 +32,13 @@ export default async function globalSetup(): Promise<void> {
     'POST',
     '/painel-escola/turmas',
     tokenEscola,
-    { serie: '6º Ano', letra: 'E', turno: 'manha', anoLetivo: ano, limiteAlunos: 30 },
+    {
+      serie: '6º Ano',
+      letra: 'E',
+      turno: 'manha',
+      anoLetivo: ano,
+      limiteAlunos: 30,
+    },
   );
 
   const professor = { email: `prof.${marca}@${dominio}`, senha };
@@ -87,12 +98,16 @@ export default async function globalSetup(): Promise<void> {
   });
   const form = new FormData();
   form.append('arquivo', pdf, 'laudo.pdf');
-  const envio = await fetch(`${API}/painel-escola/alunos/${comFamilia.data.id}/laudo`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${tokenEscola}` },
-    body: form,
-  });
-  if (!envio.ok) throw new Error(`laudo: ${envio.status} ${await envio.text()}`);
+  const envio = await fetch(
+    `${API}/painel-escola/alunos/${comFamilia.data.id}/laudo`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenEscola}` },
+      body: form,
+    },
+  );
+  if (!envio.ok)
+    throw new Error(`laudo: ${envio.status} ${await envio.text()}`);
 
   // O professor cria uma tarefa para hoje na turma.
   const tokenProf = await entrar(professor.email, senha);
@@ -102,14 +117,38 @@ export default async function globalSetup(): Promise<void> {
     '/painel-professor/contexto',
     tokenProf,
   );
-  const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
-  const tarefa = await api<{ data: { id: number } }>('POST', '/painel-professor/tarefas', tokenProf, {
-    titulo: 'Frações E2E',
-    descricao: 'Resolva os exercícios 1 a 3 da página 20.',
-    turmaId: turma.data.id,
-    disciplinaId: contexto.data.disciplinas[0].id,
-    dataEntrega: hoje,
+  const hoje = new Date().toLocaleDateString('sv-SE', {
+    timeZone: 'America/Sao_Paulo',
   });
+  const tarefa = await api<{ data: { id: number } }>(
+    'POST',
+    '/painel-professor/tarefas',
+    tokenProf,
+    {
+      titulo: 'Frações E2E',
+      descricao: 'Resolva os exercícios 1 a 3 da página 20.',
+      turmaId: turma.data.id,
+      disciplinaId: contexto.data.disciplinas[0].id,
+      dataEntrega: hoje,
+    },
+  );
+
+  // Uma segunda escola com um aluno, para o teste de isolamento entre escolas
+  // (o nome tambem comeca com "Escola E2E", entao a limpeza apaga as duas).
+  const outra = {
+    nome: `Escola E2E Outra ${marca}`,
+    email: `outra.${marca}@${dominio}`,
+    senha,
+  };
+  await api('POST', '/admin/escolas', adm, outra);
+  const tokenOutra = await entrar(outra.email, senha);
+  await api('POST', '/auth/senha/manter', tokenOutra, {});
+  const alunoOutra = await api<{ data: { id: number } }>(
+    'POST',
+    '/painel-escola/alunos',
+    tokenOutra,
+    { nomeCompleto: 'Aluno De Outra Escola E2E' },
+  );
 
   const estado: Estado = {
     escola: { id: criada.data.id, ...escola },
@@ -119,7 +158,11 @@ export default async function globalSetup(): Promise<void> {
     alunoSemTurma: { id: semTurma.data.id, nome: 'Carla Sem Turma E2E' },
     tarefa: { id: tarefa.data.id, titulo: 'Frações E2E' },
     alunoComFamilia: { id: comFamilia.data.id, nome: 'Davi Com Familia E2E' },
-    familia: { email: familia.email, senha: comFamilia.data.responsavel.senhaProvisoria },
+    familia: {
+      email: familia.email,
+      senha: comFamilia.data.responsavel.senhaProvisoria,
+    },
+    alunoDeOutraEscola: { id: alunoOutra.data.id },
   };
   writeFileSync(ARQUIVO_ESTADO, JSON.stringify(estado, null, 2));
 }

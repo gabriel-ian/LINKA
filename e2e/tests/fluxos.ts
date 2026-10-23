@@ -10,7 +10,10 @@ export async function entrarComo(
   senha: string,
 ): Promise<void> {
   await page.goto('/login');
-  await page.getByRole('button', { name: perfil, exact: false }).first().click();
+  await page
+    .getByRole('button', { name: perfil, exact: false })
+    .first()
+    .click();
   await page.locator('input[name=email]').fill(email);
   await page.locator('input[name=senha]').fill(senha);
   await page.locator('button[type=submit]').click();

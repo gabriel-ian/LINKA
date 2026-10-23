@@ -7,7 +7,9 @@ test.describe('Entrada', () => {
     const { escola } = lerEstado();
     await entrarComo(page, 'Escola', escola.email, escola.senha);
     await expect(page).toHaveURL(/\/escola$/);
-    await expect(page.getByText(escola.nome, { exact: false }).first()).toBeVisible();
+    await expect(
+      page.getByText(escola.nome, { exact: false }).first(),
+    ).toBeVisible();
   });
 
   test('senha errada mostra o aviso e não entra', async ({ page }) => {
@@ -32,6 +34,8 @@ test.describe('Entrada', () => {
     await page.goto('/adm/escolas/buscar');
     await page.locator('input[name=texto]').fill(escola.nome);
     await page.getByRole('button', { name: 'Buscar' }).click();
-    await expect(page.getByRole('heading', { name: escola.nome })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: escola.nome }),
+    ).toBeVisible();
   });
 });

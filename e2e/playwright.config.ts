@@ -19,8 +19,11 @@ export default defineConfig({
   globalTeardown: './global-teardown.ts',
   use: {
     baseURL: SITE,
-    // Na maquina de desenvolvimento usa o Edge do Windows; na CI, o Chromium.
-    channel: process.env.CI || process.env.E2E_CHROMIUM ? undefined : 'msedge',
+    // Na maquina de desenvolvimento usa o Edge do Windows (ou E2E_CANAL=chrome);
+    // na CI, o Chromium do Playwright.
+    channel:
+      process.env.E2E_CANAL ??
+      (process.env.CI || process.env.E2E_CHROMIUM ? undefined : 'msedge'),
     locale: 'pt-BR',
     timezoneId: 'America/Sao_Paulo',
     trace: 'retain-on-failure',

@@ -8,7 +8,9 @@ test('o professor vê a turma com todos os alunos', async ({ page }) => {
   await expect(page).toHaveURL(/\/professor$/);
 
   await page.goto(`/professor/turmas/${turma.id}`);
-  await expect(page.getByRole('heading', { name: new RegExp(turma.nome) })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: new RegExp(turma.nome) }),
+  ).toBeVisible();
   await expect(page.getByText(aluno.nome)).toBeVisible();
   await expect(page.getByRole('button', { name: /Todos/ })).toBeVisible();
 });

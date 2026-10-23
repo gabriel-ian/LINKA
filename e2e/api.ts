@@ -15,6 +15,8 @@ export interface Estado {
   /** Aluno com familia e laudo, usado no teste de LGPD (tem os dados apagados no fim). */
   alunoComFamilia: { id: number; nome: string };
   familia: { email: string; senha: string };
+  /** Aluno de OUTRA escola de teste: a escola principal nao pode ve-lo. */
+  alunoDeOutraEscola: { id: number };
 }
 
 export function lerEstado(): Estado {
@@ -44,10 +46,15 @@ export async function api<T = unknown>(
 }
 
 export async function entrar(email: string, senha: string): Promise<string> {
-  const r = await api<{ access_token: string }>('POST', '/auth/login', undefined, {
-    email,
-    senha,
-  });
+  const r = await api<{ access_token: string }>(
+    'POST',
+    '/auth/login',
+    undefined,
+    {
+      email,
+      senha,
+    },
+  );
   return r.access_token;
 }
 

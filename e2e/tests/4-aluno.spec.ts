@@ -3,13 +3,17 @@ import { lerEstado } from '../api';
 import { entrarComo } from './fluxos';
 
 test.describe.serial('Aluno', () => {
-  test('primeiro acesso: mantém a senha recebida e chega ao Início', async ({ page }) => {
+  test('primeiro acesso: mantém a senha recebida e chega ao Início', async ({
+    page,
+  }) => {
     const { aluno } = lerEstado();
     await entrarComo(page, 'Aluno', aluno.email, aluno.senha);
     await expect(page).toHaveURL(/\/primeiro-acesso/);
     await page.getByRole('button', { name: 'Manter a senha recebida' }).click();
     await expect(page).toHaveURL(/\/aluno$/);
-    await expect(page.getByRole('heading', { name: 'Olá, Bruno!' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Olá, Bruno!' }),
+    ).toBeVisible();
   });
 
   test('faz a tarefa passo a passo até a missão cumprida', async ({ page }) => {
@@ -24,17 +28,26 @@ test.describe.serial('Aluno', () => {
       if (/concluida/.test(page.url())) break;
       await page.waitForTimeout(300);
     }
-    await expect(page.getByRole('heading', { name: 'Missão cumprida!' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Missão cumprida!' }),
+    ).toBeVisible();
   });
 
-  test('sem internet, mostra o aviso e as missões salvas', async ({ page, context }) => {
+  test('sem internet, mostra o aviso e as missões salvas', async ({
+    page,
+    context,
+  }) => {
     const { aluno } = lerEstado();
     await entrarComo(page, 'Aluno', aluno.email, aluno.senha);
-    await expect(page.getByRole('heading', { name: 'Olá, Bruno!' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Olá, Bruno!' }),
+    ).toBeVisible();
 
     await context.setOffline(true);
     await expect(page.getByText('Você está sem internet')).toBeVisible();
-    await expect(page.getByText('Sem internet agora - mas suas missões estão salvas.')).toBeVisible();
+    await expect(
+      page.getByText('Sem internet agora - mas suas missões estão salvas.'),
+    ).toBeVisible();
     await context.setOffline(false);
   });
 

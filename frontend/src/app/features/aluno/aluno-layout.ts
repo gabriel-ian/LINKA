@@ -8,6 +8,7 @@ import { horaCurta, tituloCompleto } from './aluno-ui';
 
 const ALUNO = 'assets/aluno/menu-';
 const ESCOLA = 'assets/escola/menu-';
+const PROF = 'assets/professor/menu-';
 
 /** Moldura das telas "Aluno - ..." do Figma: o Dino fala na barra. */
 @Component({
@@ -52,6 +53,7 @@ export class AlunoLayout {
       abas: [
         { rota: '/aluno', rotulo: 'Início', icone: 'inicio' },
         { rota: '/aluno/tarefas', rotulo: 'Tarefas', icone: 'tarefas', exato: false },
+        { rota: '/aluno/avisos', rotulo: 'Avisos', icone: 'avisos' },
         { rota: '/aluno/progresso', rotulo: 'Progresso', icone: 'progresso' },
         { rota: '/aluno/perfil', rotulo: 'Perfil', icone: 'perfil' },
       ],
@@ -66,6 +68,12 @@ export class AlunoLayout {
               selecionado: naTarefa,
               contador: this.contexto.deHoje().filter((t) => t.situacao !== 'concluida').length,
               icone: [{ src: ALUNO + 'tarefas', left: 12, top: 13.5 }],
+            },
+            {
+              rota: '/aluno/avisos',
+              rotulo: 'Avisos',
+              contador: r?.avisosNaoLidos ?? 0,
+              icone: [{ src: PROF + 'comunicados', left: 14.2, top: 13.2 }],
             },
             {
               rota: '/aluno/progresso',

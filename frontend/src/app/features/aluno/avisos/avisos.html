@@ -1,0 +1,52 @@
+<div class="pagina">
+  <header class="painel-cabecalho">
+    <h1>Avisos</h1>
+    <p>Recados da escola e dos professores para a sua turma</p>
+  </header>
+
+  @if (erro()) {
+    <p class="alerta-erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (avisos(); as lista) {
+    <ul class="avisos">
+      @for (a of lista; track a.id) {
+        <li class="aviso" [class.novo]="!a.lido">
+          <div class="topo">
+            <span class="etiqueta" [class]="'etiqueta ' + a.tipo">{{ rotulo(a) }}</span>
+            @if (!a.lido) {
+              <span class="selo-novo">Novo</span>
+            }
+            <small>{{ a.enviadoEm | date: "dd/MM 'às' HH:mm" }} · {{ a.autor }}</small>
+          </div>
+          <h2>{{ a.titulo }}</h2>
+          @if (verOriginal(a)) {
+            <div class="texto-rico" [innerHTML]="a.mensagemHtml"></div>
+          } @else {
+            <p class="simples">{{ a.simplificada }}</p>
+          }
+          <div class="acoes">
+            <button type="button" class="bt-aviso" (click)="ouvir(a)">
+              <img src="assets/aluno/icone-som.svg" alt="" width="18" height="18" /> Ouvir
+            </button>
+            @if (a.simplificada) {
+              <button type="button" class="link-acao" (click)="alternar(a)">
+                {{ verOriginal(a) ? 'Ver versão fácil' : 'Ver texto completo' }}
+              </button>
+            }
+            @if (!a.lido) {
+              <button type="button" class="link-acao" (click)="marcarLido(a)">Já li</button>
+            }
+          </div>
+        </li>
+      } @empty {
+        <li class="vazio">
+          <img src="assets/aluno/dino.svg" alt="" width="80" height="80" />
+          <p>Nenhum aviso por enquanto. Quando a escola mandar um recado, ele aparece aqui.</p>
+        </li>
+      }
+    </ul>
+  } @else if (!erro()) {
+    <p class="carregando">Carregando os avisos...</p>
+  }
+</div>

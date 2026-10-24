@@ -1,10 +1,10 @@
 .pagina.larga {
-  max-width: 1008px;
+  max-width: var(--largura-pagina);
 }
 
 .colunas {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 321px));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: end;
   gap: 24px 22px;
 }

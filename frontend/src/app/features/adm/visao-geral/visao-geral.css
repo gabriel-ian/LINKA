@@ -2,12 +2,12 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 919px;
+  max-width: var(--largura-pagina);
 }
 
 .numeros {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 215px));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
 }
 

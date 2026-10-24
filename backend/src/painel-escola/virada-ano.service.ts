@@ -213,6 +213,11 @@ export class ViradaAnoService {
       const matriculas = manager.getRepository(Matricula);
       for (const m of movimentos) {
         await matriculas.delete({ alunoId: m.alunoId });
+        await this.tarefaStatus.removerPendentesDeOutrasTurmas(
+          m.alunoId,
+          m.turma?.id ?? null,
+          manager,
+        );
         if (!m.turma) continue;
         await matriculas.save({ alunoId: m.alunoId, turmaId: m.turma.id });
         await this.tarefaStatus.seedParaAluno(m.alunoId, m.turma.id, manager);

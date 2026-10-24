@@ -59,11 +59,28 @@ export interface Aviso {
   id: number;
   tipo: TipoAviso;
   titulo: string;
+  /** Texto sem formatacao. */
   mensagem: string;
+  /** A mensagem com a formatacao do professor (HTML limpo). */
+  mensagemHtml: string;
   simplificada: string | null;
   enviadoEm: string;
   autor: string;
   lido: boolean;
+}
+
+export interface TarefaDoFilho extends TarefaResumoAluno {
+  professor: string | null;
+  /** Quando o filho entregou a resposta escrita. */
+  respostaEm: string | null;
+}
+
+export interface TarefasDoFilho {
+  filho: Filho;
+  atrasadas: TarefaDoFilho[];
+  aFazer: TarefaDoFilho[];
+  /** As 50 ultimas feitas, da mais recente para a mais antiga. */
+  feitas: TarefaDoFilho[];
 }
 
 export interface AvisosFamilia {

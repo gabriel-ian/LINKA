@@ -24,6 +24,14 @@
       "resources": {
         "files": ["/assets/entrada/girassol*.png"]
       }
+    },
+    {
+      "name": "editor-texto",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "files": ["/tinymce/**", "/tinymce-i18n/**"]
+      }
     }
   ]
 }

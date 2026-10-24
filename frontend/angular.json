@@ -21,11 +21,20 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               { "glob": "**/*", "input": "public" },
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce",
+                "output": "tinymce",
+                "ignore": ["**/*.d.ts", "**/*.md", "**/*.json", "tinymce.js"]
+              },
+              {
+                "glob": "pt-BR.js",
+                "input": "node_modules/tinymce-i18n/langs8",
+                "output": "tinymce-i18n"
+              },
               "src/assets"
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           },
           "configurations": {
             "production": {

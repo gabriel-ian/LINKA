@@ -28,6 +28,7 @@ import { resumoSemanal } from './resumo-semanal';
 import { LgpdService, TERMO_VERSAO } from '../lgpd/lgpd.service';
 import { PREFERENCIAS_PADRAO, preferenciasDe } from './preferencias';
 import { EnviarIncentivoDto, PerfilFamiliaDto } from './dto/painel-familia.dto';
+import { htmlParaTexto, limparHtml } from '../comum/html';
 
 const MESES = [
   'Janeiro',
@@ -231,6 +232,40 @@ export class PainelFamiliaService {
     };
   }
 
+  /** Todas as tarefas do filho, separadas para a tela "Tarefas" da familia. */
+  async tarefas(usuarioId: number, alunoId: number) {
+    const { filho } = await this.filho(usuarioId, alunoId);
+    const tarefas = await this.aluno.tarefasDoAluno(alunoId);
+    const dia = iso(new Date());
+    const porPrazo = (a: TarefaDoAluno, b: TarefaDoAluno) =>
+      (a.dataEntrega ?? '9999').localeCompare(b.dataEntrega ?? '9999') ||
+      (a.horaLimite ?? '99').localeCompare(b.horaLimite ?? '99');
+    const pendentes = tarefas.filter((t) => !t.concluida).sort(porPrazo);
+    const feitas = tarefas
+      .filter((t) => t.concluida)
+      .sort(
+        (a, b) =>
+          (b.concluidoEm?.getTime() ?? 0) - (a.concluidoEm?.getTime() ?? 0),
+      );
+    const item = (t: TarefaDoAluno) => ({
+      ...this.aluno.resumoTarefa(t),
+      professor: t.professor,
+      respostaEm: t.respostaEm,
+    });
+    return {
+      data: {
+        filho,
+        atrasadas: pendentes
+          .filter((t) => t.dataEntrega && t.dataEntrega < dia)
+          .map(item),
+        aFazer: pendentes
+          .filter((t) => !t.dataEntrega || t.dataEntrega >= dia)
+          .map(item),
+        feitas: feitas.slice(0, 50).map(item),
+      },
+    };
+  }
+
   private porMateria(
     tarefas: TarefaDoAluno[],
     linhas: LinhaTarefa[],
@@ -381,7 +416,8 @@ export class PainelFamiliaService {
           id: Number(a.id),
           tipo: a.tipo,
           titulo: a.titulo,
-          mensagem: a.mensagem,
+          mensagem: htmlParaTexto(a.mensagem),
+          mensagemHtml: limparHtml(a.mensagem),
           simplificada: a.simplificada,
           enviadoEm: a.enviadoEm,
           autor: a.professor ?? 'Coordenação',

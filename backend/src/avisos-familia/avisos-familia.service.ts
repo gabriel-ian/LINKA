@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { htmlParaTexto } from '../comum/html';
 import { Cron } from '@nestjs/schedule';
 import { DataSource } from 'typeorm';
 import { EmailService } from '../email/email.service';
@@ -201,7 +202,7 @@ export class AvisosFamiliaService {
           nome: f.nome,
           turma: c.turma,
           titulo: c.titulo,
-          mensagem: c.mensagem,
+          mensagem: htmlParaTexto(c.mensagem),
           urlAvisos: this.email.url('/familia/avisos'),
         }),
       );

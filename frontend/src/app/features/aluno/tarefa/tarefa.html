@@ -1,8 +1,8 @@
 @if (erro() && !tarefa()) {
   <p class="alerta-erro" role="alert">{{ erro() }}</p>
-  <a class="voltar-botao" routerLink="/aluno/tarefas" aria-label="Voltar para as tarefas">
+  <button type="button" class="voltar-botao" aria-label="Voltar" (click)="voltar()">
     <img src="assets/aluno/botao-voltar.svg" alt="" width="100.901" height="49.8057" />
-  </a>
+  </button>
 }
 
 @if (tarefa(); as t) {
@@ -64,6 +64,51 @@
         </p>
       }
 
+      <section class="cartao-aluno minha-resposta" aria-labelledby="titulo-resposta">
+        <h2 id="titulo-resposta">
+          <img src="assets/aluno/icone-lapis.svg" alt="" /> Minha resposta
+        </h2>
+        @if (respostaEnviada()) {
+          <p class="aviso-caixa verde" role="status">Resposta enviada para a professora!</p>
+        }
+        @if (t.resposta && !escrevendo()) {
+          <div class="texto-rico" [innerHTML]="t.resposta"></div>
+          <p class="entregue-em">Entregue em {{ t.respostaEm | date: "dd/MM 'às' HH:mm" }}</p>
+          <button type="button" class="link-acao" (click)="escrevendo.set(true)">
+            Mudar a resposta
+          </button>
+        } @else if (escrevendo()) {
+          <app-editor-texto
+            rotulo="Minha resposta"
+            placeholder="Escreva aqui a sua resposta."
+            [simples]="true"
+            [altura]="200"
+            [(valor)]="resposta"
+          />
+          @if (erroResposta()) {
+            <p class="alerta-erro" role="alert">{{ erroResposta() }}</p>
+          }
+          <div class="resposta-botoes">
+            <button type="button" class="link-acao" (click)="escrevendo.set(false)">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="passo-bt"
+              [disabled]="enviandoResposta()"
+              (click)="enviarResposta()"
+            >
+              {{ enviandoResposta() ? 'Enviando...' : 'Enviar resposta' }}
+            </button>
+          </div>
+        } @else {
+          <p>A professora pediu algo escrito? Escreva aqui e envie para ela.</p>
+          <button type="button" class="passo-bt" (click)="escrevendo.set(true)">
+            Escrever resposta
+          </button>
+        }
+      </section>
+
       <footer class="calma-rodape">
         <span>Modo calmo: menos cores, letras maiores e um passo por vez.</span>
         <button type="button" class="link-acao" (click)="voltarAoNormal()">
@@ -75,9 +120,9 @@
     <!-- ---------------- Modo normal ---------------- -->
     <div class="pagina">
       <nav class="trilha" aria-label="Você está em">
-        <a class="voltar-botao" routerLink="/aluno/tarefas" aria-label="Voltar para as tarefas">
+        <button type="button" class="voltar-botao" aria-label="Voltar" (click)="voltar()">
           <img src="assets/aluno/botao-voltar.svg" alt="" width="100.901" height="49.8057" />
-        </a>
+        </button>
         <span
           >Tarefas / <strong>{{ titulo() }}</strong></span
         >
@@ -108,7 +153,11 @@
       <section class="objetivo">
         <div>
           <h2><img src="assets/aluno/icone-objetivo.svg" alt="" /> Objetivo da tarefa</h2>
-          <p>{{ t.objetivo }}</p>
+          @if (t.enunciadoHtml) {
+            <div class="texto-rico" [innerHTML]="t.enunciadoHtml"></div>
+          } @else {
+            <p>{{ t.objetivo }}</p>
+          }
         </div>
         <button
           type="button"
@@ -212,6 +261,51 @@
           </li>
         }
       </ol>
+
+      <section class="cartao-aluno minha-resposta" aria-labelledby="titulo-resposta">
+        <h2 id="titulo-resposta">
+          <img src="assets/aluno/icone-lapis.svg" alt="" /> Minha resposta
+        </h2>
+        @if (respostaEnviada()) {
+          <p class="aviso-caixa verde" role="status">Resposta enviada para a professora!</p>
+        }
+        @if (t.resposta && !escrevendo()) {
+          <div class="texto-rico" [innerHTML]="t.resposta"></div>
+          <p class="entregue-em">Entregue em {{ t.respostaEm | date: "dd/MM 'às' HH:mm" }}</p>
+          <button type="button" class="link-acao" (click)="escrevendo.set(true)">
+            Mudar a resposta
+          </button>
+        } @else if (escrevendo()) {
+          <app-editor-texto
+            rotulo="Minha resposta"
+            placeholder="Escreva aqui a sua resposta."
+            [simples]="true"
+            [altura]="200"
+            [(valor)]="resposta"
+          />
+          @if (erroResposta()) {
+            <p class="alerta-erro" role="alert">{{ erroResposta() }}</p>
+          }
+          <div class="resposta-botoes">
+            <button type="button" class="link-acao" (click)="escrevendo.set(false)">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="passo-bt"
+              [disabled]="enviandoResposta()"
+              (click)="enviarResposta()"
+            >
+              {{ enviandoResposta() ? 'Enviando...' : 'Enviar resposta' }}
+            </button>
+          </div>
+        } @else {
+          <p>A professora pediu algo escrito? Escreva aqui e envie para ela.</p>
+          <button type="button" class="passo-bt" (click)="escrevendo.set(true)">
+            Escrever resposta
+          </button>
+        }
+      </section>
 
       <!-- So no celular: os passos que faltam, numa lista curta (Figma "Mobile"). -->
       @if (atual() < total() - 1) {

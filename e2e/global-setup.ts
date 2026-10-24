@@ -41,12 +41,26 @@ export default async function globalSetup(): Promise<void> {
     },
   );
 
+  // Segunda turma do mesmo professor: copiar tarefa e trocar aluno de turma.
+  const turma2 = await api<{ data: { id: number; nome: string } }>(
+    'POST',
+    '/painel-escola/turmas',
+    tokenEscola,
+    {
+      serie: '6º Ano',
+      letra: 'F',
+      turno: 'manha',
+      anoLetivo: ano,
+      limiteAlunos: 30,
+    },
+  );
+
   const professor = { email: `prof.${marca}@${dominio}`, senha };
   await api('POST', '/painel-escola/professores', tokenEscola, {
     nomeCompleto: 'Paula Professora E2E',
     ...professor,
     disciplinas: ['Matemática'],
-    turmaIds: [turma.data.id],
+    turmaIds: [turma.data.id, turma2.data.id],
   });
 
   const aluno = {
@@ -153,6 +167,7 @@ export default async function globalSetup(): Promise<void> {
   const estado: Estado = {
     escola: { id: criada.data.id, ...escola },
     turma: turma.data,
+    turma2: turma2.data,
     professor,
     aluno: { id: alunoCriado.data.id, ...aluno },
     alunoSemTurma: { id: semTurma.data.id, nome: 'Carla Sem Turma E2E' },

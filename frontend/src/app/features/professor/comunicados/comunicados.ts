@@ -10,6 +10,7 @@ import {
   ListaComunicados,
   TipoComunicado,
 } from '../../../core/model/painel-professor.model';
+import { EditorTexto, temTexto } from '../../../shared/editor-texto/editor-texto';
 import { ProfessorContexto } from '../professor-contexto';
 import { AdmResultado } from '../../adm/resultado/resultado';
 import { COR_TIPO, ROTULO_TIPO, quandoRelativo } from '../professor-ui';
@@ -17,7 +18,7 @@ import { COR_TIPO, ROTULO_TIPO, quandoRelativo } from '../professor-ui';
 /** "Professor - Comunicados" e "Comunicado enviado" do Figma. */
 @Component({
   selector: 'app-professor-comunicados',
-  imports: [FormsModule, RouterLink, AdmResultado],
+  imports: [FormsModule, RouterLink, AdmResultado, EditorTexto],
   templateUrl: './comunicados.html',
   styleUrl: './comunicados.css',
 })
@@ -83,7 +84,7 @@ export class ProfessorComunicados {
   salvar(rascunho: boolean): void {
     const e: { titulo?: string; mensagem?: string } = {};
     if (!this.titulo.trim()) e.titulo = 'Dê um título ao comunicado.';
-    if (!this.mensagem.trim()) e.mensagem = 'Escreva a mensagem.';
+    if (!temTexto(this.mensagem)) e.mensagem = 'Escreva a mensagem.';
     this.erros.set(e);
     if (Object.keys(e).length || this.turmaId === null) return;
 
@@ -95,7 +96,7 @@ export class ProfessorComunicados {
         turmaId: this.turmaId,
         tipo: this.tipo,
         titulo: this.titulo.trim(),
-        mensagem: this.mensagem.trim(),
+        mensagem: this.mensagem,
         simplificada: this.simplificada,
         rascunho,
       })

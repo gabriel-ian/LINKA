@@ -1,8 +1,8 @@
 <div class="pagina">
   @if (editandoId) {
-    <a class="voltar" [routerLink]="['/escola/turmas', editandoId]">&lt; Voltar para a turma</a>
+    <button type="button" class="voltar" (click)="voltar()">&lt; Voltar para a turma</button>
   } @else {
-    <a class="voltar" routerLink="/escola/turmas">&lt; Voltar para turmas</a>
+    <button type="button" class="voltar" (click)="voltar()">&lt; Voltar</button>
   }
 
   <header class="painel-cabecalho">

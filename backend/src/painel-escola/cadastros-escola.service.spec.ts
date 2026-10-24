@@ -84,6 +84,7 @@ describe('CadastrosEscolaService', () => {
       } as unknown as DataSource;
       const status = {
         seedParaAluno: jest.fn(),
+        removerPendentesDeOutrasTurmas: jest.fn(),
       } as unknown as TarefaStatusService;
       return {
         svc: new CadastrosEscolaService(dataSource, status, email),

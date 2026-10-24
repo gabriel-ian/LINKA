@@ -21,6 +21,7 @@ import {
   ConcluirPassoDto,
   LembreteDto,
   PreferenciasDto,
+  RespostaDto,
 } from './dto/painel-aluno.dto';
 
 /** Rotas das telas "Aluno - ..." do Figma. O aluno vem sempre do token. */
@@ -67,6 +68,33 @@ export class PainelAlunoController {
     @Body() dto: AjudaDto,
   ) {
     return this.painel.ajuda(usuarioId, id, dto);
+  }
+
+  @Post('tarefas/:id/resposta')
+  @ApiOperation({
+    summary: 'Entrega (ou reenvia) a resposta escrita da tarefa',
+  })
+  resposta(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: RespostaDto,
+  ) {
+    return this.painel.entregarResposta(usuarioId, id, dto.resposta);
+  }
+
+  @Get('avisos')
+  @ApiOperation({ summary: 'Avisos da turma (versao simplificada para NEE)' })
+  avisos(@UsuarioId() usuarioId: number) {
+    return this.painel.listarAvisos(usuarioId);
+  }
+
+  @Post('avisos/:id/lido')
+  @ApiOperation({ summary: 'Marca o aviso como lido pelo aluno' })
+  avisoLido(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.painel.marcarAvisoLido(usuarioId, id);
   }
 
   @Post('incentivos/:id/lido')

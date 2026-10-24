@@ -12,6 +12,115 @@
       </p>
     </header>
 
+    @if (recado()) {
+      <p class="aviso-caixa verde" role="status">
+        <span>{{ recado() }}</span>
+      </p>
+    }
+
+    <div class="barra-acoes">
+      <button type="button" class="bt bt-secundario bt-p" (click)="voltar()">← Voltar</button>
+      <span class="espaco"></span>
+      <a class="bt bt-secundario bt-p" [routerLink]="['/professor/tarefas', t.id, 'editar']"
+        >Editar tarefa</a
+      >
+      @if (outrasTurmas().length) {
+        <button
+          type="button"
+          class="bt bt-secundario bt-p"
+          [attr.aria-expanded]="copiando()"
+          (click)="copiando.set(!copiando())"
+        >
+          Copiar para outras turmas
+        </button>
+      }
+      <button
+        type="button"
+        class="bt bt-perigo bt-p"
+        (click)="confirmarExclusao.set(true)"
+        [disabled]="excluindo()"
+      >
+        Excluir
+      </button>
+    </div>
+
+    @if (copiando()) {
+      <section class="cartao painel-copia" aria-label="Copiar para outras turmas">
+        <strong>Enviar a mesma tarefa para:</strong>
+        <div class="turmas">
+          @for (o of outrasTurmas(); track o.id) {
+            <label class="marcar">
+              <input
+                type="checkbox"
+                [checked]="turmasCopia().includes(o.id)"
+                (change)="alternarCopia(o.id, $any($event.target).checked)"
+              />
+              {{ o.nome }}
+            </label>
+          }
+        </div>
+        <small
+          >Mesmo título, enunciado, disciplina e prazo. Cada turma recebe as suas versões
+          adaptadas.</small
+        >
+        <div class="acoes">
+          <button type="button" class="bt bt-secundario bt-p" (click)="copiando.set(false)">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="bt bt-primario bt-p"
+            [disabled]="!turmasCopia().length || salvando()"
+            (click)="copiar()"
+          >
+            {{
+              salvando()
+                ? 'Copiando...'
+                : turmasCopia().length > 1
+                  ? 'Copiar para ' + turmasCopia().length + ' turmas'
+                  : 'Copiar'
+            }}
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (confirmarExclusao()) {
+      <section class="cartao confirmar" role="alertdialog" aria-labelledby="titulo-excluir">
+        <strong id="titulo-excluir">Excluir “{{ t.titulo }}”?</strong>
+        <p>
+          A tarefa some para os alunos e famílias da {{ t.turma }}.
+          @if (contagem().feitas || contagem().andamento) {
+            {{ contagem().feitas + contagem().andamento }}
+            {{
+              contagem().feitas + contagem().andamento === 1
+                ? 'aluno já começou ou terminou'
+                : 'alunos já começaram ou terminaram'
+            }}
+            e vai perder esse registro.
+          }
+          Não dá para desfazer.
+        </p>
+        <div class="acoes">
+          <button
+            type="button"
+            class="bt bt-secundario bt-p"
+            (click)="confirmarExclusao.set(false)"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="bt bt-perigo bt-p"
+            [disabled]="excluindo()"
+            (click)="excluir()"
+          >
+            {{ excluindo() ? 'Excluindo...' : 'Sim, excluir' }}
+          </button>
+        </div>
+      </section>
+    }
+
     @for (p of t.pedidosAjuda; track p.id) {
       <p class="aviso-caixa laranja" role="status">
         <span
@@ -66,7 +175,11 @@
     <div class="versoes">
       <section class="cartao original">
         <span class="pilula inativa">Versão original</span>
-        <p>{{ t.descricao || t.titulo }}</p>
+        @if (t.descricao) {
+          <div class="texto-rico" [innerHTML]="t.descricao"></div>
+        } @else {
+          <p>{{ t.titulo }}</p>
+        }
       </section>
 
       @if (adaptacao(); as a) {
@@ -133,6 +246,61 @@
       }
     </div>
 
+    <section class="cartao entregas" aria-labelledby="titulo-entregas">
+      <div class="topo">
+        <h2 id="titulo-entregas">Entregas da turma</h2>
+        <small>
+          {{ contagem().feitas }} feitas · {{ contagem().andamento }} em andamento ·
+          {{ contagem().pendentes }} a fazer
+          @if (contagem().respostas) {
+            · {{ contagem().respostas }}
+            {{ contagem().respostas === 1 ? 'resposta escrita' : 'respostas escritas' }}
+          }
+        </small>
+      </div>
+      <ul>
+        @for (e of t.entregas; track e.alunoId) {
+          <li>
+            <div class="linha">
+              <span class="nome">{{ e.nome }}</span>
+              <span
+                class="pilula"
+                [class.ativa]="e.situacao === 'concluida'"
+                [class.pendente]="e.situacao === 'em-andamento'"
+                [class.inativa]="e.situacao === 'pendente'"
+              >
+                {{
+                  e.situacao === 'concluida'
+                    ? 'Feita'
+                    : e.situacao === 'em-andamento'
+                      ? 'Em andamento'
+                      : 'A fazer'
+                }}
+              </span>
+              @if (e.resposta) {
+                <button
+                  type="button"
+                  class="bt bt-secundario bt-p"
+                  [attr.aria-expanded]="respostaAberta() === e.alunoId"
+                  (click)="respostaAberta.set(respostaAberta() === e.alunoId ? null : e.alunoId)"
+                >
+                  {{ respostaAberta() === e.alunoId ? 'Fechar resposta' : 'Ver resposta' }}
+                </button>
+              }
+            </div>
+            @if (respostaAberta() === e.alunoId && e.resposta) {
+              <div class="resposta">
+                <small>Entregue em {{ e.respostaEm | date: "dd/MM 'às' HH:mm" }}</small>
+                <div class="texto-rico" [innerHTML]="e.resposta"></div>
+              </div>
+            }
+          </li>
+        } @empty {
+          <li class="vazio">Nenhum aluno matriculado nesta turma.</li>
+        }
+      </ul>
+    </section>
+
     <div class="acoes">
       @if (adaptacao() && !editando()) {
         @if (t.iaDisponivel) {
@@ -152,7 +320,7 @@
       @if (nova()) {
         <a class="bt bt-primario" routerLink="/professor">Voltar para visão geral</a>
       } @else {
-        <a class="bt bt-primario" routerLink="/professor/tarefas">Voltar para tarefas</a>
+        <button type="button" class="bt bt-primario" (click)="voltar()">Voltar</button>
       }
     </div>
   }

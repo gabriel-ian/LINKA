@@ -120,6 +120,18 @@ CREATE TABLE `comunicado_leitura` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comunicado_leitura_aluno` (
+  `comunicado_id` bigint unsigned NOT NULL,
+  `aluno_id` bigint unsigned NOT NULL,
+  `lido_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`comunicado_id`,`aluno_id`),
+  KEY `fk_leitura_aluno_aluno` (`aluno_id`),
+  CONSTRAINT `fk_leitura_aluno_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_leitura_aluno_comunicado` FOREIGN KEY (`comunicado_id`) REFERENCES `comunicado` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `consentimento` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `responsavel_id` bigint unsigned NOT NULL,
@@ -373,6 +385,8 @@ CREATE TABLE `tarefa_status` (
   `iniciou_sozinho` tinyint(1) DEFAULT NULL,
   `passos_feitos` tinyint unsigned NOT NULL DEFAULT '0',
   `concluido_em` datetime DEFAULT NULL,
+  `resposta` text,
+  `resposta_em` datetime DEFAULT NULL,
   PRIMARY KEY (`aluno_id`,`tarefa_id`),
   KEY `fk_tarefa_status_tarefa` (`tarefa_id`),
   CONSTRAINT `fk_tarefa_status_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`),

@@ -1,0 +1,74 @@
+@if (dados(); as d) {
+  <div class="pagina larga">
+    <header class="cabecalho">
+      <h1>Tarefas</h1>
+      <p>{{ d.filho.nome }}{{ d.filho.turma ? ' - ' + d.filho.turma : '' }}</p>
+    </header>
+
+    @if (erro()) {
+      <p class="alerta-erro" role="alert">{{ erro() }}</p>
+    }
+
+    <div class="abas" role="tablist" aria-label="Filtrar tarefas">
+      @for (g of grupos(); track g.chave) {
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="aba() === g.chave"
+          [class.ativa]="aba() === g.chave"
+          (click)="aba.set(g.chave)"
+        >
+          {{ g.titulo }} <span>{{ g.itens.length }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="colunas">
+      @for (g of grupos(); track g.chave) {
+        <section
+          class="coluna"
+          [class.aberta]="aba() === g.chave"
+          [attr.aria-labelledby]="'titulo-' + g.chave"
+        >
+          <h2
+            class="coluna-titulo"
+            [id]="'titulo-' + g.chave"
+            [class.vermelho]="g.chave === 'atrasadas'"
+          >
+            {{ g.titulo }} <span>({{ g.itens.length }})</span>
+          </h2>
+          <ul class="bloco lista">
+            @for (t of g.itens; track t.id) {
+              <li>
+                <app-item-tarefa [tarefa]="t" />
+                @if (detalhe(t)) {
+                  <small class="detalhe">{{ detalhe(t) }}</small>
+                }
+                @if (t.respostaEm) {
+                  <small class="entregue"
+                    >Resposta entregue em {{ t.respostaEm | date: "dd/MM 'às' HH:mm" }}</small
+                  >
+                }
+                @if (t.situacao === 'concluida' && t.concluidoEm) {
+                  <small class="detalhe"
+                    >Feita em {{ t.concluidoEm | date: "dd/MM 'às' HH:mm" }}</small
+                  >
+                }
+              </li>
+            } @empty {
+              <li class="vazio-lista">{{ g.vazio }}</li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    @if (d.atrasadas.length || d.aFazer.length) {
+      <a class="botao primario incentivo" routerLink="/familia/incentivo">Enviar um incentivo</a>
+    }
+  </div>
+} @else if (erro()) {
+  <p class="alerta-erro" role="alert">{{ erro() }}</p>
+} @else {
+  <p class="carregando">Carregando as tarefas...</p>
+}

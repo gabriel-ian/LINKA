@@ -10,6 +10,7 @@ import {
   PainelFamilia,
   PerfilFamilia,
   RelatorioFamilia,
+  TarefasDoFilho,
 } from '../model/painel-familia.model';
 
 /** Rotas do perfil responsavel (/painel-familia). So os filhos do token. */
@@ -51,6 +52,10 @@ export class PainelFamiliaService {
 
   avisos(filhoId: number): Observable<ApiResponse<AvisosFamilia>> {
     return this.http.get<ApiResponse<AvisosFamilia>>(`${this.api}/filhos/${filhoId}/avisos`);
+  }
+
+  tarefas(filhoId: number): Observable<ApiResponse<TarefasDoFilho>> {
+    return this.http.get<ApiResponse<TarefasDoFilho>>(`${this.api}/filhos/${filhoId}/tarefas`);
   }
 
   marcarAvisoLido(avisoId: number): Observable<unknown> {

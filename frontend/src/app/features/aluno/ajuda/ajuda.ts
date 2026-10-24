@@ -1,7 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TarefaAluno, TipoAjuda } from '../../../core/model/painel-aluno.model';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
 import { VozService } from '../../../core/services/voz.service';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
@@ -19,7 +20,7 @@ interface Dica {
 /** "Aluno - Preciso de ajuda" do Figma. */
 @Component({
   selector: 'app-aluno-ajuda',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './ajuda.html',
   styleUrl: './ajuda.css',
 })
@@ -27,6 +28,7 @@ export class AlunoAjuda {
   private service = inject(PainelAlunoService);
   private contexto = inject(AlunoContexto);
   readonly voz = inject(VozService);
+  private navegacao = inject(NavegacaoService);
 
   readonly tarefaId: number;
   readonly passo: number;
@@ -114,5 +116,10 @@ export class AlunoAjuda {
   ouvirDica(): void {
     const d = this.dica();
     if (d) this.voz.falar(`${d.texto} ${d.pergunta ?? ''}`);
+  }
+
+  voltar(): void {
+    const t = this.tarefa();
+    this.navegacao.voltar(t ? `/aluno/tarefas/${t.id}` : '/aluno/tarefas');
   }
 }

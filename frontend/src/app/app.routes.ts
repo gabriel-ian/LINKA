@@ -112,6 +112,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/aluno/tarefa/tarefa').then((m) => m.AlunoTarefa),
       },
       {
+        path: 'avisos',
+        loadComponent: () => import('./features/aluno/avisos/avisos').then((m) => m.AlunoAvisos),
+      },
+      {
         path: 'progresso',
         loadComponent: () =>
           import('./features/aluno/progresso/progresso').then((m) => m.AlunoProgresso),
@@ -145,6 +149,11 @@ export const routes: Routes = [
         path: 'incentivo',
         loadComponent: () =>
           import('./features/familia/incentivo/incentivo').then((m) => m.FamiliaIncentivo),
+      },
+      {
+        path: 'tarefas',
+        loadComponent: () =>
+          import('./features/familia/tarefas/tarefas').then((m) => m.FamiliaTarefas),
       },
       {
         path: 'avisos',
@@ -277,6 +286,11 @@ export const routes: Routes = [
       },
       {
         path: 'tarefas/nova',
+        loadComponent: () =>
+          import('./features/professor/tarefa-nova/tarefa-nova').then((m) => m.ProfessorTarefaNova),
+      },
+      {
+        path: 'tarefas/:id/editar',
         loadComponent: () =>
           import('./features/professor/tarefa-nova/tarefa-nova').then((m) => m.ProfessorTarefaNova),
       },

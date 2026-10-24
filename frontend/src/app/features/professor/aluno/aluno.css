@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 919px;
+  max-width: var(--largura-pagina);
 }
 
 .voltar-botao {
@@ -32,7 +32,7 @@
 }
 
 .indicadores.tres {
-  grid-template-columns: repeat(3, minmax(0, 225px));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .indicador strong small {

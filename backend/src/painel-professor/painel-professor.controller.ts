@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -19,7 +20,9 @@ import { UsuarioId } from '../auth/usuario-id.decorator';
 import { PainelProfessorService } from './painel-professor.service';
 import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import {
+  CopiarTarefaDto,
   CriarTarefaProfessorDto,
+  EditarTarefaProfessorDto,
   EditarAdaptacaoDto,
   SalvarComunicadoDto,
 } from './dto/professor.dto';
@@ -138,6 +141,38 @@ export class PainelProfessorController {
       id,
       alunoId ? Number(alunoId) || undefined : undefined,
     );
+  }
+
+  @Patch('tarefas/:id')
+  @ApiOperation({ summary: 'Editar tarefa ja enviada' })
+  editarTarefa(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: EditarTarefaProfessorDto,
+  ) {
+    return this.painel.editarTarefa(usuarioId, escolaId, id, dto);
+  }
+
+  @Delete('tarefas/:id')
+  @ApiOperation({ summary: 'Excluir tarefa' })
+  excluirTarefa(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.painel.excluirTarefa(usuarioId, escolaId, id);
+  }
+
+  @Post('tarefas/:id/copiar')
+  @ApiOperation({ summary: 'Copiar a tarefa para outras turmas' })
+  copiarTarefa(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CopiarTarefaDto,
+  ) {
+    return this.painel.copiarTarefa(usuarioId, escolaId, id, dto.turmaIds);
   }
 
   @Put('tarefas/:id/adaptacoes/:alunoId')

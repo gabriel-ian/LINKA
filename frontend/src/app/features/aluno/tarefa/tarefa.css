@@ -578,3 +578,46 @@ h3 {
     font-size: 15px;
   }
 }
+
+button.voltar-botao {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.minha-resposta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px 18px;
+}
+
+.minha-resposta h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 18px;
+}
+
+.minha-resposta p {
+  margin: 0;
+}
+
+.minha-resposta .entregue-em {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.minha-resposta > .passo-bt,
+.minha-resposta > .link-acao,
+.resposta-botoes {
+  align-self: flex-start;
+}
+
+.resposta-botoes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}

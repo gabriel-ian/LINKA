@@ -67,18 +67,18 @@
           }
         </label>
 
-        <label class="campo-p" [class.invalido]="erros().mensagem">
-          Mensagem
-          <textarea
-            name="mensagem"
-            maxlength="3000"
-            [(ngModel)]="mensagem"
-            placeholder="Escreva o aviso para as famílias."
-          ></textarea>
+        <div class="campo-p" [class.invalido]="erros().mensagem">
+          <span>Mensagem</span>
+          <app-editor-texto
+            rotulo="Mensagem do aviso"
+            placeholder="Escreva o aviso para as famílias e os alunos."
+            [altura]="220"
+            [(valor)]="mensagem"
+          />
           @if (erros().mensagem) {
             <span class="msg-erro">{{ erros().mensagem }}</span>
           }
-        </label>
+        </div>
 
         <label class="simplificada" [class.desligada]="!contexto.dados()?.iaDisponivel">
           <input

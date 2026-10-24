@@ -17,6 +17,7 @@ import {
   juntar,
   percentual,
 } from '../escola-ui';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 
 /** "Escola - Perfil do aluno" do Figma. */
 @Component({
@@ -28,6 +29,7 @@ import {
 export class EscolaAlunoPerfil {
   private service = inject(PainelEscolaService);
   private router = inject(Router);
+  private navegacao = inject(NavegacaoService);
   private contexto = inject(EscolaContexto);
 
   readonly pct = percentual;
@@ -146,5 +148,10 @@ export class EscolaAlunoPerfil {
         this.erro.set('Não foi possível baixar o laudo.');
       },
     });
+  }
+
+  /** Volta para a tela de onde veio; aberta direto, vai para '/escola/alunos'. */
+  voltar(): void {
+    this.navegacao.voltar('/escola/alunos');
   }
 }

@@ -1,4 +1,5 @@
 import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -7,6 +8,8 @@ import { PainelAlunoService } from '../../../core/services/painel-aluno.service'
 import { ConexaoService } from '../../../core/services/conexao.service';
 import { VozService } from '../../../core/services/voz.service';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
+import { EditorTexto, temTexto } from '../../../shared/editor-texto/editor-texto';
 import { AlunoContexto } from '../aluno-contexto';
 import { hojeIso, horaCurta, plural, tituloCompleto } from '../aluno-ui';
 
@@ -23,7 +26,7 @@ const ICONES_MATERIAL: [RegExp, string][] = [
  */
 @Component({
   selector: 'app-aluno-tarefa',
-  imports: [RouterLink],
+  imports: [RouterLink, EditorTexto, DatePipe],
   templateUrl: './tarefa.html',
   styleUrl: './tarefa.css',
 })
@@ -33,10 +36,18 @@ export class AlunoTarefa {
   readonly contexto = inject(AlunoContexto);
   readonly voz = inject(VozService);
   private conexao = inject(ConexaoService);
+  private navegacao = inject(NavegacaoService);
 
   readonly tarefa = signal<TarefaAluno | null>(null);
   readonly erro = signal('');
   readonly salvando = signal(false);
+
+  /** Resposta escrita (editor). */
+  resposta = '';
+  readonly escrevendo = signal(false);
+  readonly enviandoResposta = signal(false);
+  readonly erroResposta = signal('');
+  readonly respostaEnviada = signal(false);
 
   readonly titulo = computed(() => {
     const t = this.tarefa();
@@ -99,6 +110,7 @@ export class AlunoTarefa {
       next: (res) => {
         offline.guardarTarefa(res.data);
         this.tarefa.set(offline.aplicar(res.data));
+        this.resposta = res.data.resposta ?? '';
       },
       error: (e: HttpErrorResponse) => {
         // Sem internet: abre a copia guardada, com os passos feitos offline.
@@ -114,6 +126,44 @@ export class AlunoTarefa {
             : ConexaoService.semRede(e)
               ? 'Esta missão ainda não foi salva para usar sem internet. Abra de novo quando a conexão voltar.'
               : 'Não foi possível abrir a tarefa agora. Tente de novo.',
+        );
+      },
+    });
+  }
+
+  /** Volta para onde o aluno estava (Agenda, Inicio ou Tarefas). */
+  voltar(): void {
+    this.navegacao.voltar('/aluno/tarefas');
+  }
+
+  enviarResposta(): void {
+    const t = this.tarefa();
+    if (!t) return;
+    if (!temTexto(this.resposta)) {
+      this.erroResposta.set('Escreva a sua resposta antes de enviar.');
+      return;
+    }
+    this.enviandoResposta.set(true);
+    this.erroResposta.set('');
+    this.service.entregarResposta(t.id, this.resposta).subscribe({
+      next: () => {
+        this.enviandoResposta.set(false);
+        this.escrevendo.set(false);
+        this.respostaEnviada.set(true);
+        this.tarefa.set({
+          ...t,
+          resposta: this.resposta,
+          respostaEm: new Date().toISOString(),
+          entregue: true,
+        });
+        this.contexto.fala.set('Resposta enviada para a professora. Muito bem!');
+      },
+      error: (e: HttpErrorResponse) => {
+        this.enviandoResposta.set(false);
+        this.erroResposta.set(
+          ConexaoService.semRede(e)
+            ? 'Sem internet agora. Sua resposta continua aqui; envie quando a conexão voltar.'
+            : mensagemDeErro(e, 'Não foi possível enviar a resposta. Tente de novo.'),
         );
       },
     });

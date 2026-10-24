@@ -687,6 +687,11 @@ export class CadastrosEscolaService {
         .delete({ alunoId, turmaId });
       if (!r.affected)
         throw new NotFoundException('Aluno nao esta nesta turma');
+      await this.tarefaStatusService.removerPendentesDeOutrasTurmas(
+        alunoId,
+        null,
+        manager,
+      );
       return { data: true };
     });
   }
@@ -699,6 +704,12 @@ export class CadastrosEscolaService {
   ) {
     const matriculas = manager.getRepository(Matricula);
     await matriculas.delete({ alunoId });
+    // Tarefas nao concluidas da turma antiga saem; as da nova entram.
+    await this.tarefaStatusService.removerPendentesDeOutrasTurmas(
+      alunoId,
+      turma?.id ?? null,
+      manager,
+    );
     if (!turma) return;
     await matriculas.save({ alunoId, turmaId: turma.id });
     await this.tarefaStatusService.seedParaAluno(alunoId, turma.id, manager);

@@ -118,22 +118,40 @@ export interface TarefaProfessor {
   horaLimite: string | null;
   turmaId: number;
   turma: string;
+  disciplinaId: number | null;
   disciplina: string | null;
   totalAlunos: number;
   iaDisponivel: boolean;
   adaptacoes: Adaptacao[];
+  /** Situacao de cada aluno da turma, com a resposta entregue. */
+  entregas: EntregaAluno[];
   /** Pedidos de ajuda desta tarefa (abrir a tarefa marca como vistos). */
   pedidosAjuda: PedidoAjuda[];
 }
 
+export interface EntregaAluno {
+  alunoId: number;
+  nome: string;
+  situacao: 'pendente' | 'em-andamento' | 'concluida';
+  concluidoEm: string | null;
+  /** HTML limpo pelo servidor. */
+  resposta: string | null;
+  respostaEm: string | null;
+}
+
 export interface NovaTarefa {
   titulo: string;
+  /** HTML do editor. */
   descricao: string;
   turmaId: number;
+  /** Outras turmas que recebem a mesma tarefa. */
+  outrasTurmas?: number[];
   disciplinaId: number;
   dataEntrega: string;
   horaLimite?: string;
 }
+
+export type EdicaoTarefa = Partial<Omit<NovaTarefa, 'turmaId' | 'outrasTurmas'>>;
 
 export type TipoComunicado = 'atividade' | 'evento' | 'material' | 'aviso';
 
@@ -143,7 +161,10 @@ export interface Comunicado {
   turma: string;
   tipo: TipoComunicado;
   titulo: string;
+  /** HTML limpo pelo servidor. */
   mensagem: string;
+  /** A mesma mensagem sem formatacao. */
+  texto: string;
   versaoSimplificada: string | null;
   enviadoEm: string | null;
   criadoEm: string;

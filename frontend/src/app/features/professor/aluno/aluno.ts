@@ -1,9 +1,9 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { PerfilAprendizagemForm } from '../../../shared/perfil-aprendizagem/perfil-aprendizagem';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
 import { AlunoProfessor } from '../../../core/model/painel-professor.model';
 import {
@@ -24,7 +24,7 @@ import { situacaoDe } from './situacao';
 })
 export class ProfessorAluno {
   private service = inject(PainelProfessorService);
-  private location = inject(Location);
+  private navegacao = inject(NavegacaoService);
 
   readonly pct = percentual;
   readonly iniciais = iniciaisPessoa;
@@ -88,7 +88,7 @@ export class ProfessorAluno {
   }
 
   voltar(): void {
-    this.location.back();
+    this.navegacao.voltar('/professor');
   }
 
   subtitulo(a: AlunoProfessor): string {

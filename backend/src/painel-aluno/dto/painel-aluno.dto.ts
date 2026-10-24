@@ -44,6 +44,17 @@ export class AjudaDto {
   passo!: number;
 }
 
+export class RespostaDto {
+  @ApiProperty({
+    example: '<p>Minha resposta: 12 + 8 = 20</p>',
+    description: 'Texto do editor (HTML simples; o servidor limpa)',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20000)
+  resposta!: string;
+}
+
 export class LembreteDto {
   @ApiProperty({ example: 'Colocar a régua na mochila' })
   @IsString()

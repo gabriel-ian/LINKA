@@ -36,6 +36,8 @@ export interface TarefaResumoAluno {
   passosFeitos: number;
   totalPassos: number;
   concluidoEm: string | null;
+  /** O aluno ja entregou uma resposta escrita. */
+  entregue?: boolean;
 }
 
 export interface ResumoAluno extends Placar {
@@ -54,6 +56,23 @@ export interface ResumoAluno extends Placar {
   tarefas: TarefaResumoAluno[];
   /** Mensagens da familia ainda nao vistas (ultimos 3 dias). */
   incentivos: IncentivoAluno[];
+  /** Avisos da turma que o aluno ainda nao abriu. */
+  avisosNaoLidos: number;
+}
+
+export interface AvisoAluno {
+  id: number;
+  tipo: 'atividade' | 'evento' | 'material' | 'aviso';
+  titulo: string;
+  /** HTML limpo pelo servidor. */
+  mensagemHtml: string;
+  /** Texto para ouvir (a versao simplificada, para NEE, quando houver). */
+  texto: string;
+  /** Versao simplificada pela IA (so para alunos NEE). */
+  simplificada: string | null;
+  enviadoEm: string;
+  autor: string;
+  lido: boolean;
 }
 
 export interface IncentivoAluno {
@@ -68,6 +87,11 @@ export interface IncentivoAluno {
 
 export interface TarefaAluno extends TarefaResumoAluno {
   objetivo: string;
+  /** Enunciado com a formatacao do professor (HTML limpo). */
+  enunciadoHtml: string | null;
+  /** Resposta escrita entregue (HTML limpo). */
+  resposta: string | null;
+  respostaEm: string | null;
   professor: string | null;
   passos: string[];
   materiais: string[];

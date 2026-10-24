@@ -74,7 +74,11 @@
     </span>
     <div class="aviso-texto">
       <h3>{{ a.titulo }}</h3>
-      <p>{{ simples().has(a.id) && a.simplificada ? a.simplificada : a.mensagem }}</p>
+      @if (simples().has(a.id) && a.simplificada) {
+        <p>{{ a.simplificada }}</p>
+      } @else {
+        <div class="texto-rico" [innerHTML]="a.mensagemHtml || a.mensagem"></div>
+      }
       <div class="meta">
         <span class="etiqueta" [class]="'etiqueta ' + a.tipo">{{ rotulo(a) }}</span>
         <small>{{ quando(a) }}</small>

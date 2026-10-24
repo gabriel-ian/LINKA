@@ -1,5 +1,5 @@
 <div class="pagina">
-  <a class="voltar" routerLink="/escola/alunos">&lt; Voltar para alunos</a>
+  <button type="button" class="voltar" (click)="voltar()">&lt; Voltar</button>
 
   @if (salvo()) {
     <p class="aviso-caixa verde forte" role="status">

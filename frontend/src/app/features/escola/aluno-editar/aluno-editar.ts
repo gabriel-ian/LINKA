@@ -10,6 +10,7 @@ import { EscolaContexto } from '../escola-contexto';
 import { PerfilAprendizagemForm } from '../../../shared/perfil-aprendizagem/perfil-aprendizagem';
 import { hojeIso } from '../../adm/escola-ui';
 import { alternado } from '../escola-ui';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 
 const LAUDO_MAX = 10 * 1024 * 1024;
 const TIPOS_LAUDO = ['application/pdf', 'image/png', 'image/jpeg'];
@@ -28,6 +29,7 @@ const TIPOS_LAUDO = ['application/pdf', 'image/png', 'image/jpeg'];
 export class EscolaAlunoEditar {
   private service = inject(PainelEscolaService);
   private router = inject(Router);
+  private navegacao = inject(NavegacaoService);
   private contexto = inject(EscolaContexto);
 
   readonly id = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
@@ -156,6 +158,14 @@ export class EscolaAlunoEditar {
 
   private concluir(aviso?: 'laudo'): void {
     this.contexto.recarregar();
-    this.router.navigate(['/escola/alunos', this.id], { queryParams: { salvo: aviso ?? 1 } });
+    this.router.navigate(['/escola/alunos', this.id], {
+      queryParams: { salvo: aviso ?? 1 },
+      replaceUrl: true,
+    });
+  }
+
+  /** Volta para a tela de onde veio; aberta direto, vai para `/escola/alunos/${this.id}`. */
+  voltar(): void {
+    this.navegacao.voltar(`/escola/alunos/${this.id}`);
   }
 }

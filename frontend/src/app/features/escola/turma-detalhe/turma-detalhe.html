@@ -1,5 +1,5 @@
 <div class="pagina">
-  <a class="voltar" routerLink="/escola/turmas">&lt; Voltar para turmas</a>
+  <button type="button" class="voltar" (click)="voltar()">&lt; Voltar</button>
 
   @if (erro()) {
     <p class="alerta-erro" role="alert">{{ erro() }}</p>

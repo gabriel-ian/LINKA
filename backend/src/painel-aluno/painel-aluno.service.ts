@@ -15,6 +15,7 @@ import { TarefaAdaptada } from '../tarefa-adaptada/tarefa-adaptada.entity';
 import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
 import { AdaptacaoIaService } from '../painel-professor/adaptacao-ia.service';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
+import { htmlParaTexto, limparHtml, temTexto } from '../comum/html';
 import {
   LinhaTarefa,
   iso,
@@ -53,6 +54,9 @@ export interface TarefaDoAluno extends TarefaJogo {
   passos: string[];
   materiais: string[];
   passosFeitos: number;
+  /** Resposta entregue pelo aluno (HTML limpo) e quando. */
+  resposta: string | null;
+  respostaEm: Date | null;
 }
 
 /** Linha da consulta de tarefas do aluno, como o mysql2 devolve. */
@@ -70,6 +74,8 @@ interface LinhaBanco {
   iniciadoEm: Date | null;
   iniciouSozinho: number | null;
   passosFeitos: number;
+  resposta: string | null;
+  respostaEm: Date | null;
 }
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -132,7 +138,8 @@ export class PainelAlunoService {
               t.data_entrega dataEntrega, t.hora_limite horaLimite,
               d.nome disciplina, p.nome_completo professor,
               ts.status, ts.concluido_em concluidoEm, ts.iniciado_em iniciadoEm,
-              ts.iniciou_sozinho iniciouSozinho, ts.passos_feitos passosFeitos
+              ts.iniciou_sozinho iniciouSozinho, ts.passos_feitos passosFeitos,
+              ts.resposta, ts.resposta_em respostaEm
          FROM tarefa_status ts
          JOIN tarefa t ON t.id = ts.tarefa_id
          LEFT JOIN disciplina d ON d.id = t.disciplina_id
@@ -152,7 +159,7 @@ export class PainelAlunoService {
       const ad = porTarefa.get(Number(l.id));
       const passos = ad?.passos?.length
         ? ad.passos
-        : [l.descricao?.trim() || l.titulo];
+        : [htmlParaTexto(l.descricao) || l.titulo];
       return {
         id: Number(l.id),
         turmaId: Number(l.turmaId),
@@ -171,6 +178,8 @@ export class PainelAlunoService {
         passos,
         materiais: ad?.materiais ?? [],
         totalPassos: passos.length,
+        resposta: l.resposta,
+        respostaEm: l.respostaEm,
       };
     });
   }
@@ -200,6 +209,7 @@ export class PainelAlunoService {
       passosFeitos: t.passosFeitos,
       totalPassos: t.totalPassos,
       concluidoEm: t.concluidoEm,
+      entregue: t.respostaEm !== null,
     };
   }
 
@@ -271,6 +281,7 @@ export class PainelAlunoService {
         ),
         tarefas: visiveis.map((t) => this.resumoTarefa(t)),
         incentivos: await this.incentivosNaoLidos(aluno.id),
+        avisosNaoLidos: await this.avisosNaoLidos(aluno.id, turma?.id ?? null),
       },
     };
   }
@@ -345,13 +356,109 @@ export class PainelAlunoService {
     return {
       data: {
         ...this.resumoTarefa(t),
-        objetivo: t.descricao?.trim() || t.titulo,
+        objetivo: htmlParaTexto(t.descricao) || t.titulo,
+        /** Enunciado com a formatacao do professor (HTML limpo). */
+        enunciadoHtml: t.descricao ? limparHtml(t.descricao) : null,
         professor: t.professor,
         passos: t.passos,
         materiais: t.materiais,
+        resposta: t.resposta,
+        respostaEm: t.respostaEm,
         iaDisponivel: this.ia.disponivel,
       },
     };
+  }
+
+  /** O aluno entrega (ou reenvia) uma resposta escrita da tarefa. */
+  async entregarResposta(
+    usuarioId: number,
+    tarefaId: number,
+    resposta: string,
+  ) {
+    const { aluno } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    const limpa = limparHtml(resposta);
+    if (!temTexto(limpa)) {
+      throw new BadRequestException('Escreva a resposta antes de enviar');
+    }
+    await this.dataSource.query(
+      `UPDATE tarefa_status SET resposta = ?, resposta_em = NOW()
+        WHERE aluno_id = ? AND tarefa_id = ?`,
+      [limpa, aluno.id, tarefaId],
+    );
+    return { data: { entregue: true } };
+  }
+
+  /** Avisos da turma do aluno; NEE ve a versao simplificada quando houver. */
+  async listarAvisos(usuarioId: number) {
+    const { aluno, turma } = await this.alunoDoUsuario(usuarioId);
+    if (!turma) return { data: { avisos: [] } };
+    const linhas: {
+      id: number;
+      tipo: string;
+      titulo: string;
+      mensagem: string;
+      simplificada: string | null;
+      enviadoEm: Date;
+      professor: string | null;
+      lidoEm: Date | null;
+    }[] = await this.dataSource.query(
+      `SELECT c.id, c.tipo, c.titulo, c.mensagem, c.versao_simplificada simplificada,
+              c.enviado_em enviadoEm, p.nome_completo professor, l.lido_em lidoEm
+         FROM comunicado c
+         LEFT JOIN professor p ON p.id = c.professor_id
+         LEFT JOIN comunicado_leitura_aluno l ON l.comunicado_id = c.id AND l.aluno_id = ?
+        WHERE c.turma_id = ? AND c.rascunho = 0 AND c.enviado_em IS NOT NULL
+        ORDER BY c.enviado_em DESC LIMIT 50`,
+      [aluno.id, turma.id],
+    );
+    return {
+      data: {
+        avisos: linhas.map((a) => ({
+          id: Number(a.id),
+          tipo: a.tipo,
+          titulo: a.titulo,
+          mensagemHtml: limparHtml(a.mensagem),
+          /** Texto para ler em voz alta (simplificado para NEE quando houver). */
+          texto:
+            aluno.neurodivergente && a.simplificada
+              ? a.simplificada
+              : htmlParaTexto(a.mensagem),
+          simplificada: aluno.neurodivergente ? a.simplificada : null,
+          enviadoEm: a.enviadoEm,
+          autor: a.professor ?? 'Coordenação',
+          lido: a.lidoEm !== null,
+        })),
+      },
+    };
+  }
+
+  async marcarAvisoLido(usuarioId: number, comunicadoId: number) {
+    const { aluno, turma } = await this.alunoDoUsuario(usuarioId);
+    const [aviso]: unknown[] = turma
+      ? await this.dataSource.query(
+          `SELECT 1 FROM comunicado WHERE id = ? AND turma_id = ?
+              AND rascunho = 0 AND enviado_em IS NOT NULL`,
+          [comunicadoId, turma.id],
+        )
+      : [];
+    if (!aviso) throw new NotFoundException('Aviso nao encontrado');
+    await this.dataSource.query(
+      'INSERT IGNORE INTO comunicado_leitura_aluno (comunicado_id, aluno_id) VALUES (?, ?)',
+      [comunicadoId, aluno.id],
+    );
+    return { data: true };
+  }
+
+  private async avisosNaoLidos(alunoId: number, turmaId: number | null) {
+    if (!turmaId) return 0;
+    const [{ total }]: { total: number }[] = await this.dataSource.query(
+      `SELECT COUNT(*) total FROM comunicado c
+         LEFT JOIN comunicado_leitura_aluno l ON l.comunicado_id = c.id AND l.aluno_id = ?
+        WHERE c.turma_id = ? AND c.rascunho = 0 AND c.enviado_em IS NOT NULL
+          AND l.aluno_id IS NULL`,
+      [alunoId, turmaId],
+    );
+    return Number(total);
   }
 
   /** Conclui o passo `passo` (1..n), sempre em ordem. O ultimo conclui a tarefa. */
@@ -448,7 +555,7 @@ export class PainelAlunoService {
       tarefa: {
         titulo: tarefa.titulo,
         disciplina: tarefa.disciplina,
-        enunciado: tarefa.descricao ?? tarefa.titulo,
+        enunciado: htmlParaTexto(tarefa.descricao) || tarefa.titulo,
       },
       passo,
       aluno: {

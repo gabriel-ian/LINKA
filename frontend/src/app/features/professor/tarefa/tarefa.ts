@@ -1,11 +1,13 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
 import { TarefaProfessor } from '../../../core/model/painel-professor.model';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { ProfessorContexto } from '../professor-contexto';
 import { hojeIso } from '../../adm/escola-ui';
 import { dataCurta, primeiroNome } from '../professor-ui';
@@ -13,13 +15,15 @@ import { dataCurta, primeiroNome } from '../professor-ui';
 /** "Professor - Tarefa criada" do Figma: original x versao adaptada por aluno. */
 @Component({
   selector: 'app-professor-tarefa',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, DatePipe],
   templateUrl: './tarefa.html',
   styleUrl: './tarefa.css',
 })
 export class ProfessorTarefa {
   private service = inject(PainelProfessorService);
-  private contexto = inject(ProfessorContexto);
+  readonly contexto = inject(ProfessorContexto);
+  private router = inject(Router);
+  private navegacao = inject(NavegacaoService);
 
   readonly primeiroNome = primeiroNome;
 
@@ -32,6 +36,29 @@ export class ProfessorTarefa {
   readonly editando = signal(false);
   readonly salvando = signal(false);
   textoEdicao = '';
+
+  /** Recado de cima: tarefa atualizada, copiada etc. */
+  readonly recado = signal('');
+  readonly copiando = signal(false);
+  readonly turmasCopia = signal<number[]>([]);
+  readonly excluindo = signal(false);
+  readonly confirmarExclusao = signal(false);
+  /** Aluno cuja resposta esta aberta. */
+  readonly respostaAberta = signal<number | null>(null);
+
+  readonly outrasTurmas = computed(() =>
+    (this.contexto.dados()?.turmas ?? []).filter((t) => t.id !== this.tarefa()?.turmaId),
+  );
+
+  readonly contagem = computed(() => {
+    const e = this.tarefa()?.entregas ?? [];
+    return {
+      feitas: e.filter((x) => x.situacao === 'concluida').length,
+      andamento: e.filter((x) => x.situacao === 'em-andamento').length,
+      pendentes: e.filter((x) => x.situacao === 'pendente').length,
+      respostas: e.filter((x) => x.respostaEm).length,
+    };
+  });
 
   readonly adaptacao = computed(() => {
     const t = this.tarefa();
@@ -52,18 +79,32 @@ export class ProfessorTarefa {
   constructor() {
     const rota = inject(ActivatedRoute);
     rota.paramMap.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe((p) => {
-      this.nova.set(rota.snapshot.queryParamMap.get('nova') === '1');
-      this.carregar(Number(p.get('id')));
+      const q = rota.snapshot.queryParamMap;
+      this.nova.set(q.get('nova') === '1');
+      const copias = Number(q.get('copias'));
+      if (copias)
+        this.recado.set(
+          `A mesma tarefa também foi criada para ${copias === 1 ? 'mais 1 turma' : 'mais ' + copias + ' turmas'}.`,
+        );
+      const r = this.navegacao.lerRecado();
+      if (r?.['editada'])
+        this.recado.set(
+          'Tarefa atualizada.' +
+            (Number(r['refazer'])
+              ? ` O enunciado mudou: ${r['refazer'] === 1 ? '1 versão adaptada vai' : r['refazer'] + ' versões adaptadas vão'} ser refeitas.`
+              : ''),
+        );
+      this.carregar(Number(p.get('id')), !!Number(r?.['refazer']));
     });
   }
 
-  private carregar(id: number): void {
+  private carregar(id: number, refazer = false): void {
     this.service.tarefa(id).subscribe({
       next: (res) => {
         this.aplicar(res.data);
         const faltam = res.data.adaptacoes.some((a) => !a.passos?.length);
-        // Recem-criada: ja pede as versoes adaptadas para a IA.
-        if (this.nova() && faltam && res.data.iaDisponivel) this.gerar();
+        // Recem-criada (ou enunciado mudou): ja pede as versoes para a IA.
+        if ((this.nova() || refazer) && faltam && res.data.iaDisponivel) this.gerar();
       },
       error: (e: HttpErrorResponse) =>
         this.erro.set(
@@ -94,6 +135,60 @@ export class ProfessorTarefa {
         this.erroIa.set(
           `${mensagemDeErro(e, 'A IA não respondeu.')} Você pode escrever os passos manualmente em "Editar adaptação".`,
         );
+      },
+    });
+  }
+
+  voltar(): void {
+    this.navegacao.voltar(this.nova() ? '/professor' : '/professor/tarefas');
+  }
+
+  alternarCopia(id: number, marcada: boolean): void {
+    this.turmasCopia.update((ids) =>
+      marcada ? [...new Set([...ids, id])] : ids.filter((i) => i !== id),
+    );
+  }
+
+  copiar(): void {
+    const t = this.tarefa();
+    const turmas = this.turmasCopia();
+    if (!t || !turmas.length) return;
+    this.salvando.set(true);
+    this.erro.set('');
+    this.service.copiarTarefa(t.id, turmas).subscribe({
+      next: (res) => {
+        this.salvando.set(false);
+        this.copiando.set(false);
+        this.turmasCopia.set([]);
+        this.contexto.recarregarVisao();
+        const nomes = (this.contexto.dados()?.turmas ?? [])
+          .filter((x) => turmas.includes(x.id))
+          .map((x) => x.nome)
+          .join(', ');
+        this.recado.set(
+          `Tarefa copiada para ${nomes}. ${res.data.ids.length === 1 ? 'A cópia já está' : 'As cópias já estão'} com os alunos.`,
+        );
+      },
+      error: (e: HttpErrorResponse) => {
+        this.salvando.set(false);
+        this.erro.set(mensagemDeErro(e, 'Não foi possível copiar a tarefa.'));
+      },
+    });
+  }
+
+  excluir(): void {
+    const t = this.tarefa();
+    if (!t) return;
+    this.excluindo.set(true);
+    this.service.excluirTarefa(t.id).subscribe({
+      next: () => {
+        this.contexto.recarregarVisao();
+        this.router.navigate(['/professor/tarefas'], { replaceUrl: true });
+      },
+      error: (e: HttpErrorResponse) => {
+        this.excluindo.set(false);
+        this.confirmarExclusao.set(false);
+        this.erro.set(mensagemDeErro(e, 'Não foi possível excluir a tarefa.'));
       },
     });
   }

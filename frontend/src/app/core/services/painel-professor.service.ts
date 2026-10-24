@@ -9,6 +9,7 @@ import {
   AlunosTurma,
   ComunicadoSalvo,
   ContextoProfessor,
+  EdicaoTarefa,
   ListaComunicados,
   NovaTarefa,
   NovoComunicado,
@@ -47,8 +48,29 @@ export class PainelProfessorService {
     return this.http.patch<ApiResponse<AlunoProfessor>>(`${this.api}/alunos/${id}/perfil`, perfil);
   }
 
-  criarTarefa(dados: NovaTarefa): Observable<ApiResponse<{ id: number }>> {
-    return this.http.post<ApiResponse<{ id: number }>>(`${this.api}/tarefas`, dados);
+  criarTarefa(dados: NovaTarefa): Observable<ApiResponse<{ id: number; ids: number[] }>> {
+    return this.http.post<ApiResponse<{ id: number; ids: number[] }>>(`${this.api}/tarefas`, dados);
+  }
+
+  /** Mudar o enunciado apaga as adaptacoes de quem ainda nao comecou. */
+  editarTarefa(
+    id: number,
+    dados: EdicaoTarefa,
+  ): Observable<ApiResponse<{ id: number; adaptacoesRefazer: number }>> {
+    return this.http.patch<ApiResponse<{ id: number; adaptacoesRefazer: number }>>(
+      `${this.api}/tarefas/${id}`,
+      dados,
+    );
+  }
+
+  excluirTarefa(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.api}/tarefas/${id}`);
+  }
+
+  copiarTarefa(id: number, turmaIds: number[]): Observable<ApiResponse<{ ids: number[] }>> {
+    return this.http.post<ApiResponse<{ ids: number[] }>>(`${this.api}/tarefas/${id}/copiar`, {
+      turmaIds,
+    });
   }
 
   tarefas(turmaId?: number): Observable<ApiResponse<TarefaListada[]>> {

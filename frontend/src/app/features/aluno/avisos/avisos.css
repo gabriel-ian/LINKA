@@ -1,0 +1,136 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1100px;
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aviso {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.aviso.novo {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 1px var(--cor-primaria);
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.topo small {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+.etiqueta {
+  padding: 3px 10px;
+  border-radius: 59px;
+  background: var(--cor-fundo-painel);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.etiqueta.atividade {
+  background: #e8effe;
+  color: #1558d6;
+}
+
+.etiqueta.evento {
+  background: #f3e8ff;
+  color: #6d28d9;
+}
+
+.etiqueta.material {
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso);
+}
+
+.selo-novo {
+  padding: 3px 10px;
+  border-radius: 59px;
+  background: var(--cor-primaria);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.aviso h2 {
+  margin: 0;
+  font-size: 19px;
+  color: var(--cor-titulo);
+}
+
+.texto-rico,
+.simples {
+  margin: 0;
+  font-size: 16px;
+  color: var(--cor-titulo);
+}
+
+.simples {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+}
+
+.bt-aviso {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--cor-texto);
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cor-titulo);
+  cursor: pointer;
+}
+
+.vazio {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  border: 1px dashed var(--cor-linha);
+  border-radius: 16px;
+}
+
+.vazio p,
+.carregando {
+  margin: 0;
+}
+
+@media (max-width: 1000px) {
+  .topo small {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+}

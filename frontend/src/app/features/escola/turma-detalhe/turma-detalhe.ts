@@ -15,6 +15,7 @@ import {
   juntar,
   percentual,
 } from '../escola-ui';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 
 /** "Escola - Detalhe da turma" e "Escola - Turma sem alunos" do Figma. */
 @Component({
@@ -25,6 +26,7 @@ import {
 })
 export class EscolaTurmaDetalhe {
   private service = inject(PainelEscolaService);
+  private navegacao = inject(NavegacaoService);
 
   readonly pct = percentual;
   readonly iniciais = iniciaisPessoa;
@@ -99,5 +101,10 @@ export class EscolaTurmaDetalhe {
     return t.professores.length
       ? juntar(t.professores.map((p) => p.nome))
       : 'sem professores vinculados';
+  }
+
+  /** Volta para a tela de onde veio; aberta direto, vai para '/escola/turmas'. */
+  voltar(): void {
+    this.navegacao.voltar('/escola/turmas');
   }
 }

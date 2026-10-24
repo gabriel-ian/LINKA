@@ -8,6 +8,8 @@ const ARQUIVO_ESTADO = join(__dirname, '.estado.json');
 export interface Estado {
   escola: { id: number; nome: string; email: string; senha: string };
   turma: { id: number; nome: string };
+  /** Outra turma do mesmo professor. */
+  turma2: { id: number; nome: string };
   professor: { email: string; senha: string };
   aluno: { id: number; nome: string; email: string; senha: string };
   alunoSemTurma: { id: number; nome: string };

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 919px;
+  max-width: var(--largura-pagina);
 }
 
 .alerta-erro,
@@ -149,4 +149,104 @@
 .vazio {
   padding: 8px 0;
   text-align: left;
+}
+
+.barra-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.barra-acoes .espaco {
+  flex: 1;
+}
+
+.painel-copia,
+.confirmar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.painel-copia .turmas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.painel-copia small {
+  color: #6b7280;
+}
+
+.confirmar {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+}
+
+.confirmar p {
+  margin: 0;
+}
+
+.marcar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.entregas h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.entregas .topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+}
+
+.entregas .topo small {
+  color: #6b7280;
+}
+
+.entregas ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 8px 16px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entregas li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f1f4;
+}
+
+.entregas .linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.entregas .nome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entregas .resposta {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.entregas .resposta small {
+  color: #6b7280;
 }

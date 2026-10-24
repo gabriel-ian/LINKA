@@ -6,6 +6,7 @@ import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { NovaTurma, Opcoes, Turno } from '../../../core/model/painel-escola.model';
 import { EscolaContexto } from '../escola-contexto';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 
 const SERIES = [
   '1º Ano',
@@ -32,6 +33,7 @@ const SERIES = [
 export class EscolaTurmaNova {
   private service = inject(PainelEscolaService);
   private router = inject(Router);
+  private navegacao = inject(NavegacaoService);
   private contexto = inject(EscolaContexto);
 
   /** Turma em edicao (rota /escola/turmas/:id/editar); null = nova. */
@@ -120,6 +122,7 @@ export class EscolaTurmaNova {
         const id = this.editandoId ?? (res as { data: { id: number } }).data.id;
         this.router.navigate(['/escola/turmas', id], {
           queryParams: this.editandoId ? { salva: 1 } : { criada: 1 },
+          replaceUrl: true,
         });
       },
       error: (e: HttpErrorResponse) => {
@@ -127,5 +130,10 @@ export class EscolaTurmaNova {
         this.erro.set(mensagemDeErro(e, 'Não foi possível salvar a turma.'));
       },
     });
+  }
+
+  /** Volta para a tela de onde veio; aberta direto, vai para this.editandoId ? `/escola/turmas/${this.editandoId}` : '/escola/turmas'. */
+  voltar(): void {
+    this.navegacao.voltar(this.editandoId ? `/escola/turmas/${this.editandoId}` : '/escola/turmas');
   }
 }

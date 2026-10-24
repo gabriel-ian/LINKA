@@ -382,9 +382,13 @@ ol {
     min-height: 0;
   }
 
-  .materias-bloco,
-  #titulo-tarefas,
-  #titulo-tarefas + ul {
+  .materias-bloco {
     display: none;
   }
+}
+
+.ver-todas {
+  align-self: flex-start;
+  margin-top: -4px;
+  font-size: 14px;
 }

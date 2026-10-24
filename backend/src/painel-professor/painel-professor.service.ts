@@ -12,9 +12,11 @@ import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import { AdaptacaoIaService, PerfilParaIa } from './adaptacao-ia.service';
 import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
+import { htmlParaTexto, limparHtml, temTexto } from '../comum/html';
 import {
   CriarTarefaProfessorDto,
   EditarAdaptacaoDto,
+  EditarTarefaProfessorDto,
   SalvarComunicadoDto,
 } from './dto/professor.dto';
 import {
@@ -31,6 +33,13 @@ import {
   taxaConclusao,
   taxaNoPrazo,
 } from '../painel-escola/metricas';
+
+/** Enunciado do editor sem nada perigoso; vazio ("<p></p>") nao vale. */
+function descricaoLimpa(html: string): string {
+  const limpo = limparHtml(html);
+  if (!temTexto(limpo)) throw new BadRequestException('Escreva o enunciado');
+  return limpo;
+}
 
 interface Professor {
   id: number;
@@ -388,22 +397,138 @@ export class PainelProfessorService {
     dto: CriarTarefaProfessorDto,
   ) {
     const professor = await this.professor(usuarioId, escolaId);
-    await this.turmaDoProfessor(professor.id, dto.turmaId);
+    const turmas = [...new Set([dto.turmaId, ...(dto.outrasTurmas ?? [])])];
+    // Confere todas antes de criar, para nao ficar copia pela metade.
+    for (const turmaId of turmas)
+      await this.turmaDoProfessor(professor.id, turmaId);
+    const descricao = descricaoLimpa(dto.descricao);
 
-    const criada = await this.tarefas.create(
-      {
-        titulo: dto.titulo.trim(),
-        descricao: dto.descricao.trim(),
-        turmaId: dto.turmaId,
-        disciplinaId: dto.disciplinaId,
-        data_entrega: dto.dataEntrega.slice(0, 10),
-        hora_limite: dto.horaLimite,
-      },
-      usuarioId,
-      escolaId,
-    );
+    const ids: number[] = [];
+    for (const turmaId of turmas) {
+      const criada = await this.tarefas.create(
+        {
+          titulo: dto.titulo.trim(),
+          descricao,
+          turmaId,
+          disciplinaId: dto.disciplinaId,
+          data_entrega: dto.dataEntrega.slice(0, 10),
+          hora_limite: dto.horaLimite,
+        },
+        usuarioId,
+        escolaId,
+      );
+      ids.push(criada.data.id);
+    }
 
-    return { data: { id: criada.data.id } };
+    return { data: { id: ids[0], ids } };
+  }
+
+  /**
+   * Ajusta a tarefa ja enviada. Se o enunciado muda, as versoes adaptadas
+   * de quem ainda nao comecou saem, para gerar de novo a partir do novo texto.
+   */
+  async editarTarefa(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    dto: EditarTarefaProfessorDto,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    const atual = await this.tarefaDoProfessor(professor.id, tarefaId);
+
+    const campos: Record<string, unknown> = {};
+    if (dto.titulo !== undefined) campos.titulo = dto.titulo.trim();
+    if (dto.descricao !== undefined)
+      campos.descricao = descricaoLimpa(dto.descricao);
+    if (dto.dataEntrega !== undefined)
+      campos.data_entrega = dto.dataEntrega.slice(0, 10);
+    if (dto.horaLimite !== undefined)
+      campos.hora_limite = dto.horaLimite || null;
+    if (dto.disciplinaId !== undefined) {
+      const [d]: unknown[] = await this.dataSource.query(
+        'SELECT 1 FROM disciplina WHERE id = ?',
+        [dto.disciplinaId],
+      );
+      if (!d) throw new BadRequestException('Disciplina nao encontrada');
+      campos.disciplina_id = dto.disciplinaId;
+    }
+
+    const mudouEnunciado =
+      campos.descricao !== undefined && campos.descricao !== atual.descricao;
+    let adaptacoesRefazer = 0;
+    await this.dataSource.transaction(async (manager) => {
+      // As chaves de "campos" sao fixas (acima), nunca vem do corpo.
+      const colunas = Object.keys(campos);
+      if (colunas.length)
+        await manager.query(
+          `UPDATE tarefa SET ${colunas.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`,
+          [...Object.values(campos), tarefaId],
+        );
+      if (mudouEnunciado) {
+        const r: { affectedRows?: number } = await manager.query(
+          `DELETE ta FROM tarefa_adaptada ta
+             JOIN tarefa_status ts ON ts.tarefa_id = ta.tarefa_id AND ts.aluno_id = ta.aluno_id
+            WHERE ta.tarefa_id = ? AND ts.status = 'pendente'
+              AND ts.iniciado_em IS NULL AND ts.passos_feitos = 0`,
+          [tarefaId],
+        );
+        adaptacoesRefazer = r.affectedRows ?? 0;
+      }
+    });
+
+    return { data: { id: tarefaId, adaptacoesRefazer } };
+  }
+
+  /** Apaga a tarefa e tudo ligado a ela (status, adaptacoes, pedidos). */
+  async excluirTarefa(usuarioId: number, escolaId: number, tarefaId: number) {
+    const professor = await this.professor(usuarioId, escolaId);
+    await this.tarefaDoProfessor(professor.id, tarefaId);
+    await this.dataSource.transaction(async (manager) => {
+      await manager.query(
+        'UPDATE incentivo SET tarefa_id = NULL WHERE tarefa_id = ?',
+        [tarefaId],
+      );
+      for (const tabela of ['pedido_ajuda', 'tarefa_adaptada', 'tarefa_status'])
+        await manager.query(`DELETE FROM ${tabela} WHERE tarefa_id = ?`, [
+          tarefaId,
+        ]);
+      await manager.query('DELETE FROM tarefa WHERE id = ?', [tarefaId]);
+    });
+    return { data: true };
+  }
+
+  /** Envia a mesma tarefa (texto, materia e prazo) para outras turmas. */
+  async copiarTarefa(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    turmaIds: number[],
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    const t = await this.tarefaDoProfessor(professor.id, tarefaId);
+    const destinos = [...new Set(turmaIds)].filter((id) => id !== t.turmaId);
+    if (!destinos.length)
+      throw new BadRequestException('Escolha outra turma para copiar');
+    for (const turmaId of destinos)
+      await this.turmaDoProfessor(professor.id, turmaId);
+
+    const ids: number[] = [];
+    for (const turmaId of destinos) {
+      const criada = await this.tarefas.create(
+        {
+          titulo: t.titulo,
+          descricao: t.descricao ?? undefined,
+          turmaId,
+          disciplinaId: t.disciplinaId!,
+          data_entrega: t.dataEntrega ?? undefined,
+          hora_limite: t.horaLimite ?? undefined,
+        },
+        usuarioId,
+        escolaId,
+      );
+      ids.push(criada.data.id);
+    }
+    return { data: { ids } };
   }
 
   /** Todas as tarefas do professor (opcionalmente de uma turma). */
@@ -429,6 +554,19 @@ export class PainelProfessorService {
     const adaptacoes: TarefaAdaptada[] = await this.dataSource
       .getRepository(TarefaAdaptada)
       .find({ where: { tarefaId } });
+    const status: {
+      alunoId: number;
+      status: string;
+      passosFeitos: number;
+      concluidoEm: Date | null;
+      resposta: string | null;
+      respostaEm: Date | null;
+    }[] = await this.dataSource.query(
+      `SELECT aluno_id alunoId, status, passos_feitos passosFeitos,
+              concluido_em concluidoEm, resposta, resposta_em respostaEm
+         FROM tarefa_status WHERE tarefa_id = ?`,
+      [tarefaId],
+    );
 
     // Abrir a tarefa marca os pedidos de ajuda dela como vistos.
     const pedidosAjuda = await this.pedidosAjuda(professor.id, { tarefaId });
@@ -441,7 +579,25 @@ export class PainelProfessorService {
     return {
       data: {
         ...tarefa,
+        descricao: tarefa.descricao ? limparHtml(tarefa.descricao) : null,
         pedidosAjuda,
+        /** Como cada aluno esta na tarefa, com a resposta entregue. */
+        entregas: alunos.map((a) => {
+          const s = status.find((x) => Number(x.alunoId) === a.id);
+          return {
+            alunoId: a.id,
+            nome: a.nome,
+            situacao:
+              s?.status === 'concluida'
+                ? 'concluida'
+                : s && Number(s.passosFeitos) > 0
+                  ? 'em-andamento'
+                  : 'pendente',
+            concluidoEm: s?.concluidoEm ?? null,
+            resposta: s?.resposta ?? null,
+            respostaEm: s?.respostaEm ?? null,
+          };
+        }),
         totalAlunos: alunos.length,
         iaDisponivel: this.ia.disponivel,
         adaptacoes: alunos
@@ -495,7 +651,7 @@ export class PainelProfessorService {
         {
           titulo: tarefa.titulo,
           disciplina: tarefa.disciplina,
-          enunciado: tarefa.descricao ?? tarefa.titulo,
+          enunciado: htmlParaTexto(tarefa.descricao) || tarefa.titulo,
         },
         perfis,
       );
@@ -574,7 +730,8 @@ export class PainelProfessorService {
       turma: c.turma,
       tipo: c.tipo,
       titulo: c.titulo,
-      mensagem: c.mensagem,
+      mensagem: limparHtml(c.mensagem),
+      texto: htmlParaTexto(c.mensagem),
       versaoSimplificada: c.versaoSimplificada,
       enviadoEm: c.enviadoEm,
       criadoEm: c.criadoEm,
@@ -613,6 +770,10 @@ export class PainelProfessorService {
       if (!rascunho) throw new BadRequestException('Rascunho nao encontrado');
     }
 
+    const mensagem = limparHtml(dto.mensagem);
+    if (!temTexto(mensagem))
+      throw new BadRequestException('Escreva a mensagem');
+
     let versaoSimplificada: string | null = null;
     let avisoIa: string | null = null;
     if (dto.simplificada && !dto.rascunho) {
@@ -620,7 +781,7 @@ export class PainelProfessorService {
         try {
           versaoSimplificada = await this.ia.simplificarComunicado(
             dto.titulo,
-            dto.mensagem,
+            htmlParaTexto(mensagem),
           );
         } catch {
           avisoIa =
@@ -636,7 +797,7 @@ export class PainelProfessorService {
       dto.turmaId,
       dto.tipo,
       dto.titulo.trim(),
-      dto.mensagem.trim(),
+      mensagem,
       versaoSimplificada,
       dto.rascunho ? 1 : 0,
       dto.rascunho ? null : new Date(),
@@ -853,7 +1014,8 @@ export class PainelProfessorService {
   private async tarefaDoProfessor(professorId: number, tarefaId: number) {
     const [t] = await this.dataSource.query(
       `SELECT t.id, t.titulo, t.descricao, t.data_entrega dataEntrega, t.hora_limite horaLimite,
-              t.turma_id turmaId, tu.nome turma, d.nome disciplina
+              t.turma_id turmaId, tu.nome turma, t.disciplina_id disciplinaId,
+              d.nome disciplina
          FROM tarefa t JOIN turma tu ON tu.id = t.turma_id
          LEFT JOIN disciplina d ON d.id = t.disciplina_id
         WHERE t.id = ? AND t.professor_id = ?`,
@@ -868,6 +1030,7 @@ export class PainelProfessorService {
       horaLimite: t.horaLimite ? String(t.horaLimite).slice(0, 5) : null,
       turmaId: Number(t.turmaId),
       turma: t.turma as string,
+      disciplinaId: t.disciplinaId ? Number(t.disciplinaId) : null,
       disciplina: t.disciplina as string | null,
     };
   }

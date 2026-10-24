@@ -88,6 +88,15 @@ export class PainelFamiliaController {
     return this.painel.enviarIncentivo(usuarioId, id, dto);
   }
 
+  @Get('filhos/:id/tarefas')
+  @ApiOperation({ summary: 'Tarefas do filho: atrasadas, a fazer e feitas' })
+  tarefas(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.painel.tarefas(usuarioId, id);
+  }
+
   @Get('filhos/:id/avisos')
   @ApiOperation({ summary: 'Avisos da escola (turma do filho)' })
   avisos(

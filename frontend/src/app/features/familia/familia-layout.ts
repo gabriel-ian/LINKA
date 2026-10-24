@@ -12,6 +12,7 @@ import { TermoAceite } from './termo-aceite';
 
 const ALUNO = 'assets/aluno/menu-';
 const ESCOLA = 'assets/escola/menu-';
+const PROF = 'assets/professor/menu-';
 
 /** Moldura das telas "Familia - ..." do Figma: menu e a lista "FILHO (A)". */
 @Component({
@@ -76,6 +77,7 @@ export class FamiliaLayout {
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
       abas: [
         { rota: '/familia', rotulo: 'Painel', icone: 'inicio' },
+        { rota: '/familia/tarefas', rotulo: 'Tarefas', icone: 'tarefas' },
         { rota: '/familia/avisos', rotulo: 'Avisos', icone: 'avisos' },
         { rota: '/familia/relatorios', rotulo: 'Relatórios', icone: 'relatorios' },
         { rota: '/familia/configuracoes', rotulo: 'Ajustes', icone: 'ajustes' },
@@ -86,11 +88,16 @@ export class FamiliaLayout {
           itens: [
             { rota: '/familia', rotulo: 'Painel familiar', icone: 'visao' },
             {
+              rota: '/familia/tarefas',
+              rotulo: 'Tarefas',
+              icone: [{ src: ALUNO + 'tarefas', left: 12, top: 13.5 }],
+            },
+            {
               rota: '/familia/avisos',
               rotulo: 'Avisos da Escola',
               contador: this.contexto.painel()?.avisosNaoLidos ?? 0,
               contadorNoCanto: true,
-              icone: [{ src: ALUNO + 'tarefas', left: 12, top: 13.5 }],
+              icone: [{ src: PROF + 'comunicados', left: 14.2, top: 13.2 }],
             },
             {
               rota: '/familia/relatorios',

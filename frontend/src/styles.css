@@ -22,6 +22,8 @@
 
   --raio: 10px;
   --altura-campo: 53px;
+  /* Largura maxima das telas de lista e painel (formularios ficam mais estreitos). */
+  --largura-pagina: 1400px;
 
   --fonte-base: 'Montserrat', sans-serif;
   --fonte-destaque: 'Inria Serif', serif;
@@ -694,6 +696,11 @@ button.pilula.selecionada {
 
 .voltar {
   align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
   font-size: 15px;
   font-weight: 600;
   color: var(--cor-primaria);
@@ -973,4 +980,41 @@ button.pilula.selecionada {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+}
+
+/* Texto com formatacao do editor (enunciados, avisos, respostas). */
+.texto-rico {
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+.texto-rico > :first-child {
+  margin-top: 0;
+}
+
+.texto-rico > :last-child {
+  margin-bottom: 0;
+}
+
+.texto-rico h2 {
+  font-size: 1.2em;
+}
+
+.texto-rico h3 {
+  font-size: 1.05em;
+}
+
+.texto-rico blockquote {
+  margin: 8px 0;
+  padding: 4px 12px;
+  border-left: 3px solid var(--cor-linha);
+}
+
+.texto-rico a {
+  color: var(--cor-primaria);
+}
+
+/* O editor ocupa a largura do campo e segue o raio dos outros campos. */
+app-editor-texto .tox-tinymce {
+  border-radius: var(--raio);
 }

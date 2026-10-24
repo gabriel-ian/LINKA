@@ -1,0 +1,114 @@
+.pagina.larga {
+  max-width: var(--largura-pagina);
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px 22px;
+}
+
+.coluna-titulo {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.coluna-titulo span {
+  font-weight: 500;
+}
+
+.coluna-titulo.vermelho {
+  color: var(--cor-erro-texto);
+}
+
+.lista {
+  min-height: 200px;
+  margin: 0;
+  padding: 14px 18px 18px 16px;
+  list-style: none;
+}
+
+.lista li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.lista li:last-child {
+  border-bottom: 0;
+}
+
+.detalhe,
+.entregue {
+  padding-left: 39px;
+  font-size: 13px;
+}
+
+.entregue {
+  font-weight: 600;
+  color: var(--cor-sucesso);
+}
+
+.vazio-lista {
+  font-size: 15px;
+}
+
+.incentivo {
+  align-self: flex-start;
+}
+
+/* So no celular: abas no lugar das tres colunas. */
+.abas {
+  display: none;
+  gap: 6px;
+}
+
+.abas button {
+  flex: 1;
+  padding: 10px 6px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+
+.abas button.ativa {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria-clara);
+  color: var(--cor-primaria-escura);
+}
+
+.carregando {
+  margin: 0;
+}
+
+@media (max-width: 1000px) {
+  .cabecalho h1 {
+    font-size: 32px;
+  }
+
+  .abas {
+    display: flex;
+  }
+
+  .colunas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coluna:not(.aberta) {
+    display: none;
+  }
+
+  .coluna-titulo {
+    display: none;
+  }
+}

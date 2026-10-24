@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../model/escola.model';
 import {
   AgendaAluno,
+  AvisoAluno,
   ConquistasAluno,
   Lembrete,
   PassoConcluido,
@@ -47,6 +48,21 @@ export class PainelAlunoService {
       tipo,
       passo,
     });
+  }
+
+  entregarResposta(id: number, resposta: string): Observable<ApiResponse<{ entregue: boolean }>> {
+    return this.http.post<ApiResponse<{ entregue: boolean }>>(
+      `${this.api}/tarefas/${id}/resposta`,
+      { resposta },
+    );
+  }
+
+  avisos(): Observable<ApiResponse<{ avisos: AvisoAluno[] }>> {
+    return this.http.get<ApiResponse<{ avisos: AvisoAluno[] }>>(`${this.api}/avisos`);
+  }
+
+  marcarAvisoLido(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.post<ApiResponse<boolean>>(`${this.api}/avisos/${id}/lido`, {});
   }
 
   progresso(): Observable<ApiResponse<ProgressoAluno>> {

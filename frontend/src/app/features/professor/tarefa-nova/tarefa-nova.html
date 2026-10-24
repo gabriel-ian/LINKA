@@ -1,14 +1,26 @@
 <div class="pagina">
   <header class="painel-cabecalho">
-    <h1>Criar nova tarefa</h1>
-    <p>Escreva como sempre fez - a Linka adapta automaticamente para os alunos NEE</p>
+    @if (editandoId()) {
+      <h1>Editar tarefa</h1>
+      <p>
+        Os alunos veem a mudança na hora. Se mudar o enunciado, a Linka refaz a versão adaptada de
+        quem ainda não começou.
+      </p>
+    } @else {
+      <h1>Criar nova tarefa</h1>
+      <p>Escreva como sempre fez - a Linka adapta automaticamente para os alunos NEE</p>
+    }
   </header>
 
   @if (erroGeral()) {
     <p class="alerta-erro" role="alert">{{ erroGeral() }}</p>
   }
 
-  <form class="cartao formulario" (ngSubmit)="criar()" novalidate>
+  @if (carregando()) {
+    <p class="cartao">Carregando a tarefa...</p>
+  }
+
+  <form class="cartao formulario" [hidden]="carregando()" (ngSubmit)="salvar()" novalidate>
     <div class="grade-campos">
       <label class="campo-p" [class.invalido]="erro('titulo')">
         Título da tarefa
@@ -38,7 +50,12 @@
     <div class="grade-campos" style="--colunas: 3">
       <label class="campo-p" [class.invalido]="erro('turma')">
         Turma
-        <select name="turma" [ngModel]="turmaId()" (ngModelChange)="turmaId.set($event)">
+        <select
+          name="turma"
+          [ngModel]="turmaId()"
+          (ngModelChange)="turmaId.set($event)"
+          [disabled]="editandoId() !== null"
+        >
           @for (t of contexto.dados()?.turmas ?? []; track t.id) {
             <option [ngValue]="t.id">{{ t.nome }}</option>
           }
@@ -49,7 +66,7 @@
       </label>
       <label class="campo-p" [class.invalido]="erro('data')">
         Data de entrega
-        <input name="data" type="date" [min]="hoje" [(ngModel)]="dataEntrega" />
+        <input name="data" type="date" [min]="editandoId() ? '' : hoje" [(ngModel)]="dataEntrega" />
         @if (erro('data')) {
           <span class="msg-erro">{{ erro('data') }}</span>
         }
@@ -60,19 +77,40 @@
       </label>
     </div>
 
-    <label class="campo-p" [class.invalido]="erro('descricao')">
-      Enunciado da tarefa
-      <textarea
-        name="descricao"
-        rows="4"
-        maxlength="5000"
-        [(ngModel)]="descricao"
-        placeholder="Escreva o enunciado como faria no quadro ou no caderno."
-      ></textarea>
+    @if (!editandoId() && turmasExtras().length) {
+      <fieldset class="outras-turmas">
+        <legend>Enviar também para</legend>
+        @for (t of turmasExtras(); track t.id) {
+          <label class="marcar">
+            <input
+              type="checkbox"
+              [checked]="outrasTurmas().includes(t.id)"
+              (change)="alternarTurma(t.id, $any($event.target).checked)"
+            />
+            {{ t.nome }}
+          </label>
+        }
+        @if (outrasTurmas().length) {
+          <small
+            >Cada turma recebe uma cópia, com as versões adaptadas para os alunos NEE dela.</small
+          >
+        }
+      </fieldset>
+    }
+
+    <div class="campo-p" [class.invalido]="erro('descricao')">
+      <span id="rotulo-enunciado">Enunciado da tarefa</span>
+      @if (!carregando()) {
+        <app-editor-texto
+          rotulo="Enunciado da tarefa"
+          placeholder="Escreva o enunciado como faria no quadro ou no caderno."
+          [(valor)]="descricao"
+        />
+      }
       @if (erro('descricao')) {
         <span class="msg-erro">{{ erro('descricao') }}</span>
       }
-    </label>
+    </div>
 
     <div class="rodape">
       <div class="ia">
@@ -113,9 +151,24 @@
           </div>
         </div>
       </div>
-      <button type="submit" class="bt bt-primario" [disabled]="salvando()">
-        {{ salvando() ? 'Criando...' : 'Criar tarefa' }}
-      </button>
+      <div class="botoes">
+        @if (editandoId()) {
+          <button type="button" class="bt bt-secundario" (click)="cancelar()">Cancelar</button>
+        }
+        <button type="submit" class="bt bt-primario" [disabled]="salvando()">
+          @if (editandoId()) {
+            {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
+          } @else {
+            {{
+              salvando()
+                ? 'Criando...'
+                : outrasTurmas().length
+                  ? 'Criar para ' + (outrasTurmas().length + 1) + ' turmas'
+                  : 'Criar tarefa'
+            }}
+          }
+        </button>
+      </div>
     </div>
   </form>
 </div>

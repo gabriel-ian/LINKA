@@ -12,6 +12,7 @@ import {
   limparAlocacoes,
   paraAlocacoes,
 } from '../cadastro-professor/escolha-turmas';
+import { NavegacaoService } from '../../../core/services/navegacao.service';
 
 /** Editar nome, disciplinas e turmas (com a disciplina de cada turma) do professor. */
 @Component({
@@ -24,6 +25,7 @@ export class EscolaProfessorEditar {
   private service = inject(PainelEscolaService);
   private contexto = inject(EscolaContexto);
   private router = inject(Router);
+  private navegacao = inject(NavegacaoService);
 
   readonly id = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
   readonly professor = signal<ProfessorEdicao | null>(null);
@@ -94,12 +96,20 @@ export class EscolaProfessorEditar {
       .subscribe({
         next: () => {
           this.contexto.recarregar();
-          this.router.navigate(['/escola/professores'], { queryParams: { salvo: this.id } });
+          this.router.navigate(['/escola/professores'], {
+            queryParams: { salvo: this.id },
+            replaceUrl: true,
+          });
         },
         error: (e: HttpErrorResponse) => {
           this.salvando.set(false);
           this.erro.set(mensagemDeErro(e, 'Não foi possível salvar o professor.'));
         },
       });
+  }
+
+  /** Volta para a tela de onde veio; aberta direto, vai para '/escola/professores'. */
+  voltar(): void {
+    this.navegacao.voltar('/escola/professores');
   }
 }

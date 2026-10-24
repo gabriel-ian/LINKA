@@ -83,6 +83,28 @@ export class TarefaStatusService {
     );
   }
 
+  /**
+   * O aluno saiu da turma (troca, virada do ano ou remocao): as tarefas que
+   * ele nao concluiu nas outras turmas deixam de ser dele. As concluidas e
+   * as que ja tem resposta entregue ficam, como historico. turmaAtual null =
+   * aluno sem turma.
+   */
+  async removerPendentesDeOutrasTurmas(
+    alunoId: number,
+    turmaAtual: number | null,
+    manager?: EntityManager,
+  ): Promise<void> {
+    const executor = manager ?? this.statusRepository.manager;
+    await executor.query(
+      `DELETE ts FROM tarefa_status ts
+         JOIN tarefa t ON t.id = ts.tarefa_id
+        WHERE ts.aluno_id = ? AND ts.status <> 'concluida'
+          AND ts.resposta_em IS NULL
+          AND (? IS NULL OR t.turma_id <> ?)`,
+      [alunoId, turmaAtual, turmaAtual],
+    );
+  }
+
   /** orIgnore evita erro se a linha (aluno, tarefa) ja existir. */
   private async inserirPendentes(
     linhas: { alunoId: number; tarefaId: number }[],

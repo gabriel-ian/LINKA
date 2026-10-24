@@ -80,7 +80,7 @@
       <button type="button" class="bt bt-secundario" (click)="aindaNaoEntendi()">
         Ainda não entendi
       </button>
-      <a class="bt bt-primario" [routerLink]="['/aluno/tarefas', t.id]">Voltar para a tarefa</a>
+      <button type="button" class="bt bt-primario" (click)="voltar()">Voltar para a tarefa</button>
     </div>
   </div>
 } @else if (erro()) {

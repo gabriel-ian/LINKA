@@ -46,12 +46,25 @@ export interface Aba {
   exato?: boolean;
 }
 
+/** Icones da segunda linha do cartao da barra (desenhados em SVG no template). */
+export type IconeInfo =
+  'escola' | 'livro' | 'pessoa' | 'turma' | 'plano' | 'email' | 'filho' | 'status';
+
+/** Uma informacao da segunda linha do cartao (ex.: escola, disciplinas, turma). */
+export interface InfoBarra {
+  icone: IconeInfo;
+  texto: string;
+  /** 'ok' verde e 'alerta' laranja (ex.: escola ativa/inativa). */
+  tom?: 'ok' | 'alerta';
+}
+
 export interface ConfigPainel {
+  /** Nome de quem esta logado (pessoa, escola ou familia). */
   titulo: string;
-  /** Texto menor ao lado do titulo (ex.: "Plano Institucional - Ativo"). */
-  detalhe?: string;
-  /** Escola usa 32px em caixa alta; ADM usa 36px. */
-  tituloPequeno?: boolean;
+  /** Etiqueta do perfil ao lado do nome (ex.: "Escola", "Professor(a)"). */
+  perfil?: string;
+  /** Segunda linha do cartao da barra: informacoes com icone. */
+  infos?: InfoBarra[];
   secoes: { titulo: string; itens: ItemMenu[] }[];
   conta: {
     iniciais: string;
@@ -61,7 +74,7 @@ export interface ConfigPainel {
   };
   /** Medidas que mudam entre os paineis do Figma. */
   medidas: { rotuloX: number; visaoX: number; secaoTam: number; gapItens: number };
-  /** Aluno: o mascote fala na barra no lugar do titulo (com botao de ouvir). */
+  /** Aluno: o mascote fala na barra, ao lado do cartao (com botao de ouvir). */
   fala?: string;
   /** Aluno/familia: iniciais no canto do topo, que abrem o menu da conta. */
   avatar?: string;

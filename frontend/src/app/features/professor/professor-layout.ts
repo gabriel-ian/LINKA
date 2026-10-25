@@ -45,8 +45,16 @@ export class ProfessorLayout {
 
     return {
       titulo: dados?.nome ?? 'Professor',
-      detalhe: dados ? [dados.escola, disciplinas].filter(Boolean).join(' - ') : '',
-      tituloPequeno: true,
+      perfil: 'Professor(a)',
+      infos: dados
+        ? [
+            { icone: 'escola', texto: dados.escola },
+            ...(disciplinas ? [{ icone: 'livro' as const, texto: disciplinas }] : []),
+            ...dados.turmas
+              .filter((t) => t.id === turmaAtual)
+              .map((t) => ({ icone: 'turma' as const, texto: t.nome })),
+          ]
+        : [],
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
       secoes: [
         {

@@ -59,6 +59,7 @@ export class FamiliaLayout {
     const d = this.contexto.dados();
     const resp = d?.responsavel;
     const filhoId = this.contexto.filhoId();
+    const filho = this.contexto.filho();
 
     const filhos: ItemMenu[] = (d?.filhos ?? []).map((f) => ({
       rota: `filho:${f.id}`,
@@ -70,9 +71,19 @@ export class FamiliaLayout {
     }));
 
     return {
-      titulo: resp ? `FAMÍLIA ${resp.sobrenome.toUpperCase()}` : 'FAMÍLIA',
-      detalhe: resp ? `Responsável: ${resp.nome}` : '',
-      tituloPequeno: true,
+      titulo: resp ? `Família ${resp.sobrenome}` : 'Família',
+      perfil: 'Família',
+      infos: [
+        ...(resp ? [{ icone: 'pessoa' as const, texto: `Responsável: ${resp.nome}` }] : []),
+        ...(filho
+          ? [
+              {
+                icone: 'filho' as const,
+                texto: filho.turma ? `${filho.nome} · ${filho.turma}` : filho.nome,
+              },
+            ]
+          : []),
+      ],
       avatar: resp?.iniciais ?? '',
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
       abas: [

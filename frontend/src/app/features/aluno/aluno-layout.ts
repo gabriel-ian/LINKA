@@ -43,6 +43,8 @@ export class AlunoLayout {
 
     return {
       titulo: r?.aluno.nome ?? 'Aluno',
+      perfil: 'Aluno(a)',
+      infos: r?.aluno.turma ? [{ icone: 'turma', texto: r.aluno.turma }] : [],
       fala: this.contexto.semConexao()
         ? 'Sem internet agora - mas suas missões estão salvas.'
         : this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),

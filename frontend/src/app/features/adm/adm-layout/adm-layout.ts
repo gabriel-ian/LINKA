@@ -40,7 +40,9 @@ export class AdmLayout {
 
   /** A busca por ID fica dentro de "Buscar Escola"; o detalhe acende esse item. */
   readonly config = computed<ConfigPainel>(() => ({
-    titulo: 'Painel administrativo',
+    titulo: 'Administração Linka',
+    perfil: 'ADM',
+    infos: this.email ? [{ icone: 'email', texto: this.email }] : [],
     medidas: { rotuloX: 44, visaoX: 18, secaoTam: 36, gapItens: 16 },
     secoes: [
       {

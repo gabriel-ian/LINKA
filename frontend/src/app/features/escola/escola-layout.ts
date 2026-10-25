@@ -26,10 +26,20 @@ export class EscolaLayout {
 
     return {
       titulo: escola?.nome ?? 'Painel da escola',
-      detalhe: escola
-        ? `Plano ${ROTULO_PLANO[escola.plano]} - ${escola.ativo ? 'Ativo' : 'Inativo'}`
-        : '',
-      tituloPequeno: true,
+      perfil: 'Escola',
+      infos: escola
+        ? [
+            { icone: 'plano', texto: `Plano ${ROTULO_PLANO[escola.plano]}` },
+            {
+              icone: 'status',
+              texto: escola.ativo ? 'Ativa' : 'Inativa',
+              tom: escola.ativo ? 'ok' : 'alerta',
+            },
+            ...(escola.responsavel
+              ? [{ icone: 'pessoa' as const, texto: `Coordenação: ${escola.responsavel}` }]
+              : []),
+          ]
+        : [],
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
       secoes: [
         {

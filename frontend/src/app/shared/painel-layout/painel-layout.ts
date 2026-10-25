@@ -78,8 +78,6 @@ export interface ConfigPainel {
   medidas: { rotuloX: number; visaoX: number; secaoTam: number; gapItens: number };
   /** Aluno: o mascote fala na barra, ao lado do cartao (com botao de ouvir). */
   fala?: string;
-  /** Aluno/familia: iniciais no canto do topo, que abrem o menu da conta. */
-  avatar?: string;
   /** Aluno/familia: barra de abas no rodape, so no celular. */
   abas?: Aba[];
   /** Preferencias do aluno que mudam a moldura inteira. */

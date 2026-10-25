@@ -17,13 +17,55 @@
   background-image: url('/assets/adm/rodape.png');
 }
 
-.topo a {
+.topo .logo {
   display: inline-block;
   margin: 35px 0 0 32px;
 }
 
-.topo img {
+.topo .logo img {
   display: block;
+}
+
+/* ---------- "Meu perfil" e "Sair" no canto direito da faixa da logo ---------- */
+
+.topo-acoes {
+  position: absolute;
+  top: 34px;
+  right: 32px;
+  display: flex;
+  gap: 12px;
+}
+
+.topo-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 59px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--cor-primaria-escura);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.topo-botao:hover,
+.topo-botao.ativo {
+  background: var(--cor-primaria-clara);
+}
+
+.topo-botao.sair-topo {
+  background: transparent;
+  color: #fff;
+}
+
+.topo-botao.sair-topo:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 /* ---------- Barra "Painel administrativo" ---------- */
@@ -193,22 +235,6 @@
 
 .topo {
   position: relative;
-}
-
-.avatar-topo {
-  position: absolute;
-  top: 34px;
-  right: 32px;
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  border: 1px solid #20c0ed;
-  border-radius: 50%;
-  background: #d0f5ff;
-  color: #20c0ed;
-  font-size: 20px;
-  font-weight: 500;
-  cursor: pointer;
 }
 
 .fala {
@@ -646,13 +672,25 @@ button.menu-item {
     height: 72px;
   }
 
-  .topo a {
+  .topo .logo {
     margin: 16px 0 0 16px;
   }
 
-  .avatar-topo {
+  /* Celular: so os icones. */
+  .topo-acoes {
     top: 15px;
     right: 16px;
+    gap: 8px;
+  }
+
+  .topo-botao {
+    justify-content: center;
+    width: 42px;
+    padding: 0;
+  }
+
+  .topo-botao span {
+    display: none;
   }
 
   .fala {
@@ -741,53 +779,5 @@ button.menu-item {
 
   :host:has(.abas) .rodape {
     margin-bottom: 64px;
-  }
-}
-
-/* ---------- Botao "Meu perfil" na barra ---------- */
-
-.barra-icones {
-  align-items: center;
-}
-
-.botao-perfil {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  margin-right: 6px;
-  padding: 0 16px;
-  border: 1px solid var(--cor-linha);
-  border-radius: 59px;
-  background: #fff;
-  color: var(--cor-titulo);
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.botao-perfil svg {
-  color: var(--cor-primaria);
-}
-
-.botao-perfil:hover,
-.botao-perfil.ativo {
-  border-color: var(--cor-primaria);
-  background: var(--cor-primaria-clara);
-  color: var(--cor-primaria-escura);
-}
-
-@media (max-width: 1000px) {
-  /* Celular: so o icone. */
-  .botao-perfil {
-    width: 40px;
-    margin-right: 0;
-    padding: 0;
-    justify-content: center;
-  }
-
-  .botao-perfil span {
-    display: none;
   }
 }

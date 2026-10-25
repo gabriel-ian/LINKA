@@ -85,7 +85,6 @@ export class FamiliaLayout {
             ]
           : []),
       ],
-      avatar: resp?.iniciais ?? '',
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
       abas: [
         { rota: '/familia', rotulo: 'Painel', icone: 'inicio' },

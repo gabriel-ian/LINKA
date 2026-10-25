@@ -326,6 +326,38 @@
   zoom: 1.15;
 }
 
+/* Letra para dislexia: Lexend com mais espaco entre letras, palavras e linhas. */
+:host(.fonte-dislexia) .painel {
+  font-family: 'Lexend', var(--fonte-base);
+  letter-spacing: 0.02em;
+  word-spacing: 0.12em;
+}
+
+:host(.fonte-dislexia) .conteudo p,
+:host(.fonte-dislexia) .conteudo li {
+  line-height: 1.7;
+}
+
+/* Alto contraste: texto preto, linhas e bordas fortes, azul mais escuro. */
+:host(.alto-contraste) .painel {
+  --cor-texto: #111;
+  --cor-titulo: #000;
+  --cor-linha: #555;
+  --cor-borda: #000;
+  --cor-primaria: #0a3d91;
+  --cor-primaria-escura: #002266;
+  --cor-fundo-painel: #fff;
+}
+
+:host(.alto-contraste) .conteudo :is(.cartao, .cartao-aluno, .bloco) {
+  border: 2px solid #000;
+  box-shadow: none;
+}
+
+:host(.alto-contraste) .conteudo :is(a, .link-acao) {
+  text-decoration: underline;
+}
+
 /* ---------- Menu lateral ---------- */
 
 .corpo {

@@ -1,9 +1,15 @@
+/* Letra para dislexia (perfil do aluno): hospedada no proprio app, funciona sem internet. */
+@import '@fontsource/lexend/400.css';
+@import '@fontsource/lexend/600.css';
+@import '@fontsource/lexend/700.css';
+
 /* Tokens extraidos do Figma (arquivo Linka). */
 :root {
   --cor-primaria: #2277e5;
   --cor-primaria-escura: #0046a0;
   --cor-primaria-clara: #e8effe;
-  --cor-texto: #6e6e6e;
+  /* Cinza escuro: contraste de 7,5:1 no branco (antes #6e6e6e, 5:1). */
+  --cor-texto: #4b5563;
   --cor-borda: #7e7f80;
   --cor-fundo: #effaff;
   --cor-painel: #dceef8;

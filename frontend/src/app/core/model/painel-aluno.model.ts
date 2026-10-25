@@ -8,6 +8,10 @@ export interface PreferenciasAluno {
   passosCurtos: boolean;
   letrasMaiores: boolean;
   modoCalmo: boolean;
+  /** Fonte Lexend, com mais espaco entre letras e linhas. */
+  fonteDislexia?: boolean;
+  /** Texto preto, bordas fortes e cores mais escuras. */
+  altoContraste?: boolean;
   mascote: Mascote;
 }
 

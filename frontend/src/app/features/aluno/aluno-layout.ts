@@ -51,6 +51,8 @@ export class AlunoLayout {
         : this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),
       modoCalmo: r?.preferencias.modoCalmo,
       letrasMaiores: r?.preferencias.letrasMaiores,
+      fonteDislexia: r?.preferencias.fonteDislexia,
+      altoContraste: r?.preferencias.altoContraste,
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },
       abas: [
         { rota: '/aluno', rotulo: 'Início', icone: 'inicio' },

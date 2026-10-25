@@ -88,6 +88,16 @@ export class PreferenciasDto {
   @IsBoolean()
   modoCalmo?: boolean;
 
+  @ApiPropertyOptional({ description: 'Fonte para dislexia (Lexend)' })
+  @IsOptional()
+  @IsBoolean()
+  fonteDislexia?: boolean;
+
+  @ApiPropertyOptional({ description: 'Alto contraste' })
+  @IsOptional()
+  @IsBoolean()
+  altoContraste?: boolean;
+
   @ApiPropertyOptional({ enum: ['dino', 'coruja', 'robo'] })
   @IsOptional()
   @IsIn(['dino', 'coruja', 'robo'])

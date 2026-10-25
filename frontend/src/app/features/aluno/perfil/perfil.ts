@@ -4,7 +4,8 @@ import { Mascote, PreferenciasAluno } from '../../../core/model/painel-aluno.mod
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
 import { AlunoContexto } from '../aluno-contexto';
 
-type Chave = 'ouvirVoz' | 'passosCurtos' | 'letrasMaiores' | 'modoCalmo';
+type Chave =
+  'ouvirVoz' | 'passosCurtos' | 'letrasMaiores' | 'fonteDislexia' | 'altoContraste' | 'modoCalmo';
 
 const MASCOTES: { id: Mascote; nome: string; letra: string; jeito: string }[] = [
   { id: 'dino', nome: 'Dino', letra: 'D', jeito: 'animado e divertido' },
@@ -34,6 +35,16 @@ export class AlunoPerfil {
     },
     { chave: 'passosCurtos', titulo: 'Passos curtos', texto: 'No máximo 3 linhas por passo' },
     { chave: 'letrasMaiores', titulo: 'Letras maiores', texto: 'Deixa o texto mais fácil de ler' },
+    {
+      chave: 'fonteDislexia',
+      titulo: 'Letra para dislexia',
+      texto: 'Uma letra mais fácil de ler, com mais espaço entre as palavras',
+    },
+    {
+      chave: 'altoContraste',
+      titulo: 'Alto contraste',
+      texto: 'Texto mais escuro e bordas mais fortes',
+    },
     { chave: 'modoCalmo', titulo: 'Modo calmo', texto: 'Menos cores e animações' },
   ];
 

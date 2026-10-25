@@ -84,6 +84,8 @@ export interface ConfigPainel {
   /** Preferencias do aluno que mudam a moldura inteira. */
   modoCalmo?: boolean;
   letrasMaiores?: boolean;
+  fonteDislexia?: boolean;
+  altoContraste?: boolean;
 }
 
 export interface Notificacao {
@@ -111,6 +113,8 @@ export interface Notificacao {
     '[style.--gap-itens.px]': 'config().medidas.gapItens',
     '[class.calmo]': 'config().modoCalmo',
     '[class.letras-maiores]': 'config().letrasMaiores',
+    '[class.fonte-dislexia]': 'config().fonteDislexia',
+    '[class.alto-contraste]': 'config().altoContraste',
   },
 })
 export class PainelLayout {

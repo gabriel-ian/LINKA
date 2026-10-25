@@ -8,6 +8,7 @@ import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
 import { TarefaProfessor } from '../../../core/model/painel-professor.model';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
+import { DialogoService } from '../../../core/services/dialogo.service';
 import { ProfessorContexto } from '../professor-contexto';
 import { hojeIso } from '../../adm/escola-ui';
 import { dataCurta, primeiroNome } from '../professor-ui';
@@ -24,6 +25,7 @@ export class ProfessorTarefa {
   readonly contexto = inject(ProfessorContexto);
   private router = inject(Router);
   private navegacao = inject(NavegacaoService);
+  private dialogo = inject(DialogoService);
 
   readonly primeiroNome = primeiroNome;
 
@@ -37,12 +39,9 @@ export class ProfessorTarefa {
   readonly salvando = signal(false);
   textoEdicao = '';
 
-  /** Recado de cima: tarefa atualizada, copiada etc. */
-  readonly recado = signal('');
   readonly copiando = signal(false);
   readonly turmasCopia = signal<number[]>([]);
   readonly excluindo = signal(false);
-  readonly confirmarExclusao = signal(false);
   /** Aluno cuja resposta esta aberta. */
   readonly respostaAberta = signal<number | null>(null);
 
@@ -83,12 +82,12 @@ export class ProfessorTarefa {
       this.nova.set(q.get('nova') === '1');
       const copias = Number(q.get('copias'));
       if (copias)
-        this.recado.set(
+        this.dialogo.avisar(
           `A mesma tarefa também foi criada para ${copias === 1 ? 'mais 1 turma' : 'mais ' + copias + ' turmas'}.`,
         );
       const r = this.navegacao.lerRecado();
       if (r?.['editada'])
-        this.recado.set(
+        this.dialogo.avisar(
           'Tarefa atualizada.' +
             (Number(r['refazer'])
               ? ` O enunciado mudou: ${r['refazer'] === 1 ? '1 versão adaptada vai' : r['refazer'] + ' versões adaptadas vão'} ser refeitas.`
@@ -165,7 +164,7 @@ export class ProfessorTarefa {
           .filter((x) => turmas.includes(x.id))
           .map((x) => x.nome)
           .join(', ');
-        this.recado.set(
+        this.dialogo.avisar(
           `Tarefa copiada para ${nomes}. ${res.data.ids.length === 1 ? 'A cópia já está' : 'As cópias já estão'} com os alunos.`,
         );
       },
@@ -176,9 +175,23 @@ export class ProfessorTarefa {
     });
   }
 
-  excluir(): void {
+  async excluir(): Promise<void> {
     const t = this.tarefa();
     if (!t) return;
+    const c = this.contagem();
+    const comecaram = c.feitas + c.andamento;
+    const sim = await this.dialogo.confirmar({
+      titulo: `Excluir "${t.titulo}"?`,
+      mensagem:
+        `A tarefa some para os alunos e famílias da ${t.turma}.` +
+        (comecaram
+          ? ` ${comecaram === 1 ? '1 aluno já começou ou terminou' : comecaram + ' alunos já começaram ou terminaram'} e vai perder esse registro.`
+          : '') +
+        ' Não dá para desfazer.',
+      confirmar: 'Sim, excluir',
+      perigo: true,
+    });
+    if (!sim) return;
     this.excluindo.set(true);
     this.service.excluirTarefa(t.id).subscribe({
       next: () => {
@@ -187,7 +200,6 @@ export class ProfessorTarefa {
       },
       error: (e: HttpErrorResponse) => {
         this.excluindo.set(false);
-        this.confirmarExclusao.set(false);
         this.erro.set(mensagemDeErro(e, 'Não foi possível excluir a tarefa.'));
       },
     });

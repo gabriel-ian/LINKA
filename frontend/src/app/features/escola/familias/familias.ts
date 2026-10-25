@@ -6,6 +6,7 @@ import { Familia, SenhaGerada } from '../../../core/model/painel-escola.model';
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { iniciaisPessoa } from '../escola-ui';
+import { DialogoService } from '../../../core/services/dialogo.service';
 
 const POR_PAGINA = 10;
 
@@ -17,6 +18,7 @@ const POR_PAGINA = 10;
   styleUrl: './familias.css',
 })
 export class EscolaFamilias {
+  private dialogo = inject(DialogoService);
   private service = inject(PainelEscolaService);
   readonly iniciais = iniciaisPessoa;
 
@@ -58,9 +60,13 @@ export class EscolaFamilias {
     this.pagina.update((p) => (p + 1 < this.totalPaginas() ? p + 1 : 0));
   }
 
-  novaSenha(f: Familia): void {
+  async novaSenha(f: Familia): Promise<void> {
     if (
-      !confirm(`Gerar uma nova senha de acesso para ${f.nome}? A senha atual deixa de funcionar.`)
+      !(await this.dialogo.confirmar({
+        titulo: 'Gerar nova senha?',
+        mensagem: `A senha atual de ${f.nome} deixa de funcionar. A nova senha aparece uma vez para você anotar.`,
+        confirmar: 'Gerar nova senha',
+      }))
     )
       return;
     this.service.redefinirSenha('responsaveis', f.id).subscribe({

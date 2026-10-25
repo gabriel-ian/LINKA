@@ -6,6 +6,7 @@ import { PainelFamiliaService } from '../../../core/services/painel-familia.serv
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { baixarJson, nomeDeArquivo } from '../../../core/util/baixar-json';
 import { FamiliaContexto } from '../familia-contexto';
+import { DialogoService } from '../../../core/services/dialogo.service';
 
 type Chave = Exclude<keyof PreferenciasFamilia, 'horario'>;
 
@@ -17,6 +18,7 @@ type Chave = Exclude<keyof PreferenciasFamilia, 'horario'>;
   styleUrls: ['../familia-comum.css', './configuracoes.css'],
 })
 export class FamiliaConfiguracoes {
+  private dialogo = inject(DialogoService);
   readonly contexto = inject(FamiliaContexto);
   private service = inject(PainelFamiliaService);
 
@@ -82,16 +84,16 @@ export class FamiliaConfiguracoes {
     });
   }
 
-  pedirExclusao(filhoId: number, nome: string): void {
-    if (
-      !confirm(
-        `Pedir a exclusão dos dados de ${nome}?
-
-A escola recebe o pedido e apaga os dados ` +
-          'pessoais e de saúde. Depois disso o acompanhamento pela Linka termina.',
-      )
-    )
-      return;
+  async pedirExclusao(filhoId: number, nome: string): Promise<void> {
+    const sim = await this.dialogo.confirmar({
+      titulo: `Pedir a exclusão dos dados de ${nome}?`,
+      mensagem:
+        'A escola recebe o pedido e apaga os dados pessoais e de saúde. Depois disso o ' +
+        'acompanhamento pela Linka termina.',
+      confirmar: 'Pedir a exclusão',
+      perigo: true,
+    });
+    if (!sim) return;
     this.service.pedirExclusao(filhoId).subscribe({
       next: () => this.avisar(filhoId, 'Pedido enviado. A escola vai atender e avisar você.'),
       error: () => this.avisar(filhoId, 'Não foi possível enviar o pedido agora.'),

@@ -12,12 +12,6 @@
       </p>
     </header>
 
-    @if (recado()) {
-      <p class="aviso-caixa verde" role="status">
-        <span>{{ recado() }}</span>
-      </p>
-    }
-
     <div class="barra-acoes">
       <button type="button" class="bt bt-secundario bt-p" (click)="voltar()">← Voltar</button>
       <span class="espaco"></span>
@@ -34,12 +28,7 @@
           Copiar para outras turmas
         </button>
       }
-      <button
-        type="button"
-        class="bt bt-perigo bt-p"
-        (click)="confirmarExclusao.set(true)"
-        [disabled]="excluindo()"
-      >
+      <button type="button" class="bt bt-perigo bt-p" (click)="excluir()" [disabled]="excluindo()">
         Excluir
       </button>
     </div>
@@ -80,42 +69,6 @@
                   ? 'Copiar para ' + turmasCopia().length + ' turmas'
                   : 'Copiar'
             }}
-          </button>
-        </div>
-      </section>
-    }
-
-    @if (confirmarExclusao()) {
-      <section class="cartao confirmar" role="alertdialog" aria-labelledby="titulo-excluir">
-        <strong id="titulo-excluir">Excluir “{{ t.titulo }}”?</strong>
-        <p>
-          A tarefa some para os alunos e famílias da {{ t.turma }}.
-          @if (contagem().feitas || contagem().andamento) {
-            {{ contagem().feitas + contagem().andamento }}
-            {{
-              contagem().feitas + contagem().andamento === 1
-                ? 'aluno já começou ou terminou'
-                : 'alunos já começaram ou terminaram'
-            }}
-            e vai perder esse registro.
-          }
-          Não dá para desfazer.
-        </p>
-        <div class="acoes">
-          <button
-            type="button"
-            class="bt bt-secundario bt-p"
-            (click)="confirmarExclusao.set(false)"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="bt bt-perigo bt-p"
-            [disabled]="excluindo()"
-            (click)="excluir()"
-          >
-            {{ excluindo() ? 'Excluindo...' : 'Sim, excluir' }}
           </button>
         </div>
       </section>

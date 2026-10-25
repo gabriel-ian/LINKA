@@ -5,6 +5,7 @@ import { PainelEscolaService } from '../../../core/services/painel-escola.servic
 import { ProfessorResumo, StatusProfessor } from '../../../core/model/painel-escola.model';
 import { EscolaContexto } from '../escola-contexto';
 import { ROTULO_STATUS_PROFESSOR, corDoIndice, iniciaisPessoa, juntar } from '../escola-ui';
+import { DialogoService } from '../../../core/services/dialogo.service';
 
 const POR_PAGINA = 6;
 
@@ -16,6 +17,7 @@ const POR_PAGINA = 6;
   styleUrl: './professores.css',
 })
 export class EscolaProfessores {
+  private dialogo = inject(DialogoService);
   private service = inject(PainelEscolaService);
   readonly contexto = inject(EscolaContexto);
 
@@ -71,8 +73,15 @@ export class EscolaProfessores {
     this.pagina.update((p) => (p + 1 < this.totalPaginas() ? p + 1 : 0));
   }
 
-  redefinirSenha(p: ProfessorResumo): void {
-    if (!confirm(`Gerar uma nova senha para ${p.nome}? A senha atual deixa de funcionar.`)) return;
+  async redefinirSenha(p: ProfessorResumo): Promise<void> {
+    if (
+      !(await this.dialogo.confirmar({
+        titulo: 'Gerar nova senha?',
+        mensagem: `A senha atual de ${p.nome} deixa de funcionar. A nova senha aparece uma vez para você anotar.`,
+        confirmar: 'Gerar nova senha',
+      }))
+    )
+      return;
     this.alterando.set(p.id);
     this.service.redefinirSenha('professores', p.id).subscribe({
       next: (res) => {
@@ -86,12 +95,23 @@ export class EscolaProfessores {
     });
   }
 
-  alternarAtivo(p: ProfessorResumo): void {
+  async alternarAtivo(p: ProfessorResumo): Promise<void> {
     const ativar = p.status === 'inativo';
-    const pergunta = ativar
-      ? `Reativar o acesso de ${p.nome}?`
-      : `Desativar o acesso de ${p.nome}? O login fica bloqueado, mas o histórico é mantido.`;
-    if (!confirm(pergunta)) return;
+    const sim = await this.dialogo.confirmar(
+      ativar
+        ? {
+            titulo: 'Reativar o acesso?',
+            mensagem: `${p.nome} volta a entrar na Linka com a mesma senha.`,
+            confirmar: 'Sim, reativar',
+          }
+        : {
+            titulo: 'Desativar o acesso?',
+            mensagem: `O login de ${p.nome} fica bloqueado. O histórico de tarefas e turmas é mantido.`,
+            confirmar: 'Sim, desativar',
+            perigo: true,
+          },
+    );
+    if (!sim) return;
 
     this.alterando.set(p.id);
     this.erro.set('');

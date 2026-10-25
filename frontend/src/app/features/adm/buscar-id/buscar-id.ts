@@ -15,6 +15,7 @@ import {
   statusEscola,
 } from '../escola-ui';
 import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
+import { DialogoService } from '../../../core/services/dialogo.service';
 
 /** "ADM - Buscar por ID" do Figma. O ID fica na URL (?id=) para poder ser linkado. */
 @Component({
@@ -24,6 +25,7 @@ import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
   styleUrl: './buscar-id.css',
 })
 export class BuscarId {
+  private dialogo = inject(DialogoService);
   private service = inject(EscolaService);
   private router = inject(Router);
 
@@ -85,9 +87,13 @@ export class BuscarId {
     });
   }
 
-  redefinirSenha(e: Escola): void {
+  async redefinirSenha(e: Escola): Promise<void> {
     if (
-      !confirm(`Gerar uma nova senha de acesso para ${e.nome}? A senha atual deixa de funcionar.`)
+      !(await this.dialogo.confirmar({
+        titulo: 'Gerar nova senha?',
+        mensagem: `A senha atual de ${e.nome} deixa de funcionar. A nova senha aparece uma vez para você anotar.`,
+        confirmar: 'Gerar nova senha',
+      }))
     )
       return;
     this.erro.set('');

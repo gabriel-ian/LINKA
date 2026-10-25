@@ -64,8 +64,11 @@ test.describe.serial('LGPD', () => {
       )
       .toEqual(['dados-davi-com-familia-e2e.json']);
 
-    page.once('dialog', (d) => d.accept());
     await item.getByRole('button', { name: 'Pedir exclusão' }).click();
+    await page
+      .getByRole('alertdialog')
+      .getByRole('button', { name: 'Pedir a exclusão' })
+      .click();
     await expect(item.getByText('Pedido enviado')).toBeVisible();
   });
 

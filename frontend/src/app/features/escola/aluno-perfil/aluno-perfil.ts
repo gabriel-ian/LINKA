@@ -18,6 +18,7 @@ import {
   percentual,
 } from '../escola-ui';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
+import { DialogoService } from '../../../core/services/dialogo.service';
 
 /** "Escola - Perfil do aluno" do Figma. */
 @Component({
@@ -27,6 +28,7 @@ import { NavegacaoService } from '../../../core/services/navegacao.service';
   styleUrl: './aluno-perfil.css',
 })
 export class EscolaAlunoPerfil {
+  private dialogo = inject(DialogoService);
   private service = inject(PainelEscolaService);
   private router = inject(Router);
   private navegacao = inject(NavegacaoService);
@@ -86,9 +88,14 @@ export class EscolaAlunoPerfil {
     this.carregar(a.id);
   }
 
-  desvincular(a: AlunoDetalhe, responsavelId: number, nome: string): void {
-    if (!confirm(`Desvincular ${nome} de ${a.nome}? A família continua cadastrada na escola.`))
-      return;
+  async desvincular(a: AlunoDetalhe, responsavelId: number, nome: string): Promise<void> {
+    const sim = await this.dialogo.confirmar({
+      titulo: 'Desvincular a família?',
+      mensagem: `${nome} deixa de acompanhar ${a.nome}. A família continua cadastrada na escola.`,
+      confirmar: 'Sim, desvincular',
+      perigo: true,
+    });
+    if (!sim) return;
     this.service.desvincularFamilia(a.id, responsavelId).subscribe({
       next: () => {
         this.avisoFamilia.set(`${nome} não acompanha mais ${a.nome.split(' ')[0]}.`);
@@ -114,8 +121,15 @@ export class EscolaAlunoPerfil {
   }
 
   /** Gera senha provisoria do aluno ou de um responsavel e mostra uma vez. */
-  redefinirSenha(tipo: 'alunos' | 'responsaveis', id: number, nome: string): void {
-    if (!confirm(`Gerar uma nova senha para ${nome}? A senha atual deixa de funcionar.`)) return;
+  async redefinirSenha(tipo: 'alunos' | 'responsaveis', id: number, nome: string): Promise<void> {
+    if (
+      !(await this.dialogo.confirmar({
+        titulo: 'Gerar nova senha?',
+        mensagem: `A senha atual de ${nome} deixa de funcionar. A nova senha aparece uma vez para você anotar.`,
+        confirmar: 'Gerar nova senha',
+      }))
+    )
+      return;
     const chave = `${tipo}-${id}`;
     this.gerando.set(chave);
     this.service.redefinirSenha(tipo, id).subscribe({

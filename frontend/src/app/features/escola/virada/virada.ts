@@ -6,6 +6,7 @@ import { AcaoVirada, PreviaVirada, ResultadoVirada } from '../../../core/model/p
 import { PainelEscolaService } from '../../../core/services/painel-escola.service';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { EscolaContexto } from '../escola-contexto';
+import { DialogoService } from '../../../core/services/dialogo.service';
 
 type TurmaPrevia = PreviaVirada['turmas'][number];
 
@@ -20,6 +21,7 @@ type TurmaPrevia = PreviaVirada['turmas'][number];
   styleUrl: './virada.css',
 })
 export class EscolaVirada {
+  private dialogo = inject(DialogoService);
   private service = inject(PainelEscolaService);
   private contexto = inject(EscolaContexto);
 
@@ -92,19 +94,20 @@ export class EscolaVirada {
     return `Repete o ${[t.serie, t.letra].filter(Boolean).join(' ')}`;
   }
 
-  confirmar(): void {
+  async confirmar(): Promise<void> {
     const p = this.previa();
     if (!p || this.salvando()) return;
     const r = this.resumo();
-    if (
-      !confirm(
-        `Fazer a virada para ${p.anoDestino}?\n\n` +
-          `${r.promover} sobem de série, ${r.reter} ${r.reter === 1 ? 'repete' : 'repetem'} e ` +
-          `${r.sair} ficam sem turma.\n` +
-          `As turmas de ${p.anoOrigem} ficam encerradas (só para consulta). Não dá para desfazer.`,
-      )
-    )
-      return;
+    const sim = await this.dialogo.confirmar({
+      titulo: `Fazer a virada para ${p.anoDestino}?`,
+      mensagem:
+        `${r.promover} sobem de série, ${r.reter} ${r.reter === 1 ? 'repete' : 'repetem'} e ` +
+        `${r.sair} ficam sem turma. As turmas de ${p.anoOrigem} ficam encerradas (só para ` +
+        'consulta). Não dá para desfazer.',
+      confirmar: 'Fazer a virada',
+      perigo: true,
+    });
+    if (!sim) return;
 
     this.salvando.set(true);
     this.erro.set('');

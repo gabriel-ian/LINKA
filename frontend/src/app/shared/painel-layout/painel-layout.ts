@@ -2,6 +2,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { AlterarSenha } from '../senha/alterar-senha';
+import { DialogoService } from '../../core/services/dialogo.service';
 import { VozService } from '../../core/services/voz.service';
 
 /** Uma camada de icone do menu, na posicao do Figma (relativa a borda externa do botao). */
@@ -116,6 +117,7 @@ export class PainelLayout {
   private auth = inject(AuthService);
   private router = inject(Router);
   readonly voz = inject(VozService);
+  private dialogo = inject(DialogoService);
 
   config = input.required<ConfigPainel>();
   notificacoes = input<Notificacao[]>([]);
@@ -164,7 +166,15 @@ export class PainelLayout {
     this.painel.update((atual) => (atual === qual ? null : qual));
   }
 
-  sair(): void {
+  async sair(): Promise<void> {
+    this.painel.set(null);
+    const sim = await this.dialogo.confirmar({
+      titulo: 'Sair da conta?',
+      mensagem: 'Você vai precisar entrar de novo com e-mail e senha para usar a Linka.',
+      confirmar: 'Sim, sair',
+      cancelar: 'Continuar aqui',
+    });
+    if (!sim) return;
     this.auth.logout();
     this.router.navigate(['/login']);
   }

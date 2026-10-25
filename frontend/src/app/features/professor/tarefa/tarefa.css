@@ -162,8 +162,7 @@
   flex: 1;
 }
 
-.painel-copia,
-.confirmar {
+.painel-copia {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -177,15 +176,6 @@
 
 .painel-copia small {
   color: #6b7280;
-}
-
-.confirmar {
-  border: 1px solid #fecaca;
-  background: #fef2f2;
-}
-
-.confirmar p {
-  margin: 0;
 }
 
 .marcar {

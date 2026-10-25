@@ -16,6 +16,7 @@ import {
   percentual,
 } from '../escola-ui';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
+import { DialogoService } from '../../../core/services/dialogo.service';
 
 /** "Escola - Detalhe da turma" e "Escola - Turma sem alunos" do Figma. */
 @Component({
@@ -25,6 +26,7 @@ import { NavegacaoService } from '../../../core/services/navegacao.service';
   styleUrl: './turma-detalhe.css',
 })
 export class EscolaTurmaDetalhe {
+  private dialogo = inject(DialogoService);
   private service = inject(PainelEscolaService);
   private navegacao = inject(NavegacaoService);
 
@@ -84,9 +86,16 @@ export class EscolaTurmaDetalhe {
     this.carregar(t.id);
   }
 
-  remover(a: AlunoResumo): void {
+  async remover(a: AlunoResumo): Promise<void> {
     const t = this.turma();
-    if (!t || !confirm(`Tirar ${a.nome} da turma ${t.nome}? O aluno fica sem turma.`)) return;
+    if (!t) return;
+    const sim = await this.dialogo.confirmar({
+      titulo: 'Tirar da turma?',
+      mensagem: `${a.nome} sai da ${t.nome} e fica sem turma. As tarefas pendentes desta turma saem da lista dele.`,
+      confirmar: 'Sim, tirar da turma',
+      perigo: true,
+    });
+    if (!sim) return;
     this.service.removerDaTurma(t.id, a.id).subscribe({
       next: () => {
         this.aviso.set(`${a.nome} saiu da turma.`);

@@ -392,3 +392,28 @@ ol {
   margin-top: -4px;
   font-size: 14px;
 }
+
+/* Frase do dia: o resumo de hoje em uma linha, antes de tudo. */
+.frase-hoje {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 20px;
+  border-left: 5px solid var(--cor-primaria);
+  border-radius: 14px;
+  background: var(--cor-primaria-clara);
+  color: var(--cor-titulo);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.frase-hoje.feito {
+  border-left-color: var(--cor-sucesso);
+  background: var(--cor-sucesso-fundo);
+}
+
+.frase-hoje span {
+  font-size: 24px;
+}

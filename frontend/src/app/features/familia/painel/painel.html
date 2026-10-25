@@ -5,6 +5,11 @@
       <p>Acompanhe a rotina de {{ p.filho.primeiroNome }} em tempo real - {{ hoje }}</p>
     </header>
 
+    <p class="frase-hoje" [class.feito]="concluiuHoje()" role="status">
+      <span aria-hidden="true">{{ concluiuHoje() ? '🎉' : '📋' }}</span>
+      {{ fraseHoje() }}
+    </p>
+
     @if (p.alerta; as a) {
       <a
         class="alerta"

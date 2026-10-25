@@ -16,6 +16,25 @@
   }
 
   @if (contexto.visao(); as v) {
+    <section class="cartao hoje" aria-labelledby="titulo-hoje">
+      <h2 id="titulo-hoje">Hoje</h2>
+      @if (hojeItens().length) {
+        <ul>
+          @for (i of hojeItens(); track i.texto) {
+            <li [class]="i.tipo">
+              <span class="marca" aria-hidden="true">{{
+                i.tipo === 'ajuda' ? '✋' : i.tipo === 'prazo' ? '⏰' : '!'
+              }}</span>
+              <span class="texto">{{ i.texto }}</span>
+              <a class="link-acao" [routerLink]="i.link">{{ i.acao }}</a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="tranquilo">Nada urgente para hoje na {{ v.turma.nome }}. Bom trabalho!</p>
+      }
+    </section>
+
     @if (v.alunosComAtraso.length) {
       <p class="faixa alerta" role="status">
         <img src="assets/professor/icone-alerta.svg" alt="" />

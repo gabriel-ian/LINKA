@@ -154,3 +154,88 @@
 .aviso-caixa {
   margin: 0;
 }
+
+/* ---------- Bloco "Hoje" (o que precisa de atencao primeiro) ---------- */
+
+.hoje {
+  gap: 10px;
+  border-left: 5px solid var(--cor-primaria);
+}
+
+.hoje h2 {
+  margin: 0;
+  color: var(--cor-titulo);
+  font-size: 20px;
+}
+
+.hoje ul {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hoje li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.hoje li:last-child {
+  border-bottom: 0;
+}
+
+.hoje .marca {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--cor-primaria-clara);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.hoje li.ajuda .marca {
+  background: #f3e8ff;
+}
+
+.hoje li.prazo .marca {
+  background: var(--cor-alerta-fundo);
+}
+
+.hoje li.atencao .marca {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+}
+
+.hoje .texto {
+  flex: 1;
+  color: var(--cor-titulo);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.hoje .link-acao {
+  flex: none;
+}
+
+.hoje .tranquilo {
+  margin: 0;
+  font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  .hoje li {
+    flex-wrap: wrap;
+  }
+
+  .hoje .link-acao {
+    margin-left: 46px;
+  }
+}

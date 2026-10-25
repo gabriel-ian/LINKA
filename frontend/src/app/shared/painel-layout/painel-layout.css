@@ -8,7 +8,7 @@
 .topo,
 .rodape {
   flex: none;
-  height: 111px;
+  height: 64px;
   /* As imagens ja vem recortadas do Figma para preencher a faixa inteira. */
   background: url('/assets/adm/topo.png') 0 0 / 100% 100% no-repeat;
 }
@@ -19,7 +19,7 @@
 
 .topo .logo {
   display: inline-block;
-  margin: 35px 0 0 32px;
+  margin: 12px 0 0 32px;
 }
 
 .topo .logo img {
@@ -30,7 +30,7 @@
 
 .topo-acoes {
   position: absolute;
-  top: 34px;
+  top: 11px;
   right: 32px;
   display: flex;
   gap: 12px;
@@ -343,14 +343,16 @@
 
 .menu-titulo {
   margin: 0 0 6px;
-  font-size: var(--secao-tam);
+  color: var(--cor-texto);
+  font-size: 15px;
+  letter-spacing: 1px;
   font-weight: 600;
   line-height: 40px;
 }
 
 /* A margem do item anterior colapsa com esta: 55px = 15 do item + 40 do Figma. */
 .menu-titulo.seguinte {
-  margin-top: 55px;
+  margin-top: 36px;
 }
 
 /* As posicoes dos icones vem do Figma (borda externa); --b desconta a borda. */
@@ -361,21 +363,38 @@
   align-items: center;
   width: 280px;
   height: 45px;
-  margin-bottom: var(--gap-itens);
+  margin-bottom: calc(var(--gap-itens) - 8px);
   padding-left: calc(var(--rotulo-x) - var(--b));
-  border: var(--b) solid var(--cor-borda);
+  border: var(--b) solid transparent;
   border-radius: var(--raio);
-  background: #fff;
-  color: var(--cor-texto);
-  font-size: 24px;
+  background: transparent;
+  color: var(--cor-titulo);
+  font-size: 21px;
   font-weight: 500;
   text-decoration: none;
+  transition: background-color 0.15s;
 }
 
+.menu-item:hover {
+  background: var(--cor-fundo-painel);
+}
+
+/* Item ativo: fundo azul claro e uma barrinha a esquerda. */
 .menu-item.ativo {
-  --b: 2px;
-  border-color: var(--cor-primaria);
-  color: var(--cor-primaria);
+  background: var(--cor-primaria-clara);
+  color: var(--cor-primaria-escura);
+  font-weight: 700;
+}
+
+.menu-item.ativo::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: -1px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--cor-primaria);
 }
 
 button.menu-item {
@@ -390,10 +409,12 @@ button.menu-item {
 }
 
 .menu-item.filho.ativo {
-  --b: 1px;
-  border-color: #ffdfcc;
   background: #fef0e8;
   color: #f2620f;
+}
+
+.menu-item.filho.ativo::before {
+  background: #f2620f;
 }
 
 .icone {
@@ -669,16 +690,16 @@ button.menu-item {
 
   .topo,
   .rodape {
-    height: 72px;
+    height: 60px;
   }
 
   .topo .logo {
-    margin: 16px 0 0 16px;
+    margin: 10px 0 0 16px;
   }
 
   /* Celular: so os icones. */
   .topo-acoes {
-    top: 15px;
+    top: 9px;
     right: 16px;
     gap: 8px;
   }

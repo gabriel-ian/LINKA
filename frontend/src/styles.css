@@ -203,14 +203,14 @@ textarea {
 
 .painel-cabecalho h1 {
   margin: 0;
-  font-size: 48px;
+  font-size: 34px;
   font-weight: 600;
   line-height: normal;
 }
 
 .painel-cabecalho p {
   margin: 0;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 500;
 }
 
@@ -872,7 +872,7 @@ button.pilula.selecionada {
 
 @media (max-width: 700px) {
   .painel-cabecalho h1 {
-    font-size: 32px;
+    font-size: 27px;
   }
 
   .painel-cabecalho p {

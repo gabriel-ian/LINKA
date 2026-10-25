@@ -19,18 +19,18 @@
 
 .cabecalho h1 {
   margin: 0;
-  font-size: 40px;
+  font-size: 32px;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .cabecalho.coluna h1 {
-  font-size: 48px;
+  font-size: 36px;
 }
 
 .cabecalho p {
   margin: 0;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 500;
 }
 

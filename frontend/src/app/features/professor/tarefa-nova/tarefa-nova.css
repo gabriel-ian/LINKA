@@ -97,3 +97,19 @@
   display: flex;
   gap: 10px;
 }
+
+/* Celular: o aviso da IA e os botoes um embaixo do outro. */
+@media (max-width: 600px) {
+  .rodape {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .botoes {
+    flex-direction: column-reverse;
+  }
+
+  .botoes .bt {
+    width: 100%;
+  }
+}

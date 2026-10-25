@@ -7,13 +7,14 @@ import { PainelEscolaService } from '../../../core/services/painel-escola.servic
 import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { iniciaisPessoa } from '../escola-ui';
 import { DialogoService } from '../../../core/services/dialogo.service';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 const POR_PAGINA = 10;
 
 /** Familias da escola: busca, filhos de cada uma e atalho para cadastrar outro filho. */
 @Component({
   selector: 'app-escola-familias',
-  imports: [RouterLink, SenhaProvisoria],
+  imports: [Esqueleto, RouterLink, SenhaProvisoria],
   templateUrl: './familias.html',
   styleUrl: './familias.css',
 })

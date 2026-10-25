@@ -5,13 +5,14 @@ import { ItemTarefa } from '../../aluno/item-tarefa';
 import { dataLonga, hojeIso, horaCurta } from '../../aluno/aluno-ui';
 import { FamiliaContexto } from '../familia-contexto';
 import { corMateria } from '../familia-ui';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 const PONTO = { verde: 'ponto-verde', laranja: 'ponto-laranja', cinza: 'ponto-cinza' } as const;
 
 /** "Familia - Painel" do Figma: a rotina do filho escolhido. */
 @Component({
   selector: 'app-familia-painel',
-  imports: [RouterLink, ItemTarefa],
+  imports: [Esqueleto, RouterLink, ItemTarefa],
   templateUrl: './painel.html',
   styleUrls: ['../familia-comum.css', './painel.css'],
 })

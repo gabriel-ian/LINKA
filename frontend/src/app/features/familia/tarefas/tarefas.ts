@@ -5,13 +5,14 @@ import { TarefaDoFilho, TarefasDoFilho } from '../../../core/model/painel-famili
 import { PainelFamiliaService } from '../../../core/services/painel-familia.service';
 import { ItemTarefa } from '../../aluno/item-tarefa';
 import { FamiliaContexto } from '../familia-contexto';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 type Aba = 'aFazer' | 'atrasadas' | 'feitas';
 
 /** Todas as tarefas do filho: a fazer, atrasadas e feitas (com a entrega). */
 @Component({
   selector: 'app-familia-tarefas',
-  imports: [RouterLink, DatePipe, ItemTarefa],
+  imports: [Esqueleto, RouterLink, DatePipe, ItemTarefa],
   templateUrl: './tarefas.html',
   styleUrls: ['../familia-comum.css', './tarefas.css'],
 })

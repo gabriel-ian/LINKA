@@ -11,13 +11,14 @@ import { ProfessorContexto } from '../professor-contexto';
 import { hojeIso } from '../../adm/escola-ui';
 import { corDaSituacao, iniciaisPessoa } from '../../escola/escola-ui';
 import { primeiroNome } from '../professor-ui';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 type Campo = 'titulo' | 'descricao' | 'disciplina' | 'turma' | 'data';
 
 /** "Professor - Criar tarefa" do Figma. Com :id na rota, edita a tarefa. */
 @Component({
   selector: 'app-professor-tarefa-nova',
-  imports: [FormsModule, EditorTexto],
+  imports: [Esqueleto, FormsModule, EditorTexto],
   templateUrl: './tarefa-nova.html',
   styleUrl: './tarefa-nova.css',
 })

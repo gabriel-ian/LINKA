@@ -7,6 +7,7 @@ import { PainelEscolaService } from '../../../core/services/painel-escola.servic
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { EscolaContexto } from '../escola-contexto';
 import { DialogoService } from '../../../core/services/dialogo.service';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 type TurmaPrevia = PreviaVirada['turmas'][number];
 
@@ -16,7 +17,7 @@ type TurmaPrevia = PreviaVirada['turmas'][number];
  */
 @Component({
   selector: 'app-escola-virada',
-  imports: [FormsModule, RouterLink],
+  imports: [Esqueleto, FormsModule, RouterLink],
   templateUrl: './virada.html',
   styleUrl: './virada.css',
 })

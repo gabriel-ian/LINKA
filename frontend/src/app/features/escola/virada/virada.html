@@ -49,7 +49,7 @@
     }
 
     @if (carregando()) {
-      <p class="vazio">Carregando...</p>
+      <app-esqueleto [linhas]="4" rotulo="Carregando a prévia..." />
     } @else if (!previa()) {
       <section class="cartao">
         <p>

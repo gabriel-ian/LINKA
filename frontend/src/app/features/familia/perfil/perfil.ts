@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PerfilPagina } from '../../../shared/perfil-pagina/perfil-pagina';
 import { FamiliaContexto } from '../familia-contexto';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 /** "Meu perfil" da familia: dados do responsavel e os filhos vinculados. */
 @Component({
   selector: 'app-familia-perfil',
-  imports: [PerfilPagina, RouterLink],
+  imports: [Esqueleto, PerfilPagina, RouterLink],
   template: `
     @if (contexto.dados(); as d) {
       <app-perfil-pagina
@@ -56,7 +57,7 @@ import { FamiliaContexto } from '../familia-contexto';
         </div>
       </app-perfil-pagina>
     } @else {
-      <p>Carregando...</p>
+      <app-esqueleto tipo="pagina" [linhas]="3" rotulo="Carregando o perfil..." />
     }
   `,
 })

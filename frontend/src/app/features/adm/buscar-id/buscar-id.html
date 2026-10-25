@@ -17,7 +17,7 @@
   }
 
   @if (carregando()) {
-    <p class="vazio">Carregando...</p>
+    <app-esqueleto [linhas]="3" rotulo="Carregando a escola..." />
   } @else if (escola(); as e) {
     <section class="cartao">
       <div class="topo">

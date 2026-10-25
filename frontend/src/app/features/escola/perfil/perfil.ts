@@ -2,11 +2,12 @@ import { Component, computed, inject } from '@angular/core';
 import { PerfilPagina } from '../../../shared/perfil-pagina/perfil-pagina';
 import { dataBr, iniciais, ROTULO_PLANO } from '../../adm/escola-ui';
 import { EscolaContexto } from '../escola-contexto';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 /** "Meu perfil" da escola: dados da instituicao, coordenacao, plano e numeros. */
 @Component({
   selector: 'app-escola-perfil',
-  imports: [PerfilPagina],
+  imports: [Esqueleto, PerfilPagina],
   template: `
     @if (contexto.escola(); as e) {
       <app-perfil-pagina
@@ -84,7 +85,7 @@ import { EscolaContexto } from '../escola-contexto';
         </div>
       </app-perfil-pagina>
     } @else {
-      <p>Carregando...</p>
+      <app-esqueleto tipo="pagina" [linhas]="3" rotulo="Carregando o perfil..." />
     }
   `,
 })

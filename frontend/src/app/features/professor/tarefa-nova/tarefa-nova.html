@@ -17,7 +17,7 @@
   }
 
   @if (carregando()) {
-    <p class="cartao">Carregando a tarefa...</p>
+    <app-esqueleto [linhas]="4" rotulo="Carregando a tarefa..." />
   }
 
   <form class="cartao formulario" [hidden]="carregando()" (ngSubmit)="salvar()" novalidate>

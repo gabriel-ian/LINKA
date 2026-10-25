@@ -70,5 +70,5 @@
 } @else if (erro()) {
   <p class="alerta-erro" role="alert">{{ erro() }}</p>
 } @else {
-  <p class="carregando">Carregando as tarefas...</p>
+  <app-esqueleto tipo="pagina" [linhas]="4" rotulo="Carregando as tarefas..." />
 }

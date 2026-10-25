@@ -16,11 +16,12 @@ import {
 } from '../escola-ui';
 import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { DialogoService } from '../../../core/services/dialogo.service';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 /** "ADM - Buscar por ID" do Figma. O ID fica na URL (?id=) para poder ser linkado. */
 @Component({
   selector: 'app-buscar-id',
-  imports: [FormsModule, RouterLink, SenhaProvisoria],
+  imports: [Esqueleto, FormsModule, RouterLink, SenhaProvisoria],
   templateUrl: './buscar-id.html',
   styleUrl: './buscar-id.css',
 })

@@ -4,6 +4,7 @@ import { AvisoAluno } from '../../../core/model/painel-aluno.model';
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
 import { VozService } from '../../../core/services/voz.service';
 import { AlunoContexto } from '../aluno-contexto';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 const ROTULO: Record<AvisoAluno['tipo'], string> = {
   atividade: 'Atividade',
@@ -18,7 +19,7 @@ const ROTULO: Record<AvisoAluno['tipo'], string> = {
  */
 @Component({
   selector: 'app-aluno-avisos',
-  imports: [DatePipe],
+  imports: [Esqueleto, DatePipe],
   templateUrl: './avisos.html',
   styleUrl: './avisos.css',
 })

@@ -11,7 +11,10 @@ import { dataDe, hojeIso, horaCurta, intervaloSemana, isoDe, plural } from '../a
 const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const CORES_LEMBRETE = ['laranja', 'roxo', 'vermelho', 'azul'];
 
-/** "Aluno - Agenda" do Figma: semana de segunda a sexta e lembretes. */
+/**
+ * "Aluno - Agenda" do Figma: semana de segunda a sexta e lembretes. Sabado e
+ * domingo aparecem quando tem tarefa neles ou quando e hoje.
+ */
 @Component({
   selector: 'app-aluno-agenda',
   imports: [FormsModule, RouterLink],

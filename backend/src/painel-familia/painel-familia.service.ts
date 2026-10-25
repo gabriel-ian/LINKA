@@ -330,9 +330,10 @@ export class PainelFamiliaService {
         );
         eventos.push({
           cor: 'laranja',
-          titulo: `${materia} ainda não iniciada`,
+          // O titulo distingue duas tarefas da mesma materia no mesmo dia.
+          titulo: `${t.titulo} ainda não iniciada`,
           detalhe:
-            `Prazo: ${horaLimite(t.horaLimite) || 'hoje'}` +
+            `Prazo: ${horaLimite(t.horaLimite) || 'hoje'} - ${materia}` +
             (incentivo
               ? ` - Incentivo enviado às ${hora(incentivo.criadoEm)}`
               : ''),

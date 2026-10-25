@@ -19,7 +19,7 @@
       </div>
     </header>
 
-    <ol class="dias">
+    <ol class="dias" [style.--colunas]="a.dias.length">
       @for (d of a.dias; track d.data) {
         <li class="dia" [class.hoje]="d.data === hoje">
           <div class="dia-topo">

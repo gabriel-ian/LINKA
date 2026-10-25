@@ -667,7 +667,7 @@ export class PainelAlunoService {
       throw new BadRequestException('Data invalida');
     const [inicio] = semanaDe(base);
 
-    const dias = Array.from({ length: 5 }, (_, i) => {
+    const semana = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(`${inicio}T12:00:00`);
       d.setDate(d.getDate() + i);
       const dia = iso(d);
@@ -682,6 +682,13 @@ export class PainelAlunoService {
           .map((t) => this.resumoTarefa(t)),
       };
     });
+    // Segunda a sexta; o fim de semana entra quando tem tarefa ou e hoje
+    // (senao a tarefa de sabado/domingo some da agenda).
+    const fimDeSemana = semana.slice(5);
+    const hojeIso = iso(new Date());
+    const dias = fimDeSemana.some((d) => d.tarefas.length || d.data === hojeIso)
+      ? semana
+      : semana.slice(0, 5);
 
     const desde = new Date();
     desde.setHours(0, 0, 0, 0);
@@ -694,7 +701,7 @@ export class PainelAlunoService {
     return {
       data: {
         inicio,
-        fim: dias[4].data,
+        fim: dias[dias.length - 1].data,
         dias,
         lembretes: lembretes.map((l) => ({
           id: Number(l.id),

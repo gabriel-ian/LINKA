@@ -22,7 +22,8 @@
 
 .dias {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  /* 5 dias; 7 quando o fim de semana tem tarefa ou e hoje. */
+  grid-template-columns: repeat(var(--colunas, 5), minmax(0, 1fr));
   align-items: start;
   gap: 16px;
   margin: 0;

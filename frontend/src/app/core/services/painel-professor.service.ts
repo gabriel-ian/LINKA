@@ -10,6 +10,7 @@ import {
   ComunicadoSalvo,
   ContextoProfessor,
   EdicaoTarefa,
+  PerfilProfessor,
   ListaComunicados,
   NovaTarefa,
   NovoComunicado,
@@ -27,6 +28,10 @@ export class PainelProfessorService {
 
   contexto(): Observable<ApiResponse<ContextoProfessor>> {
     return this.http.get<ApiResponse<ContextoProfessor>>(`${this.api}/contexto`);
+  }
+
+  perfil(): Observable<ApiResponse<PerfilProfessor>> {
+    return this.http.get<ApiResponse<PerfilProfessor>>(`${this.api}/perfil`);
   }
 
   visao(turmaId: number): Observable<ApiResponse<VisaoTurma>> {

@@ -1018,3 +1018,130 @@ button.pilula.selecionada {
 app-editor-texto .tox-tinymce {
   border-radius: var(--raio);
 }
+
+/* ---------- Telas "Meu perfil": blocos de informacao ---------- */
+
+.perfil-blocos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 20px;
+}
+
+.perfil-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 24px;
+}
+
+.perfil-bloco h2 {
+  margin: 0;
+  color: var(--cor-titulo);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.perfil-dados {
+  display: grid;
+  grid-template-columns: minmax(140px, max-content) 1fr;
+  gap: 10px 20px;
+  margin: 0;
+}
+
+.perfil-dados dt {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.perfil-dados dd {
+  margin: 0;
+  color: var(--cor-titulo);
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.perfil-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.perfil-chips span {
+  padding: 4px 12px;
+  border-radius: 59px;
+  background: var(--cor-fundo-painel);
+  color: var(--cor-titulo);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.perfil-numeros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.perfil-numeros div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--cor-fundo-painel);
+}
+
+.perfil-numeros strong {
+  color: var(--cor-primaria-escura);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.perfil-numeros span {
+  font-size: 14px;
+}
+
+.perfil-lista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perfil-lista li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.perfil-lista li:last-child {
+  border-bottom: 0;
+}
+
+.perfil-lista strong {
+  color: var(--cor-titulo);
+  font-size: 16px;
+}
+
+.perfil-lista small {
+  font-size: 14px;
+}
+
+@media (max-width: 700px) {
+  .perfil-blocos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .perfil-dados {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .perfil-dados dd {
+    margin-bottom: 10px;
+  }
+}

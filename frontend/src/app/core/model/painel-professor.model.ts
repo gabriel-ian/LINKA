@@ -8,6 +8,15 @@ export interface TurmaProfessor {
   codigo: string;
 }
 
+export interface PerfilProfessor {
+  nome: string;
+  email: string | null;
+  ultimoAcesso: string | null;
+  escola: string;
+  disciplinas: string[];
+  turmas: { id: number; nome: string; disciplinas: string[]; alunos: number; nee: number }[];
+}
+
 export interface ContextoProfessor {
   nome: string;
   escola: string;

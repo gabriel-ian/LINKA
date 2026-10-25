@@ -114,6 +114,71 @@ export class PainelProfessorService {
     };
   }
 
+  /** Tela "Meu perfil": dados do professor e o que da em cada turma. */
+  async perfil(usuarioId: number, escolaId: number) {
+    const professor = await this.professor(usuarioId, escolaId);
+    const [usuario]: { email: string; ultimoLogin: Date | null }[] =
+      await this.dataSource.query(
+        'SELECT email, ultimo_login ultimoLogin FROM usuario WHERE id = ?',
+        [usuarioId],
+      );
+    const linhas: {
+      id: number;
+      nome: string;
+      disciplina: string | null;
+      alunos: number;
+      nee: number;
+    }[] = await this.dataSource.query(
+      `SELECT t.id, t.nome, d.nome disciplina,
+              (SELECT COUNT(*) FROM matricula m WHERE m.turma_id = t.id) alunos,
+              (SELECT COUNT(*) FROM matricula m JOIN aluno a ON a.id = m.aluno_id
+                WHERE m.turma_id = t.id AND a.neurodivergente = 1) nee
+         FROM turma_professor_disciplina tpd
+         JOIN turma t ON t.id = tpd.turma_id AND t.encerrada = 0
+         LEFT JOIN disciplina d ON d.id = tpd.disciplina_id
+        WHERE tpd.professor_id = ?
+        ORDER BY t.nome, d.nome`,
+      [professor.id],
+    );
+
+    const turmas = new Map<
+      number,
+      {
+        id: number;
+        nome: string;
+        disciplinas: string[];
+        alunos: number;
+        nee: number;
+      }
+    >();
+    for (const l of linhas) {
+      const id = Number(l.id);
+      const t = turmas.get(id) ?? {
+        id,
+        nome: l.nome,
+        disciplinas: [],
+        alunos: Number(l.alunos),
+        nee: Number(l.nee),
+      };
+      if (l.disciplina && !t.disciplinas.includes(l.disciplina))
+        t.disciplinas.push(l.disciplina);
+      turmas.set(id, t);
+    }
+
+    return {
+      data: {
+        nome: professor.nome,
+        email: usuario?.email ?? null,
+        ultimoAcesso: usuario?.ultimoLogin ?? null,
+        escola: professor.escola,
+        disciplinas: (await this.disciplinasDoProfessor(professor.id)).map(
+          (d: { nome: string }) => d.nome,
+        ),
+        turmas: [...turmas.values()],
+      },
+    };
+  }
+
   // -------------------------------------------------------- visao geral
 
   async visao(usuarioId: number, escolaId: number, turmaId: number) {

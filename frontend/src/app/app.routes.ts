@@ -42,6 +42,10 @@ export const routes: Routes = [
           import('./features/adm/visao-geral/visao-geral').then((m) => m.VisaoGeral),
       },
       {
+        path: 'perfil',
+        loadComponent: () => import('./features/adm/perfil/perfil').then((m) => m.AdmPerfil),
+      },
+      {
         path: 'escolas',
         loadComponent: () =>
           import('./features/adm/escolas-lista/escolas-lista').then((m) => m.EscolasLista),
@@ -146,6 +150,11 @@ export const routes: Routes = [
           import('./features/familia/painel/painel').then((m) => m.FamiliaPainel),
       },
       {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/familia/perfil/perfil').then((m) => m.FamiliaPerfil),
+      },
+      {
         path: 'incentivo',
         loadComponent: () =>
           import('./features/familia/incentivo/incentivo').then((m) => m.FamiliaIncentivo),
@@ -185,6 +194,10 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./features/escola/painel/painel').then((m) => m.EscolaPainel),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () => import('./features/escola/perfil/perfil').then((m) => m.EscolaPerfil),
       },
       {
         path: 'turmas',
@@ -278,6 +291,11 @@ export const routes: Routes = [
         path: '',
         loadComponent: () =>
           import('./features/professor/visao/visao').then((m) => m.ProfessorVisao),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/professor/perfil/perfil').then((m) => m.ProfessorPerfil),
       },
       {
         path: 'tarefas',

@@ -44,6 +44,12 @@ export class PainelProfessorController {
     return this.painel.contexto(usuarioId, escolaId);
   }
 
+  @Get('perfil')
+  @ApiOperation({ summary: 'Meu perfil: dados do professor e suas turmas' })
+  perfil(@UsuarioId() usuarioId: number, @EscolaId() escolaId: number) {
+    return this.painel.perfil(usuarioId, escolaId);
+  }
+
   @Get('turmas/:id/visao')
   @ApiOperation({ summary: 'Visao geral da turma' })
   visao(

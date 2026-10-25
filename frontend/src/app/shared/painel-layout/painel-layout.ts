@@ -63,8 +63,10 @@ export interface ConfigPainel {
   titulo: string;
   /** Etiqueta do perfil ao lado do nome (ex.: "Escola", "Professor(a)"). */
   perfil?: string;
-  /** Segunda linha do cartao da barra: informacoes com icone. */
+  /** Informacoes com icone ao lado do nome, na barra. */
   infos?: InfoBarra[];
+  /** Tela "Meu perfil" (botao no canto direito da barra). */
+  perfilRota?: string;
   secoes: { titulo: string; itens: ItemMenu[] }[];
   conta: {
     iniciais: string;

@@ -42,6 +42,7 @@ export class AdmLayout {
   readonly config = computed<ConfigPainel>(() => ({
     titulo: 'Administração Linka',
     perfil: 'ADM',
+    perfilRota: '/adm/perfil',
     infos: this.email ? [{ icone: 'email', texto: this.email }] : [],
     medidas: { rotuloX: 44, visaoX: 18, secaoTam: 36, gapItens: 16 },
     secoes: [

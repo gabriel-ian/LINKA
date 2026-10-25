@@ -46,6 +46,7 @@ export class ProfessorLayout {
     return {
       titulo: dados?.nome ?? 'Professor',
       perfil: 'Professor(a)',
+      perfilRota: '/professor/perfil',
       infos: dados
         ? [
             { icone: 'escola', texto: dados.escola },

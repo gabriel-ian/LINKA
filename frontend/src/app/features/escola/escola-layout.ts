@@ -27,6 +27,7 @@ export class EscolaLayout {
     return {
       titulo: escola?.nome ?? 'Painel da escola',
       perfil: 'Escola',
+      perfilRota: '/escola/perfil',
       infos: escola
         ? [
             { icone: 'plano', texto: `Plano ${ROTULO_PLANO[escola.plano]}` },

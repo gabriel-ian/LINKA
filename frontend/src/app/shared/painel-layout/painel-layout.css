@@ -743,3 +743,51 @@ button.menu-item {
     margin-bottom: 64px;
   }
 }
+
+/* ---------- Botao "Meu perfil" na barra ---------- */
+
+.barra-icones {
+  align-items: center;
+}
+
+.botao-perfil {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  margin-right: 6px;
+  padding: 0 16px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 59px;
+  background: #fff;
+  color: var(--cor-titulo);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.botao-perfil svg {
+  color: var(--cor-primaria);
+}
+
+.botao-perfil:hover,
+.botao-perfil.ativo {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria-clara);
+  color: var(--cor-primaria-escura);
+}
+
+@media (max-width: 1000px) {
+  /* Celular: so o icone. */
+  .botao-perfil {
+    width: 40px;
+    margin-right: 0;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .botao-perfil span {
+    display: none;
+  }
+}

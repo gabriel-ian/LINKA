@@ -73,6 +73,7 @@ export class FamiliaLayout {
     return {
       titulo: resp ? `Família ${resp.sobrenome}` : 'Família',
       perfil: 'Família',
+      perfilRota: '/familia/perfil',
       infos: [
         ...(resp ? [{ icone: 'pessoa' as const, texto: `Responsável: ${resp.nome}` }] : []),
         ...(filho

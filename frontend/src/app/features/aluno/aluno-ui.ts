@@ -112,3 +112,37 @@ export const MEDALHAS: Record<string, { simbolo: string; cor: string }> = {
 };
 
 export const COR_BLOQUEADA = '#c7c7c7';
+
+/** Figura de cada passo pelo que ele pede: ajuda quem tem dificuldade de leitura. */
+const ICONES_PASSO: [RegExp, string, string][] = [
+  [/\b(separ|peg|organiz|material|mochila|caderno|l[aá]pis)/i, '🎒', 'separar o material'],
+  [/\b(le[iy]a|ler\b|leitura|texto|cap[ií]tulo|p[aá]gina)/i, '📖', 'ler'],
+  [/\b(ou[cç]a|escut|ouvir)/i, '🎧', 'ouvir'],
+  [/\b(desenh|pint|colora)/i, '🎨', 'desenhar'],
+  [/\b(recort|cole\b|colar)/i, '✂️', 'recortar'],
+  [
+    /\b(calcul|some|soma|subtra|multiplic|divid|conta|n[uú]mero|resolv|exerc[ií]cio)/i,
+    '🔢',
+    'calcular',
+  ],
+  [/\b(pesquis|procur|busqu)/i, '🔎', 'pesquisar'],
+  [/\b(revis|confir|verifiqu|olhe de novo)/i, '✅', 'revisar'],
+  [/\b(escrev|anot|copi|respond|complet|preench|marqu)/i, '✏️', 'escrever'],
+  [/\b(pausa|descans|respir|beba [aá]gua)/i, '🧘', 'pausa'],
+  [/\b(entreg|envi|mostr)/i, '📤', 'entregar'],
+];
+
+export function iconePasso(texto: string): { emoji: string; rotulo: string } | null {
+  const achado = ICONES_PASSO.find(([re]) => re.test(texto));
+  return achado ? { emoji: achado[1], rotulo: achado[2] } : null;
+}
+
+/** Frases curtas de incentivo depois de cada passo. */
+export const ELOGIOS = [
+  'Mandou bem!',
+  'Isso aí!',
+  'Muito bem!',
+  'Arrasou!',
+  'Passo feito!',
+  'Show!',
+];

@@ -27,7 +27,14 @@
       @if (atual() < total()) {
         <section class="calma-cartao" aria-live="polite">
           <small>PASSO {{ atual() + 1 }}</small>
-          <p class="calma-texto">{{ t.passos[atual()] }}</p>
+          <p class="calma-texto">
+            @if (icone(t.passos[atual()]); as ic) {
+              <span class="passo-icone" role="img" [attr.aria-label]="ic.rotulo">{{
+                ic.emoji
+              }}</span>
+            }
+            {{ t.passos[atual()] }}
+          </p>
           @if (erro()) {
             <p class="alerta-erro" role="alert">{{ erro() }}</p>
           }
@@ -227,7 +234,14 @@
               <h3>
                 Passo {{ i + 1 }}<span class="de-total"> de {{ total() }}</span>
               </h3>
-              <p>{{ p }}</p>
+              <p class="passo-texto">
+                @if (icone(p); as ic) {
+                  <span class="passo-icone" role="img" [attr.aria-label]="ic.rotulo">{{
+                    ic.emoji
+                  }}</span>
+                }
+                {{ p }}
+              </p>
               @if (i < atual()) {
                 <small><img src="assets/aluno/relogio-p.svg" alt="" /> concluído</small>
               }
@@ -320,4 +334,14 @@
       }
     </div>
   }
+}
+
+@if (comemoracao(); as c) {
+  <div class="comemoracao" [class.calma]="calmo()" role="status" aria-live="polite">
+    @if (!calmo()) {
+      <span class="estrelas" aria-hidden="true">⭐ ✨ ⭐</span>
+    }
+    <strong>{{ c.texto }}</strong>
+    <span>{{ c.falta }}</span>
+  </div>
 }

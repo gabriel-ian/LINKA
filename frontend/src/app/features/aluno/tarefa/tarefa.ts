@@ -11,7 +11,7 @@ import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { EditorTexto, temTexto } from '../../../shared/editor-texto/editor-texto';
 import { AlunoContexto } from '../aluno-contexto';
-import { hojeIso, horaCurta, plural, tituloCompleto } from '../aluno-ui';
+import { ELOGIOS, hojeIso, horaCurta, iconePasso, plural, tituloCompleto } from '../aluno-ui';
 
 /** Icone do Figma para cada material, pelo nome que a IA escreveu. */
 const ICONES_MATERIAL: [RegExp, string][] = [
@@ -41,6 +41,11 @@ export class AlunoTarefa {
   readonly tarefa = signal<TarefaAluno | null>(null);
   readonly erro = signal('');
   readonly salvando = signal(false);
+
+  readonly icone = iconePasso;
+  /** Comemoracao rapida depois de cada passo (some sozinha). */
+  readonly comemoracao = signal<{ texto: string; falta: string } | null>(null);
+  private timerComemoracao?: ReturnType<typeof setTimeout>;
 
   /** Resposta escrita (editor). */
   resposta = '';
@@ -131,6 +136,16 @@ export class AlunoTarefa {
     });
   }
 
+  private comemorar(feitos: number): void {
+    const faltam = this.total() - feitos;
+    const texto = this.calmo() ? 'Passo feito.' : ELOGIOS[feitos % ELOGIOS.length];
+    const falta = faltam === 1 ? 'Falta só 1 passo!' : `Faltam ${faltam} passos.`;
+    this.comemoracao.set({ texto, falta });
+    this.contexto.fala.set(`${texto} ${falta}`);
+    clearTimeout(this.timerComemoracao);
+    this.timerComemoracao = setTimeout(() => this.comemoracao.set(null), 2200);
+  }
+
   /** Volta para onde o aluno estava (Agenda, Inicio ou Tarefas). */
   voltar(): void {
     this.navegacao.voltar('/aluno/tarefas');
@@ -218,6 +233,7 @@ export class AlunoTarefa {
           return;
         }
         this.tarefa.set({ ...t, passosFeitos: res.data.passosFeitos, situacao: 'em-andamento' });
+        this.comemorar(res.data.passosFeitos);
         if (this.contexto.resumo()?.preferencias.ouvirVoz) this.ouvirPasso(res.data.passosFeitos);
       },
       error: (e: HttpErrorResponse) => {

@@ -9,6 +9,7 @@
 
 .cabecalho h1 {
   margin: 0;
+  color: var(--cor-titulo);
   font-size: 34px;
   font-weight: 600;
   line-height: 1.2;
@@ -23,7 +24,7 @@
 .bloco {
   position: relative;
   border: 1px solid var(--cor-linha);
-  border-radius: 16px;
+  border-radius: var(--raio-cartao);
   background: #fff;
   box-shadow: var(--sombra-cartao);
 }
@@ -135,10 +136,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: var(--altura-botao);
   padding: 0 22px;
   border: 1px solid var(--cor-borda);
-  border-radius: 10px;
+  border-radius: var(--raio);
   background: #fff;
   color: var(--cor-texto);
   font-family: inherit;

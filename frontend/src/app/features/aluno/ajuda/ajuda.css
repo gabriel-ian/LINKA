@@ -6,6 +6,7 @@
 }
 
 .cabecalho h1 {
+  color: var(--cor-titulo);
   margin: 0;
   font-size: 36px;
   font-weight: 600;

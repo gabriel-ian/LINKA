@@ -24,7 +24,12 @@
   --cor-azul-forte: #1558d6;
   --cor-alerta: #b8420a;
   --cor-alerta-fundo: #fef0e8;
-  --sombra-cartao: 0 4px 4px rgba(0, 0, 0, 0.25);
+  /* Sombra suave e igual em todos os cartoes (antes 0 4px 4px preta 25%). */
+  --sombra-cartao: 0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 16px rgba(16, 24, 40, 0.08);
+  /* Padroes comuns de todos os perfis. */
+  --raio-cartao: 16px;
+  --altura-botao: 46px;
+  --anel-foco: 0 0 0 3px rgba(34, 119, 229, 0.35);
 
   --raio: 10px;
   --altura-campo: 53px;
@@ -209,6 +214,7 @@ textarea {
 
 .painel-cabecalho h1 {
   margin: 0;
+  color: var(--cor-titulo);
   font-size: 34px;
   font-weight: 600;
   line-height: normal;
@@ -226,7 +232,7 @@ textarea {
   gap: 18px;
   padding: 22px 24px;
   border: 1px solid var(--cor-linha);
-  border-radius: 16px;
+  border-radius: var(--raio-cartao);
   background: #fff;
   box-shadow: var(--sombra-cartao);
 }
@@ -373,7 +379,13 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 22px;
+  gap: 8px;
+  min-height: var(--altura-botao);
+  padding: 0 22px;
+  font-family: inherit;
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
   border: 1px solid transparent;
   border-radius: var(--raio);
   font-size: 16px;
@@ -390,7 +402,8 @@ textarea {
 }
 
 .bt-p {
-  padding: 7px 14px;
+  min-height: 36px;
+  padding: 0 14px;
   font-size: 14px;
 }
 
@@ -1150,4 +1163,15 @@ app-editor-texto .tox-tinymce {
   .perfil-dados dd {
     margin-bottom: 10px;
   }
+}
+
+/* ---------- Padrao comum: foco visivel do teclado em todos os perfis ---------- */
+
+:is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--anel-foco);
+}
+
+.bt-perigo:hover:not(:disabled) {
+  background: var(--cor-erro-fundo);
 }

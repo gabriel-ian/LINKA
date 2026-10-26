@@ -18,6 +18,7 @@
 }
 
 .cabecalho h1 {
+  color: var(--cor-titulo);
   margin: 0;
   font-size: 32px;
   font-weight: 600;
@@ -44,7 +45,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--cor-linha);
-  border-radius: 16px;
+  border-radius: var(--raio-cartao);
   background: #fff;
   box-shadow: var(--sombra-cartao);
 }

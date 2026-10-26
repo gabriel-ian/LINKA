@@ -32,7 +32,7 @@
 
 .cartao-aluno {
   border: 1px solid var(--cor-linha);
-  border-radius: 16px;
+  border-radius: var(--raio-cartao);
   background: #fff;
   box-shadow: var(--sombra-cartao);
 }

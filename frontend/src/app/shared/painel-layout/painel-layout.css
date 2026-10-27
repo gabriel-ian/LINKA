@@ -259,10 +259,10 @@
   width: min(693px, 100%);
   min-height: 32px;
   padding: 4px 16px;
-  border: 1px solid #00704d;
+  border: 1px solid var(--cor-mascote, #00704d);
   border-radius: 55px;
-  background: #b8d7cd;
-  color: #00704d;
+  background: var(--cor-mascote-clara, #b8d7cd);
+  color: var(--cor-mascote, #00704d);
   font-size: 16px;
   font-weight: 700;
   line-height: 18px;
@@ -275,7 +275,7 @@
 }
 
 .balao.falando {
-  box-shadow: 0 0 0 3px rgba(0, 112, 77, 0.25);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cor-mascote, #00704d) 25%, transparent);
 }
 
 .menu-contador {

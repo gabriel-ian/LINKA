@@ -6,13 +6,14 @@ import { TarefaResumoAluno } from '../../../core/model/painel-aluno.model';
 import { VozService } from '../../../core/services/voz.service';
 import { AlunoContexto } from '../aluno-contexto';
 import { ItemTarefa } from '../item-tarefa';
+import { MascoteDesenho } from '../../../shared/mascote/mascote';
 import { AdmResultado } from '../../adm/resultado/resultado';
 import { dataLonga, hojeIso, horaCurta, prazo, tituloCompleto } from '../aluno-ui';
 
 /** "Aluno - Tarefas" e "Aluno - Tarefas (tudo feito hoje)" do Figma. */
 @Component({
   selector: 'app-aluno-tarefas',
-  imports: [RouterLink, ItemTarefa, AdmResultado, DatePipe],
+  imports: [RouterLink, ItemTarefa, AdmResultado, DatePipe, MascoteDesenho],
   templateUrl: './tarefas.html',
   styleUrl: './tarefas.css',
 })

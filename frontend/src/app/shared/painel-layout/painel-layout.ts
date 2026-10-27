@@ -4,6 +4,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { AlterarSenha } from '../senha/alterar-senha';
 import { DialogoService } from '../../core/services/dialogo.service';
 import { VozService } from '../../core/services/voz.service';
+import { MascoteDesenho } from '../mascote/mascote';
+import { Mascote } from '../../core/model/painel-aluno.model';
 
 /** Uma camada de icone do menu, na posicao do Figma (relativa a borda externa do botao). */
 export interface CamadaIcone {
@@ -79,6 +81,8 @@ export interface ConfigPainel {
   medidas: { rotuloX: number; visaoX: number; secaoTam: number; gapItens: number };
   /** Aluno: o mascote fala na barra, ao lado do cartao (com botao de ouvir). */
   fala?: string;
+  /** Aluno: qual mascote fala (desenho e cores). */
+  mascote?: Mascote;
   /** Aluno/familia: barra de abas no rodape, so no celular. */
   abas?: Aba[];
   /** Preferencias do aluno que mudam a moldura inteira. */
@@ -103,7 +107,7 @@ export interface Notificacao {
  */
 @Component({
   selector: 'app-painel-layout',
-  imports: [RouterLink, RouterLinkActive, AlterarSenha],
+  imports: [RouterLink, RouterLinkActive, AlterarSenha, MascoteDesenho],
   templateUrl: './painel-layout.html',
   styleUrl: './painel-layout.css',
   host: {

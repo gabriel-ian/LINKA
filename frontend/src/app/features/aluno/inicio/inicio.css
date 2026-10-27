@@ -230,6 +230,12 @@
   top: 24px;
   left: 63px;
   width: 110px;
+  height: 110px;
+  opacity: 0.1;
+}
+
+.recado-dino {
+  height: 54px;
 }
 
 .estrela {
@@ -335,7 +341,53 @@ li a {
 }
 
 .foto {
-  border-color: #00704d;
+  border-color: var(--cor-mascote, #00704d);
+}
+
+/* Coruja e Robo: cena desenhada na cor do mascote (o Dino usa a foto). */
+.cena {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background:
+    radial-gradient(circle at 50% 42%, #fff 0 28%, transparent 29%),
+    var(--cor-mascote-fundo, #e3f3ec);
+}
+
+.cena-mascote {
+  width: 46%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.cena-nome {
+  color: var(--cor-mascote);
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.cena-enfeite {
+  position: absolute;
+  font-size: 34px;
+}
+
+.e1 {
+  top: 10%;
+  left: 12%;
+}
+
+.e2 {
+  top: 16%;
+  right: 12%;
+}
+
+.e3 {
+  bottom: 12%;
+  left: 16%;
 }
 
 .imagem {

@@ -10,9 +10,14 @@ const ALUNO = 'assets/aluno/menu-';
 const ESCOLA = 'assets/escola/menu-';
 const PROF = 'assets/professor/menu-';
 
-/** Moldura das telas "Aluno - ..." do Figma: o Dino fala na barra. */
+/** Moldura das telas "Aluno - ..." do Figma: o mascote fala na barra. */
 @Component({
   selector: 'app-aluno-layout',
+  host: {
+    '[style.--cor-mascote]': 'contexto.infoMascote().cor',
+    '[style.--cor-mascote-clara]': 'contexto.infoMascote().corClara',
+    '[style.--cor-mascote-fundo]': 'contexto.infoMascote().corFundo',
+  },
   imports: [RouterOutlet, PainelLayout],
   template: `
     <app-painel-layout [config]="config()" [notificacoes]="notificacoes()">
@@ -49,6 +54,7 @@ export class AlunoLayout {
       fala: this.contexto.semConexao()
         ? 'Sem internet agora - mas suas missões estão salvas.'
         : this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),
+      mascote: this.contexto.mascote(),
       modoCalmo: r?.preferencias.modoCalmo,
       letrasMaiores: r?.preferencias.letrasMaiores,
       fonteDislexia: r?.preferencias.fonteDislexia,

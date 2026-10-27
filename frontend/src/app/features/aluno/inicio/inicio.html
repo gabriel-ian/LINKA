@@ -53,7 +53,7 @@
 
     @if (incentivo(); as i) {
       <section class="recado" aria-label="Recado da sua família" aria-live="polite">
-        <img class="recado-dino" src="assets/aluno/dino.svg" alt="" />
+        <app-mascote class="recado-dino" [tipo]="contexto.mascote()" />
         <div>
           <span class="recado-de">{{ i.de }} mandou um recado</span>
           <p>{{ i.mensagem }}</p>
@@ -91,7 +91,7 @@
 
     <div class="numeros">
       <div class="numero verde">
-        <img class="decoracao dino" src="assets/aluno/dino-marca.svg" alt="" />
+        <app-mascote class="decoracao dino" [tipo]="contexto.mascote()" />
         <span><b class="longo">Tarefas hoje</b><b class="curto">Hoje</b></span>
         <strong>{{ contexto.deHoje().length }}</strong>
         <small
@@ -143,8 +143,18 @@
         <a class="ver-todas" routerLink="/aluno/tarefas">Ver todas as tarefas</a>
       </section>
 
-      <section class="cartao-aluno foto" aria-label="Meu tema">
-        <img class="imagem" src="assets/aluno/foto-dino.png" alt="Um dinossauro de boca aberta" />
+      <section class="cartao-aluno foto" [class]="'cartao-aluno foto ' + contexto.mascote()" aria-label="Meu mascote">
+        @if (contexto.mascote() === 'dino') {
+          <img class="imagem" src="assets/aluno/foto-dino.png" alt="Um dinossauro de boca aberta" />
+        } @else {
+          <div class="cena" role="img" [attr.aria-label]="'Meu mascote: ' + contexto.infoMascote().nome">
+            <span class="cena-enfeite e1" aria-hidden="true">{{ contexto.mascote() === 'coruja' ? '🌙' : '⚙️' }}</span>
+            <span class="cena-enfeite e2" aria-hidden="true">{{ contexto.mascote() === 'coruja' ? '⭐' : '💡' }}</span>
+            <span class="cena-enfeite e3" aria-hidden="true">{{ contexto.mascote() === 'coruja' ? '📚' : '🔧' }}</span>
+            <app-mascote class="cena-mascote" [tipo]="contexto.mascote()" />
+            <strong class="cena-nome">{{ contexto.infoMascote().nome }}</strong>
+          </div>
+        }
         <a class="editar" routerLink="/aluno/perfil" aria-label="Mudar meus interesses">
           <img src="assets/aluno/icone-lapis.svg" alt="" width="12" height="12" />
         </a>

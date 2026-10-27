@@ -125,7 +125,7 @@
     </div>
     @if (config().fala; as fala) {
       <div class="fala">
-        <img class="mascote" src="assets/aluno/dino.svg" alt="" />
+        <app-mascote class="mascote" [tipo]="config().mascote ?? 'dino'" />
         <button
           type="button"
           class="balao"

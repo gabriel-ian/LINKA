@@ -1,4 +1,5 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
+import { infoMascote } from '../../shared/mascote/mascote';
 import { ResumoAluno, TarefaResumoAluno } from '../../core/model/painel-aluno.model';
 import { AlunoOfflineService } from '../../core/services/aluno-offline.service';
 import { ConexaoService } from '../../core/services/conexao.service';
@@ -24,6 +25,9 @@ export class AlunoContexto {
   readonly fala = signal('');
   readonly tentando = signal(false);
   readonly semConexao = computed(() => !this.conexao.online());
+  /** Mascote escolhido em "Meu perfil" (cores e desenho em todas as telas). */
+  readonly mascote = computed(() => this.resumo()?.preferencias.mascote ?? 'dino');
+  readonly infoMascote = computed(() => infoMascote(this.mascote()));
 
   readonly pendentes = computed(
     () => this.resumo()?.tarefas.filter((t) => t.situacao !== 'concluida') ?? [],

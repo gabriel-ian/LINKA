@@ -3,22 +3,18 @@ import { FormsModule } from '@angular/forms';
 import { Mascote, PreferenciasAluno } from '../../../core/model/painel-aluno.model';
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
 import { AlunoContexto } from '../aluno-contexto';
+import { MASCOTES, MascoteDesenho, infoMascote } from '../../../shared/mascote/mascote';
 
 type Chave =
   'ouvirVoz' | 'passosCurtos' | 'letrasMaiores' | 'fonteDislexia' | 'altoContraste' | 'modoCalmo';
 
-const MASCOTES: { id: Mascote; nome: string; letra: string; jeito: string }[] = [
-  { id: 'dino', nome: 'Dino', letra: 'D', jeito: 'animado e divertido' },
-  { id: 'coruja', nome: 'Coruja', letra: 'C', jeito: 'calma e sabida' },
-  { id: 'robo', nome: 'Robô', letra: 'R', jeito: 'direto e organizado' },
-];
 
 const CORES_INTERESSE = ['verde', 'azul', 'roxo', 'laranja'];
 
 /** "Aluno - Meu perfil" do Figma. Cada mudanca e salva na hora. */
 @Component({
   selector: 'app-aluno-perfil',
-  imports: [FormsModule],
+  imports: [FormsModule, MascoteDesenho],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css',
 })
@@ -59,7 +55,7 @@ export class AlunoPerfil {
   }
 
   mascote(id: Mascote) {
-    return MASCOTES.find((m) => m.id === id) ?? MASCOTES[0];
+    return infoMascote(id);
   }
 
   corInteresse(i: number): string {

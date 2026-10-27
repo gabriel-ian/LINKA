@@ -5,6 +5,7 @@ import { PainelAlunoService } from '../../../core/services/painel-aluno.service'
 import { VozService } from '../../../core/services/voz.service';
 import { AlunoContexto } from '../aluno-contexto';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { MascoteDesenho } from '../../../shared/mascote/mascote';
 
 const ROTULO: Record<AvisoAluno['tipo'], string> = {
   atividade: 'Atividade',
@@ -19,13 +20,13 @@ const ROTULO: Record<AvisoAluno['tipo'], string> = {
  */
 @Component({
   selector: 'app-aluno-avisos',
-  imports: [Esqueleto, DatePipe],
+  imports: [Esqueleto, DatePipe, MascoteDesenho],
   templateUrl: './avisos.html',
   styleUrl: './avisos.css',
 })
 export class AlunoAvisos {
   private service = inject(PainelAlunoService);
-  private contexto = inject(AlunoContexto);
+  readonly contexto = inject(AlunoContexto);
   readonly voz = inject(VozService);
 
   readonly avisos = signal<AvisoAluno[] | null>(null);

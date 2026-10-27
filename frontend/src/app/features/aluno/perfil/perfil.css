@@ -78,26 +78,33 @@ h2 {
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background: #0e996b;
-  color: #fff;
-  font-size: 28px;
-  font-weight: 800;
+  background: var(--cor-mascote-clara, #b8d7cd);
+}
+
+.mascote-selo app-mascote {
+  width: 40px;
+  height: 40px;
 }
 
 .mascote-nome {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
-  color: #0e996b;
+  color: var(--cor-mascote, #0e996b);
 }
 
 .mascotes {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
 }
 
 .mascotes button {
-  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   border: none;
   border-radius: 59px;
   background: var(--cor-fundo-painel);
@@ -108,8 +115,14 @@ h2 {
 }
 
 .mascotes button.ativo {
-  background: #0e996b;
-  color: #fff;
+  outline: 3px solid var(--cor-mascote, #0e996b);
+  background: var(--cor-mascote-clara, #b8d7cd);
+  color: var(--cor-titulo);
+}
+
+.mascotes .mini {
+  width: 22px;
+  height: 22px;
 }
 
 /* ---------- Preferencias ---------- */

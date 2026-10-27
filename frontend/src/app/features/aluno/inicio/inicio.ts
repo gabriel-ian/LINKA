@@ -5,12 +5,13 @@ import { VozService } from '../../../core/services/voz.service';
 import { RouterLink } from '@angular/router';
 import { AlunoContexto } from '../aluno-contexto';
 import { ItemTarefa } from '../item-tarefa';
+import { MascoteDesenho } from '../../../shared/mascote/mascote';
 import { dataLonga, hojeIso, horaCurta, plural, tituloCompleto } from '../aluno-ui';
 
 /** "Aluno - Início" do Figma, e a versão "Aluno - Sem conexão". */
 @Component({
   selector: 'app-aluno-inicio',
-  imports: [RouterLink, ItemTarefa],
+  imports: [RouterLink, ItemTarefa, MascoteDesenho],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
 })

@@ -173,13 +173,15 @@
   right: 37px;
   width: 42px;
   height: 15px;
-  background: #b8d7cd;
+  background: var(--cor-mascote-clara, #b8d7cd);
 }
 
 .dino {
   position: absolute;
   right: 4px;
   bottom: -16px;
+  width: 162px;
+  height: 162px;
 }
 
 /* ---------- Proximos dias ---------- */

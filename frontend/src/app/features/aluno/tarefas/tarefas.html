@@ -45,7 +45,7 @@
           </button>
           <img class="ponta" src="assets/aluno/balao-ponta.svg" alt="" width="41" height="32" />
           <span class="ponta-fundo"></span>
-          <img class="dino" src="assets/aluno/dino-grande.svg" alt="" width="162" height="162" />
+          <app-mascote class="dino" [tipo]="contexto.mascote()" />
         </div>
       </section>
     } @else {

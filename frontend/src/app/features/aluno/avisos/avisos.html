@@ -41,7 +41,7 @@
         </li>
       } @empty {
         <li class="vazio">
-          <img src="assets/aluno/dino.svg" alt="" width="80" height="80" />
+          <app-mascote class="vazio-mascote" [tipo]="contexto.mascote()" />
           <p>Nenhum aviso por enquanto. Quando a escola mandar um recado, ele aparece aqui.</p>
         </li>
       }

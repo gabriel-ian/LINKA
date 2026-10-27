@@ -25,7 +25,7 @@
         <hr class="divisor" />
 
         <p class="rotulo-mascote">Meu mascote</p>
-        <span class="mascote-selo">{{ mascote(r.preferencias.mascote).letra }}</span>
+        <span class="mascote-selo"><app-mascote [tipo]="r.preferencias.mascote" /></span>
         <p class="mascote-nome">
           {{ mascote(r.preferencias.mascote).nome }} - {{ mascote(r.preferencias.mascote).jeito }}
         </p>
@@ -38,6 +38,7 @@
               [class.ativo]="r.preferencias.mascote === m.id"
               (click)="escolherMascote(m.id)"
             >
+              <app-mascote class="mini" [tipo]="m.id" />
               {{ m.nome }}
             </button>
           }

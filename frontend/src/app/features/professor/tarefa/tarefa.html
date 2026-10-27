@@ -279,15 +279,23 @@
           {{ contagem().pendentes }} a fazer
           @if (contagem().respostas) {
             · {{ contagem().respostas }}
-            {{ contagem().respostas === 1 ? 'resposta escrita' : 'respostas escritas' }}
+            {{ contagem().respostas === 1 ? 'entrega para ver' : 'entregas para ver' }}
           }
         </small>
       </div>
       <ul>
         @for (e of t.entregas; track e.alunoId) {
-          <li>
+          <li [class.aberta]="respostaAberta() === e.alunoId">
             <div class="linha">
-              <span class="nome">{{ e.nome }}</span>
+              <span class="nome"
+                >{{ e.nome }}
+                @if (e.arquivos.length) {
+                  <span class="marca-entrega" title="Enviou foto ou documento">📷</span>
+                }
+                @if (e.comentario) {
+                  <span class="marca-entrega" title="Você já comentou">💬</span>
+                }
+              </span>
               <span
                 class="pilula"
                 [class.ativa]="e.situacao === 'concluida'"
@@ -302,21 +310,76 @@
                       : 'A fazer'
                 }}
               </span>
-              @if (e.resposta) {
+              @if (temEntrega(e)) {
                 <button
                   type="button"
                   class="bt bt-secundario bt-p"
                   [attr.aria-expanded]="respostaAberta() === e.alunoId"
-                  (click)="respostaAberta.set(respostaAberta() === e.alunoId ? null : e.alunoId)"
+                  (click)="abrirEntrega(e)"
                 >
-                  {{ respostaAberta() === e.alunoId ? 'Fechar resposta' : 'Ver resposta' }}
+                  {{ respostaAberta() === e.alunoId ? 'Fechar' : 'Abrir entrega' }}
                 </button>
               }
             </div>
-            @if (respostaAberta() === e.alunoId && e.resposta) {
+            @if (respostaAberta() === e.alunoId) {
               <div class="resposta">
-                <small>Entregue em {{ e.respostaEm | date: "dd/MM 'às' HH:mm" }}</small>
-                <div class="texto-rico" [innerHTML]="e.resposta"></div>
+                @if (e.concluidoEm) {
+                  <small>Terminou em {{ e.concluidoEm | date: "dd/MM 'às' HH:mm" }}</small>
+                }
+                @if (e.resposta) {
+                  <h3>Resposta escrita</h3>
+                  <small>Entregue em {{ e.respostaEm | date: "dd/MM 'às' HH:mm" }}</small>
+                  <div class="texto-rico" [innerHTML]="e.resposta"></div>
+                }
+                @if (e.arquivos.length) {
+                  <h3>Fotos e documentos</h3>
+                  <app-anexos-lista [anexos]="e.arquivos" [baixar]="baixarEntrega(e.alunoId)" />
+                }
+                @if (!e.resposta && !e.arquivos.length) {
+                  <p class="sem-entrega">
+                    {{ primeiroNome(e.nome) }} fez os passos, mas não enviou resposta nem arquivo.
+                  </p>
+                }
+
+                <label class="campo-p comentario">
+                  <span>Comentário ou correção para {{ primeiroNome(e.nome) }}</span>
+                  <textarea
+                    name="comentario"
+                    rows="3"
+                    maxlength="1000"
+                    [(ngModel)]="textoComentario"
+                    placeholder="Ex.: Muito bem! Só confira a conta do exercício 3."
+                  ></textarea>
+                  <small>O aluno e a família veem este comentário.</small>
+                </label>
+                <div class="sugestoes">
+                  @for (s of sugestoesComentario; track s) {
+                    <button type="button" class="chip" (click)="usarSugestaoComentario(s)">
+                      + {{ s }}
+                    </button>
+                  }
+                </div>
+                <div class="acoes-comentario">
+                  @if (e.comentarioEm) {
+                    <small
+                      >Último comentário em {{ e.comentarioEm | date: "dd/MM 'às' HH:mm" }}</small
+                    >
+                  }
+                  <button
+                    type="button"
+                    class="bt bt-primario bt-p"
+                    [disabled]="salvandoComentario() || (!textoComentario.trim() && !e.comentario)"
+                    (click)="salvarComentario(e)"
+                  >
+                    {{
+                      salvandoComentario()
+                        ? 'Salvando...'
+                        : textoComentario.trim()
+                          ? 'Enviar comentário'
+                          : 'Apagar comentário'
+                    }}
+                  </button>
+                </div>
               </div>
             }
           </li>

@@ -299,3 +299,19 @@
     align-items: flex-start;
   }
 }
+
+/* ---------- Historico das tarefas feitas ---------- */
+
+.feitas .feita-em {
+  display: block;
+  margin: 6px 0 0 39px;
+  font-size: 14px;
+}
+
+.ver-mais {
+  margin: 0 0 16px 18px;
+}
+
+.tem-recado {
+  color: var(--cor-primaria);
+}

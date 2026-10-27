@@ -241,6 +241,43 @@
   color: #6b7280;
 }
 
+.entregas li.aberta {
+  grid-column: 1 / -1;
+}
+
+.entregas .resposta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entregas .resposta h3 {
+  margin: 6px 0 0;
+  color: var(--cor-titulo);
+  font-size: 15px;
+}
+
+.marca-entrega {
+  margin-left: 4px;
+  font-size: 14px;
+}
+
+.sem-entrega {
+  margin: 0;
+}
+
+.comentario {
+  margin-top: 6px;
+}
+
+.acoes-comentario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .materiais h2 {
   margin: 0;
   color: var(--cor-titulo);

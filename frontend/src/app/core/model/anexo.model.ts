@@ -13,3 +13,5 @@ export const ANEXO_VISUALIZAVEL: Anexo['tipo'][] = ['pdf', 'png', 'jpg'];
 export const ANEXO_EXTENSOES = '.pdf,.png,.jpg,.jpeg,.doc,.docx';
 export const ANEXO_TAMANHO_MAXIMO = 10 * 1024 * 1024;
 export const ANEXOS_POR_TAREFA = 5;
+/** Fotos ou documentos que o aluno envia da tarefa feita. */
+export const ARQUIVOS_POR_ENTREGA = 3;

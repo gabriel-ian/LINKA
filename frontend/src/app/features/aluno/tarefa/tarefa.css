@@ -730,3 +730,40 @@ button.voltar-botao {
   margin: 0;
   font-size: 15px;
 }
+
+/* ---------- Tarefa mudada pela professora e recado dela ---------- */
+
+.atualizada {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff7e6;
+  color: #8a4b00;
+  font-weight: 600;
+}
+
+.comentario-prof {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border: 2px solid #b8d4ff;
+  border-radius: var(--raio-cartao);
+  background: #f0f6ff;
+}
+
+.comentario-prof h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.comentario-prof p {
+  margin: 0;
+  font-size: 19px;
+  white-space: pre-line;
+  color: var(--cor-titulo);
+}
+
+.comentario-prof .link-acao {
+  align-self: flex-start;
+}

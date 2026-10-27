@@ -44,6 +44,12 @@
           </div>
         </div>
       }
+
+      @if (tarefaId) {
+        <div class="entrega-fim">
+          <app-entrega-arquivos [tarefaId]="tarefaId" />
+        </div>
+      }
     </div>
 
     <a class="bt bt-secundario" routerLink="/aluno">Voltar ao início</a>

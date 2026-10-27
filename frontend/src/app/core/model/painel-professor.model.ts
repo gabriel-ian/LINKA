@@ -151,6 +151,11 @@ export interface EntregaAluno {
   /** HTML limpo pelo servidor. */
   resposta: string | null;
   respostaEm: string | null;
+  /** Fotos ou documentos que o aluno enviou. */
+  arquivos: Anexo[];
+  /** Comentario ou correcao do professor (aluno e familia veem). */
+  comentario: string | null;
+  comentarioEm: string | null;
 }
 
 export interface NovaTarefa {

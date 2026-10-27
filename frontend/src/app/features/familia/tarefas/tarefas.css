@@ -112,3 +112,34 @@
     display: none;
   }
 }
+
+/* ---------- O que o filho enviou e o comentario do professor ---------- */
+
+.ver-arquivos {
+  display: block;
+  text-align: left;
+  margin: 6px 0 0 39px;
+  font-size: 14px;
+}
+
+.arquivos-filho {
+  margin: 8px 0 0 39px;
+}
+
+.comentario-prof {
+  margin: 8px 0 0 39px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--cor-primaria);
+  border-radius: 8px;
+  background: #f0f6ff;
+}
+
+.comentario-prof p {
+  margin: 4px 0;
+  color: var(--cor-titulo);
+  white-space: pre-line;
+}
+
+.comentario-prof small {
+  font-size: 12px;
+}

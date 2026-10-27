@@ -6,13 +6,15 @@ import { PainelFamiliaService } from '../../../core/services/painel-familia.serv
 import { ItemTarefa } from '../../aluno/item-tarefa';
 import { FamiliaContexto } from '../familia-contexto';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AnexosLista } from '../../../shared/anexos/anexos-lista';
+import { Anexo } from '../../../core/model/anexo.model';
 
 type Aba = 'aFazer' | 'atrasadas' | 'feitas';
 
 /** Todas as tarefas do filho: a fazer, atrasadas e feitas (com a entrega). */
 @Component({
   selector: 'app-familia-tarefas',
-  imports: [Esqueleto, RouterLink, DatePipe, ItemTarefa],
+  imports: [Esqueleto, RouterLink, DatePipe, ItemTarefa, AnexosLista],
   templateUrl: './tarefas.html',
   styleUrls: ['../familia-comum.css', './tarefas.css'],
 })
@@ -24,6 +26,10 @@ export class FamiliaTarefas {
   readonly erro = signal('');
   /** Aba aberta no celular (no computador as tres colunas aparecem juntas). */
   readonly aba = signal<Aba>('aFazer');
+  /** Tarefa com os arquivos abertos. */
+  readonly arquivosAbertos = signal<number | null>(null);
+  readonly baixarEntrega = (tarefaId: number) => (a: Anexo) =>
+    this.service.baixarEntrega(this.contexto.filhoId()!, tarefaId, a.id);
 
   readonly grupos = computed(() => {
     const d = this.dados();

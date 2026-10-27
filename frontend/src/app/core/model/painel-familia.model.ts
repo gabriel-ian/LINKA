@@ -1,5 +1,6 @@
 /** Modelos das telas "Familia - ..." (/painel-familia). */
 import { Nivel, Placar, TarefaResumoAluno } from './painel-aluno.model';
+import { Anexo } from './anexo.model';
 
 export interface PreferenciasFamilia {
   tarefaNaoIniciada: boolean;
@@ -73,6 +74,11 @@ export interface TarefaDoFilho extends TarefaResumoAluno {
   professor: string | null;
   /** Quando o filho entregou a resposta escrita. */
   respostaEm: string | null;
+  /** Fotos ou documentos que o filho enviou. */
+  arquivos: Anexo[];
+  /** Comentario ou correcao do professor. */
+  comentario: string | null;
+  comentarioEm: string | null;
 }
 
 export interface TarefasDoFilho {

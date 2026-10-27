@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TarefaAnexoService } from './tarefa-anexo.service';
+import { EntregaArquivoService } from './entrega-arquivo.service';
 
-/** Arquivos anexados as tarefas (usado pelos paineis do professor e do aluno). */
+/** Arquivos das tarefas: materiais do professor e entregas do aluno. */
 @Module({
-  providers: [TarefaAnexoService],
-  exports: [TarefaAnexoService],
+  providers: [TarefaAnexoService, EntregaArquivoService],
+  exports: [TarefaAnexoService, EntregaArquivoService],
 })
 export class TarefaAnexoModule {}

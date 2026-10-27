@@ -9,9 +9,19 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ANEXO_TAMANHO_MAXIMO } from '../tarefa-anexo/tarefa-anexo.service';
+import { ARQUIVOS_POR_ENTREGA } from '../tarefa-anexo/entrega-arquivo.service';
 import { createReadStream } from 'fs';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -86,6 +96,49 @@ export class PainelAlunoController {
     });
   }
 
+  @Post('tarefas/:id/entrega')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary:
+      'Enviar foto ou documento da tarefa feita (PNG, JPG, PDF, DOC ou DOCX; ate 3)',
+  })
+  @UseInterceptors(
+    FilesInterceptor('arquivos', ARQUIVOS_POR_ENTREGA, {
+      limits: { fileSize: ANEXO_TAMANHO_MAXIMO },
+    }),
+  )
+  enviarArquivos(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFiles() arquivos: Express.Multer.File[],
+  ) {
+    return this.painel.enviarArquivos(usuarioId, id, arquivos);
+  }
+
+  @Delete('tarefas/:id/entrega/:arquivoId')
+  @ApiOperation({ summary: 'Tirar uma foto ou documento enviado' })
+  removerArquivo(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('arquivoId', ParseIntPipe) arquivoId: number,
+  ) {
+    return this.painel.removerArquivo(usuarioId, id, arquivoId);
+  }
+
+  @Get('tarefas/:id/entrega/:arquivoId')
+  @ApiOperation({ summary: 'Ver uma foto ou documento que enviei' })
+  async baixarArquivo(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('arquivoId', ParseIntPipe) arquivoId: number,
+  ) {
+    const a = await this.painel.arquivoParaBaixar(usuarioId, id, arquivoId);
+    return new StreamableFile(createReadStream(a.caminho), {
+      type: a.mime,
+      disposition: a.disposicao,
+    });
+  }
+
   @Post('tarefas/:id/resposta')
   @ApiOperation({
     summary: 'Entrega (ou reenvia) a resposta escrita da tarefa',
@@ -120,6 +173,12 @@ export class PainelAlunoController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.painel.marcarIncentivoLido(usuarioId, id);
+  }
+
+  @Get('historico')
+  @ApiOperation({ summary: 'Tarefas ja feitas (historico)' })
+  historico(@UsuarioId() usuarioId: number) {
+    return this.painel.historico(usuarioId);
   }
 
   @Get('progresso')

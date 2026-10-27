@@ -11,6 +11,7 @@ import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { EditorTexto, temTexto } from '../../../shared/editor-texto/editor-texto';
 import { AnexosLista } from '../../../shared/anexos/anexos-lista';
+import { EntregaArquivos } from '../entrega-arquivos';
 import { Anexo } from '../../../core/model/anexo.model';
 import { AlunoContexto } from '../aluno-contexto';
 import { ELOGIOS, hojeIso, horaCurta, iconePasso, plural, tituloCompleto } from '../aluno-ui';
@@ -28,7 +29,7 @@ const ICONES_MATERIAL: [RegExp, string][] = [
  */
 @Component({
   selector: 'app-aluno-tarefa',
-  imports: [RouterLink, EditorTexto, DatePipe, AnexosLista],
+  imports: [RouterLink, EditorTexto, DatePipe, AnexosLista, EntregaArquivos],
   templateUrl: './tarefa.html',
   styleUrl: './tarefa.css',
 })
@@ -79,6 +80,17 @@ export class AlunoTarefa {
     if (t.dataEntrega < hojeIso()) return 'Atrasada';
     const [, m, d] = t.dataEntrega.split('-');
     return `Entrega em ${d}/${m}${hora}`;
+  });
+
+  /**
+   * A professora editou a tarefa depois que o aluno comecou (ou nos ultimos
+   * 3 dias, se ele ainda nao comecou).
+   */
+  readonly atualizada = computed(() => {
+    const t = this.tarefa();
+    if (!t?.atualizadaEm) return false;
+    const quando = new Date(t.atualizadaEm).getTime();
+    return quando > Date.now() - 3 * 86_400_000;
   });
 
   /** Concluida sem internet: falta enviar para a professora. */
@@ -185,6 +197,22 @@ export class AlunoTarefa {
         );
       },
     });
+  }
+
+  arquivosMudaram(lista: Anexo[]): void {
+    const t = this.tarefa();
+    if (!t) return;
+    this.tarefa.set({
+      ...t,
+      arquivosEnviados: lista,
+      entregue: !!t.respostaEm || lista.length > 0,
+    });
+    if (lista.length) this.contexto.fala.set('Enviado para a professora. Muito bem!');
+  }
+
+  ouvirComentario(): void {
+    const t = this.tarefa();
+    if (t?.comentario) this.voz.falar(`Recado da professora: ${t.comentario}`);
   }
 
   iconeMaterial(nome: string): string {

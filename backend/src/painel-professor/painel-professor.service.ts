@@ -13,6 +13,7 @@ import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import { AdaptacaoIaService, PerfilParaIa } from './adaptacao-ia.service';
 import { TarefaAnexoService } from '../tarefa-anexo/tarefa-anexo.service';
+import { EntregaArquivoService } from '../tarefa-anexo/entrega-arquivo.service';
 import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
 import { htmlParaTexto, limparHtml, temTexto } from '../comum/html';
 import {
@@ -95,6 +96,7 @@ export class PainelProfessorService {
     private readonly ia: AdaptacaoIaService,
     private readonly avisos: AvisosFamiliaService,
     private readonly anexos: TarefaAnexoService,
+    private readonly entregas: EntregaArquivoService,
   ) {}
 
   // ---------------------------------------------------------- contexto
@@ -532,6 +534,21 @@ export class PainelProfessorService {
 
     const mudouEnunciado =
       campos.descricao !== undefined && campos.descricao !== atual.descricao;
+    // O aluno ve "atualizada pela professora" so quando algo que ele le mudou.
+    const antes: Record<string, unknown> = {
+      titulo: atual.titulo,
+      descricao: atual.descricao,
+      data_entrega: atual.dataEntrega,
+      hora_limite: atual.horaLimite,
+      disciplina_id: atual.disciplinaId,
+    };
+    const mudouParaAluno = Object.keys(antes).some(
+      (c) =>
+        campos[c] !== undefined &&
+        String(campos[c] ?? '').slice(0, c === 'hora_limite' ? 5 : undefined) !==
+          String(antes[c] ?? ''),
+    );
+    if (mudouParaAluno) campos.atualizada_em = new Date();
     let adaptacoesRefazer = 0;
     await this.dataSource.transaction(async (manager) => {
       // As chaves de "campos" sao fixas (acima), nunca vem do corpo.
@@ -561,8 +578,10 @@ export class PainelProfessorService {
     const professor = await this.professor(usuarioId, escolaId);
     await this.tarefaDoProfessor(professor.id, tarefaId);
     let arquivos: string[] = [];
+    let entregues: string[] = [];
     await this.dataSource.transaction(async (manager) => {
       arquivos = await this.anexos.apagarDaTarefa(tarefaId, manager);
+      entregues = await this.entregas.apagarDaTarefa(tarefaId, manager);
       await manager.query(
         'UPDATE incentivo SET tarefa_id = NULL WHERE tarefa_id = ?',
         [tarefaId],
@@ -574,6 +593,7 @@ export class PainelProfessorService {
       await manager.query('DELETE FROM tarefa WHERE id = ?', [tarefaId]);
     });
     await this.anexos.apagarArquivos(arquivos);
+    await this.entregas.apagarArquivos(entregues);
     return { data: true };
   }
 
@@ -609,6 +629,42 @@ export class PainelProfessorService {
     const professor = await this.professor(usuarioId, escolaId);
     await this.tarefaDoProfessor(professor.id, tarefaId);
     return this.anexos.paraBaixar(tarefaId, anexoId);
+  }
+
+  /** Foto ou documento que um aluno enviou da tarefa. */
+  async entregaParaBaixar(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    alunoId: number,
+    arquivoId: number,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    await this.tarefaDoProfessor(professor.id, tarefaId);
+    return this.entregas.paraBaixar(tarefaId, alunoId, arquivoId);
+  }
+
+  /**
+   * Comentario ou correcao do professor sobre a entrega de um aluno. O aluno
+   * e a familia veem. Texto vazio apaga o comentario.
+   */
+  async comentarEntrega(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    alunoId: number,
+    comentario: string,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    await this.tarefaDoProfessor(professor.id, tarefaId);
+    const texto = comentario.trim() || null;
+    const r: { affectedRows?: number } = await this.dataSource.query(
+      `UPDATE tarefa_status SET comentario = ?, comentario_em = ${texto ? 'NOW()' : 'NULL'}
+        WHERE tarefa_id = ? AND aluno_id = ?`,
+      [texto, tarefaId, alunoId],
+    );
+    if (!r.affectedRows) throw new NotFoundException('Aluno nao encontrado');
+    return { data: { comentario: texto } };
   }
 
   /** Envia a mesma tarefa (texto, materia e prazo) para outras turmas. */
@@ -681,12 +737,16 @@ export class PainelProfessorService {
       concluidoEm: Date | null;
       resposta: string | null;
       respostaEm: Date | null;
+      comentario: string | null;
+      comentarioEm: Date | null;
     }[] = await this.dataSource.query(
       `SELECT aluno_id alunoId, status, passos_feitos passosFeitos,
-              concluido_em concluidoEm, resposta, resposta_em respostaEm
+              concluido_em concluidoEm, resposta, resposta_em respostaEm,
+              comentario, comentario_em comentarioEm
          FROM tarefa_status WHERE tarefa_id = ?`,
       [tarefaId],
     );
+    const arquivos = await this.entregas.porAluno(tarefaId);
 
     // Abrir a tarefa marca os pedidos de ajuda dela como vistos.
     const pedidosAjuda = await this.pedidosAjuda(professor.id, { tarefaId });
@@ -717,6 +777,10 @@ export class PainelProfessorService {
             concluidoEm: s?.concluidoEm ?? null,
             resposta: s?.resposta ?? null,
             respostaEm: s?.respostaEm ?? null,
+            /** Fotos ou documentos que o aluno enviou. */
+            arquivos: arquivos.get(a.id) ?? [],
+            comentario: s?.comentario ?? null,
+            comentarioEm: s?.comentarioEm ?? null,
           };
         }),
         totalAlunos: alunos.length,

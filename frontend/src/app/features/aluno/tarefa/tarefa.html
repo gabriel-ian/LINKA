@@ -18,6 +18,12 @@
         </p>
       </header>
 
+      @if (atualizada()) {
+        <p class="atualizada" role="status">
+          A professora mudou esta tarefa em {{ t.atualizadaEm | date: "dd/MM 'às' HH:mm" }}.
+        </p>
+      }
+
       @if (t.anexos?.length) {
         <section class="cartao-aluno materiais-aluno" aria-labelledby="titulo-materiais-aluno">
           <h2 id="titulo-materiais-aluno">📎 Materiais da professora</h2>
@@ -78,6 +84,26 @@
           Missão concluída! A Linka envia para a professora quando a internet voltar.
         </p>
       }
+
+
+      @if (t.comentario) {
+        <section class="comentario-prof" aria-labelledby="titulo-comentario" role="status">
+          <h2 id="titulo-comentario">💬 Recado da professora sobre a sua tarefa</h2>
+          <p>{{ t.comentario }}</p>
+          <small
+            >{{ t.professor ? 'Prof. ' + t.professor.split(' ')[0] + ' · ' : '' }}{{
+              t.comentarioEm | date: "dd/MM 'às' HH:mm"
+            }}</small
+          >
+          <button type="button" class="link-acao" (click)="ouvirComentario()">Ouvir o recado</button>
+        </section>
+      }
+
+      <app-entrega-arquivos
+        [tarefaId]="t.id"
+        [inicial]="t.arquivosEnviados ?? []"
+        (mudou)="arquivosMudaram($event)"
+      />
 
       <section class="cartao-aluno minha-resposta" aria-labelledby="titulo-resposta">
         <h2 id="titulo-resposta">
@@ -158,6 +184,12 @@
             <span>Prof. {{ t.professor.split(' ')[0] }}</span>
           }
         </p>
+        @if (atualizada()) {
+          <p class="atualizada" role="status">
+            ✏️ A professora mudou esta tarefa em {{ t.atualizadaEm | date: "dd/MM 'às' HH:mm" }}.
+            Leia de novo com calma.
+          </p>
+        }
         <div class="barra" aria-hidden="true"><span [style.width.%]="pct()"></span></div>
         <p class="rodape-barra">
           <span>{{ feitos() }} de {{ textoPassos(total()) }} concluídos</span>
@@ -291,6 +323,26 @@
           </li>
         }
       </ol>
+
+
+      @if (t.comentario) {
+        <section class="comentario-prof" aria-labelledby="titulo-comentario" role="status">
+          <h2 id="titulo-comentario">💬 Recado da professora sobre a sua tarefa</h2>
+          <p>{{ t.comentario }}</p>
+          <small
+            >{{ t.professor ? 'Prof. ' + t.professor.split(' ')[0] + ' · ' : '' }}{{
+              t.comentarioEm | date: "dd/MM 'às' HH:mm"
+            }}</small
+          >
+          <button type="button" class="link-acao" (click)="ouvirComentario()">Ouvir o recado</button>
+        </section>
+      }
+
+      <app-entrega-arquivos
+        [tarefaId]="t.id"
+        [inicial]="t.arquivosEnviados ?? []"
+        (mudou)="arquivosMudaram($event)"
+      />
 
       <section class="cartao-aluno minha-resposta" aria-labelledby="titulo-resposta">
         <h2 id="titulo-resposta">

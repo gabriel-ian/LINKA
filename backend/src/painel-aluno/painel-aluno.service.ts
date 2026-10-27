@@ -15,6 +15,7 @@ import { TarefaAdaptada } from '../tarefa-adaptada/tarefa-adaptada.entity';
 import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
 import { AdaptacaoIaService } from '../painel-professor/adaptacao-ia.service';
 import { TarefaAnexoService } from '../tarefa-anexo/tarefa-anexo.service';
+import { EntregaArquivoService } from '../tarefa-anexo/entrega-arquivo.service';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import { htmlParaTexto, limparHtml, temTexto } from '../comum/html';
 import {
@@ -58,6 +59,13 @@ export interface TarefaDoAluno extends TarefaJogo {
   /** Resposta entregue pelo aluno (HTML limpo) e quando. */
   resposta: string | null;
   respostaEm: Date | null;
+  /** Fotos ou documentos que o aluno enviou da tarefa feita. */
+  arquivosEnviados: number;
+  /** Comentario ou correcao do professor sobre a entrega. */
+  comentario: string | null;
+  comentarioEm: Date | null;
+  /** Ultima vez que o professor editou a tarefa. */
+  atualizadaEm: Date | null;
 }
 
 /** Linha da consulta de tarefas do aluno, como o mysql2 devolve. */
@@ -77,6 +85,10 @@ interface LinhaBanco {
   passosFeitos: number;
   resposta: string | null;
   respostaEm: Date | null;
+  arquivosEnviados: number | string;
+  comentario: string | null;
+  comentarioEm: Date | null;
+  atualizadaEm: Date | null;
 }
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -113,6 +125,7 @@ export class PainelAlunoService {
     private readonly ia: AdaptacaoIaService,
     private readonly avisos: AvisosFamiliaService,
     private readonly anexos: TarefaAnexoService,
+    private readonly entregas: EntregaArquivoService,
   ) {}
 
   // ------------------------------------------------------------ leitura
@@ -141,7 +154,11 @@ export class PainelAlunoService {
               d.nome disciplina, p.nome_completo professor,
               ts.status, ts.concluido_em concluidoEm, ts.iniciado_em iniciadoEm,
               ts.iniciou_sozinho iniciouSozinho, ts.passos_feitos passosFeitos,
-              ts.resposta, ts.resposta_em respostaEm
+              ts.resposta, ts.resposta_em respostaEm,
+              ts.comentario, ts.comentario_em comentarioEm,
+              t.atualizada_em atualizadaEm,
+              (SELECT COUNT(*) FROM tarefa_entrega_arquivo ea
+                WHERE ea.tarefa_id = t.id AND ea.aluno_id = ts.aluno_id) arquivosEnviados
          FROM tarefa_status ts
          JOIN tarefa t ON t.id = ts.tarefa_id
          LEFT JOIN disciplina d ON d.id = t.disciplina_id
@@ -182,6 +199,10 @@ export class PainelAlunoService {
         totalPassos: passos.length,
         resposta: l.resposta,
         respostaEm: l.respostaEm,
+        arquivosEnviados: Number(l.arquivosEnviados) || 0,
+        comentario: l.comentario,
+        comentarioEm: l.comentarioEm,
+        atualizadaEm: l.atualizadaEm,
       };
     });
   }
@@ -211,7 +232,10 @@ export class PainelAlunoService {
       passosFeitos: t.passosFeitos,
       totalPassos: t.totalPassos,
       concluidoEm: t.concluidoEm,
-      entregue: t.respostaEm !== null,
+      entregue: t.respostaEm !== null || t.arquivosEnviados > 0,
+      /** O professor deixou um comentario na entrega. */
+      comentada: t.comentario !== null,
+      atualizadaEm: t.atualizadaEm,
     };
   }
 
@@ -354,7 +378,7 @@ export class PainelAlunoService {
   }
 
   async tarefa(usuarioId: number, tarefaId: number) {
-    const { tarefa: t } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    const { aluno, tarefa: t } = await this.tarefaDoAluno(usuarioId, tarefaId);
     return {
       data: {
         ...this.resumoTarefa(t),
@@ -368,6 +392,10 @@ export class PainelAlunoService {
         respostaEm: t.respostaEm,
         /** Materiais que a professora anexou (ver ou baixar). */
         anexos: await this.anexos.listar(tarefaId),
+        /** Fotos ou documentos que o aluno enviou. */
+        arquivosEnviados: await this.entregas.listar(tarefaId, aluno.id),
+        comentario: t.comentario,
+        comentarioEm: t.comentarioEm,
         iaDisponivel: this.ia.disponivel,
       },
     };
@@ -377,6 +405,34 @@ export class PainelAlunoService {
   async anexoParaBaixar(usuarioId: number, tarefaId: number, anexoId: number) {
     await this.tarefaDoAluno(usuarioId, tarefaId);
     return this.anexos.paraBaixar(tarefaId, anexoId);
+  }
+
+  /** Foto ou documento da tarefa feita (ate 3 por tarefa). */
+  async enviarArquivos(
+    usuarioId: number,
+    tarefaId: number,
+    arquivos: Express.Multer.File[] | undefined,
+  ) {
+    const { aluno } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    return {
+      data: await this.entregas.enviar(tarefaId, aluno.id, arquivos),
+    };
+  }
+
+  async removerArquivo(usuarioId: number, tarefaId: number, arquivoId: number) {
+    const { aluno } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    return {
+      data: await this.entregas.remover(tarefaId, aluno.id, arquivoId),
+    };
+  }
+
+  async arquivoParaBaixar(
+    usuarioId: number,
+    tarefaId: number,
+    arquivoId: number,
+  ) {
+    const { aluno } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    return this.entregas.paraBaixar(tarefaId, aluno.id, arquivoId);
   }
 
   /** O aluno entrega (ou reenvia) uma resposta escrita da tarefa. */
@@ -575,6 +631,23 @@ export class PainelAlunoService {
       },
     });
     return { data: resposta };
+  }
+
+  /** Historico: todas as tarefas ja feitas, da mais recente para a mais antiga. */
+  async historico(usuarioId: number) {
+    const { aluno } = await this.alunoDoUsuario(usuarioId);
+    const feitas = (await this.tarefasDoAluno(aluno.id))
+      .filter((t) => t.concluida)
+      .sort(
+        (a, b) =>
+          (b.concluidoEm?.getTime() ?? 0) - (a.concluidoEm?.getTime() ?? 0),
+      );
+    return {
+      data: feitas.map((t) => ({
+        ...this.resumoTarefa(t),
+        professor: t.professor,
+      })),
+    };
   }
 
   async progresso(usuarioId: number) {

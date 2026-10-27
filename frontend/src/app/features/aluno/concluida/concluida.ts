@@ -1,14 +1,15 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PassoConcluido } from '../../../core/model/painel-aluno.model';
 import { AdmResultado } from '../../adm/resultado/resultado';
 import { AlunoContexto } from '../aluno-contexto';
 import { COR_BLOQUEADA, MEDALHAS } from '../aluno-ui';
+import { EntregaArquivos } from '../entrega-arquivos';
 
 /** "Aluno - Tarefa concluída" (Missão cumprida!) do Figma. */
 @Component({
   selector: 'app-aluno-concluida',
-  imports: [RouterLink, AdmResultado],
+  imports: [RouterLink, AdmResultado, EntregaArquivos],
   templateUrl: './concluida.html',
   styleUrl: './concluida.css',
 })
@@ -18,6 +19,8 @@ export class AlunoConcluida {
   /** Vem da tela da tarefa; se a pagina for recarregada, usa o resumo. */
   readonly resultado = signal<PassoConcluido | null>(null);
   readonly titulo = signal('');
+  /** Antes de sair, o aluno pode mandar a foto ou o documento da tarefa. */
+  readonly tarefaId = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
   readonly medalhas = MEDALHAS;
   readonly corBloqueada = COR_BLOQUEADA;
 

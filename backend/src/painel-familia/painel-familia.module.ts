@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PainelAlunoModule } from '../painel-aluno/painel-aluno.module';
 import { LgpdModule } from '../lgpd/lgpd.module';
+import { TarefaAnexoModule } from '../tarefa-anexo/tarefa-anexo.module';
 import { Incentivo } from './incentivo.entity';
 import { PainelFamiliaController } from './painel-familia.controller';
 import { PainelFamiliaService } from './painel-familia.service';
@@ -16,6 +17,7 @@ import { ResumoEmailService } from './resumo-email.service';
     TypeOrmModule.forFeature([Incentivo]),
     PainelAlunoModule,
     LgpdModule,
+    TarefaAnexoModule,
   ],
   controllers: [PainelFamiliaController],
   providers: [PainelFamiliaService, ResumoEmailService],

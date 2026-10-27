@@ -350,6 +350,7 @@ CREATE TABLE `tarefa` (
   `professor_id` bigint unsigned DEFAULT NULL,
   `criado_em` datetime DEFAULT CURRENT_TIMESTAMP,
   `orientacao_ia` text,
+  `atualizada_em` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `turma_id` (`turma_id`),
   KEY `disciplina_id` (`disciplina_id`),
@@ -396,6 +397,24 @@ CREATE TABLE `tarefa_adaptada` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tarefa_entrega_arquivo` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tarefa_id` bigint unsigned NOT NULL,
+  `aluno_id` bigint unsigned NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `arquivo` varchar(120) NOT NULL,
+  `tipo` varchar(10) NOT NULL,
+  `tamanho` int unsigned NOT NULL,
+  `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_entrega_arquivo_tarefa` (`tarefa_id`),
+  KEY `fk_entrega_arquivo_aluno` (`aluno_id`),
+  CONSTRAINT `fk_entrega_arquivo_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_entrega_arquivo_tarefa` FOREIGN KEY (`tarefa_id`) REFERENCES `tarefa` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tarefa_status` (
   `aluno_id` bigint unsigned NOT NULL,
   `tarefa_id` bigint unsigned NOT NULL,
@@ -406,6 +425,8 @@ CREATE TABLE `tarefa_status` (
   `concluido_em` datetime DEFAULT NULL,
   `resposta` text,
   `resposta_em` datetime DEFAULT NULL,
+  `comentario` text,
+  `comentario_em` datetime DEFAULT NULL,
   PRIMARY KEY (`aluno_id`,`tarefa_id`),
   KEY `fk_tarefa_status_tarefa` (`tarefa_id`),
   CONSTRAINT `fk_tarefa_status_aluno` FOREIGN KEY (`aluno_id`) REFERENCES `aluno` (`id`),

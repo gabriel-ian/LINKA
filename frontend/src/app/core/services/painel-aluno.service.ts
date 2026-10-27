@@ -14,8 +14,10 @@ import {
   RespostaAjuda,
   ResumoAluno,
   TarefaAluno,
+  TarefaResumoAluno,
   TipoAjuda,
 } from '../model/painel-aluno.model';
+import { Anexo } from '../model/anexo.model';
 
 /** Rotas do perfil aluno (/painel-aluno). O aluno vem do token. */
 @Injectable({ providedIn: 'root' })
@@ -57,6 +59,25 @@ export class PainelAlunoService {
     });
   }
 
+  /** Foto ou documento da tarefa feita. */
+  enviarArquivos(tarefaId: number, arquivos: File[]): Observable<ApiResponse<Anexo[]>> {
+    const corpo = new FormData();
+    for (const a of arquivos) corpo.append('arquivos', a, a.name);
+    return this.http.post<ApiResponse<Anexo[]>>(`${this.api}/tarefas/${tarefaId}/entrega`, corpo);
+  }
+
+  removerArquivo(tarefaId: number, arquivoId: number): Observable<ApiResponse<Anexo[]>> {
+    return this.http.delete<ApiResponse<Anexo[]>>(
+      `${this.api}/tarefas/${tarefaId}/entrega/${arquivoId}`,
+    );
+  }
+
+  baixarArquivo(tarefaId: number, arquivoId: number): Observable<Blob> {
+    return this.http.get(`${this.api}/tarefas/${tarefaId}/entrega/${arquivoId}`, {
+      responseType: 'blob',
+    });
+  }
+
   entregarResposta(id: number, resposta: string): Observable<ApiResponse<{ entregue: boolean }>> {
     return this.http.post<ApiResponse<{ entregue: boolean }>>(
       `${this.api}/tarefas/${id}/resposta`,
@@ -70,6 +91,13 @@ export class PainelAlunoService {
 
   marcarAvisoLido(id: number): Observable<ApiResponse<boolean>> {
     return this.http.post<ApiResponse<boolean>>(`${this.api}/avisos/${id}/lido`, {});
+  }
+
+  /** Todas as tarefas ja feitas (historico). */
+  historico(): Observable<ApiResponse<(TarefaResumoAluno & { professor: string | null })[]>> {
+    return this.http.get<ApiResponse<(TarefaResumoAluno & { professor: string | null })[]>>(
+      `${this.api}/historico`,
+    );
   }
 
   progresso(): Observable<ApiResponse<ProgressoAluno>> {

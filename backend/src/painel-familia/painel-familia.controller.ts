@@ -8,8 +8,10 @@ import {
   Patch,
   Post,
   Query,
+  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
+import { createReadStream } from 'fs';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -95,6 +97,26 @@ export class PainelFamiliaController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.painel.tarefas(usuarioId, id);
+  }
+
+  @Get('filhos/:id/tarefas/:tarefaId/entrega/:arquivoId')
+  @ApiOperation({ summary: 'Ver a foto ou documento que o filho enviou' })
+  async baixarEntrega(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('tarefaId', ParseIntPipe) tarefaId: number,
+    @Param('arquivoId', ParseIntPipe) arquivoId: number,
+  ) {
+    const a = await this.painel.entregaParaBaixar(
+      usuarioId,
+      id,
+      tarefaId,
+      arquivoId,
+    );
+    return new StreamableFile(createReadStream(a.caminho), {
+      type: a.mime,
+      disposition: a.disposicao,
+    });
   }
 
   @Get('filhos/:id/avisos')

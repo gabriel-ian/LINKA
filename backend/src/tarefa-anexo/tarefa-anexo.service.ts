@@ -16,7 +16,7 @@ export const ANEXOS_POR_TAREFA = 5;
  * Tipos aceitos, conferidos pelos primeiros bytes do arquivo (nao pelo nome):
  * um .exe renomeado para .pdf e recusado.
  */
-const TIPOS = [
+export const TIPOS = [
   {
     tipo: 'pdf',
     mime: 'application/pdf',
@@ -38,7 +38,7 @@ const TIPOS = [
   },
 ] as const;
 
-type TipoAnexo = (typeof TIPOS)[number]['tipo'];
+export type TipoAnexo = (typeof TIPOS)[number]['tipo'];
 
 export interface Anexo {
   id: number;
@@ -48,7 +48,7 @@ export interface Anexo {
   criadoEm: Date;
 }
 
-function tipoDoArquivo(arquivo: Express.Multer.File) {
+export function tipoDoArquivo(arquivo: Express.Multer.File) {
   const t = TIPOS.find((x) =>
     x.assinatura.every((b, i) => arquivo.buffer[i] === b),
   );
@@ -57,7 +57,7 @@ function tipoDoArquivo(arquivo: Express.Multer.File) {
 }
 
 /** Nome para mostrar: sem pastas nem caracteres de controle. */
-function nomeLimpo(nome: string): string {
+export function nomeLimpo(nome: string): string {
   // O multer entrega o nome em latin1; acentos voltam para utf8.
   const utf8 = Buffer.from(nome, 'latin1').toString('utf8');
   const base = utf8.split(/[\\/]/).pop() ?? 'arquivo';

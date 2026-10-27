@@ -35,6 +35,7 @@ import { PainelProfessorService } from './painel-professor.service';
 import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import {
   AdaptarTarefaDto,
+  ComentarEntregaDto,
   CopiarTarefaDto,
   CriarTarefaProfessorDto,
   EditarTarefaProfessorDto,
@@ -236,6 +237,48 @@ export class PainelProfessorController {
       type: a.mime,
       disposition: a.disposicao,
     });
+  }
+
+  @Get('tarefas/:id/entregas/:alunoId/arquivos/:arquivoId')
+  @ApiOperation({ summary: 'Ver a foto ou documento que o aluno enviou' })
+  async baixarEntrega(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('alunoId', ParseIntPipe) alunoId: number,
+    @Param('arquivoId', ParseIntPipe) arquivoId: number,
+  ) {
+    const a = await this.painel.entregaParaBaixar(
+      usuarioId,
+      escolaId,
+      id,
+      alunoId,
+      arquivoId,
+    );
+    return new StreamableFile(createReadStream(a.caminho), {
+      type: a.mime,
+      disposition: a.disposicao,
+    });
+  }
+
+  @Put('tarefas/:id/entregas/:alunoId/comentario')
+  @ApiOperation({
+    summary: 'Comentar ou corrigir a entrega do aluno (aluno e familia veem)',
+  })
+  comentarEntrega(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('alunoId', ParseIntPipe) alunoId: number,
+    @Body() dto: ComentarEntregaDto,
+  ) {
+    return this.painel.comentarEntrega(
+      usuarioId,
+      escolaId,
+      id,
+      alunoId,
+      dto.comentario,
+    );
   }
 
   @Post('tarefas/:id/copiar')

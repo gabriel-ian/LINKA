@@ -126,6 +126,16 @@ export class AdaptarTarefaDto {
   pedido?: string;
 }
 
+export class ComentarEntregaDto {
+  @ApiProperty({
+    example: 'Muito bem! Só confira a conta do exercício 3.',
+    description: 'Comentário ou correção (aluno e família veem). Vazio apaga.',
+  })
+  @IsString()
+  @MaxLength(1000)
+  comentario: string;
+}
+
 export class CopiarTarefaDto {
   @ApiProperty({ type: [Number] })
   @IsArray()

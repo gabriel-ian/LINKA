@@ -14,6 +14,9 @@ import { prazo, tituloCompleto } from './aluno-ui';
       <p [class.feita]="concluida()">{{ titulo() }}</p>
       <span class="etiqueta" [class]="'etiqueta ' + etiqueta().cor">{{ etiqueta().texto }}</span>
     </div>
+    @if (abrir()) {
+      <span class="abrir" aria-hidden="true">{{ concluida() ? 'Ver' : 'Abrir' }} ›</span>
+    }
   `,
   styles: `
     :host {
@@ -23,6 +26,21 @@ import { prazo, tituloCompleto } from './aluno-ui';
     }
     .marca {
       flex: none;
+    }
+    .abrir {
+      flex: none;
+      align-self: center;
+      margin-left: auto;
+      padding: 8px 18px;
+      border-radius: 12px;
+      background: var(--cor-primaria);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    :host-context(a:hover) .abrir {
+      background: var(--cor-primaria-escura);
     }
     .texto {
       display: flex;
@@ -68,6 +86,8 @@ import { prazo, tituloCompleto } from './aluno-ui';
 })
 export class ItemTarefa {
   tarefa = input.required<TarefaResumoAluno>();
+  /** Mostra o botao "Abrir" (a linha inteira e o link). */
+  abrir = input(false);
 
   readonly concluida = computed(() => this.tarefa().situacao === 'concluida');
   readonly etiqueta = computed(() => prazo(this.tarefa()));

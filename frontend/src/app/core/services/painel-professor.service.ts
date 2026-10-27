@@ -84,6 +84,24 @@ export class PainelProfessorService {
     return this.http.get(`${this.api}/tarefas/${id}/anexos/${anexoId}`, { responseType: 'blob' });
   }
 
+  /** Foto ou documento que o aluno enviou. */
+  baixarEntrega(id: number, alunoId: number, arquivoId: number): Observable<Blob> {
+    return this.http.get(`${this.api}/tarefas/${id}/entregas/${alunoId}/arquivos/${arquivoId}`, {
+      responseType: 'blob',
+    });
+  }
+
+  comentarEntrega(
+    id: number,
+    alunoId: number,
+    comentario: string,
+  ): Observable<ApiResponse<{ comentario: string | null }>> {
+    return this.http.put<ApiResponse<{ comentario: string | null }>>(
+      `${this.api}/tarefas/${id}/entregas/${alunoId}/comentario`,
+      { comentario },
+    );
+  }
+
   excluirTarefa(id: number): Observable<ApiResponse<boolean>> {
     return this.http.delete<ApiResponse<boolean>>(`${this.api}/tarefas/${id}`);
   }

@@ -142,7 +142,13 @@ export function tamanhoLegivel(bytes: number): string {
       gap: 6px;
     }
 
-    @media (max-width: 600px) {
+    :host {
+      display: block;
+      container-type: inline-size;
+    }
+
+    /* Pela largura do proprio bloco: tambem quebra em colunas estreitas. */
+    @container (max-width: 420px) {
       li {
         flex-wrap: wrap;
       }
@@ -164,6 +170,8 @@ export class AnexosLista {
   /** Busca o arquivo (rota do professor ou do aluno). */
   readonly baixar = input.required<(a: Anexo) => Observable<Blob>>();
   readonly removivel = input(false);
+  /** Texto da confirmacao ao tirar (depois do nome do arquivo). */
+  readonly avisoRemocao = input('deixa de aparecer para os alunos.');
   readonly remover = output<Anexo>();
 
   readonly ocupado = signal<number | null>(null);
@@ -200,7 +208,7 @@ export class AnexosLista {
   async confirmarRemocao(a: Anexo): Promise<void> {
     const sim = await this.dialogo.confirmar({
       titulo: 'Tirar o arquivo da tarefa?',
-      mensagem: `"${a.nome}" deixa de aparecer para os alunos.`,
+      mensagem: `"${a.nome}" ${this.avisoRemocao()}`,
       confirmar: 'Sim, tirar',
       perigo: true,
     });

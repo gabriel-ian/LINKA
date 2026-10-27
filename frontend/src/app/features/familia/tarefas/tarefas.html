@@ -54,6 +54,31 @@
                     >Feita em {{ t.concluidoEm | date: "dd/MM 'às' HH:mm" }}</small
                   >
                 }
+                @if (t.arquivos.length) {
+                  <button
+                    type="button"
+                    class="link-acao ver-arquivos"
+                    [attr.aria-expanded]="arquivosAbertos() === t.id"
+                    (click)="arquivosAbertos.set(arquivosAbertos() === t.id ? null : t.id)"
+                  >
+                    📷 {{ arquivosAbertos() === t.id ? 'Esconder' : 'Ver' }} o que
+                    {{ d.filho.nome.split(' ')[0] }} enviou ({{ t.arquivos.length }})
+                  </button>
+                  @if (arquivosAbertos() === t.id) {
+                    <div class="arquivos-filho">
+                      <app-anexos-lista [anexos]="t.arquivos" [baixar]="baixarEntrega(t.id)" />
+                    </div>
+                  }
+                }
+                @if (t.comentario) {
+                  <div class="comentario-prof">
+                    <strong
+                      >💬 Comentário {{ t.professor ? 'da Prof. ' + t.professor.split(' ')[0] : 'do professor' }}</strong
+                    >
+                    <p>{{ t.comentario }}</p>
+                    <small>{{ t.comentarioEm | date: "dd/MM 'às' HH:mm" }}</small>
+                  </div>
+                }
               </li>
             } @empty {
               <li class="vazio-lista">{{ g.vazio }}</li>

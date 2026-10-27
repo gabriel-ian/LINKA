@@ -58,6 +58,13 @@ export class PainelFamiliaService {
     return this.http.get<ApiResponse<TarefasDoFilho>>(`${this.api}/filhos/${filhoId}/tarefas`);
   }
 
+  /** Foto ou documento que o filho enviou da tarefa. */
+  baixarEntrega(filhoId: number, tarefaId: number, arquivoId: number): Observable<Blob> {
+    return this.http.get(`${this.api}/filhos/${filhoId}/tarefas/${tarefaId}/entrega/${arquivoId}`, {
+      responseType: 'blob',
+    });
+  }
+
   marcarAvisoLido(avisoId: number): Observable<unknown> {
     return this.http.post(`${this.api}/avisos/${avisoId}/lido`, {});
   }

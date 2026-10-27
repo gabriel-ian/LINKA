@@ -6,7 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
-import { TarefaProfessor } from '../../../core/model/painel-professor.model';
+import { EntregaAluno, TarefaProfessor } from '../../../core/model/painel-professor.model';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { DialogoService } from '../../../core/services/dialogo.service';
 import { AnexosLista } from '../../../shared/anexos/anexos-lista';
@@ -45,8 +45,17 @@ export class ProfessorTarefa {
   readonly copiando = signal(false);
   readonly turmasCopia = signal<number[]>([]);
   readonly excluindo = signal(false);
-  /** Aluno cuja resposta esta aberta. */
+  /** Aluno cuja entrega esta aberta (resposta, arquivos e comentario). */
   readonly respostaAberta = signal<number | null>(null);
+  textoComentario = '';
+  readonly salvandoComentario = signal(false);
+  readonly sugestoesComentario = [
+    'Muito bem! Parabéns pelo capricho.',
+    'Quase lá! Confira de novo o último exercício.',
+    'Refaça com calma e me envie de novo.',
+  ];
+  readonly baixarEntrega = (alunoId: number) => (a: Anexo) =>
+    this.service.baixarEntrega(this.tarefa()!.id, alunoId, a.id);
 
   readonly outrasTurmas = computed(() =>
     (this.contexto.dados()?.turmas ?? []).filter((t) => t.id !== this.tarefa()?.turmaId),
@@ -58,7 +67,7 @@ export class ProfessorTarefa {
       feitas: e.filter((x) => x.situacao === 'concluida').length,
       andamento: e.filter((x) => x.situacao === 'em-andamento').length,
       pendentes: e.filter((x) => x.situacao === 'pendente').length,
-      respostas: e.filter((x) => x.respostaEm).length,
+      respostas: e.filter((x) => x.respostaEm || x.arquivos?.length).length,
     };
   });
 
@@ -271,6 +280,52 @@ export class ProfessorTarefa {
       error: () => {
         this.salvando.set(false);
         this.erroIa.set('Não foi possível salvar a adaptação.');
+      },
+    });
+  }
+
+  /** Professor pode abrir a entrega de quem terminou ou mandou algo. */
+  temEntrega(e: EntregaAluno): boolean {
+    return e.situacao === 'concluida' || !!e.resposta || !!e.arquivos?.length;
+  }
+
+  abrirEntrega(e: EntregaAluno): void {
+    const aberta = this.respostaAberta() === e.alunoId;
+    this.respostaAberta.set(aberta ? null : e.alunoId);
+    this.textoComentario = aberta ? '' : (e.comentario ?? '');
+  }
+
+  usarSugestaoComentario(s: string): void {
+    this.textoComentario = this.textoComentario.trim()
+      ? `${this.textoComentario.trim()} ${s}`
+      : s;
+  }
+
+  salvarComentario(e: EntregaAluno): void {
+    const t = this.tarefa();
+    if (!t || this.salvandoComentario()) return;
+    this.salvandoComentario.set(true);
+    this.service.comentarEntrega(t.id, e.alunoId, this.textoComentario).subscribe({
+      next: (res) => {
+        this.salvandoComentario.set(false);
+        const comentario = res.data.comentario;
+        this.tarefa.set({
+          ...t,
+          entregas: t.entregas.map((x) =>
+            x.alunoId === e.alunoId
+              ? { ...x, comentario, comentarioEm: comentario ? new Date().toISOString() : null }
+              : x,
+          ),
+        });
+        this.dialogo.avisar(
+          comentario
+            ? `Comentário enviado para ${primeiroNome(e.nome)} e a família.`
+            : 'Comentário apagado.',
+        );
+      },
+      error: (err: HttpErrorResponse) => {
+        this.salvandoComentario.set(false);
+        this.dialogo.avisar(mensagemDeErro(err, 'Não foi possível salvar o comentário.'), 'erro');
       },
     });
   }

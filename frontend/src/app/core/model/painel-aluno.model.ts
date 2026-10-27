@@ -41,8 +41,12 @@ export interface TarefaResumoAluno {
   passosFeitos: number;
   totalPassos: number;
   concluidoEm: string | null;
-  /** O aluno ja entregou uma resposta escrita. */
+  /** O aluno ja entregou uma resposta escrita ou uma foto/documento. */
   entregue?: boolean;
+  /** O professor deixou um comentario na entrega. */
+  comentada?: boolean;
+  /** Ultima vez que o professor editou a tarefa. */
+  atualizadaEm?: string | null;
 }
 
 export interface ResumoAluno extends Placar {
@@ -98,6 +102,11 @@ export interface TarefaAluno extends TarefaResumoAluno {
   resposta: string | null;
   /** Materiais que a professora anexou. */
   anexos?: Anexo[];
+  /** Fotos ou documentos que o aluno enviou da tarefa feita. */
+  arquivosEnviados?: Anexo[];
+  /** Comentario ou correcao da professora sobre a entrega. */
+  comentario?: string | null;
+  comentarioEm?: string | null;
   respostaEm: string | null;
   professor: string | null;
   passos: string[];

@@ -182,20 +182,50 @@ test.describe.serial('Tarefas e avisos', () => {
     await expect(
       page.getByText('Resposta enviada para a professora!'),
     ).toBeVisible();
+    // A professora editou a tarefa antes: o aluno ve o aviso.
+    await expect(page.getByText(/A professora mudou esta tarefa/)).toBeVisible();
+
+    // Foto da tarefa feita (o "Tirar foto" abre a camera no celular).
+    await page
+      .locator('app-entrega-arquivos input[type=file][capture]')
+      .setInputFiles({
+        name: 'caderno.jpg',
+        mimeType: 'image/jpeg',
+        buffer: Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0]),
+      });
+    await expect(page.getByText('Enviado para a professora:')).toBeVisible();
+    await expect(page.getByText('caderno.jpg')).toBeVisible();
 
     await page.getByRole('button', { name: 'Voltar' }).first().click();
     await expect(page).toHaveURL(/\/aluno\/agenda$/);
   });
 
-  test('o professor vê a resposta do aluno', async ({ page }) => {
+  test('o professor abre a entrega, vê a foto e comenta', async ({ page }) => {
     const { professor } = lerEstado();
     await entrarComo(page, 'Professor', professor.email, professor.senha);
     await page.goto(`/professor/tarefas/${novo.tarefaId}`);
     const linha = page.locator('.entregas li', { hasText: novo.aluno.nome });
-    await linha.getByRole('button', { name: 'Ver resposta' }).click();
+    await linha.getByRole('button', { name: 'Abrir entrega' }).click();
     await expect(
       linha.getByText('O capítulo fala sobre amizade.'),
     ).toBeVisible();
+    await expect(linha.getByText('caderno.jpg')).toBeVisible();
+
+    await linha
+      .locator('textarea[name=comentario]')
+      .fill('Muito bem, Lia! Capriche na letra.');
+    await linha.getByRole('button', { name: 'Enviar comentário' }).click();
+    await expect(page.getByText(/Comentário enviado para Lia/)).toBeVisible();
+
+    // O aluno ve o recado na tarefa.
+    const ctx = await page.context().browser()!.newContext();
+    const aluno = await ctx.newPage();
+    await entrarComo(aluno, 'Aluno', novo.aluno.email, senha);
+    await aluno.goto(`/aluno/tarefas/${novo.tarefaId}`);
+    await expect(
+      aluno.getByText('Muito bem, Lia! Capriche na letra.'),
+    ).toBeVisible();
+    await ctx.close();
   });
 
   test('o aviso do professor chega para o aluno e para a família', async ({
@@ -241,6 +271,11 @@ test.describe.serial('Tarefas e avisos', () => {
     const item = aFazer.locator('li', { hasText: 'Leitura E2E revisada' });
     await expect(item).toBeVisible();
     await expect(item.getByText(/Resposta entregue em/)).toBeVisible();
+    await expect(
+      item.getByText('Muito bem, Lia! Capriche na letra.'),
+    ).toBeVisible();
+    await item.getByRole('button', { name: /Ver o que Lia enviou/ }).click();
+    await expect(item.getByText('caderno.jpg')).toBeVisible();
   });
 
   test('trocar de turma leva as tarefas da turma nova', async () => {

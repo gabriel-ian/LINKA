@@ -24,6 +24,7 @@ import {
 import { semanasDoMes } from '../painel-professor/painel-professor.service';
 import { sequenciaAtual } from '../painel-aluno/gamificacao';
 import { Incentivo } from './incentivo.entity';
+import { EntregaArquivoService } from '../tarefa-anexo/entrega-arquivo.service';
 import { resumoSemanal } from './resumo-semanal';
 import { LgpdService, TERMO_VERSAO } from '../lgpd/lgpd.service';
 import { PREFERENCIAS_PADRAO, preferenciasDe } from './preferencias';
@@ -72,6 +73,7 @@ export class PainelFamiliaService {
     private readonly dataSource: DataSource,
     private readonly aluno: PainelAlunoService,
     private readonly lgpd: LgpdService,
+    private readonly entregas: EntregaArquivoService,
   ) {}
 
   // ------------------------------------------------------------ acesso
@@ -247,10 +249,24 @@ export class PainelFamiliaService {
         (a, b) =>
           (b.concluidoEm?.getTime() ?? 0) - (a.concluidoEm?.getTime() ?? 0),
       );
+    const enviados = new Map(
+      await Promise.all(
+        tarefas
+          .filter((t) => t.arquivosEnviados > 0)
+          .map(
+            async (t) =>
+              [t.id, await this.entregas.listar(t.id, alunoId)] as const,
+          ),
+      ),
+    );
     const item = (t: TarefaDoAluno) => ({
       ...this.aluno.resumoTarefa(t),
       professor: t.professor,
       respostaEm: t.respostaEm,
+      /** Fotos ou documentos que o filho enviou e o comentario do professor. */
+      arquivos: enviados.get(t.id) ?? [],
+      comentario: t.comentario,
+      comentarioEm: t.comentarioEm,
     });
     return {
       data: {
@@ -353,6 +369,17 @@ export class PainelFamiliaService {
       .sort((a, b) => a.quando - b.quando)
       .slice(0, 6)
       .map(({ quando: _, ...e }) => e);
+  }
+
+  /** Foto ou documento que o filho enviou da tarefa. */
+  async entregaParaBaixar(
+    usuarioId: number,
+    alunoId: number,
+    tarefaId: number,
+    arquivoId: number,
+  ) {
+    await this.filho(usuarioId, alunoId);
+    return this.entregas.paraBaixar(tarefaId, alunoId, arquivoId);
   }
 
   async enviarIncentivo(

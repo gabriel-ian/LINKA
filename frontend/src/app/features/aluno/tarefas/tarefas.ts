@@ -1,4 +1,6 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
 import { RouterLink } from '@angular/router';
 import { TarefaResumoAluno } from '../../../core/model/painel-aluno.model';
 import { VozService } from '../../../core/services/voz.service';
@@ -10,7 +12,7 @@ import { dataLonga, hojeIso, horaCurta, prazo, tituloCompleto } from '../aluno-u
 /** "Aluno - Tarefas" e "Aluno - Tarefas (tudo feito hoje)" do Figma. */
 @Component({
   selector: 'app-aluno-tarefas',
-  imports: [RouterLink, ItemTarefa, AdmResultado],
+  imports: [RouterLink, ItemTarefa, AdmResultado, DatePipe],
   templateUrl: './tarefas.html',
   styleUrl: './tarefas.css',
 })
@@ -20,6 +22,13 @@ export class AlunoTarefas {
   readonly hoje = dataLonga();
   readonly prazo = prazo;
   readonly titulo = tituloCompleto;
+
+  /** Historico das tarefas feitas (nao somem depois de concluidas). */
+  readonly feitas = signal<TarefaResumoAluno[]>([]);
+  readonly mostrarTodas = signal(false);
+  readonly feitasVisiveis = computed(() =>
+    this.mostrarTodas() ? this.feitas() : this.feitas().slice(0, 8),
+  );
 
   readonly abertasHoje = computed(() =>
     this.contexto.deHoje().filter((t) => t.situacao !== 'concluida'),
@@ -31,6 +40,10 @@ export class AlunoTarefas {
   );
 
   constructor() {
+    inject(PainelAlunoService)
+      .historico()
+      .subscribe({ next: (res) => this.feitas.set(res.data) });
+
     effect(() => {
       if (!this.contexto.resumo()) return;
       this.contexto.fala.set(

@@ -86,7 +86,7 @@ export class TarefaStatusService {
   /**
    * O aluno saiu da turma (troca, virada do ano ou remocao): as tarefas que
    * ele nao concluiu nas outras turmas deixam de ser dele. As concluidas e
-   * as que ja tem resposta entregue ficam, como historico. turmaAtual null =
+   * as que ja tem resposta ou arquivo entregue ficam, como historico. turmaAtual null =
    * aluno sem turma.
    */
   async removerPendentesDeOutrasTurmas(
@@ -100,6 +100,8 @@ export class TarefaStatusService {
          JOIN tarefa t ON t.id = ts.tarefa_id
         WHERE ts.aluno_id = ? AND ts.status <> 'concluida'
           AND ts.resposta_em IS NULL
+          AND NOT EXISTS (SELECT 1 FROM tarefa_entrega_arquivo ea
+                           WHERE ea.tarefa_id = ts.tarefa_id AND ea.aluno_id = ts.aluno_id)
           AND (? IS NULL OR t.turma_id <> ?)`,
       [alunoId, turmaAtual, turmaAtual],
     );

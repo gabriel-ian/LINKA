@@ -129,7 +129,12 @@
         <ul>
           @for (t of lista(); track t.id) {
             <li>
-              <a [routerLink]="['/aluno/tarefas', t.id]"><app-item-tarefa [tarefa]="t" /></a>
+              <a
+                class="linha-tarefa"
+                [routerLink]="['/aluno/tarefas', t.id]"
+                [attr.aria-label]="'Abrir ' + titulo(t)"
+                ><app-item-tarefa [tarefa]="t" [abrir]="true"
+              /></a>
             </li>
           } @empty {
             <li class="vazio-lista">Nenhuma missão por enquanto. Aproveite!</li>

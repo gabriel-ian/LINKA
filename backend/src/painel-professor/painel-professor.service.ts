@@ -12,6 +12,7 @@ import { Aluno } from '../aluno/aluno.entity';
 import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import { AdaptacaoIaService, PerfilParaIa } from './adaptacao-ia.service';
+import { TarefaAnexoService } from '../tarefa-anexo/tarefa-anexo.service';
 import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
 import { htmlParaTexto, limparHtml, temTexto } from '../comum/html';
 import {
@@ -93,6 +94,7 @@ export class PainelProfessorService {
     private readonly tarefas: TarefaService,
     private readonly ia: AdaptacaoIaService,
     private readonly avisos: AvisosFamiliaService,
+    private readonly anexos: TarefaAnexoService,
   ) {}
 
   // ---------------------------------------------------------- contexto
@@ -549,7 +551,9 @@ export class PainelProfessorService {
   async excluirTarefa(usuarioId: number, escolaId: number, tarefaId: number) {
     const professor = await this.professor(usuarioId, escolaId);
     await this.tarefaDoProfessor(professor.id, tarefaId);
+    let arquivos: string[] = [];
     await this.dataSource.transaction(async (manager) => {
+      arquivos = await this.anexos.apagarDaTarefa(tarefaId, manager);
       await manager.query(
         'UPDATE incentivo SET tarefa_id = NULL WHERE tarefa_id = ?',
         [tarefaId],
@@ -560,7 +564,42 @@ export class PainelProfessorService {
         ]);
       await manager.query('DELETE FROM tarefa WHERE id = ?', [tarefaId]);
     });
+    await this.anexos.apagarArquivos(arquivos);
     return { data: true };
+  }
+
+  /** Materiais da tarefa (PDF, imagem ou Word) que os alunos veem e baixam. */
+  async anexar(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    arquivos: Express.Multer.File[] | undefined,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    await this.tarefaDoProfessor(professor.id, tarefaId);
+    return { data: await this.anexos.anexar(tarefaId, arquivos) };
+  }
+
+  async removerAnexo(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    anexoId: number,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    await this.tarefaDoProfessor(professor.id, tarefaId);
+    return { data: await this.anexos.remover(tarefaId, anexoId) };
+  }
+
+  async anexoParaBaixar(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    anexoId: number,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    await this.tarefaDoProfessor(professor.id, tarefaId);
+    return this.anexos.paraBaixar(tarefaId, anexoId);
   }
 
   /** Envia a mesma tarefa (texto, materia e prazo) para outras turmas. */
@@ -593,6 +632,7 @@ export class PainelProfessorService {
         escolaId,
       );
       ids.push(criada.data.id);
+      await this.anexos.copiar(tarefaId, criada.data.id);
     }
     return { data: { ids } };
   }
@@ -646,6 +686,7 @@ export class PainelProfessorService {
       data: {
         ...tarefa,
         descricao: tarefa.descricao ? limparHtml(tarefa.descricao) : null,
+        anexos: await this.anexos.listar(tarefaId),
         pedidosAjuda,
         /** Como cada aluno esta na tarefa, com a resposta entregue. */
         entregas: alunos.map((a) => {

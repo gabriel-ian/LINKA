@@ -9,6 +9,8 @@ import { PainelProfessorService } from '../../../core/services/painel-professor.
 import { TarefaProfessor } from '../../../core/model/painel-professor.model';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { DialogoService } from '../../../core/services/dialogo.service';
+import { AnexosLista } from '../../../shared/anexos/anexos-lista';
+import { Anexo } from '../../../core/model/anexo.model';
 import { ProfessorContexto } from '../professor-contexto';
 import { hojeIso } from '../../adm/escola-ui';
 import { dataCurta, primeiroNome } from '../professor-ui';
@@ -16,7 +18,7 @@ import { dataCurta, primeiroNome } from '../professor-ui';
 /** "Professor - Tarefa criada" do Figma: original x versao adaptada por aluno. */
 @Component({
   selector: 'app-professor-tarefa',
-  imports: [FormsModule, RouterLink, DatePipe],
+  imports: [FormsModule, RouterLink, DatePipe, AnexosLista],
   templateUrl: './tarefa.html',
   styleUrl: './tarefa.css',
 })
@@ -26,6 +28,7 @@ export class ProfessorTarefa {
   private router = inject(Router);
   private navegacao = inject(NavegacaoService);
   private dialogo = inject(DialogoService);
+  readonly baixarAnexo = (a: Anexo) => this.service.baixarAnexo(this.tarefa()!.id, a.id);
 
   readonly primeiroNome = primeiroNome;
 

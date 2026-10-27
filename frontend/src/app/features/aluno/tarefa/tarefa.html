@@ -18,6 +18,14 @@
         </p>
       </header>
 
+      @if (t.anexos?.length) {
+        <section class="cartao-aluno materiais-aluno" aria-labelledby="titulo-materiais-aluno">
+          <h2 id="titulo-materiais-aluno">📎 Materiais da professora</h2>
+          <p>Abra para ver ou baixe para usar na tarefa.</p>
+          <app-anexos-lista [anexos]="t.anexos!" [baixar]="baixarAnexo" />
+        </section>
+      }
+
       <div class="segmentos" aria-hidden="true">
         @for (p of t.passos; track $index) {
           <span [class.feito]="$index < atual()" [class.agora]="$index === atual()"></span>
@@ -176,6 +184,14 @@
           <img src="assets/aluno/som-azul.svg" alt="" />
         </button>
       </section>
+
+      @if (t.anexos?.length) {
+        <section class="cartao-aluno materiais-aluno" aria-labelledby="titulo-materiais-aluno">
+          <h2 id="titulo-materiais-aluno">📎 Materiais da professora</h2>
+          <p>Abra para ver ou baixe para usar na tarefa.</p>
+          <app-anexos-lista [anexos]="t.anexos!" [baixar]="baixarAnexo" />
+        </section>
+      }
 
       @if (t.materiais.length) {
         <section class="cartao-aluno materiais">

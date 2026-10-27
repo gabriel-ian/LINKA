@@ -113,3 +113,87 @@
     width: 100%;
   }
 }
+
+/* ---------- Materiais da tarefa (anexos) ---------- */
+
+.materiais {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px dashed var(--cor-linha);
+  border-radius: 14px;
+}
+
+.materiais-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.materiais h2 {
+  margin: 0;
+  color: var(--cor-titulo);
+  font-size: 17px;
+}
+
+.materiais-topo p,
+.sem-arquivos {
+  margin: 2px 0 0;
+  font-size: 14px;
+}
+
+.botao-arquivo {
+  position: relative;
+  cursor: pointer;
+}
+
+.botao-arquivo input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.botao-arquivo:focus-within {
+  box-shadow: var(--anel-foco);
+}
+
+.botao-arquivo.desligado {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.novos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.novos li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--cor-fundo-painel);
+}
+
+.novos strong {
+  overflow: hidden;
+  max-width: 50%;
+  color: var(--cor-titulo);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.novos small {
+  flex: 1;
+  font-size: 13px;
+}

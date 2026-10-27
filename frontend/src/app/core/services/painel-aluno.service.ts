@@ -50,6 +50,13 @@ export class PainelAlunoService {
     });
   }
 
+  /** Material da tarefa como blob (o arquivo exige o token). */
+  baixarAnexo(tarefaId: number, anexoId: number): Observable<Blob> {
+    return this.http.get(`${this.api}/tarefas/${tarefaId}/anexos/${anexoId}`, {
+      responseType: 'blob',
+    });
+  }
+
   entregarResposta(id: number, resposta: string): Observable<ApiResponse<{ entregue: boolean }>> {
     return this.http.post<ApiResponse<{ entregue: boolean }>>(
       `${this.api}/tarefas/${id}/resposta`,

@@ -360,6 +360,21 @@ CREATE TABLE `tarefa` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tarefa_anexo` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tarefa_id` bigint unsigned NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `arquivo` varchar(100) NOT NULL,
+  `tipo` varchar(10) NOT NULL,
+  `tamanho` int unsigned NOT NULL,
+  `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_tarefa_anexo_tarefa` (`tarefa_id`),
+  CONSTRAINT `fk_tarefa_anexo_tarefa` FOREIGN KEY (`tarefa_id`) REFERENCES `tarefa` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tarefa_adaptada` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tarefa_id` bigint unsigned DEFAULT NULL,

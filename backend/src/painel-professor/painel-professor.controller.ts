@@ -1,5 +1,8 @@
 import {
   Body,
+  StreamableFile,
+  UploadedFiles,
+  UseInterceptors,
   Controller,
   Delete,
   Get,
@@ -11,7 +14,18 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { createReadStream } from 'fs';
+import {
+  ANEXO_TAMANHO_MAXIMO,
+  ANEXOS_POR_TAREFA,
+} from '../tarefa-anexo/tarefa-anexo.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -168,6 +182,57 @@ export class PainelProfessorController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.painel.excluirTarefa(usuarioId, escolaId, id);
+  }
+
+  @Post('tarefas/:id/anexos')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary:
+      'Anexar arquivos a tarefa (PDF, PNG, JPG, DOC ou DOCX; ate 5, 10 MB cada)',
+  })
+  @UseInterceptors(
+    FilesInterceptor('arquivos', ANEXOS_POR_TAREFA, {
+      limits: { fileSize: ANEXO_TAMANHO_MAXIMO },
+    }),
+  )
+  anexar(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFiles() arquivos: Express.Multer.File[],
+  ) {
+    return this.painel.anexar(usuarioId, escolaId, id, arquivos);
+  }
+
+  @Delete('tarefas/:id/anexos/:anexoId')
+  @ApiOperation({ summary: 'Tirar um arquivo da tarefa' })
+  removerAnexo(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('anexoId', ParseIntPipe) anexoId: number,
+  ) {
+    return this.painel.removerAnexo(usuarioId, escolaId, id, anexoId);
+  }
+
+  @Get('tarefas/:id/anexos/:anexoId')
+  @ApiOperation({ summary: 'Baixar um arquivo da tarefa' })
+  async baixarAnexo(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('anexoId', ParseIntPipe) anexoId: number,
+  ) {
+    const a = await this.painel.anexoParaBaixar(
+      usuarioId,
+      escolaId,
+      id,
+      anexoId,
+    );
+    return new StreamableFile(createReadStream(a.caminho), {
+      type: a.mime,
+      disposition: a.disposicao,
+    });
   }
 
   @Post('tarefas/:id/copiar')

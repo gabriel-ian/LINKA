@@ -1,3 +1,4 @@
+import { Anexo } from './anexo.model';
 /** Modelos das telas "Aluno - ..." (/painel-aluno). */
 
 export type SituacaoTarefaAluno = 'pendente' | 'em-andamento' | 'concluida';
@@ -95,6 +96,8 @@ export interface TarefaAluno extends TarefaResumoAluno {
   enunciadoHtml: string | null;
   /** Resposta escrita entregue (HTML limpo). */
   resposta: string | null;
+  /** Materiais que a professora anexou. */
+  anexos?: Anexo[];
   respostaEm: string | null;
   professor: string | null;
   passos: string[];

@@ -199,6 +199,13 @@
       }
     </div>
 
+    @if (t.anexos.length) {
+      <section class="cartao materiais" aria-labelledby="titulo-materiais">
+        <h2 id="titulo-materiais">Materiais da tarefa ({{ t.anexos.length }})</h2>
+        <app-anexos-lista [anexos]="t.anexos" [baixar]="baixarAnexo" />
+      </section>
+    }
+
     <section class="cartao entregas" aria-labelledby="titulo-entregas">
       <div class="topo">
         <h2 id="titulo-entregas">Entregas da turma</h2>

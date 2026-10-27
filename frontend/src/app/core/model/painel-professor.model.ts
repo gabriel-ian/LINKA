@@ -1,3 +1,4 @@
+import { Anexo } from './anexo.model';
 import { Situacao } from './painel-escola.model';
 
 /** Tipos das rotas /painel-professor (telas "Professor - ..." do Figma). */
@@ -134,6 +135,8 @@ export interface TarefaProfessor {
   adaptacoes: Adaptacao[];
   /** Situacao de cada aluno da turma, com a resposta entregue. */
   entregas: EntregaAluno[];
+  /** Materiais anexados (PDF, imagem ou Word). */
+  anexos: Anexo[];
   /** Pedidos de ajuda desta tarefa (abrir a tarefa marca como vistos). */
   pedidosAjuda: PedidoAjuda[];
 }

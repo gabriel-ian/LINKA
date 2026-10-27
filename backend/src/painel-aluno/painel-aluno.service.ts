@@ -14,6 +14,7 @@ import { TarefaStatusEntity } from '../tarefa-status/tarefa-status.entity';
 import { TarefaAdaptada } from '../tarefa-adaptada/tarefa-adaptada.entity';
 import { AvisosFamiliaService } from '../avisos-familia/avisos-familia.service';
 import { AdaptacaoIaService } from '../painel-professor/adaptacao-ia.service';
+import { TarefaAnexoService } from '../tarefa-anexo/tarefa-anexo.service';
 import { perfilParaColunas } from '../painel-escola/cadastros-escola.service';
 import { htmlParaTexto, limparHtml, temTexto } from '../comum/html';
 import {
@@ -111,6 +112,7 @@ export class PainelAlunoService {
     private readonly dataSource: DataSource,
     private readonly ia: AdaptacaoIaService,
     private readonly avisos: AvisosFamiliaService,
+    private readonly anexos: TarefaAnexoService,
   ) {}
 
   // ------------------------------------------------------------ leitura
@@ -364,9 +366,17 @@ export class PainelAlunoService {
         materiais: t.materiais,
         resposta: t.resposta,
         respostaEm: t.respostaEm,
+        /** Materiais que a professora anexou (ver ou baixar). */
+        anexos: await this.anexos.listar(tarefaId),
         iaDisponivel: this.ia.disponivel,
       },
     };
+  }
+
+  /** Arquivo anexado pela professora; so de uma tarefa do proprio aluno. */
+  async anexoParaBaixar(usuarioId: number, tarefaId: number, anexoId: number) {
+    await this.tarefaDoAluno(usuarioId, tarefaId);
+    return this.anexos.paraBaixar(tarefaId, anexoId);
   }
 
   /** O aluno entrega (ou reenvia) uma resposta escrita da tarefa. */

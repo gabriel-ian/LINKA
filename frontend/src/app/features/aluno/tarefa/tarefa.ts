@@ -10,6 +10,8 @@ import { VozService } from '../../../core/services/voz.service';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { EditorTexto, temTexto } from '../../../shared/editor-texto/editor-texto';
+import { AnexosLista } from '../../../shared/anexos/anexos-lista';
+import { Anexo } from '../../../core/model/anexo.model';
 import { AlunoContexto } from '../aluno-contexto';
 import { ELOGIOS, hojeIso, horaCurta, iconePasso, plural, tituloCompleto } from '../aluno-ui';
 
@@ -26,7 +28,7 @@ const ICONES_MATERIAL: [RegExp, string][] = [
  */
 @Component({
   selector: 'app-aluno-tarefa',
-  imports: [RouterLink, EditorTexto, DatePipe],
+  imports: [RouterLink, EditorTexto, DatePipe, AnexosLista],
   templateUrl: './tarefa.html',
   styleUrl: './tarefa.css',
 })
@@ -43,6 +45,7 @@ export class AlunoTarefa {
   readonly salvando = signal(false);
 
   readonly icone = iconePasso;
+  readonly baixarAnexo = (a: Anexo) => this.service.baixarAnexo(this.tarefa()!.id, a.id);
   /** Comemoracao rapida depois de cada passo (some sozinha). */
   readonly comemoracao = signal<{ texto: string; falta: string } | null>(null);
   private timerComemoracao?: ReturnType<typeof setTimeout>;

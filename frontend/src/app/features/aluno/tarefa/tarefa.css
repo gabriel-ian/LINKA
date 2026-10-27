@@ -712,3 +712,21 @@ button.voltar-botao {
     animation: none;
   }
 }
+
+.materiais-aluno {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+}
+
+.materiais-aluno h2 {
+  margin: 0;
+  color: var(--cor-titulo);
+  font-size: 18px;
+}
+
+.materiais-aluno p {
+  margin: 0;
+  font-size: 15px;
+}

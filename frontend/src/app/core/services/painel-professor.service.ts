@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../model/escola.model';
+import { Anexo } from '../model/anexo.model';
 import { PerfilAprendizagem } from '../model/painel-escola.model';
 import {
   AlunoProfessor,
@@ -66,6 +67,21 @@ export class PainelProfessorService {
       `${this.api}/tarefas/${id}`,
       dados,
     );
+  }
+
+  anexar(id: number, arquivos: File[]): Observable<ApiResponse<Anexo[]>> {
+    const form = new FormData();
+    for (const a of arquivos) form.append('arquivos', a, a.name);
+    return this.http.post<ApiResponse<Anexo[]>>(`${this.api}/tarefas/${id}/anexos`, form);
+  }
+
+  removerAnexo(id: number, anexoId: number): Observable<ApiResponse<Anexo[]>> {
+    return this.http.delete<ApiResponse<Anexo[]>>(`${this.api}/tarefas/${id}/anexos/${anexoId}`);
+  }
+
+  /** Vem como blob: o arquivo exige o token (um link direto nao levaria o header). */
+  baixarAnexo(id: number, anexoId: number): Observable<Blob> {
+    return this.http.get(`${this.api}/tarefas/${id}/anexos/${anexoId}`, { responseType: 'blob' });
   }
 
   excluirTarefa(id: number): Observable<ApiResponse<boolean>> {

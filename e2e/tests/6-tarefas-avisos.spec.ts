@@ -68,13 +68,11 @@ test.describe.serial('Tarefas e avisos', () => {
     await page.goto('/professor/tarefas/nova');
 
     await page.locator('input[name=titulo]').fill('Leitura E2E');
-    await page
-      .locator('input[name=data]')
-      .fill(
-        new Date().toLocaleDateString('sv-SE', {
-          timeZone: 'America/Sao_Paulo',
-        }),
-      );
+    await page.locator('input[name=data]').fill(
+      new Date().toLocaleDateString('sv-SE', {
+        timeZone: 'America/Sao_Paulo',
+      }),
+    );
     await escreverNoEditor(page, 'Leia o capítulo 2 e responda.');
     await page.getByRole('checkbox', { name: turma2.nome }).check();
     await page.getByRole('button', { name: 'Criar para 2 turmas' }).click();
@@ -103,6 +101,40 @@ test.describe.serial('Tarefas e avisos', () => {
     await expect(
       page.getByRole('heading', { name: 'Leitura E2E revisada' }),
     ).toBeVisible();
+  });
+
+  test('o professor anexa um PDF e o aluno vê e baixa', async ({
+    page,
+    browser,
+  }) => {
+    const { professor } = lerEstado();
+    await entrarComo(page, 'Professor', professor.email, professor.senha);
+    await page.goto(`/professor/tarefas/${novo.tarefaId}/editar`);
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'Exercícios extras.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('%PDF-1.4 exercicios extras %%EOF'),
+    });
+    await expect(page.getByText('será enviado ao salvar')).toBeVisible();
+    await page.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(page).toHaveURL(/\/professor\/tarefas\/\d+$/);
+    await expect(page.getByText('Materiais da tarefa (1)')).toBeVisible();
+
+    // O aluno da turma ve o material e baixa.
+    const ctx = await browser.newContext();
+    const aluno = await ctx.newPage();
+    await entrarComo(aluno, 'Aluno', novo.aluno.email, senha);
+    await aluno.goto(`/aluno/tarefas/${novo.tarefaId}`);
+    await expect(aluno.getByText('Materiais da professora')).toBeVisible();
+    await expect(aluno.getByText('Exercícios extras.pdf')).toBeVisible();
+    const [download] = await Promise.all([
+      aluno.waitForEvent('download'),
+      aluno
+        .getByRole('button', { name: 'Baixar Exercícios extras.pdf' })
+        .click(),
+    ]);
+    expect(download.suggestedFilename()).toBe('Exercícios extras.pdf');
+    await ctx.close();
   });
 
   test('o professor exclui uma tarefa', async ({ page }) => {

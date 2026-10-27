@@ -112,6 +112,62 @@
       }
     </div>
 
+    <section class="materiais" aria-labelledby="titulo-materiais">
+      <div class="materiais-topo">
+        <div>
+          <h2 id="titulo-materiais">Materiais da tarefa</h2>
+          <p>
+            PDF, imagem (PNG ou JPG) ou Word (DOC ou DOCX), até 10 MB cada. Os alunos podem ver e
+            baixar.
+          </p>
+        </div>
+        <label
+          class="bt bt-secundario botao-arquivo"
+          [class.desligado]="anexos().length + novosArquivos().length >= maximo"
+        >
+          <span aria-hidden="true">📎</span> Adicionar arquivos
+          <input
+            #campoArquivo
+            type="file"
+            multiple
+            [accept]="extensoes"
+            [disabled]="anexos().length + novosArquivos().length >= maximo"
+            (change)="escolherArquivos(campoArquivo.files, campoArquivo)"
+          />
+        </label>
+      </div>
+
+      @if (erroArquivo()) {
+        <p class="msg-erro" role="alert">{{ erroArquivo() }}</p>
+      }
+
+      @if (anexos().length) {
+        <app-anexos-lista
+          [anexos]="anexos()"
+          [baixar]="baixarAnexo"
+          [removivel]="true"
+          (remover)="removerAnexo($event)"
+        />
+      }
+
+      @if (novosArquivos().length) {
+        <ul class="novos">
+          @for (f of novosArquivos(); track f) {
+            <li>
+              <span aria-hidden="true">📄</span>
+              <strong>{{ f.name }}</strong>
+              <small>{{ tamanho(f.size) }} · será enviado ao salvar</small>
+              <button type="button" class="link-acao" (click)="tirarNovo(f)">Tirar</button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (!anexos().length && !novosArquivos().length) {
+        <p class="sem-arquivos">Nenhum arquivo. Opcional: folha de exercícios, texto, imagem...</p>
+      }
+    </section>
+
     <div class="rodape">
       <div class="ia">
         <span class="brilho" aria-hidden="true">✦</span>

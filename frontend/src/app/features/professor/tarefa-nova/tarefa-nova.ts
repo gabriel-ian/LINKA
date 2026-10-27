@@ -1,4 +1,13 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Observable, forkJoin, of } from 'rxjs';
+import {
+  Anexo,
+  ANEXO_EXTENSOES,
+  ANEXO_TAMANHO_MAXIMO,
+  ANEXOS_POR_TAREFA,
+} from '../../../core/model/anexo.model';
+import { DialogoService } from '../../../core/services/dialogo.service';
+import { AnexosLista, tamanhoLegivel } from '../../../shared/anexos/anexos-lista';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -18,7 +27,7 @@ type Campo = 'titulo' | 'descricao' | 'disciplina' | 'turma' | 'data';
 /** "Professor - Criar tarefa" do Figma. Com :id na rota, edita a tarefa. */
 @Component({
   selector: 'app-professor-tarefa-nova',
-  imports: [Esqueleto, FormsModule, EditorTexto],
+  imports: [Esqueleto, FormsModule, EditorTexto, AnexosLista],
   templateUrl: './tarefa-nova.html',
   styleUrl: './tarefa-nova.css',
 })
@@ -27,6 +36,16 @@ export class ProfessorTarefaNova {
   private router = inject(Router);
   private navegacao = inject(NavegacaoService);
   readonly contexto = inject(ProfessorContexto);
+  private dialogo = inject(DialogoService);
+
+  /** Materiais: os que ja estao na tarefa (edicao) e os escolhidos agora. */
+  readonly anexos = signal<Anexo[]>([]);
+  readonly novosArquivos = signal<File[]>([]);
+  readonly erroArquivo = signal('');
+  readonly extensoes = ANEXO_EXTENSOES;
+  readonly maximo = ANEXOS_POR_TAREFA;
+  readonly tamanho = tamanhoLegivel;
+  readonly baixarAnexo = (a: Anexo) => this.service.baixarAnexo(this.editandoId()!, a.id);
 
   readonly iniciais = iniciaisPessoa;
   readonly primeiroNome = primeiroNome;
@@ -88,6 +107,7 @@ export class ProfessorTarefaNova {
         const t = res.data;
         this.titulo = t.titulo;
         this.descricao = t.descricao ?? '';
+        this.anexos.set(t.anexos ?? []);
         this.disciplinaId = t.disciplinaId;
         this.dataEntrega = t.dataEntrega ?? '';
         this.dataOriginal = this.dataEntrega;
@@ -102,6 +122,66 @@ export class ProfessorTarefaNova {
         );
       },
     });
+  }
+
+  /** Confere tipo, tamanho e limite antes de enviar (o servidor confere de novo). */
+  escolherArquivos(lista: FileList | null, campo: HTMLInputElement): void {
+    this.erroArquivo.set('');
+    const escolhidos = Array.from(lista ?? []);
+    campo.value = '';
+    const aceitos: File[] = [];
+    for (const f of escolhidos) {
+      if (!/\.(pdf|png|jpe?g|docx?)$/i.test(f.name)) {
+        this.erroArquivo.set(`${f.name}: envie PDF, imagem (PNG ou JPG) ou Word (DOC ou DOCX).`);
+        continue;
+      }
+      if (f.size > ANEXO_TAMANHO_MAXIMO) {
+        this.erroArquivo.set(`${f.name}: o limite é 10 MB por arquivo.`);
+        continue;
+      }
+      aceitos.push(f);
+    }
+    const total = this.anexos().length + this.novosArquivos().length + aceitos.length;
+    if (total > ANEXOS_POR_TAREFA) {
+      this.erroArquivo.set(`Cada tarefa pode ter até ${ANEXOS_POR_TAREFA} arquivos.`);
+      aceitos.splice(ANEXOS_POR_TAREFA - this.anexos().length - this.novosArquivos().length);
+    }
+    this.novosArquivos.update((l) => [...l, ...aceitos]);
+  }
+
+  tirarNovo(f: File): void {
+    this.novosArquivos.update((l) => l.filter((x) => x !== f));
+  }
+
+  /** Tira na hora um arquivo que ja estava na tarefa (edicao). */
+  removerAnexo(a: Anexo): void {
+    const id = this.editandoId();
+    if (!id) return;
+    this.service.removerAnexo(id, a.id).subscribe({
+      next: (res) => {
+        this.anexos.set(res.data);
+        this.dialogo.avisar('Arquivo tirado da tarefa.');
+      },
+      error: () => this.dialogo.avisar('Não foi possível tirar o arquivo.', 'erro'),
+    });
+  }
+
+  /** Envia os arquivos novos para cada tarefa criada (uma por turma). */
+  private enviarArquivos(ids: number[]): Observable<unknown> {
+    const arquivos = this.novosArquivos();
+    if (!arquivos.length) return of(null);
+    return forkJoin(ids.map((id) => this.service.anexar(id, arquivos)));
+  }
+
+  private avisarFalhaArquivos(err: HttpErrorResponse): void {
+    this.dialogo.avisar(
+      mensagemDeErro(
+        err,
+        'A tarefa foi salva, mas os arquivos não foram enviados. Tente de novo pela edição.',
+      ),
+      'erro',
+      8000,
+    );
   }
 
   erro(c: Campo): string | undefined {
@@ -153,9 +233,17 @@ export class ProfessorTarefaNova {
       .subscribe({
         next: (res) => {
           this.contexto.recarregarVisao();
-          this.router.navigate(['/professor/tarefas', res.data.id], {
-            queryParams: { nova: 1, copias: res.data.ids.length - 1 || null },
-            replaceUrl: true,
+          const abrir = () =>
+            this.router.navigate(['/professor/tarefas', res.data.id], {
+              queryParams: { nova: 1, copias: res.data.ids.length - 1 || null },
+              replaceUrl: true,
+            });
+          this.enviarArquivos(res.data.ids).subscribe({
+            next: () => abrir(),
+            error: (e: HttpErrorResponse) => {
+              this.avisarFalhaArquivos(e);
+              abrir();
+            },
           });
         },
         error: (err: HttpErrorResponse) => this.falhou(err, 'Não foi possível criar a tarefa.'),
@@ -175,9 +263,17 @@ export class ProfessorTarefaNova {
         next: (res) => {
           this.contexto.recarregarVisao();
           // Volta para a tarefa (sem empilhar a tela de edicao no historico).
-          this.navegacao.voltar(`/professor/tarefas/${id}`, {
-            editada: 1,
-            refazer: res.data.adaptacoesRefazer,
+          const voltar = () =>
+            this.navegacao.voltar(`/professor/tarefas/${id}`, {
+              editada: 1,
+              refazer: res.data.adaptacoesRefazer,
+            });
+          this.enviarArquivos([id]).subscribe({
+            next: () => voltar(),
+            error: (e: HttpErrorResponse) => {
+              this.salvando.set(false);
+              this.avisarFalhaArquivos(e);
+            },
           });
         },
         error: (err: HttpErrorResponse) => this.falhou(err, 'Não foi possível salvar a tarefa.'),

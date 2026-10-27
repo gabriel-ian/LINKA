@@ -1,5 +1,6 @@
 import {
   Body,
+  StreamableFile,
   Controller,
   Delete,
   Get,
@@ -11,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { createReadStream } from 'fs';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -68,6 +70,20 @@ export class PainelAlunoController {
     @Body() dto: AjudaDto,
   ) {
     return this.painel.ajuda(usuarioId, id, dto);
+  }
+
+  @Get('tarefas/:id/anexos/:anexoId')
+  @ApiOperation({ summary: 'Ver ou baixar um material da tarefa' })
+  async baixarAnexo(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('anexoId', ParseIntPipe) anexoId: number,
+  ) {
+    const a = await this.painel.anexoParaBaixar(usuarioId, id, anexoId);
+    return new StreamableFile(createReadStream(a.caminho), {
+      type: a.mime,
+      disposition: a.disposicao,
+    });
   }
 
   @Post('tarefas/:id/resposta')

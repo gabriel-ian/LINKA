@@ -163,6 +163,15 @@ export default async function globalSetup(): Promise<void> {
     tokenOutra,
     { nomeCompleto: 'Aluno De Outra Escola E2E' },
   );
+  // A outra escola cria uma disciplina so dela (o "+ Outra" do cadastro).
+  const disciplinaOutra = `Xadrez E2E ${marca}`;
+  await api('POST', '/painel-escola/professores', tokenOutra, {
+    nomeCompleto: 'Professor Da Outra Escola E2E',
+    email: `prof.outra.${marca}@${dominio}`,
+    senha,
+    disciplinas: [disciplinaOutra],
+    turmaIds: [],
+  });
 
   const estado: Estado = {
     escola: { id: criada.data.id, ...escola },
@@ -178,6 +187,7 @@ export default async function globalSetup(): Promise<void> {
       senha: comFamilia.data.responsavel.senhaProvisoria,
     },
     alunoDeOutraEscola: { id: alunoOutra.data.id },
+    disciplinaDeOutraEscola: disciplinaOutra,
   };
   writeFileSync(ARQUIVO_ESTADO, JSON.stringify(estado, null, 2));
 }

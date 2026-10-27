@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { DataSource, EntityManager, In, Not } from 'typeorm';
+import { DataSource, EntityManager, In, Not, IsNull } from 'typeorm';
 import { Usuario } from '../usuario/usuario.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { gerarSenhaProvisoria } from '../usuario/senha-provisoria';
@@ -234,6 +234,7 @@ export class CadastrosEscolaService {
       const disciplinaIds = await this.disciplinasPorNome(
         manager,
         dto.disciplinas ?? [],
+        escolaId,
       );
       if (disciplinaIds.length) {
         await manager.getRepository(ProfessorDisciplina).save(
@@ -375,6 +376,7 @@ export class CadastrosEscolaService {
       const disciplinaIds = await this.disciplinasPorNome(
         manager,
         dto.disciplinas,
+        escolaId,
       );
       const habilitacoes = manager.getRepository(ProfessorDisciplina);
       await habilitacoes.delete({ professorId: professor.id });
@@ -1156,13 +1158,19 @@ export class CadastrosEscolaService {
     return linhas.map((l) => Number(l.disciplinaId));
   }
 
-  /** Acha pelo nome (sem diferenciar maiusculas) ou cria a disciplina. */
+  /**
+   * Acha pelo nome (sem diferenciar maiusculas) entre as disciplinas padrao e
+   * as da escola; se nao achar, cria uma disciplina so desta escola.
+   */
   private async disciplinasPorNome(
     manager: EntityManager,
     nomes: string[],
+    escolaId: number,
   ): Promise<number[]> {
     const repo = manager.getRepository(Disciplina);
-    const todas = await repo.find();
+    const todas = await repo.find({
+      where: [{ escolaId: IsNull() }, { escolaId }],
+    });
     const ids: number[] = [];
 
     for (const bruto of nomes) {
@@ -1173,7 +1181,7 @@ export class CadastrosEscolaService {
           d.nome.toLocaleLowerCase('pt-BR') === nome.toLocaleLowerCase('pt-BR'),
       );
       if (!disciplina) {
-        disciplina = await repo.save(repo.create({ nome }));
+        disciplina = await repo.save(repo.create({ nome, escolaId }));
         todas.push(disciplina);
       }
       if (!ids.includes(disciplina.id)) ids.push(disciplina.id);

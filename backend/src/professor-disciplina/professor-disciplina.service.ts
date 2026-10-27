@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { ProfessorDisciplina } from './professor-disciplina.entity';
 import { Professor } from '../professor/professor.entity';
 import { Disciplina } from '../disciplina/disciplina.entity';
@@ -31,7 +31,10 @@ export class ProfessorDisciplinaService {
     }
 
     const disciplina = await this.disciplinaRepository.findOne({
-      where: { id: data.disciplinaId },
+      where: [
+        { id: data.disciplinaId, escolaId: IsNull() },
+        { id: data.disciplinaId, escolaId },
+      ],
     });
 
     if (!disciplina) {

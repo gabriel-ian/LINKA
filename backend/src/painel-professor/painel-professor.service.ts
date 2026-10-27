@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { DISCIPLINA_DA_ESCOLA } from '../disciplina/disciplina.entity';
 import { TarefaService } from '../tarefa/tarefa.service';
 import { TarefaAdaptada } from '../tarefa-adaptada/tarefa-adaptada.entity';
 import { Aluno } from '../aluno/aluno.entity';
@@ -511,8 +512,8 @@ export class PainelProfessorService {
       campos.hora_limite = dto.horaLimite || null;
     if (dto.disciplinaId !== undefined) {
       const [d]: unknown[] = await this.dataSource.query(
-        'SELECT 1 FROM disciplina WHERE id = ?',
-        [dto.disciplinaId],
+        `SELECT 1 FROM disciplina WHERE id = ? AND ${DISCIPLINA_DA_ESCOLA}`,
+        [dto.disciplinaId, escolaId],
       );
       if (!d) throw new BadRequestException('Disciplina nao encontrada');
       campos.disciplina_id = dto.disciplinaId;

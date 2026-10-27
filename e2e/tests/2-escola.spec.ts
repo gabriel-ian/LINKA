@@ -50,4 +50,33 @@ test.describe('Escola', () => {
     );
     expect(resposta.status()).toBe(404);
   });
+
+  test('não enxerga as disciplinas criadas por outra escola', async ({
+    page,
+  }) => {
+    const { disciplinaDeOutraEscola } = lerEstado();
+    const api = process.env.E2E_API ?? 'http://localhost:3000';
+    const token = await page.evaluate(() => localStorage.getItem('token'));
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const opcoes = await (
+      await page.request.get(`${api}/painel-escola/opcoes`, { headers })
+    ).json();
+    const nomes = opcoes.data.disciplinas.map((d: { nome: string }) => d.nome);
+    expect(nomes).toContain('Matemática');
+    expect(nomes).not.toContain(disciplinaDeOutraEscola);
+
+    const catalogo = await (
+      await page.request.get(`${api}/disciplinas`, { headers })
+    ).json();
+    expect(catalogo.data.map((d: { nome: string }) => d.nome)).not.toContain(
+      disciplinaDeOutraEscola,
+    );
+
+    await page.goto('/escola/cadastro/professor');
+    await expect(
+      page.getByRole('button', { name: 'Matemática' }),
+    ).toBeVisible();
+    await expect(page.getByText(disciplinaDeOutraEscola)).toHaveCount(0);
+  });
 });

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { Disciplina } from './disciplina.entity';
 import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
 
@@ -12,7 +12,9 @@ export class DisciplinaService {
   ) {}
 
   async findAll() {
+    // So o catalogo padrao: as criadas por uma escola ficam so com ela.
     const resultado = await this.disciplinaRepository.find({
+      where: { escolaId: IsNull() },
       order: { nome: 'ASC' },
     });
 

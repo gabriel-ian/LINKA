@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { DISCIPLINA_DA_ESCOLA } from '../disciplina/disciplina.entity';
 import { DataSource } from 'typeorm';
 import {
   LinhaTarefa,
@@ -69,7 +70,10 @@ export class PainelEscolaService {
   /** Listas dos formularios: disciplinas, diagnosticos, turmas e professores. */
   async opcoes(escolaId: number) {
     const [disciplinas, diagnosticos, turmas, professores] = await Promise.all([
-      this.dataSource.query('SELECT id, nome FROM disciplina ORDER BY nome'),
+      this.dataSource.query(
+        `SELECT id, nome FROM disciplina WHERE ${DISCIPLINA_DA_ESCOLA} ORDER BY nome`,
+        [escolaId],
+      ),
       this.dataSource.query(
         'SELECT id, nome FROM neurodivergencia ORDER BY id',
       ),

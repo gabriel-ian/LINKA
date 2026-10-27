@@ -19,6 +19,8 @@ export interface Estado {
   familia: { email: string; senha: string };
   /** Aluno de OUTRA escola de teste: a escola principal nao pode ve-lo. */
   alunoDeOutraEscola: { id: number };
+  /** Disciplina criada pela outra escola: a escola principal nao pode ve-la. */
+  disciplinaDeOutraEscola: string;
 }
 
 export function lerEstado(): Estado {

@@ -148,7 +148,10 @@ CREATE TABLE `consentimento` (
 CREATE TABLE `disciplina` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
+  `escola_id` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_disciplina_escola` (`escola_id`),
+  CONSTRAINT `fk_disciplina_escola` FOREIGN KEY (`escola_id`) REFERENCES `escola` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

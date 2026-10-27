@@ -34,7 +34,7 @@ describe('DisciplinaController', () => {
 
   it('create delega para o service', async () => {
     const dto = { nome: 'Matematica' };
-    const resposta = { data: { id: 1, ...dto } };
+    const resposta = { data: { id: 1, ...dto, escolaId: null } };
     service.create.mockResolvedValue(resposta);
 
     expect(await controller.create(dto)).toBe(resposta);

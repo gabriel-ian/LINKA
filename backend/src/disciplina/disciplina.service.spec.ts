@@ -1,3 +1,4 @@
+import { IsNull } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -34,7 +35,11 @@ describe('DisciplinaService', () => {
 
       const resultado = await service.findAll();
 
-      expect(repository.find).toHaveBeenCalledWith({ order: { nome: 'ASC' } });
+      // So o catalogo padrao: as criadas por uma escola nao aparecem aqui.
+      expect(repository.find).toHaveBeenCalledWith({
+        where: { escolaId: IsNull() },
+        order: { nome: 'ASC' },
+      });
       expect(resultado).toEqual({ data: disciplinas });
     });
   });

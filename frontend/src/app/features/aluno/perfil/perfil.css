@@ -298,3 +298,48 @@ h2 {
   background: var(--cor-mascote-clara, #b8d7cd);
   color: var(--cor-titulo);
 }
+
+/* ---------- Tamanho da letra ---------- */
+
+.tamanho-letra {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 14px;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.tamanhos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.tamanhos button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  min-height: 70px;
+  padding: 6px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--cor-texto);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tamanhos button.ativo {
+  border: 2px solid var(--cor-mascote, #0e996b);
+  background: var(--cor-mascote-clara, #b8d7cd);
+  color: var(--cor-titulo);
+}
+
+.tamanhos .amostra {
+  color: var(--cor-titulo);
+  font-weight: 800;
+  line-height: 1;
+}

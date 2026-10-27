@@ -1,0 +1,217 @@
+.abrir-ajuda {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 18px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--cor-primaria);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.abrir-ajuda span {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.fundo-ajuda {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+/* Painel na lateral direita (so uma parte da tela). */
+.painel-ajuda {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 31;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(400px, 100vw);
+  overflow-y: auto;
+  padding: 22px 22px 28px;
+  background: #fff;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.18);
+  color: #1f2937;
+  font-size: 16px;
+  animation: entrar 0.2s ease-out;
+}
+
+@keyframes entrar {
+  from {
+    translate: 100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painel-ajuda {
+    animation: none;
+  }
+}
+
+.painel-ajuda header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.painel-ajuda h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.painel-ajuda h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.explica {
+  margin: -8px 0 0;
+  color: #4b5563;
+}
+
+.fechar {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.opcoes-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.opcoes-4 button,
+.mascotes button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  min-height: 66px;
+  padding: 6px 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opcoes-4 button.ativo,
+.mascotes button.ativo {
+  border: 2px solid var(--cor-primaria);
+  background: #e8effe;
+  color: #111827;
+}
+
+.amostra {
+  color: #111827;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.chaves {
+  display: flex;
+  flex-direction: column;
+}
+
+.chaves label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+}
+
+.chaves label span {
+  display: flex;
+  flex-direction: column;
+}
+
+.chaves small {
+  color: #4b5563;
+  font-size: 13px;
+}
+
+.chaves input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--cor-primaria);
+}
+
+.mascotes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.mini {
+  width: 28px;
+  height: 28px;
+}
+
+.ouvir {
+  align-self: stretch;
+}
+
+.link-acao {
+  align-self: flex-start;
+}
+
+/* Mascote que fala, no canto de baixo. */
+.fala-mascote {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  max-width: min(420px, calc(100vw - 32px));
+}
+
+.fala-desenho {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  padding: 6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.fala-balao {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px 16px 4px 16px;
+  background: #fff;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}

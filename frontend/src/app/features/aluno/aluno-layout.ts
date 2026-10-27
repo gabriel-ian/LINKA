@@ -43,7 +43,7 @@ const PROF = 'assets/professor/menu-';
       translate: 0 -50%;
       border-block: 2px solid color-mix(in srgb, var(--cor-mascote) 60%, transparent);
       background: color-mix(in srgb, #fde68a 35%, transparent);
-      box-shadow: 0 0 0 100vmax rgba(15, 23, 42, 0.12);
+      box-shadow: 0 0 0 100vmax rgba(15, 23, 42, 0.07);
       pointer-events: none;
     }
   `,
@@ -97,7 +97,7 @@ export class AlunoLayout {
         : this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),
       mascote: this.contexto.mascote(),
       modoCalmo: r?.preferencias.modoCalmo,
-      letrasMaiores: r?.preferencias.letrasMaiores,
+      tamanhoLetra: r?.preferencias.tamanhoLetra ?? (r?.preferencias.letrasMaiores ? 1 : 0),
       fonteDislexia: r?.preferencias.fonteDislexia,
       altoContraste: r?.preferencias.altoContraste,
       medidas: { rotuloX: 41, visaoX: 12, secaoTam: 32, gapItens: 15 },

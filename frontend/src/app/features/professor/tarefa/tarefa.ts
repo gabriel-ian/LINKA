@@ -52,7 +52,7 @@ export class ProfessorTarefa {
   readonly sugestoesComentario = [
     'Muito bem! Parabéns pelo capricho.',
     'Quase lá! Confira de novo o último exercício.',
-    'Refaça com calma e me envie de novo.',
+    'Na próxima, leia cada passo com calma.',
   ];
   readonly baixarEntrega = (alunoId: number) => (a: Anexo) =>
     this.service.baixarEntrega(this.tarefa()!.id, alunoId, a.id);

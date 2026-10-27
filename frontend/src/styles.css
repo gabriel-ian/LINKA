@@ -1175,3 +1175,45 @@ app-editor-texto .tox-tinymce {
 .bt-perigo:hover:not(:disabled) {
   background: var(--cor-erro-fundo);
 }
+
+/* ---------- Ajuda para ler nas telas de entrada (classes no <html>) ---------- */
+
+html.a11y-letra-1 .entrada-esquerda {
+  zoom: 1.15;
+}
+
+html.a11y-letra-2 .entrada-esquerda {
+  zoom: 1.3;
+}
+
+html.a11y-letra-3 .entrada-esquerda {
+  zoom: 1.5;
+}
+
+/* Letra maior: o formulario usa a tela toda (a foto da direita sai). */
+html.a11y-letra-2 .entrada-direita,
+html.a11y-letra-3 .entrada-direita {
+  display: none;
+}
+
+html.a11y-dislexia app-entrada-layout {
+  font-family: 'Lexend', var(--fonte-base);
+  letter-spacing: 0.02em;
+  word-spacing: 0.12em;
+}
+
+html.a11y-contraste app-entrada-layout {
+  --cor-texto: #111;
+  --cor-titulo: #000;
+  --cor-borda: #000;
+  --cor-primaria: #0a3d91;
+  --cor-primaria-escura: #002266;
+}
+
+html.a11y-contraste app-entrada-layout .campo {
+  border: 2px solid #000;
+}
+
+html.a11y-contraste app-entrada-layout a {
+  text-decoration: underline;
+}

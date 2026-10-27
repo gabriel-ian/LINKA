@@ -129,7 +129,7 @@ export class AlunoOfflineService {
     return {
       ...t,
       passosFeitos: feitos,
-      situacao: feitos >= t.totalPassos ? 'concluida' : 'em-andamento',
+      situacao: t.situacao === 'concluida' ? 'concluida' : 'em-andamento',
     };
   }
 

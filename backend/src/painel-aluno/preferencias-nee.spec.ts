@@ -15,6 +15,7 @@ describe('preferenciasSugeridas', () => {
       tempoPasso: true,
       ouvirVoz: true,
       letrasMaiores: true,
+      tamanhoLetra: 2,
       altoContraste: true,
     });
   });

@@ -15,14 +15,10 @@
                 class="linha"
                 [routerLink]="['/aluno/tarefas', t.id]"
                 [attr.aria-label]="'Abrir ' + titulo(t)"
-                ><app-item-tarefa [tarefa]="t" [abrir]="t.id !== a.id"
+                ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
               /></a>
               @if (t.id === a.id) {
                 <div class="botoes">
-                  <a class="ver-passos" [routerLink]="['/aluno/tarefas', t.id]">
-                    <img src="assets/aluno/icone-play-cinza.svg" alt="" width="13" height="10" />
-                    {{ t.situacao === 'em-andamento' ? 'Continuar a tarefa' : 'Abrir tarefa' }}
-                  </a>
                   <button
                     type="button"
                     class="ouvir"
@@ -40,11 +36,10 @@
 
         <div class="mascote">
           <button type="button" class="balao" (click)="animar()">
-            <img src="assets/aluno/icone-som-verde.svg" alt="" width="15" height="13" />
+            <span class="icone-som" aria-hidden="true"></span>
             Vamos começar
           </button>
-          <img class="ponta" src="assets/aluno/balao-ponta.svg" alt="" width="41" height="32" />
-          <span class="ponta-fundo"></span>
+          <span class="ponta" aria-hidden="true"></span>
           <app-mascote class="dino" [tipo]="contexto.mascote()" />
         </div>
       </section>
@@ -81,7 +76,7 @@
                   class="linha"
                   [routerLink]="['/aluno/tarefas', t.id]"
                   [attr.aria-label]="'Abrir ' + titulo(t)"
-                  ><app-item-tarefa [tarefa]="t" [abrir]="true"
+                  ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
                 /></a>
               </li>
             }
@@ -112,7 +107,7 @@
                 class="linha"
                 [routerLink]="['/aluno/tarefas', t.id]"
                 [attr.aria-label]="'Ver ' + titulo(t)"
-                ><app-item-tarefa [tarefa]="t" [abrir]="true"
+                ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
               /></a>
               <small class="feita-em">
                 Feita em {{ t.concluidoEm | date: "dd/MM 'às' HH:mm" }}

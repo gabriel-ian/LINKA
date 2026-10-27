@@ -270,8 +270,13 @@
   cursor: pointer;
 }
 
-.balao img {
+/* Alto-falante na cor do mascote (o desenho vem do SVG como mascara). */
+.icone-som {
   flex: none;
+  width: 15px;
+  height: 13px;
+  background: currentColor;
+  mask: url('/assets/aluno/icone-som.svg') center / contain no-repeat;
 }
 
 .balao.falando {
@@ -322,8 +327,23 @@
   filter: grayscale(1);
 }
 
-:host(.letras-maiores) .conteudo {
+:host(.letra-1) .conteudo {
   zoom: 1.15;
+}
+
+:host(.letra-2) .conteudo {
+  zoom: 1.3;
+}
+
+:host(.letra-3) .conteudo {
+  zoom: 1.5;
+}
+
+/* A fala do mascote na barra cresce junto. */
+:host(.letra-2) .balao,
+:host(.letra-3) .balao {
+  font-size: 19px;
+  line-height: 22px;
 }
 
 /* Letra para dislexia: Lexend com mais espaco entre letras, palavras e linhas. */

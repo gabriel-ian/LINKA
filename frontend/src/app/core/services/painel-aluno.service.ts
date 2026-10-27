@@ -52,6 +52,26 @@ export class PainelAlunoService {
     });
   }
 
+  /** Desenho do aluno para o cartao do Inicio. */
+  salvarDesenho(png: Blob): Observable<ApiResponse<ResumoAluno>> {
+    const corpo = new FormData();
+    corpo.append('desenho', png, 'desenho.png');
+    return this.http.put<ApiResponse<ResumoAluno>>(`${this.api}/desenho`, corpo);
+  }
+
+  desenho(): Observable<Blob> {
+    return this.http.get(`${this.api}/desenho`, { responseType: 'blob' });
+  }
+
+  apagarDesenho(): Observable<ApiResponse<ResumoAluno>> {
+    return this.http.delete<ApiResponse<ResumoAluno>>(`${this.api}/desenho`);
+  }
+
+  /** "Entregar a tarefa", depois de todos os passos. */
+  finalizar(id: number): Observable<ApiResponse<PassoConcluido>> {
+    return this.http.post<ApiResponse<PassoConcluido>>(`${this.api}/tarefas/${id}/finalizar`, {});
+  }
+
   /** Material da tarefa como blob (o arquivo exige o token). */
   baixarAnexo(tarefaId: number, anexoId: number): Observable<Blob> {
     return this.http.get(`${this.api}/tarefas/${tarefaId}/anexos/${anexoId}`, {

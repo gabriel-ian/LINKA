@@ -133,7 +133,7 @@
           [attr.aria-label]="'Ouvir: ' + fala"
           (click)="voz.falar(fala)"
         >
-          <img src="assets/aluno/icone-som.svg" alt="" />
+          <span class="icone-som" aria-hidden="true"></span>
           <span aria-live="polite">{{ fala }}</span>
         </button>
       </div>

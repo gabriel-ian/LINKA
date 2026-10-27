@@ -83,6 +83,14 @@ export class PreferenciasDto {
   @IsBoolean()
   letrasMaiores?: boolean;
 
+  @ApiPropertyOptional({
+    enum: [0, 1, 2, 3],
+    description: '0 normal, 1 grande, 2 maior, 3 enorme',
+  })
+  @IsOptional()
+  @IsIn([0, 1, 2, 3])
+  tamanhoLetra?: 0 | 1 | 2 | 3;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()

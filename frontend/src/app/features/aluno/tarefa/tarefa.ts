@@ -9,9 +9,11 @@ import { ConexaoService } from '../../../core/services/conexao.service';
 import { VozService } from '../../../core/services/voz.service';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
+import { DialogoService } from '../../../core/services/dialogo.service';
 import { EditorTexto, temTexto } from '../../../shared/editor-texto/editor-texto';
 import { AnexosLista } from '../../../shared/anexos/anexos-lista';
 import { EntregaArquivos } from '../entrega-arquivos';
+import { MascoteDesenho } from '../../../shared/mascote/mascote';
 import { Anexo } from '../../../core/model/anexo.model';
 import { AlunoContexto } from '../aluno-contexto';
 import { ELOGIOS, hojeIso, horaCurta, iconePasso, plural, tituloCompleto } from '../aluno-ui';
@@ -19,11 +21,28 @@ import { ELOGIOS, hojeIso, horaCurta, iconePasso, plural, tituloCompleto } from 
 /** Depois deste tempo no mesmo passo, o mascote sugere uma pausa. */
 const PAUSA_SEGUNDOS = 10 * 60;
 
-/** Icone do Figma para cada material, pelo nome que a IA escreveu. */
-const ICONES_MATERIAL: [RegExp, string][] = [
-  [/calculadora/i, 'mat-calculadora'],
-  [/r[eé]gua|esquadro|transferidor/i, 'mat-regua'],
-  [/caneta|l[aá]pis|borracha|marca/i, 'mat-caneta'],
+/**
+ * Icone de cada material, pelo nome que a IA escreveu: o desenho do Figma
+ * quando existe, senao um emoji. A ordem importa ("lapis de cor" antes de "lapis").
+ */
+const ICONES_MATERIAL: [RegExp, { svg?: string; emoji?: string }][] = [
+  [/calculadora/i, { svg: 'mat-calculadora' }],
+  [/r[eé]gua|esquadro|transferidor/i, { svg: 'mat-regua' }],
+  [/celular|telefone|smartphone|tablet/i, { svg: 'mat-celular' }],
+  [/computador|notebook|chromebook|laptop/i, { emoji: '💻' }],
+  [/fone|headphone/i, { emoji: '🎧' }],
+  [/l[aá]pis de cor|giz|canetinha|hidrocor/i, { emoji: '🖍️' }],
+  [/caneta|l[aá]pis|borracha|marca/i, { svg: 'mat-caneta' }],
+  [/tesoura/i, { emoji: '✂️' }],
+  [/cola\b/i, { emoji: '🧴' }],
+  [/tinta|pincel|aquarela/i, { emoji: '🎨' }],
+  [/dicion[aá]rio/i, { emoji: '📕' }],
+  [/apostila|livro/i, { emoji: '📖' }],
+  [/caderno/i, { svg: 'mat-caderno' }],
+  [/folha|papel|cartolina|sulfite/i, { emoji: '📄' }],
+  [/mapa|atlas|globo/i, { emoji: '🗺️' }],
+  [/internet|site|pesquisa/i, { emoji: '🌐' }],
+  [/[aá]gua|garrafa/i, { emoji: '💧' }],
 ];
 
 /**
@@ -32,7 +51,7 @@ const ICONES_MATERIAL: [RegExp, string][] = [
  */
 @Component({
   selector: 'app-aluno-tarefa',
-  imports: [RouterLink, EditorTexto, DatePipe, AnexosLista, EntregaArquivos],
+  imports: [RouterLink, EditorTexto, DatePipe, AnexosLista, EntregaArquivos, MascoteDesenho],
   templateUrl: './tarefa.html',
   styleUrl: './tarefa.css',
 })
@@ -43,6 +62,7 @@ export class AlunoTarefa {
   readonly voz = inject(VozService);
   private conexao = inject(ConexaoService);
   private navegacao = inject(NavegacaoService);
+  private dialogo = inject(DialogoService);
 
   readonly tarefa = signal<TarefaAluno | null>(null);
   readonly erro = signal('');
@@ -105,6 +125,15 @@ export class AlunoTarefa {
   });
   readonly pausaSugerida = computed(() => this.segundos() >= PAUSA_SEGUNDOS);
 
+  /** Entregue: foto e resposta ficam so para ver. */
+  readonly entregue = computed(() => this.tarefa()?.situacao === 'concluida');
+  /** Todos os passos feitos e ainda nao entregue: aparece "Entregar a tarefa". */
+  readonly podeEntregar = computed(
+    () => !!this.tarefa() && !this.entregue() && this.total() > 0 && this.feitos() >= this.total(),
+  );
+  readonly entregando = signal(false);
+  readonly erroEntrega = signal('');
+
   /** Concluida sem internet: falta enviar para a professora. */
   readonly aguardandoEnvio = computed(() => {
     const t = this.tarefa();
@@ -153,6 +182,7 @@ export class AlunoTarefa {
 
   private carregar(id: number): void {
     this.tarefa.set(null);
+    this.lerSeparados(id);
     const offline = this.contexto.offline;
     this.service.tarefa(id).subscribe({
       next: (res) => {
@@ -182,7 +212,12 @@ export class AlunoTarefa {
   private comemorar(feitos: number): void {
     const faltam = this.total() - feitos;
     const texto = this.calmo() ? 'Passo feito.' : ELOGIOS[feitos % ELOGIOS.length];
-    const falta = faltam === 1 ? 'Falta só 1 passo!' : `Faltam ${faltam} passos.`;
+    const falta =
+      faltam <= 0
+        ? 'Agora é só entregar a tarefa!'
+        : faltam === 1
+          ? 'Falta só 1 passo!'
+          : `Faltam ${faltam} passos.`;
     this.comemoracao.set({ texto, falta });
     this.contexto.fala.set(`${texto} ${falta}`);
     clearTimeout(this.timerComemoracao);
@@ -227,6 +262,44 @@ export class AlunoTarefa {
     });
   }
 
+  async entregar(): Promise<void> {
+    const t = this.tarefa();
+    if (!t || this.entregando()) return;
+    if (this.contexto.semConexao()) {
+      this.erroEntrega.set('Sem internet agora. Entregue quando a conexão voltar.');
+      return;
+    }
+    const sim = await this.dialogo.confirmar({
+      titulo: 'Entregar a tarefa?',
+      mensagem: t.arquivosEnviados?.length || t.resposta
+        ? 'Depois de entregar, não dá para mudar a foto nem a resposta.'
+        : 'Você não mandou foto nem resposta escrita. Depois de entregar, não dá para mandar mais.',
+      confirmar: 'Sim, entregar',
+      cancelar: 'Ainda não',
+    });
+    if (!sim) return;
+    this.entregando.set(true);
+    this.erroEntrega.set('');
+    this.service.finalizar(t.id).subscribe({
+      next: (res) => {
+        this.entregando.set(false);
+        this.contexto.recarregar();
+        this.voz.parar();
+        this.router.navigate(['/aluno/tarefas', t.id, 'concluida'], {
+          state: { resultado: res.data, titulo: this.titulo() },
+        });
+      },
+      error: (e: HttpErrorResponse) => {
+        this.entregando.set(false);
+        this.erroEntrega.set(
+          ConexaoService.semRede(e)
+            ? 'Sem internet agora. Entregue quando a conexão voltar.'
+            : mensagemDeErro(e, 'Não foi possível entregar agora. Tente de novo.'),
+        );
+      },
+    });
+  }
+
   arquivosMudaram(lista: Anexo[]): void {
     const t = this.tarefa();
     if (!t) return;
@@ -243,9 +316,41 @@ export class AlunoTarefa {
     if (t?.comentario) this.voz.falar(`Recado da professora: ${t.comentario}`);
   }
 
-  iconeMaterial(nome: string): string {
-    const achado = ICONES_MATERIAL.find(([re]) => re.test(nome));
-    return `assets/aluno/${achado?.[1] ?? 'mat-caderno'}.svg`;
+  iconeMaterial(nome: string): { svg?: string; emoji?: string } {
+    const achado = ICONES_MATERIAL.find(([re]) => re.test(nome))?.[1];
+    if (achado?.svg) return { svg: `assets/aluno/${achado.svg}.svg` };
+    return { emoji: achado?.emoji ?? '🎒' };
+  }
+
+  /** Materiais que o aluno ja separou (marcados so neste aparelho). */
+  readonly separados = signal<string[]>([]);
+
+  private chaveSeparados(id: number): string {
+    return `linka-materiais:${id}`;
+  }
+
+  private lerSeparados(id: number): void {
+    try {
+      this.separados.set(JSON.parse(localStorage.getItem(this.chaveSeparados(id)) ?? '[]'));
+    } catch {
+      this.separados.set([]);
+    }
+  }
+
+  separar(m: string): void {
+    const t = this.tarefa();
+    if (!t) return;
+    const lista = this.separados().includes(m)
+      ? this.separados().filter((x) => x !== m)
+      : [...this.separados(), m];
+    this.separados.set(lista);
+    try {
+      localStorage.setItem(this.chaveSeparados(t.id), JSON.stringify(lista));
+    } catch {
+      // Sem armazenamento: a marcacao vale so enquanto a tela esta aberta.
+    }
+    if (lista.includes(m) && lista.length === t.materiais.length)
+      this.contexto.fala.set('Tudo separado! Agora é só começar.');
   }
 
   textoPassos(n: number): string {
@@ -284,15 +389,15 @@ export class AlunoTarefa {
       next: (res) => {
         this.salvando.set(false);
         this.contexto.recarregar();
-        if (res.data.concluida) {
-          this.voz.parar();
-          this.router.navigate(['/aluno/tarefas', t.id, 'concluida'], {
-            state: { resultado: res.data, titulo: this.titulo() },
-          });
-          return;
-        }
         this.tarefa.set({ ...t, passosFeitos: res.data.passosFeitos, situacao: 'em-andamento' });
         this.comemorar(res.data.passosFeitos);
+        if (res.data.passosFeitos >= t.totalPassos) {
+          // Ultimo passo: leva ate "Entregar a tarefa" (antes, pode mandar foto).
+          setTimeout(() =>
+            document.getElementById('entregar')?.scrollIntoView({ behavior: 'smooth' }),
+          );
+          return;
+        }
         if (this.contexto.resumo()?.preferencias.ouvirVoz) this.ouvirPasso(res.data.passosFeitos);
       },
       error: (e: HttpErrorResponse) => {

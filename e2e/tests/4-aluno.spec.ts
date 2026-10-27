@@ -25,12 +25,30 @@ test.describe.serial('Aluno', () => {
     const concluir = page.getByRole('button', { name: 'Concluir passo' });
     while (await concluir.isVisible()) {
       await concluir.click();
-      if (/concluida/.test(page.url())) break;
       await page.waitForTimeout(300);
     }
+    // O ultimo passo nao entrega: ainda da para mandar foto antes.
+    await expect(page).not.toHaveURL(/concluida/);
+    await page
+      .locator('app-entrega-arquivos input[type=file][capture]')
+      .setInputFiles({
+        name: 'caderno.jpg',
+        mimeType: 'image/jpeg',
+        buffer: Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0]),
+      });
+    await expect(page.getByText('caderno.jpg')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Entregar a tarefa' }).click();
+    await page.getByRole('button', { name: 'Sim, entregar' }).click();
     await expect(
       page.getByRole('heading', { name: 'Missão cumprida!' }),
     ).toBeVisible();
+
+    // Depois de entregue, a foto fica so para ver.
+    await page.goBack();
+    await expect(page.getByText(/A foto e a resposta não podem mais/)).toBeVisible();
+    await expect(page.getByText('Tirar foto')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Escrever resposta' })).toHaveCount(0);
   });
 
   test('sem internet, mostra o aviso e as missões salvas', async ({

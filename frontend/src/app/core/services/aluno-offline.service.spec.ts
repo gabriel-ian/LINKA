@@ -38,14 +38,15 @@ describe('AlunoOfflineService', () => {
 
   afterEach(() => localStorage.clear());
 
-  it('mostra os passos da fila como feitos e marca "aguardando envio"', () => {
+  it('mostra os passos da fila como feitos, sem entregar a tarefa', () => {
     service.adicionar({ tarefaId: 6, passo: 1, feitoEm: 'a' });
     service.adicionar({ tarefaId: 6, passo: 2, feitoEm: 'b' });
 
     const t = service.aplicar(tarefa());
     expect(t.passosFeitos).toBe(2);
-    expect(t.situacao).toBe('concluida');
-    expect(service.aguardandoEnvio(t)).toBe(true);
+    // Entregar a tarefa e outro botao e precisa de internet.
+    expect(t.situacao).toBe('em-andamento');
+    expect(service.aguardandoEnvio(t)).toBe(false);
   });
 
   it('a fila sobrevive a um recarregamento da pagina', () => {

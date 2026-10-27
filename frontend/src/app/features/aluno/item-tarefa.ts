@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 import { TarefaResumoAluno } from '../../core/model/painel-aluno.model';
-import { prazo, tituloCompleto } from './aluno-ui';
+import { horaCurta, prazo, tituloCompleto } from './aluno-ui';
 
 /**
  * Linha de tarefa do Figma ("Card de tarefa"): circulo, titulo e etiqueta
@@ -13,6 +13,20 @@ import { prazo, tituloCompleto } from './aluno-ui';
     <div class="texto">
       <p [class.feita]="concluida()">{{ titulo() }}</p>
       <span class="etiqueta" [class]="'etiqueta ' + etiqueta().cor">{{ etiqueta().texto }}</span>
+      @if (detalhes()) {
+        <ul class="detalhes">
+          <li>📅 {{ entrega() }}</li>
+          @if (tarefa().disciplina) {
+            <li>📘 {{ tarefa().disciplina }}</li>
+          }
+          @if (tarefa().professor) {
+            <li>👩‍🏫 Prof. {{ tarefa().professor!.split(' ')[0] }}</li>
+          }
+          @if (!concluida() && tarefa().totalPassos) {
+            <li>👣 {{ tarefa().passosFeitos }} de {{ tarefa().totalPassos }} passos</li>
+          }
+        </ul>
+      }
     </div>
     @if (abrir()) {
       <span class="abrir" aria-hidden="true">{{ concluida() ? 'Ver' : 'Abrir' }} ›</span>
@@ -26,6 +40,16 @@ import { prazo, tituloCompleto } from './aluno-ui';
     }
     .marca {
       flex: none;
+    }
+    .detalhes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+      color: var(--cor-texto);
+      font-size: 15px;
     }
     .abrir {
       flex: none;
@@ -88,6 +112,17 @@ export class ItemTarefa {
   tarefa = input.required<TarefaResumoAluno>();
   /** Mostra o botao "Abrir" (a linha inteira e o link). */
   abrir = input(false);
+  /** Linha com entrega, materia, professora e passos. */
+  detalhes = input(false);
+
+  /** "Entrega: sexta, 31/10 às 18h". */
+  readonly entrega = computed(() => {
+    const t = this.tarefa();
+    if (!t.dataEntrega) return 'Sem data de entrega';
+    const d = new Date(`${t.dataEntrega}T12:00:00`);
+    const dia = d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' });
+    return `Entrega: ${dia}${t.horaLimite ? ` às ${horaCurta(t.horaLimite)}` : ''}`;
+  });
 
   readonly concluida = computed(() => this.tarefa().situacao === 'concluida');
   readonly etiqueta = computed(() => prazo(this.tarefa()));

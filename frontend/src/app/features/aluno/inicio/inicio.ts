@@ -1,4 +1,6 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { DesenhoAluno } from '../desenho/desenho';
+import { DialogoService } from '../../../core/services/dialogo.service';
 import { IncentivoAluno, TarefaResumoAluno } from '../../../core/model/painel-aluno.model';
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
 import { VozService } from '../../../core/services/voz.service';
@@ -11,7 +13,7 @@ import { dataLonga, hojeIso, horaCurta, plural, tituloCompleto } from '../aluno-
 /** "Aluno - Início" do Figma, e a versão "Aluno - Sem conexão". */
 @Component({
   selector: 'app-aluno-inicio',
-  imports: [RouterLink, ItemTarefa, MascoteDesenho],
+  imports: [RouterLink, ItemTarefa, MascoteDesenho, DesenhoAluno],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
 })
@@ -22,6 +24,20 @@ export class AlunoInicio {
   /** Incentivos que o Dino ja leu sozinho nesta visita. */
   private lidosEmVoz = new Set<number>();
   readonly hoje = dataLonga();
+
+  /** Desenho do aluno no cartao do mascote (URL do blob). */
+  readonly urlDesenho = signal<string | null>(null);
+  readonly desenhando = signal(false);
+  readonly salvandoDesenho = signal(false);
+  private dialogo = inject(DialogoService);
+
+  /** Enfeites da cena de cada mascote. */
+  readonly enfeites = computed(
+    () =>
+      ({ dino: ['🌿', '☀️', '🦴'], coruja: ['🌙', '⭐', '📚'], robo: ['⚙️', '💡', '🔧'] })[
+        this.contexto.mascote()
+      ],
+  );
   readonly titulo = tituloCompleto;
 
   /** Ate 3 tarefas: as de hoje primeiro, depois as proximas. */
@@ -91,6 +107,22 @@ export class AlunoInicio {
   }
 
   constructor() {
+    let desenhoCarregado: string | null | undefined;
+    effect(() => {
+      const quando = this.contexto.resumo()?.preferencias.desenhoEm ?? null;
+      if (quando === desenhoCarregado) return;
+      desenhoCarregado = quando;
+      if (!quando) {
+        this.trocarDesenho(null);
+        return;
+      }
+      this.service.desenho().subscribe({
+        next: (blob) => this.trocarDesenho(URL.createObjectURL(blob)),
+        error: () => this.trocarDesenho(null),
+      });
+    });
+    inject(DestroyRef).onDestroy(() => this.trocarDesenho(null));
+
     // Com "voz do mascote", ele le o recado assim que a tela abre.
     effect(() => {
       const i = this.incentivo();
@@ -113,6 +145,43 @@ export class AlunoInicio {
           ? `Oi ${r.aluno.primeiroNome}! Você tem ${plural(n, 'missão', 'missões')} hoje. Quer começar pela mais fácil?`
           : `Oi ${r.aluno.primeiroNome}! Nenhuma missão para hoje. Que tal ver suas conquistas?`,
       );
+    });
+  }
+
+  private trocarDesenho(url: string | null): void {
+    const antiga = this.urlDesenho();
+    if (antiga) URL.revokeObjectURL(antiga);
+    this.urlDesenho.set(url);
+  }
+
+  salvarDesenho(png: Blob): void {
+    this.salvandoDesenho.set(true);
+    this.service.salvarDesenho(png).subscribe({
+      next: (res) => {
+        this.salvandoDesenho.set(false);
+        this.desenhando.set(false);
+        this.trocarDesenho(URL.createObjectURL(png));
+        this.contexto.resumo.set(res.data);
+        this.contexto.fala.set('Que desenho lindo!');
+      },
+      error: () => {
+        this.salvandoDesenho.set(false);
+        this.dialogo.avisar('Não foi possível salvar o desenho agora.', 'erro');
+      },
+    });
+  }
+
+  async voltarAoMascote(): Promise<void> {
+    const sim = await this.dialogo.confirmar({
+      titulo: 'Tirar o desenho?',
+      mensagem: 'O cartão volta a mostrar o seu mascote.',
+      confirmar: 'Sim, tirar',
+      cancelar: 'Manter o desenho',
+    });
+    if (!sim) return;
+    this.service.apagarDesenho().subscribe({
+      next: (res) => this.contexto.resumo.set(res.data),
+      error: () => this.dialogo.avisar('Não foi possível tirar o desenho agora.', 'erro'),
     });
   }
 }

@@ -23,11 +23,11 @@ import { AnexosLista } from '../../shared/anexos/anexos-lista';
     <section class="entrega" aria-labelledby="titulo-entrega">
       <h2 id="titulo-entrega">📷 Mostre sua tarefa feita</h2>
       @if (arquivos().length) {
-        <p>Enviado para a professora:</p>
+        <p>{{ bloqueado() ? 'Você enviou:' : 'Enviado para a professora:' }}</p>
         <app-anexos-lista
           [anexos]="arquivos()"
           [baixar]="baixar"
-          [removivel]="true"
+          [removivel]="!bloqueado()"
           avisoRemocao="deixa de aparecer para a professora."
           (remover)="remover($event)"
         />
@@ -39,7 +39,7 @@ import { AnexosLista } from '../../shared/anexos/anexos-lista';
         <p class="alerta-erro" role="alert">{{ erro() }}</p>
       }
 
-      @if (arquivos().length < maximo) {
+      @if (!bloqueado() && arquivos().length < maximo) {
         <div class="botoes">
           <label class="bt-envio" [class.ocupado]="enviando()">
             <span aria-hidden="true">📷</span> Tirar foto
@@ -146,6 +146,8 @@ export class EntregaArquivos {
   /** Lista ja carregada (tela da tarefa). Sem ela, busca. */
   readonly inicial = input<Anexo[] | undefined>(undefined);
   readonly mudou = output<Anexo[]>();
+  /** Tarefa ja entregue: so ver, sem enviar nem tirar. */
+  readonly bloqueado = input(false);
 
   readonly arquivos = signal<Anexo[]>([]);
   readonly enviando = signal(false);

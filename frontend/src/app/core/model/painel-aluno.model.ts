@@ -8,6 +8,8 @@ export interface PreferenciasAluno {
   ouvirVoz: boolean;
   passosCurtos: boolean;
   letrasMaiores: boolean;
+  /** 0 normal, 1 grande, 2 maior, 3 enorme. */
+  tamanhoLetra?: 0 | 1 | 2 | 3;
   modoCalmo: boolean;
   /** Fonte Lexend, com mais espaco entre letras e linhas. */
   fonteDislexia?: boolean;
@@ -21,6 +23,8 @@ export interface PreferenciasAluno {
   /** Nome da voz do navegador; null = automatica. */
   voz?: string | null;
   velocidadeVoz?: 'devagar' | 'normal' | 'rapida';
+  /** Quando salvou o desenho do Inicio (null = mostra o mascote). */
+  desenhoEm?: string | null;
 }
 
 export interface Nivel {
@@ -52,6 +56,7 @@ export interface TarefaResumoAluno {
   entregue?: boolean;
   /** O professor deixou um comentario na entrega. */
   comentada?: boolean;
+  professor?: string | null;
   /** Ultima vez que o professor editou a tarefa. */
   atualizadaEm?: string | null;
 }

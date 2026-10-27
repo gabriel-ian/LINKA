@@ -48,6 +48,23 @@
       <div class="direita">
         <section class="cartao">
           <h2>Como eu gosto de aprender</h2>
+          <div class="tamanho-letra">
+            <strong id="rotulo-tamanho">Tamanho da letra</strong>
+            <div class="tamanhos" role="radiogroup" aria-labelledby="rotulo-tamanho">
+              @for (tl of tamanhos; track tl.valor) {
+                <button
+                  type="button"
+                  role="radio"
+                  [attr.aria-checked]="(r.preferencias.tamanhoLetra ?? 0) === tl.valor"
+                  [class.ativo]="(r.preferencias.tamanhoLetra ?? 0) === tl.valor"
+                  (click)="escolherTamanho(tl.valor)"
+                >
+                  <span class="amostra" [style.font-size.px]="tl.amostra">Aa</span>
+                  {{ tl.nome }}
+                </button>
+              }
+            </div>
+          </div>
           <ul class="opcoes">
             @for (o of opcoes; track o.chave) {
               <li>

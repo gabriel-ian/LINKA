@@ -6,7 +6,15 @@ const POR_DIAGNOSTICO: [RegExp, Partial<PreferenciasAluno>][] = [
   [/tea|autis/i, { passosCurtos: true, modoCalmo: true }],
   [/dislexia/i, { ouvirVoz: true, fonteDislexia: true, reguaLeitura: true }],
   [/discalculia/i, { passosCurtos: true, ouvirVoz: true }],
-  [/visual/i, { ouvirVoz: true, letrasMaiores: true, altoContraste: true }],
+  [
+    /visual/i,
+    {
+      ouvirVoz: true,
+      letrasMaiores: true,
+      tamanhoLetra: 2,
+      altoContraste: true,
+    },
+  ],
   [/auditiva|surd/i, { ouvirVoz: false }],
 ];
 

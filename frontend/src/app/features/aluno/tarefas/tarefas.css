@@ -151,10 +151,10 @@
   gap: 10px;
   width: 274px;
   height: 80px;
-  border: 1px solid #00704d;
+  border: 1px solid var(--cor-mascote, #00704d);
   border-radius: 16px;
-  background: #b8d7cd;
-  color: #00704d;
+  background: var(--cor-mascote-clara, #b8d7cd);
+  color: var(--cor-mascote, #00704d);
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -162,18 +162,29 @@
 
 .ponta {
   position: absolute;
-  top: 78px;
-  right: 38px;
-  rotate: 180deg;
+  top: 93px;
+  right: 50px;
+  width: 26px;
+  height: 18px;
+  background: var(--cor-mascote, #00704d);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 
-.ponta-fundo {
+/* Miolo da ponta, na cor do balao. */
+.ponta::after {
+  content: '';
   position: absolute;
-  top: 78px;
-  right: 37px;
-  width: 42px;
-  height: 15px;
+  inset: 0 2px 2px;
   background: var(--cor-mascote-clara, #b8d7cd);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.icone-som {
+  flex: none;
+  width: 15px;
+  height: 13px;
+  background: currentColor;
+  mask: url('/assets/aluno/icone-som.svg') center / contain no-repeat;
 }
 
 .dino {
@@ -276,8 +287,7 @@
   }
 
   /* Com o balao mais estreito, a ponta nao alinha: fica so o balao. */
-  .ponta,
-  .ponta-fundo {
+  .ponta {
     display: none;
   }
 

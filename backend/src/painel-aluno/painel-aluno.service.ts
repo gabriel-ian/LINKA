@@ -42,6 +42,7 @@ import {
 } from './gamificacao';
 import { AjudaDto, LembreteDto, PreferenciasDto } from './dto/painel-aluno.dto';
 import { preferenciasSugeridas } from './preferencias-nee';
+import { apagarDesenho, desenhoExiste, gravarDesenho } from './desenho';
 
 export type SituacaoTarefa = 'pendente' | 'em-andamento' | 'concluida';
 
@@ -99,6 +100,14 @@ const INTERVALO_PEDIDO_MS = 10 * 60_000;
 function situacaoDe(t: TarefaDoAluno): SituacaoTarefa {
   if (t.concluida) return 'concluida';
   return t.iniciadoEm || t.passosFeitos > 0 ? 'em-andamento' : 'pendente';
+}
+
+/** Depois de entregue, foto e resposta nao mudam mais. */
+function naoEntregue(t: TarefaDoAluno): void {
+  if (t.concluida)
+    throw new BadRequestException(
+      'Esta tarefa ja foi entregue. Nao da para mudar a foto ou a resposta.',
+    );
 }
 
 function iniciais(nome: string): string {
@@ -233,6 +242,7 @@ export class PainelAlunoService {
       passosFeitos: t.passosFeitos,
       totalPassos: t.totalPassos,
       concluidoEm: t.concluidoEm,
+      professor: t.professor,
       entregue: t.respostaEm !== null || t.arquivosEnviados > 0,
       /** O professor deixou um comentario na entrega. */
       comentada: t.comentario !== null,
@@ -328,11 +338,14 @@ export class PainelAlunoService {
    * diagnostico (dislexia liga a letra especial, TDAH o relogio...).
    */
   private async preferenciasDe(aluno: Aluno): Promise<PreferenciasAluno> {
-    return {
+    const prefs: PreferenciasAluno = {
       ...PREFERENCIAS_PADRAO,
       ...(aluno.preferencias ??
         preferenciasSugeridas(await this.diagnosticos(aluno.id))),
     };
+    // Quem ligou "letras maiores" antes dos 3 tamanhos fica no "grande".
+    if (prefs.letrasMaiores && !prefs.tamanhoLetra) prefs.tamanhoLetra = 1;
+    return prefs;
   }
 
   /** Recados da familia que o aluno ainda nao viu (o mascote le em voz alta). */
@@ -436,14 +449,16 @@ export class PainelAlunoService {
     tarefaId: number,
     arquivos: Express.Multer.File[] | undefined,
   ) {
-    const { aluno } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    const { aluno, tarefa } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    naoEntregue(tarefa);
     return {
       data: await this.entregas.enviar(tarefaId, aluno.id, arquivos),
     };
   }
 
   async removerArquivo(usuarioId: number, tarefaId: number, arquivoId: number) {
-    const { aluno } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    const { aluno, tarefa } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    naoEntregue(tarefa);
     return {
       data: await this.entregas.remover(tarefaId, aluno.id, arquivoId),
     };
@@ -464,7 +479,8 @@ export class PainelAlunoService {
     tarefaId: number,
     resposta: string,
   ) {
-    const { aluno } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    const { aluno, tarefa } = await this.tarefaDoAluno(usuarioId, tarefaId);
+    naoEntregue(tarefa);
     const limpa = limparHtml(resposta);
     if (!temTexto(limpa)) {
       throw new BadRequestException('Escreva a resposta antes de enviar');
@@ -568,7 +584,6 @@ export class PainelAlunoService {
 
     // Hora real do passo (pode ter sido feito sem internet).
     const quando = momentoDoPasso(feitoEm);
-    const ultimo = passo === tarefa.totalPassos;
     // O primeiro passo marca o inicio; incentivo antes dele = "com lembrete".
     const sozinho = tarefa.iniciadoEm
       ? tarefa.iniciouSozinho
@@ -580,27 +595,44 @@ export class PainelAlunoService {
         ...(tarefa.iniciadoEm
           ? {}
           : { iniciado_em: quando, iniciouSozinho: sozinho }),
-        ...(ultimo
-          ? { status: 'concluida' as const, concluido_em: quando }
-          : {}),
       },
     );
+    // O ultimo passo nao entrega a tarefa: o aluno ainda pode mandar foto ou
+    // resposta e depois aperta "Entregar a tarefa" (finalizar).
+    return { data: { passosFeitos: passo, concluida: false } };
+  }
 
-    if (!ultimo) return { data: { passosFeitos: passo, concluida: false } };
+  /** "Entregar a tarefa": depois de todos os passos. Trava foto e resposta. */
+  async finalizar(usuarioId: number, tarefaId: number) {
+    const { aluno, tarefa, tarefas } = await this.tarefaDoAluno(
+      usuarioId,
+      tarefaId,
+    );
+    if (tarefa.concluida)
+      throw new BadRequestException('Esta tarefa ja foi entregue');
+    if (tarefa.passosFeitos < tarefa.totalPassos)
+      throw new BadRequestException(
+        'Conclua todos os passos antes de entregar',
+      );
+
+    const quando = new Date();
+    await this.dataSource
+      .getRepository(TarefaStatusEntity)
+      .update(
+        { alunoId: aluno.id, tarefaId },
+        { status: 'concluida', concluido_em: quando },
+      );
     this.avisos.tarefaConcluida(aluno.id, tarefaId);
 
     const atualizada: TarefaDoAluno = {
       ...tarefa,
       concluida: true,
       concluidoEm: quando,
-      iniciadoEm: tarefa.iniciadoEm ?? quando,
-      iniciouSozinho: sozinho,
-      passosFeitos: passo,
     };
     const todas = tarefas.map((t) => (t.id === tarefaId ? atualizada : t));
     return {
       data: {
-        passosFeitos: passo,
+        passosFeitos: tarefa.passosFeitos,
         concluida: true,
         ganhos: pontosDaTarefa(atualizada),
         comecouSozinho: atualizada.iniciouSozinho === true,
@@ -837,12 +869,45 @@ export class PainelAlunoService {
   }
 
   /** "Meu perfil": como gosta de aprender, mascote e interesses. */
+  /** Desenho do aluno para o cartao do Inicio (PNG feito na propria Linka). */
+  async salvarDesenho(
+    usuarioId: number,
+    arquivo: Express.Multer.File | undefined,
+  ) {
+    const { aluno } = await this.alunoDoUsuario(usuarioId);
+    await gravarDesenho(aluno.id, arquivo);
+    await this.marcarDesenho(aluno, new Date().toISOString());
+    return this.resumo(usuarioId);
+  }
+
+  async apagarDesenho(usuarioId: number) {
+    const { aluno } = await this.alunoDoUsuario(usuarioId);
+    await apagarDesenho(aluno.id);
+    await this.marcarDesenho(aluno, null);
+    return this.resumo(usuarioId);
+  }
+
+  async desenho(usuarioId: number): Promise<string> {
+    const { aluno } = await this.alunoDoUsuario(usuarioId);
+    return desenhoExiste(aluno.id);
+  }
+
+  private async marcarDesenho(aluno: Aluno, desenhoEm: string | null) {
+    await this.dataSource.getRepository(Aluno).update(aluno.id, {
+      preferencias: { ...(await this.preferenciasDe(aluno)), desenhoEm },
+    });
+  }
+
   async salvarPreferencias(usuarioId: number, dto: PreferenciasDto) {
     const { aluno } = await this.alunoDoUsuario(usuarioId);
     const { interesses, ...prefs } = dto;
     const atuais = await this.preferenciasDe(aluno);
 
     const novas: PreferenciasAluno = { ...atuais, ...prefs, voz: atuais.voz };
+    if (prefs.tamanhoLetra !== undefined)
+      novas.letrasMaiores = prefs.tamanhoLetra > 0;
+    else if (prefs.letrasMaiores !== undefined)
+      novas.tamanhoLetra = prefs.letrasMaiores ? 1 : 0;
     // Voz vazia volta para a automatica.
     if (prefs.voz !== undefined) novas.voz = prefs.voz.trim() || null;
 

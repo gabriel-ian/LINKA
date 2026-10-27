@@ -87,7 +87,8 @@ export interface ConfigPainel {
   abas?: Aba[];
   /** Preferencias do aluno que mudam a moldura inteira. */
   modoCalmo?: boolean;
-  letrasMaiores?: boolean;
+  /** 0 normal, 1 grande, 2 maior, 3 enorme. */
+  tamanhoLetra?: number;
   fonteDislexia?: boolean;
   altoContraste?: boolean;
 }
@@ -116,7 +117,9 @@ export interface Notificacao {
     '[style.--secao-tam.px]': 'config().medidas.secaoTam',
     '[style.--gap-itens.px]': 'config().medidas.gapItens',
     '[class.calmo]': 'config().modoCalmo',
-    '[class.letras-maiores]': 'config().letrasMaiores',
+    '[class.letra-1]': 'config().tamanhoLetra === 1',
+    '[class.letra-2]': 'config().tamanhoLetra === 2',
+    '[class.letra-3]': 'config().tamanhoLetra === 3',
     '[class.fonte-dislexia]': 'config().fonteDislexia',
     '[class.alto-contraste]': 'config().altoContraste',
   },

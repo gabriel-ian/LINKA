@@ -134,7 +134,7 @@
                 class="linha-tarefa"
                 [routerLink]="['/aluno/tarefas', t.id]"
                 [attr.aria-label]="'Abrir ' + titulo(t)"
-                ><app-item-tarefa [tarefa]="t" [abrir]="true"
+                ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
               /></a>
             </li>
           } @empty {
@@ -144,22 +144,42 @@
         <a class="ver-todas" routerLink="/aluno/tarefas">Ver todas as tarefas</a>
       </section>
 
-      <section class="cartao-aluno foto" [class]="'cartao-aluno foto ' + contexto.mascote()" aria-label="Meu mascote">
-        @if (contexto.mascote() === 'dino') {
-          <img class="imagem" src="assets/aluno/foto-dino.png" alt="Um dinossauro de boca aberta" />
+      <section class="cartao-aluno foto" aria-label="Meu cantinho">
+        @if (urlDesenho(); as url) {
+          <img class="desenho" [src]="url" alt="Meu desenho" />
         } @else {
-          <div class="cena" role="img" [attr.aria-label]="'Meu mascote: ' + contexto.infoMascote().nome">
-            <span class="cena-enfeite e1" aria-hidden="true">{{ contexto.mascote() === 'coruja' ? '🌙' : '⚙️' }}</span>
-            <span class="cena-enfeite e2" aria-hidden="true">{{ contexto.mascote() === 'coruja' ? '⭐' : '💡' }}</span>
-            <span class="cena-enfeite e3" aria-hidden="true">{{ contexto.mascote() === 'coruja' ? '📚' : '🔧' }}</span>
+          <div
+            class="cena"
+            role="img"
+            [attr.aria-label]="'Meu mascote: ' + contexto.infoMascote().nome"
+          >
+            <span class="cena-enfeite e1" aria-hidden="true">{{ enfeites()[0] }}</span>
+            <span class="cena-enfeite e2" aria-hidden="true">{{ enfeites()[1] }}</span>
+            <span class="cena-enfeite e3" aria-hidden="true">{{ enfeites()[2] }}</span>
             <app-mascote class="cena-mascote" [tipo]="contexto.mascote()" />
             <strong class="cena-nome">{{ contexto.infoMascote().nome }}</strong>
           </div>
         }
-        <a class="editar" routerLink="/aluno/perfil" aria-label="Mudar meus interesses">
-          <img src="assets/aluno/icone-lapis.svg" alt="" width="12" height="12" />
-        </a>
+        <div class="foto-botoes">
+          <button type="button" class="bt-desenhar" (click)="desenhando.set(true)">
+            ✏️ {{ urlDesenho() ? 'Mudar o desenho' : 'Fazer um desenho' }}
+          </button>
+          @if (urlDesenho()) {
+            <button type="button" class="bt-mascote" (click)="voltarAoMascote()">
+              Mostrar o mascote
+            </button>
+          }
+        </div>
       </section>
     </div>
   </div>
+
+  @if (desenhando()) {
+    <app-desenho
+      [inicial]="urlDesenho()"
+      [salvando]="salvandoDesenho()"
+      (salvar)="salvarDesenho($event)"
+      (fechar)="desenhando.set(false)"
+    />
+  }
 }

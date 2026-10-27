@@ -8,12 +8,14 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
+  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -22,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { ANEXO_TAMANHO_MAXIMO } from '../tarefa-anexo/tarefa-anexo.service';
 import { ARQUIVOS_POR_ENTREGA } from '../tarefa-anexo/entrega-arquivo.service';
+import { DESENHO_TAMANHO_MAXIMO } from './desenho';
 import { createReadStream } from 'fs';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -61,13 +64,25 @@ export class PainelAlunoController {
   }
 
   @Post('tarefas/:id/passos')
-  @ApiOperation({ summary: 'Conclui um passo; o ultimo conclui a tarefa' })
+  @ApiOperation({ summary: 'Conclui um passo (entregar e outra rota)' })
   concluirPasso(
     @UsuarioId() usuarioId: number,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ConcluirPassoDto,
   ) {
     return this.painel.concluirPasso(usuarioId, id, dto.passo, dto.feitoEm);
+  }
+
+  @Post('tarefas/:id/finalizar')
+  @ApiOperation({
+    summary:
+      'Entrega a tarefa depois de todos os passos (trava foto e resposta)',
+  })
+  finalizar(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.painel.finalizar(usuarioId, id);
   }
 
   @Post('tarefas/:id/ajuda')
@@ -214,6 +229,36 @@ export class PainelAlunoController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.painel.removerLembrete(usuarioId, id);
+  }
+
+  @Put('desenho')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Salva o desenho do aluno (PNG) para o Inicio' })
+  @UseInterceptors(
+    FileInterceptor('desenho', {
+      limits: { fileSize: DESENHO_TAMANHO_MAXIMO },
+    }),
+  )
+  salvarDesenho(
+    @UsuarioId() usuarioId: number,
+    @UploadedFile() desenho: Express.Multer.File,
+  ) {
+    return this.painel.salvarDesenho(usuarioId, desenho);
+  }
+
+  @Get('desenho')
+  @ApiOperation({ summary: 'O desenho do aluno' })
+  async desenho(@UsuarioId() usuarioId: number) {
+    const caminho = await this.painel.desenho(usuarioId);
+    return new StreamableFile(createReadStream(caminho), {
+      type: 'image/png',
+    });
+  }
+
+  @Delete('desenho')
+  @ApiOperation({ summary: 'Apaga o desenho (volta a mostrar o mascote)' })
+  apagarDesenho(@UsuarioId() usuarioId: number) {
+    return this.painel.apagarDesenho(usuarioId);
   }
 
   @Patch('preferencias')

@@ -17,6 +17,8 @@ export interface PreferenciasAluno {
   ouvirVoz: boolean;
   passosCurtos: boolean;
   letrasMaiores: boolean;
+  /** 0 normal, 1 grande, 2 maior, 3 enorme (letrasMaiores = tamanho > 0). */
+  tamanhoLetra: 0 | 1 | 2 | 3;
   modoCalmo: boolean;
   /** Fonte Lexend, com mais espaco entre letras e linhas. */
   fonteDislexia: boolean;
@@ -30,12 +32,15 @@ export interface PreferenciasAluno {
   /** Nome da voz do navegador escolhida (null = a primeira em portugues). */
   voz: string | null;
   velocidadeVoz: 'devagar' | 'normal' | 'rapida';
+  /** Quando o aluno salvou o desenho do Inicio (null = mostra o mascote). */
+  desenhoEm: string | null;
 }
 
 export const PREFERENCIAS_PADRAO: PreferenciasAluno = {
   ouvirVoz: true,
   passosCurtos: true,
   letrasMaiores: false,
+  tamanhoLetra: 0,
   modoCalmo: false,
   fonteDislexia: false,
   altoContraste: false,
@@ -44,6 +49,7 @@ export const PREFERENCIAS_PADRAO: PreferenciasAluno = {
   mascote: 'dino',
   voz: null,
   velocidadeVoz: 'normal',
+  desenhoEm: null,
 };
 
 @Entity('aluno')

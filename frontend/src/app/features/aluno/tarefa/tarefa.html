@@ -84,6 +84,9 @@
       } @else {
         <section class="calma-cartao">
           <p class="calma-texto">Todos os passos estão feitos. Muito bem!</p>
+          @if (podeEntregar()) {
+            <p>Agora é só entregar a tarefa, lá embaixo.</p>
+          }
         </section>
       }
 
@@ -107,11 +110,14 @@
         </section>
       }
 
-      <app-entrega-arquivos
-        [tarefaId]="t.id"
-        [inicial]="t.arquivosEnviados ?? []"
-        (mudou)="arquivosMudaram($event)"
-      />
+      @if (!entregue() || t.arquivosEnviados?.length) {
+        <app-entrega-arquivos
+          [tarefaId]="t.id"
+          [inicial]="t.arquivosEnviados ?? []"
+          [bloqueado]="entregue()"
+          (mudou)="arquivosMudaram($event)"
+        />
+      }
 
       <section class="cartao-aluno minha-resposta" aria-labelledby="titulo-resposta">
         <h2 id="titulo-resposta">
@@ -122,10 +128,12 @@
         }
         @if (t.resposta && !escrevendo()) {
           <div class="texto-rico" [innerHTML]="t.resposta"></div>
-          <p class="entregue-em">Entregue em {{ t.respostaEm | date: "dd/MM 'às' HH:mm" }}</p>
-          <button type="button" class="link-acao" (click)="escrevendo.set(true)">
-            Mudar a resposta
-          </button>
+          <p class="entregue-em">Enviada em {{ t.respostaEm | date: "dd/MM 'às' HH:mm" }}</p>
+          @if (!entregue()) {
+            <button type="button" class="link-acao" (click)="escrevendo.set(true)">
+              Mudar a resposta
+            </button>
+          }
         } @else if (escrevendo()) {
           <app-editor-texto
             rotulo="Minha resposta"
@@ -150,13 +158,41 @@
               {{ enviandoResposta() ? 'Enviando...' : 'Enviar resposta' }}
             </button>
           </div>
-        } @else {
+        } @else if (!entregue()) {
           <p>A professora pediu algo escrito? Escreva aqui e envie para ela.</p>
           <button type="button" class="passo-bt" (click)="escrevendo.set(true)">
             Escrever resposta
           </button>
+        } @else {
+          <p>Você entregou esta tarefa sem resposta escrita.</p>
         }
       </section>
+
+      @if (podeEntregar()) {
+        <section class="entregar" id="entregar" aria-labelledby="titulo-entregar">
+          <h2 id="titulo-entregar">🎉 Todos os passos feitos!</h2>
+          <p>
+            Se quiser, mande uma foto ou escreva a resposta acima. Quando estiver pronto, entregue a
+            tarefa para a professora.
+          </p>
+          @if (erroEntrega()) {
+            <p class="alerta-erro" role="alert">{{ erroEntrega() }}</p>
+          }
+          <button
+            type="button"
+            class="bt-entregar"
+            [disabled]="entregando()"
+            (click)="entregar()"
+          >
+            {{ entregando() ? 'Entregando...' : 'Entregar a tarefa' }}
+          </button>
+        </section>
+      } @else if (entregue()) {
+        <p class="aviso-caixa verde entregue-aviso" role="status">
+          Tarefa entregue{{ t.concluidoEm ? ' em ' + (t.concluidoEm | date: "dd/MM 'às' HH:mm") : '' }}.
+          A foto e a resposta não podem mais ser mudadas.
+        </p>
+      }
 
       <footer class="calma-rodape">
         <span>Modo calmo: menos cores, letras maiores e um passo por vez.</span>
@@ -221,7 +257,7 @@
           (click)="ouvirObjetivo()"
         >
           <img class="espelhar" src="assets/aluno/dino-azul-p.svg" alt="" />
-          <img src="assets/aluno/som-azul.svg" alt="" />
+          <app-mascote class="mascote-bt" [tipo]="contexto.mascote()" cor="#2277E5" />
         </button>
       </section>
 
@@ -237,9 +273,30 @@
         <section class="cartao-aluno materiais">
           <div>
             <h2><img src="assets/aluno/icone-mochila.svg" alt="" /> O que você vai precisar</h2>
+            <p class="dica-materiais">
+              Toque em cada um quando já tiver separado
+              ({{ separados().length }} de {{ t.materiais.length }})
+            </p>
             <ul>
               @for (m of t.materiais; track m) {
-                <li><img [src]="iconeMaterial(m)" alt="" /> {{ m }}</li>
+                <li>
+                  <button
+                    type="button"
+                    class="material"
+                    [class.separado]="separados().includes(m)"
+                    [attr.aria-pressed]="separados().includes(m)"
+                    (click)="separar(m)"
+                  >
+                    @if (separados().includes(m)) {
+                      <span class="check" aria-hidden="true">✓</span>
+                    } @else if (iconeMaterial(m).svg; as svg) {
+                      <img [src]="svg" alt="" />
+                    } @else {
+                      <span class="emoji" aria-hidden="true">{{ iconeMaterial(m).emoji }}</span>
+                    }
+                    {{ m }}
+                  </button>
+                </li>
               }
             </ul>
           </div>
@@ -250,7 +307,7 @@
             (click)="ouvirMateriais()"
           >
             <img class="espelhar" src="assets/aluno/dino-verde-p.svg" alt="" />
-            <img src="assets/aluno/som-verde-grande.svg" alt="" />
+            <app-mascote class="mascote-bt" [tipo]="contexto.mascote()" cor="#00704D" />
           </button>
         </section>
       }
@@ -312,7 +369,11 @@
               }
                 <div class="passo-botoes">
                   <button type="button" class="passo-bt" (click)="ouvirPasso(i)">
-                    <img class="espelhar" src="assets/aluno/passo-ouvir-som.svg" alt="" />
+                    <app-mascote
+                      class="espelhar mascote-passo"
+                      [tipo]="contexto.mascote()"
+                      cor="#F06337"
+                    />
                     <img src="assets/aluno/passo-ouvir.svg" alt="" />
                     <span class="longo">Ouvir este passo</span><span class="curto">Ouvir</span>
                   </button>
@@ -354,11 +415,14 @@
         </section>
       }
 
-      <app-entrega-arquivos
-        [tarefaId]="t.id"
-        [inicial]="t.arquivosEnviados ?? []"
-        (mudou)="arquivosMudaram($event)"
-      />
+      @if (!entregue() || t.arquivosEnviados?.length) {
+        <app-entrega-arquivos
+          [tarefaId]="t.id"
+          [inicial]="t.arquivosEnviados ?? []"
+          [bloqueado]="entregue()"
+          (mudou)="arquivosMudaram($event)"
+        />
+      }
 
       <section class="cartao-aluno minha-resposta" aria-labelledby="titulo-resposta">
         <h2 id="titulo-resposta">
@@ -369,10 +433,12 @@
         }
         @if (t.resposta && !escrevendo()) {
           <div class="texto-rico" [innerHTML]="t.resposta"></div>
-          <p class="entregue-em">Entregue em {{ t.respostaEm | date: "dd/MM 'às' HH:mm" }}</p>
-          <button type="button" class="link-acao" (click)="escrevendo.set(true)">
-            Mudar a resposta
-          </button>
+          <p class="entregue-em">Enviada em {{ t.respostaEm | date: "dd/MM 'às' HH:mm" }}</p>
+          @if (!entregue()) {
+            <button type="button" class="link-acao" (click)="escrevendo.set(true)">
+              Mudar a resposta
+            </button>
+          }
         } @else if (escrevendo()) {
           <app-editor-texto
             rotulo="Minha resposta"
@@ -397,13 +463,41 @@
               {{ enviandoResposta() ? 'Enviando...' : 'Enviar resposta' }}
             </button>
           </div>
-        } @else {
+        } @else if (!entregue()) {
           <p>A professora pediu algo escrito? Escreva aqui e envie para ela.</p>
           <button type="button" class="passo-bt" (click)="escrevendo.set(true)">
             Escrever resposta
           </button>
+        } @else {
+          <p>Você entregou esta tarefa sem resposta escrita.</p>
         }
       </section>
+
+      @if (podeEntregar()) {
+        <section class="entregar" id="entregar" aria-labelledby="titulo-entregar">
+          <h2 id="titulo-entregar">🎉 Todos os passos feitos!</h2>
+          <p>
+            Se quiser, mande uma foto ou escreva a resposta acima. Quando estiver pronto, entregue a
+            tarefa para a professora.
+          </p>
+          @if (erroEntrega()) {
+            <p class="alerta-erro" role="alert">{{ erroEntrega() }}</p>
+          }
+          <button
+            type="button"
+            class="bt-entregar"
+            [disabled]="entregando()"
+            (click)="entregar()"
+          >
+            {{ entregando() ? 'Entregando...' : 'Entregar a tarefa' }}
+          </button>
+        </section>
+      } @else if (entregue()) {
+        <p class="aviso-caixa verde entregue-aviso" role="status">
+          Tarefa entregue{{ t.concluidoEm ? ' em ' + (t.concluidoEm | date: "dd/MM 'às' HH:mm") : '' }}.
+          A foto e a resposta não podem mais ser mudadas.
+        </p>
+      }
 
       <!-- So no celular: os passos que faltam, numa lista curta (Figma "Mobile"). -->
       @if (atual() < total() - 1) {

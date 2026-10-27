@@ -61,7 +61,7 @@ export function infoMascote(id: Mascote | null | undefined): InfoMascote {
 @Component({
   selector: 'app-mascote',
   template: `
-    <svg viewBox="0 0 33 33" fill="none" aria-hidden="true" [style.color]="info().cor">
+    <svg viewBox="0 0 33 33" fill="none" aria-hidden="true" [style.color]="cor() ?? info().cor">
       @switch (tipo()) {
         @case ('coruja') {
           <g stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
@@ -124,5 +124,7 @@ export function infoMascote(id: Mascote | null | undefined): InfoMascote {
 })
 export class MascoteDesenho {
   readonly tipo = input<Mascote>('dino');
+  /** Outra cor (ex.: a do botao onde o mascote aparece). */
+  readonly cor = input<string | null>(null);
   readonly info = computed(() => infoMascote(this.tipo()));
 }

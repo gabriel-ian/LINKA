@@ -9,7 +9,6 @@ import { MASCOTES, MascoteDesenho, infoMascote } from '../../../shared/mascote/m
 type Chave =
   | 'ouvirVoz'
   | 'passosCurtos'
-  | 'letrasMaiores'
   | 'fonteDislexia'
   | 'altoContraste'
   | 'reguaLeitura'
@@ -38,7 +37,6 @@ export class AlunoPerfil {
       texto: 'A Linka lê cada passo para você',
     },
     { chave: 'passosCurtos', titulo: 'Passos curtos', texto: 'No máximo 3 linhas por passo' },
-    { chave: 'letrasMaiores', titulo: 'Letras maiores', texto: 'Deixa o texto mais fácil de ler' },
     {
       chave: 'fonteDislexia',
       titulo: 'Letra para dislexia',
@@ -61,6 +59,17 @@ export class AlunoPerfil {
     },
     { chave: 'modoCalmo', titulo: 'Modo calmo', texto: 'Menos cores e animações' },
   ];
+
+  readonly tamanhos: { valor: 0 | 1 | 2 | 3; nome: string; amostra: number }[] = [
+    { valor: 0, nome: 'Normal', amostra: 16 },
+    { valor: 1, nome: 'Grande', amostra: 19 },
+    { valor: 2, nome: 'Maior', amostra: 22 },
+    { valor: 3, nome: 'Enorme', amostra: 26 },
+  ];
+
+  escolherTamanho(valor: 0 | 1 | 2 | 3): void {
+    this.salvar({ tamanhoLetra: valor, letrasMaiores: valor > 0 });
+  }
 
   readonly voz = inject(VozService);
   readonly velocidades: { id: VelocidadeVoz; nome: string }[] = [

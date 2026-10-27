@@ -34,6 +34,7 @@ import { UsuarioId } from '../auth/usuario-id.decorator';
 import { PainelProfessorService } from './painel-professor.service';
 import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import {
+  AdaptarTarefaDto,
   CopiarTarefaDto,
   CriarTarefaProfessorDto,
   EditarTarefaProfessorDto,
@@ -153,6 +154,7 @@ export class PainelProfessorController {
     @UsuarioId() usuarioId: number,
     @EscolaId() escolaId: number,
     @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AdaptarTarefaDto,
     @Query('alunoId') alunoId?: string,
   ) {
     return this.painel.adaptar(
@@ -160,6 +162,7 @@ export class PainelProfessorController {
       escolaId,
       id,
       alunoId ? Number(alunoId) || undefined : undefined,
+      dto?.pedido,
     );
   }
 

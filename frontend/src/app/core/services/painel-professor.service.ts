@@ -104,11 +104,12 @@ export class PainelProfessorService {
   }
 
   /** Gera com IA as versoes que faltam; com alunoId, refaz so a dele. */
-  adaptar(id: number, alunoId?: number): Observable<ApiResponse<TarefaProfessor>> {
+  /** Com pedido (e alunoId), a IA refaz a versao atual do aluno aplicando a mudanca. */
+  adaptar(id: number, alunoId?: number, pedido?: string): Observable<ApiResponse<TarefaProfessor>> {
     const params = alunoId ? new HttpParams().set('alunoId', alunoId) : undefined;
     return this.http.post<ApiResponse<TarefaProfessor>>(
       `${this.api}/tarefas/${id}/adaptar`,
-      {},
+      pedido ? { pedido } : {},
       { params },
     );
   }

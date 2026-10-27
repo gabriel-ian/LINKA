@@ -51,6 +51,7 @@ mysql -u root -p bancolinka < backend/sql/lgpd.sql
 mysql -u root -p bancolinka < backend/sql/avisos-entregas.sql
 mysql -u root -p bancolinka < backend/sql/disciplinas-por-escola.sql
 mysql -u root -p bancolinka < backend/sql/tarefa-anexos.sql
+mysql -u root -p bancolinka < backend/sql/orientacao-ia.sql
 ```
 
 ### 2. Backend

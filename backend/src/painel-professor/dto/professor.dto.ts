@@ -57,6 +57,16 @@ export class CriarTarefaProfessorDto {
     message: 'horaLimite deve ser HH:MM',
   })
   horaLimite?: string;
+
+  @ApiPropertyOptional({
+    example: 'Use exemplos com futebol e no máximo 4 passos',
+    description:
+      'Orientação para a IA ao adaptar (vale para todos os alunos NEE)',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  orientacaoIa?: string;
 }
 
 export class EditarTarefaProfessorDto {
@@ -93,6 +103,27 @@ export class EditarTarefaProfessorDto {
     message: 'horaLimite deve ser HH:MM',
   })
   horaLimite?: string;
+
+  @ApiPropertyOptional({
+    example: 'Use exemplos com futebol e no máximo 4 passos',
+    description:
+      'Orientação para a IA ao adaptar (vale para todos os alunos NEE)',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  orientacaoIa?: string;
+}
+
+export class AdaptarTarefaDto {
+  @ApiPropertyOptional({
+    example: 'Deixe os passos mais curtos e use exemplos de futebol',
+    description: 'Mudança pedida à IA, aplicada sobre a versão atual do aluno',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  pedido?: string;
 }
 
 export class CopiarTarefaDto {

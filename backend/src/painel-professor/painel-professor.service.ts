@@ -488,6 +488,13 @@ export class PainelProfessorService {
       ids.push(criada.data.id);
     }
 
+    const orientacao = dto.orientacaoIa?.trim();
+    if (orientacao)
+      await this.dataSource.query(
+        'UPDATE tarefa SET orientacao_ia = ? WHERE id IN (?)',
+        [orientacao, ids],
+      );
+
     return { data: { id: ids[0], ids } };
   }
 
@@ -512,6 +519,8 @@ export class PainelProfessorService {
       campos.data_entrega = dto.dataEntrega.slice(0, 10);
     if (dto.horaLimite !== undefined)
       campos.hora_limite = dto.horaLimite || null;
+    if (dto.orientacaoIa !== undefined)
+      campos.orientacao_ia = dto.orientacaoIa.trim() || null;
     if (dto.disciplinaId !== undefined) {
       const [d]: unknown[] = await this.dataSource.query(
         `SELECT 1 FROM disciplina WHERE id = ? AND ${DISCIPLINA_DA_ESCOLA}`,
@@ -633,6 +642,11 @@ export class PainelProfessorService {
       );
       ids.push(criada.data.id);
       await this.anexos.copiar(tarefaId, criada.data.id);
+      if (t.orientacaoIa)
+        await this.dataSource.query(
+          'UPDATE tarefa SET orientacao_ia = ? WHERE id = ?',
+          [t.orientacaoIa, criada.data.id],
+        );
     }
     return { data: { ids } };
   }
@@ -730,9 +744,12 @@ export class PainelProfessorService {
     escolaId: number,
     tarefaId: number,
     refazerAlunoId?: number,
+    pedido?: string,
   ) {
     const professor = await this.professor(usuarioId, escolaId);
     const tarefa = await this.tarefaDoProfessor(professor.id, tarefaId);
+    // Pedido de mudanca so vale ao refazer um aluno: a IA parte da versao atual.
+    const mudanca = refazerAlunoId ? pedido?.trim() || null : null;
     const repo = this.dataSource.getRepository(TarefaAdaptada);
     const existentes = await repo.find({ where: { tarefaId } });
 
@@ -745,14 +762,20 @@ export class PainelProfessorService {
     );
 
     if (alvos.length) {
-      const perfis: PerfilParaIa[] = alvos.map((a) => ({
-        alunoId: a.id,
-        primeiroNome: a.nome.split(' ')[0],
-        idade: a.dataNascimento ? idade(a.dataNascimento) : null,
-        diagnosticos: a.diagnosticos,
-        interesses: a.interesses,
-        dificuldades: a.dificuldades,
-      }));
+      const perfis: (PerfilParaIa & { versaoAtual?: string[] })[] = alvos.map(
+        (a) => ({
+          alunoId: a.id,
+          primeiroNome: a.nome.split(' ')[0],
+          idade: a.dataNascimento ? idade(a.dataNascimento) : null,
+          diagnosticos: a.diagnosticos,
+          interesses: a.interesses,
+          dificuldades: a.dificuldades,
+          ...(mudanca && {
+            versaoAtual:
+              existentes.find((e) => e.alunoId === a.id)?.passos ?? [],
+          }),
+        }),
+      );
 
       const geradas = await this.ia.adaptarTarefa(
         {
@@ -761,6 +784,7 @@ export class PainelProfessorService {
           enunciado: htmlParaTexto(tarefa.descricao) || tarefa.titulo,
         },
         perfis,
+        { orientacao: tarefa.orientacaoIa, mudanca },
       );
 
       for (const g of geradas) {
@@ -1122,7 +1146,7 @@ export class PainelProfessorService {
     const [t] = await this.dataSource.query(
       `SELECT t.id, t.titulo, t.descricao, t.data_entrega dataEntrega, t.hora_limite horaLimite,
               t.turma_id turmaId, tu.nome turma, t.disciplina_id disciplinaId,
-              d.nome disciplina
+              d.nome disciplina, t.orientacao_ia orientacaoIa
          FROM tarefa t JOIN turma tu ON tu.id = t.turma_id
          LEFT JOIN disciplina d ON d.id = t.disciplina_id
         WHERE t.id = ? AND t.professor_id = ?`,
@@ -1139,6 +1163,7 @@ export class PainelProfessorService {
       turma: t.turma as string,
       disciplinaId: t.disciplinaId ? Number(t.disciplinaId) : null,
       disciplina: t.disciplina as string | null,
+      orientacaoIa: (t.orientacaoIa as string | null) ?? null,
     };
   }
 

@@ -63,6 +63,15 @@ export class ProfessorTarefaNova {
   disciplinaId: number | null = null;
   dataEntrega = '';
   horaLimite = '18:00';
+  /** Orientacao para a IA ao adaptar (opcional). */
+  orientacaoIa = '';
+  readonly sugestoesIa = [
+    'No máximo 4 passos',
+    'Use exemplos do dia a dia',
+    'Linguagem bem simples',
+    'Inclua uma pausa no meio',
+    'Use os interesses de cada aluno',
+  ];
   readonly turmaId = signal<number | null>(null);
   /** Outras turmas que recebem a mesma tarefa. */
   readonly outrasTurmas = signal<number[]>([]);
@@ -112,6 +121,7 @@ export class ProfessorTarefaNova {
         this.dataEntrega = t.dataEntrega ?? '';
         this.dataOriginal = this.dataEntrega;
         this.horaLimite = t.horaLimite ?? '';
+        this.orientacaoIa = t.orientacaoIa ?? '';
         this.turmaId.set(t.turmaId);
         this.carregando.set(false);
       },
@@ -147,6 +157,13 @@ export class ProfessorTarefaNova {
       aceitos.splice(ANEXOS_POR_TAREFA - this.anexos().length - this.novosArquivos().length);
     }
     this.novosArquivos.update((l) => [...l, ...aceitos]);
+  }
+
+  /** Junta a sugestao clicada ao texto da orientacao. */
+  usarSugestao(s: string): void {
+    const atual = this.orientacaoIa.trim();
+    if (atual.toLowerCase().includes(s.toLowerCase())) return;
+    this.orientacaoIa = atual ? `${atual.replace(/[.;]$/, '')}; ${s.toLowerCase()}` : s;
   }
 
   tirarNovo(f: File): void {
@@ -229,6 +246,7 @@ export class ProfessorTarefaNova {
         disciplinaId: this.disciplinaId!,
         dataEntrega: this.dataEntrega,
         horaLimite: this.horaLimite || undefined,
+        orientacaoIa: this.orientacaoIa.trim() || undefined,
       })
       .subscribe({
         next: (res) => {
@@ -258,6 +276,7 @@ export class ProfessorTarefaNova {
         disciplinaId: this.disciplinaId!,
         dataEntrega: this.dataEntrega,
         horaLimite: this.horaLimite || '',
+        orientacaoIa: this.orientacaoIa.trim(),
       })
       .subscribe({
         next: (res) => {

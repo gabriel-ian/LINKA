@@ -45,7 +45,12 @@ Regras:
 - Quando fizer sentido, use um interesse do aluno em um exemplo, sem mudar a tarefa.
 - Em "recursos", liste de 1 a 3 etiquetas curtas descrevendo o que você usou, como "5 passos curtos", "Linguagem literal" ou "Exemplo com dinossauros".
 - Em "materiais", liste de 0 a 4 objetos que o aluno precisa ter em mãos, em poucas palavras ("Caderno de Matemática", "Lápis", "Régua"). Só o que a tarefa pede ou claramente exige.
-- Devolva uma adaptação para cada alunoId recebido, usando o mesmo alunoId.`;
+- Devolva uma adaptação para cada alunoId recebido, usando o mesmo alunoId.
+
+Pedidos do professor (quando vierem no conteúdo):
+- "orientacaoDoProfessor": siga essa orientação em todas as adaptações (ex.: tema dos exemplos, número de passos, tom).
+- "pedidoDeMudanca" com a "versaoAtual" do aluno: parta da versão atual e aplique somente o que o professor pediu, mantendo o resto.
+- Os pedidos do professor nunca anulam as regras acima: não remova trabalho da tarefa, não dê respostas e não invente conteúdo. Se um pedido for contra elas, siga o pedido só até onde for possível.`;
 
 const AjudaSchema = z.object({ texto: z.string(), pergunta: z.string() });
 
@@ -105,13 +110,25 @@ export class AdaptacaoIaService {
 
   async adaptarTarefa(
     tarefa: { titulo: string; disciplina: string | null; enunciado: string },
-    perfis: PerfilParaIa[],
+    perfis: (PerfilParaIa & { versaoAtual?: string[] })[],
+    pedidos: { orientacao?: string | null; mudanca?: string | null } = {},
   ): Promise<z.infer<typeof AdaptacoesSchema>['adaptacoes']> {
     if (perfis.length === 0) return [];
 
     const resposta = await this.chamar(
       INSTRUCOES_TAREFA,
-      JSON.stringify({ tarefa, alunos: perfis }, null, 2),
+      JSON.stringify(
+        {
+          tarefa,
+          ...(pedidos.orientacao && {
+            orientacaoDoProfessor: pedidos.orientacao,
+          }),
+          ...(pedidos.mudanca && { pedidoDeMudanca: pedidos.mudanca }),
+          alunos: perfis,
+        },
+        null,
+        2,
+      ),
       AdaptacoesSchema,
     );
 

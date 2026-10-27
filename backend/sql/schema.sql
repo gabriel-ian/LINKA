@@ -349,6 +349,7 @@ CREATE TABLE `tarefa` (
   `disciplina_id` bigint unsigned DEFAULT NULL,
   `professor_id` bigint unsigned DEFAULT NULL,
   `criado_em` datetime DEFAULT CURRENT_TIMESTAMP,
+  `orientacao_ia` text,
   PRIMARY KEY (`id`),
   KEY `turma_id` (`turma_id`),
   KEY `disciplina_id` (`disciplina_id`),

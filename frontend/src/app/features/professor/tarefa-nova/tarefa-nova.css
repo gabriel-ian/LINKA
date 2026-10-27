@@ -197,3 +197,50 @@
   flex: 1;
   font-size: 13px;
 }
+
+/* ---------- Orientacao para a IA ---------- */
+
+.orientacao-ia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f5efff;
+}
+
+.orientacao-ia .campo-p > span {
+  color: #5b21b6;
+  font-weight: 700;
+}
+
+.orientacao-ia textarea {
+  min-height: 64px;
+}
+
+.orientacao-ia small {
+  color: #5b21b6;
+  font-size: 13px;
+}
+
+.sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sugestoes .chip {
+  padding: 4px 12px;
+  border: 1px solid #d8c7fb;
+  border-radius: 59px;
+  background: #fff;
+  color: #5b21b6;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sugestoes .chip:hover {
+  background: #ede4ff;
+}

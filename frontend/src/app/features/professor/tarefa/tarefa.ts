@@ -121,16 +121,49 @@ export class ProfessorTarefa {
       this.selecionado.set(t.adaptacoes[0].alunoId);
   }
 
-  gerar(alunoId?: number): void {
+  /** Pedido de mudanca para a IA na versao do aluno escolhido. */
+  readonly pedindoMudanca = signal(false);
+  textoPedido = '';
+  readonly sugestoesMudanca = [
+    'Passos mais curtos',
+    'Menos passos',
+    'Linguagem mais simples',
+    'Use um exemplo com os interesses do aluno',
+    'Explique melhor o primeiro passo',
+    'Inclua uma pausa no meio',
+  ];
+
+  usarSugestaoMudanca(s: string): void {
+    const atual = this.textoPedido.trim();
+    if (atual.toLowerCase().includes(s.toLowerCase())) return;
+    this.textoPedido = atual ? `${atual.replace(/[.;]$/, '')}; ${s.toLowerCase()}` : s;
+  }
+
+  pedirMudanca(): void {
+    const a = this.adaptacao();
+    const pedido = this.textoPedido.trim();
+    if (!a || !pedido) return;
+    this.gerar(a.alunoId, pedido);
+  }
+
+  gerar(alunoId?: number, pedido?: string): void {
     const t = this.tarefa();
     if (!t) return;
     this.gerando.set(true);
     this.erroIa.set('');
-    this.service.adaptar(t.id, alunoId).subscribe({
+    this.service.adaptar(t.id, alunoId, pedido).subscribe({
       next: (res) => {
         this.gerando.set(false);
         this.aplicar(res.data);
         this.contexto.recarregarVisao();
+        if (pedido) {
+          const nome = res.data.adaptacoes.find((x) => x.alunoId === alunoId)?.nome;
+          this.pedindoMudanca.set(false);
+          this.textoPedido = '';
+          this.dialogo.avisar(
+            `A IA refez a versão${nome ? ' de ' + primeiroNome(nome) : ''} com o seu pedido.`,
+          );
+        }
       },
       error: (e: HttpErrorResponse) => {
         this.gerando.set(false);
@@ -211,6 +244,7 @@ export class ProfessorTarefa {
   escolher(alunoId: number): void {
     this.selecionado.set(alunoId);
     this.editando.set(false);
+    this.pedindoMudanca.set(false);
   }
 
   editar(): void {

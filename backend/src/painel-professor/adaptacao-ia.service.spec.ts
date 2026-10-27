@@ -82,6 +82,46 @@ describe('AdaptacaoIaService', () => {
     expect(pedido.messages[0].content).not.toMatch(/cgm|laudo|email/i);
   });
 
+  it('envia a orientacao do professor e, ao pedir mudanca, a versao atual', async () => {
+    const parse = jest.fn().mockResolvedValue({
+      stop_reason: 'end_turn',
+      parsed_output: {
+        adaptacoes: [{ alunoId: 1, passos: ['Novo passo.'], recursos: [] }],
+      },
+    });
+    const s = servico('chave', parse);
+
+    await s.adaptarTarefa(
+      { titulo: 't', disciplina: null, enunciado: 'e' },
+      [{ ...perfil(1), versaoAtual: ['Passo antigo 1.', 'Passo antigo 2.'] }],
+      { orientacao: 'Use exemplos de futebol', mudanca: 'Passos mais curtos' },
+    );
+
+    const conteudo = JSON.parse(parse.mock.calls[0][0].messages[0].content);
+    expect(conteudo.orientacaoDoProfessor).toBe('Use exemplos de futebol');
+    expect(conteudo.pedidoDeMudanca).toBe('Passos mais curtos');
+    expect(conteudo.alunos[0].versaoAtual).toEqual([
+      'Passo antigo 1.',
+      'Passo antigo 2.',
+    ]);
+    // As regras de seguranca continuam acima dos pedidos.
+    expect(parse.mock.calls[0][0].system).toMatch(/nunca anulam as regras/);
+  });
+
+  it('sem orientacao nem pedido, nao manda esses campos', async () => {
+    const parse = jest.fn().mockResolvedValue({
+      stop_reason: 'end_turn',
+      parsed_output: { adaptacoes: [] },
+    });
+    const s = servico('chave', parse);
+    await s.adaptarTarefa({ titulo: 't', disciplina: null, enunciado: 'e' }, [
+      perfil(1),
+    ]);
+    const conteudo = JSON.parse(parse.mock.calls[0][0].messages[0].content);
+    expect(conteudo).not.toHaveProperty('orientacaoDoProfessor');
+    expect(conteudo).not.toHaveProperty('pedidoDeMudanca');
+  });
+
   it('trata recusa como indisponibilidade, sem quebrar a tarefa', async () => {
     const parse = jest
       .fn()

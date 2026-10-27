@@ -130,6 +130,8 @@ export interface TarefaProfessor {
   turma: string;
   disciplinaId: number | null;
   disciplina: string | null;
+  /** Orientacao do professor para a IA ao adaptar (todos os alunos NEE). */
+  orientacaoIa: string | null;
   totalAlunos: number;
   iaDisponivel: boolean;
   adaptacoes: Adaptacao[];
@@ -161,6 +163,8 @@ export interface NovaTarefa {
   disciplinaId: number;
   dataEntrega: string;
   horaLimite?: string;
+  /** Orientacao para a IA ao adaptar (opcional). */
+  orientacaoIa?: string;
 }
 
 export type EdicaoTarefa = Partial<Omit<NovaTarefa, 'turmaId' | 'outrasTurmas'>>;

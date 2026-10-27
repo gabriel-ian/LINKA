@@ -246,3 +246,60 @@
   color: var(--cor-titulo);
   font-size: 17px;
 }
+
+/* ---------- Orientacao e pedido de mudanca para a IA ---------- */
+
+.orientacao-salva {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f5efff;
+  color: #4c1d95;
+  font-size: 15px;
+}
+
+.pedir-mudanca {
+  align-self: flex-start;
+  border-color: #c4b5fd;
+  color: #5b21b6;
+}
+
+.pedido-ia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f5efff;
+}
+
+.pedido-ia .campo-p > span {
+  color: #4c1d95;
+  font-weight: 700;
+}
+
+.pedido-ia .sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pedido-ia .chip {
+  padding: 4px 12px;
+  border: 1px solid #d8c7fb;
+  border-radius: 59px;
+  background: #fff;
+  color: #5b21b6;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pedido-ia .acoes {
+  justify-content: flex-end;
+}

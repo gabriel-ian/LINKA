@@ -97,7 +97,9 @@
           @if (t.adaptacoes.length) {
             {{
               geradas() === t.adaptacoes.length
-                ? 'Todas as ' + geradas() + ' versões adaptadas para os alunos NEE estão prontas.'
+                ? geradas() === 1
+                  ? 'A versão adaptada para o aluno NEE está pronta.'
+                  : 'Todas as ' + geradas() + ' versões adaptadas para os alunos NEE estão prontas.'
                 : geradas() + ' de ' + t.adaptacoes.length + ' versões adaptadas prontas.'
             }}
           }
@@ -107,6 +109,20 @@
 
     @if (erroIa()) {
       <p class="alerta-erro" role="alert">{{ erroIa() }}</p>
+    }
+
+    @if (t.adaptacoes.length && t.iaDisponivel) {
+      <p class="orientacao-salva">
+        <span aria-hidden="true">✦</span>
+        @if (t.orientacaoIa) {
+          <span><strong>Orientação para a IA:</strong> {{ t.orientacaoIa }}</span>
+        } @else {
+          <span>Sem orientação para a IA nesta tarefa.</span>
+        }
+        <a class="link-acao" [routerLink]="['/professor/tarefas', t.id, 'editar']">{{
+          t.orientacaoIa ? 'Mudar' : 'Adicionar'
+        }}</a>
+      </p>
     }
 
     @if (t.adaptacoes.length) {
@@ -182,6 +198,55 @@
                 </li>
               }
             </ol>
+            @if (t.iaDisponivel) {
+              @if (pedindoMudanca()) {
+                <div class="pedido-ia">
+                  <label class="campo-p">
+                    <span>O que a IA deve mudar na versão de {{ primeiroNome(a.nome) }}?</span>
+                    <textarea
+                      name="pedido"
+                      rows="2"
+                      maxlength="500"
+                      [(ngModel)]="textoPedido"
+                      placeholder="Ex.: deixe os passos mais curtos e use um exemplo com futebol"
+                    ></textarea>
+                  </label>
+                  <div class="sugestoes">
+                    @for (s of sugestoesMudanca; track s) {
+                      <button type="button" class="chip" (click)="usarSugestaoMudanca(s)">
+                        + {{ s }}
+                      </button>
+                    }
+                  </div>
+                  <div class="acoes">
+                    <button
+                      type="button"
+                      class="bt bt-secundario bt-p"
+                      (click)="pedindoMudanca.set(false)"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      class="bt bt-primario bt-p"
+                      [disabled]="gerando() || !textoPedido.trim()"
+                      (click)="pedirMudanca()"
+                    >
+                      {{ gerando() ? 'A IA está refazendo...' : 'Refazer com a IA' }}
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <button
+                  type="button"
+                  class="bt bt-secundario bt-p pedir-mudanca"
+                  [disabled]="gerando()"
+                  (click)="pedindoMudanca.set(true)"
+                >
+                  ✦ Pedir mudança à IA
+                </button>
+              }
+            }
           } @else {
             <p class="vazio">
               {{

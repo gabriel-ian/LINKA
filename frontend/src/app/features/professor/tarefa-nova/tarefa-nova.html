@@ -112,6 +112,28 @@
       }
     </div>
 
+    <div class="orientacao-ia">
+      <label class="campo-p">
+        <span><span aria-hidden="true">✦</span> Orientação para a IA (opcional)</span>
+        <textarea
+          name="orientacaoIa"
+          rows="2"
+          maxlength="500"
+          [(ngModel)]="orientacaoIa"
+          placeholder="Ex.: use exemplos com futebol e no máximo 4 passos"
+        ></textarea>
+      </label>
+      <div class="sugestoes" aria-label="Sugestões">
+        @for (s of sugestoesIa; track s) {
+          <button type="button" class="chip" (click)="usarSugestao(s)">+ {{ s }}</button>
+        }
+      </div>
+      <small
+        >A IA segue a orientação ao adaptar para os alunos NEE, sem tirar trabalho da tarefa nem dar
+        respostas.</small
+      >
+    </div>
+
     <section class="materiais" aria-labelledby="titulo-materiais">
       <div class="materiais-topo">
         <div>

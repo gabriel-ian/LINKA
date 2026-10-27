@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -15,6 +15,9 @@ import { EntregaArquivos } from '../entrega-arquivos';
 import { Anexo } from '../../../core/model/anexo.model';
 import { AlunoContexto } from '../aluno-contexto';
 import { ELOGIOS, hojeIso, horaCurta, iconePasso, plural, tituloCompleto } from '../aluno-ui';
+
+/** Depois deste tempo no mesmo passo, o mascote sugere uma pausa. */
+const PAUSA_SEGUNDOS = 10 * 60;
 
 /** Icone do Figma para cada material, pelo nome que a IA escreveu. */
 const ICONES_MATERIAL: [RegExp, string][] = [
@@ -93,6 +96,15 @@ export class AlunoTarefa {
     return quando > Date.now() - 3 * 86_400_000;
   });
 
+  /** "Relogio nos passos": tempo no passo atual e pausa sugerida. */
+  readonly comRelogio = computed(() => !!this.contexto.resumo()?.preferencias.tempoPasso);
+  readonly segundos = signal(0);
+  readonly relogio = computed(() => {
+    const s = this.segundos();
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  });
+  readonly pausaSugerida = computed(() => this.segundos() >= PAUSA_SEGUNDOS);
+
   /** Concluida sem internet: falta enviar para a professora. */
   readonly aguardandoEnvio = computed(() => {
     const t = this.tarefa();
@@ -113,6 +125,22 @@ export class AlunoTarefa {
     inject(ActivatedRoute)
       .paramMap.pipe(takeUntilDestroyed(inject(DestroyRef)))
       .subscribe((p) => this.carregar(Number(p.get('id'))));
+
+    // Relogio: zera a cada passo novo e conta so com a opcao ligada.
+    effect(() => {
+      this.atual();
+      this.tarefa()?.id;
+      untracked(() => this.segundos.set(0));
+    });
+    const tique = setInterval(() => {
+      if (!this.comRelogio() || document.hidden || this.atual() >= this.total()) return;
+      this.segundos.update((s) => s + 1);
+      if (this.segundos() === PAUSA_SEGUNDOS)
+        this.contexto.fala.set(
+          'Você está há 10 minutos neste passo. Que tal uma pausa de 1 minuto? Respire e estique os braços.',
+        );
+    }, 1000);
+    inject(DestroyRef).onDestroy(() => clearInterval(tique));
 
     effect(() => {
       this.contexto.fala.set(

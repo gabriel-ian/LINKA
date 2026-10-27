@@ -22,7 +22,14 @@ export interface PreferenciasAluno {
   fonteDislexia: boolean;
   /** Texto preto, bordas fortes e cores mais escuras. */
   altoContraste: boolean;
+  /** Regua de leitura: faixa que acompanha o mouse/dedo e destaca a linha. */
+  reguaLeitura: boolean;
+  /** Relogio de cada passo, com pausa sugerida (ajuda no foco). */
+  tempoPasso: boolean;
   mascote: 'dino' | 'coruja' | 'robo';
+  /** Nome da voz do navegador escolhida (null = a primeira em portugues). */
+  voz: string | null;
+  velocidadeVoz: 'devagar' | 'normal' | 'rapida';
 }
 
 export const PREFERENCIAS_PADRAO: PreferenciasAluno = {
@@ -32,7 +39,11 @@ export const PREFERENCIAS_PADRAO: PreferenciasAluno = {
   modoCalmo: false,
   fonteDislexia: false,
   altoContraste: false,
+  reguaLeitura: false,
+  tempoPasso: false,
   mascote: 'dino',
+  voz: null,
+  velocidadeVoz: 'normal',
 };
 
 @Entity('aluno')

@@ -41,9 +41,17 @@ O professor escreveu uma tarefa para a turma inteira. Para cada aluno informado,
 Regras:
 - De 3 a 7 passos, cada um com uma única ação, em frases curtas e diretas (até cerca de 15 palavras), no imperativo e falando com o aluno ("Separe o caderno...").
 - Mantenha exatamente o mesmo conteúdo, exercícios e exigências do professor. Não acrescente nem remova trabalho, não dê respostas e não invente informações que não estão no enunciado.
-- Ajuste ao perfil: para TDAH, o primeiro passo prepara o material e os passos dividem o trabalho em blocos pequenos; para TEA, linguagem literal e previsível, sem metáforas; para dislexia, frases ainda mais curtas e palavras simples; para discalculia, explicite cada operação numérica.
+- Ajuste ao perfil de cada aluno (se ele tiver mais de um, combine as adaptações):
+  - TDAH: o primeiro passo prepara o material e tira distrações da mesa; divida o trabalho em blocos pequenos (ex.: "Faça os exercícios 1 e 2") e, em tarefas longas, inclua um passo curto de pausa ("Respire e estique os braços por 1 minuto").
+  - TEA: linguagem literal e previsível, sem metáforas, ironia ou expressões figuradas; diga logo no primeiro passo quantos passos são e como a tarefa termina ("São 5 passos. No último você confere as respostas."); evite mudanças de ordem ou surpresas.
+  - Dislexia: frases ainda mais curtas, palavras simples e do dia a dia, um número por passo; evite letras parecidas em sequência e siglas sem explicação.
+  - Discalculia: explicite cada operação numérica, uma conta por passo, e sugira apoio concreto quando ajudar (dedos, desenho, tabela, material dourado).
+  - Deficiência visual (baixa visão ou cegueira): não dependa de cores, imagens ou posição na página ("o quadro azul", "a figura ao lado"); descreva o que precisa ser lido e sugira ouvir o passo ou ampliar o texto.
+  - Deficiência auditiva ou surdez: não dependa de áudio, vídeo falado ou instruções orais; use frases escritas claras e, quando houver áudio na tarefa, peça ajuda com legenda ou intérprete.
+  - Dificuldade de leitura ou de atenção sem diagnóstico detalhado: siga as regras de TDAH e dislexia.
+- O último passo é sempre conferir ou entregar ("Confira se fez todos os exercícios e marque como feito").
 - Quando fizer sentido, use um interesse do aluno em um exemplo, sem mudar a tarefa.
-- Em "recursos", liste de 1 a 3 etiquetas curtas descrevendo o que você usou, como "5 passos curtos", "Linguagem literal" ou "Exemplo com dinossauros".
+- Em "recursos", liste de 1 a 3 etiquetas curtas descrevendo o que você usou, como "5 passos curtos", "Linguagem literal", "Pausa no meio" ou "Exemplo com dinossauros".
 - Em "materiais", liste de 0 a 4 objetos que o aluno precisa ter em mãos, em poucas palavras ("Caderno de Matemática", "Lápis", "Régua"). Só o que a tarefa pede ou claramente exige.
 - Devolva uma adaptação para cada alunoId recebido, usando o mesmo alunoId.
 

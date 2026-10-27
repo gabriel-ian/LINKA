@@ -13,7 +13,14 @@ export interface PreferenciasAluno {
   fonteDislexia?: boolean;
   /** Texto preto, bordas fortes e cores mais escuras. */
   altoContraste?: boolean;
+  /** Regua de leitura que acompanha o mouse ou o dedo. */
+  reguaLeitura?: boolean;
+  /** Relogio em cada passo, com pausa sugerida. */
+  tempoPasso?: boolean;
   mascote: Mascote;
+  /** Nome da voz do navegador; null = automatica. */
+  voz?: string | null;
+  velocidadeVoz?: 'devagar' | 'normal' | 'rapida';
 }
 
 export interface Nivel {

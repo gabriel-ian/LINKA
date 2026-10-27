@@ -41,6 +41,7 @@ import {
   sequenciaAtual,
 } from './gamificacao';
 import { AjudaDto, LembreteDto, PreferenciasDto } from './dto/painel-aluno.dto';
+import { preferenciasSugeridas } from './preferencias-nee';
 
 export type SituacaoTarefa = 'pendente' | 'em-andamento' | 'concluida';
 
@@ -296,7 +297,7 @@ export class PainelAlunoService {
               )
             : null,
         },
-        preferencias: { ...PREFERENCIAS_PADRAO, ...(aluno.preferencias ?? {}) },
+        preferencias: await this.preferenciasDe(aluno),
         interesses: listaInteresses(aluno.interesses),
         ...this.placar(tarefas, hoje),
         semana: taxaConclusao(
@@ -309,6 +310,28 @@ export class PainelAlunoService {
         incentivos: await this.incentivosNaoLidos(aluno.id),
         avisosNaoLidos: await this.avisosNaoLidos(aluno.id, turma?.id ?? null),
       },
+    };
+  }
+
+  private async diagnosticos(alunoId: number): Promise<string[]> {
+    const linhas: { nome: string }[] = await this.dataSource.query(
+      `SELECT n.nome FROM aluno_neurodivergencia an
+         JOIN neurodivergencia n ON n.id = an.neurodivergencia_id
+        WHERE an.aluno_id = ?`,
+      [alunoId],
+    );
+    return linhas.map((d) => d.nome);
+  }
+
+  /**
+   * As do aluno; enquanto ele nunca mexeu no perfil, as sugeridas pelo
+   * diagnostico (dislexia liga a letra especial, TDAH o relogio...).
+   */
+  private async preferenciasDe(aluno: Aluno): Promise<PreferenciasAluno> {
+    return {
+      ...PREFERENCIAS_PADRAO,
+      ...(aluno.preferencias ??
+        preferenciasSugeridas(await this.diagnosticos(aluno.id))),
     };
   }
 
@@ -608,13 +631,7 @@ export class PainelAlunoService {
       return { data: { enviado: true, professor: tarefa.professor } };
     }
 
-    const linhasDiag: { nome: string }[] = await this.dataSource.query(
-      `SELECT n.nome FROM aluno_neurodivergencia an
-         JOIN neurodivergencia n ON n.id = an.neurodivergencia_id
-        WHERE an.aluno_id = ?`,
-      [aluno.id],
-    );
-    const diagnosticos = linhasDiag.map((d) => d.nome);
+    const diagnosticos = await this.diagnosticos(aluno.id);
 
     const resposta = await this.ia.ajudarPasso({
       tipo: dto.tipo,
@@ -823,13 +840,14 @@ export class PainelAlunoService {
   async salvarPreferencias(usuarioId: number, dto: PreferenciasDto) {
     const { aluno } = await this.alunoDoUsuario(usuarioId);
     const { interesses, ...prefs } = dto;
-    const atuais: PreferenciasAluno = {
-      ...PREFERENCIAS_PADRAO,
-      ...(aluno.preferencias ?? {}),
-    };
+    const atuais = await this.preferenciasDe(aluno);
+
+    const novas: PreferenciasAluno = { ...atuais, ...prefs, voz: atuais.voz };
+    // Voz vazia volta para a automatica.
+    if (prefs.voz !== undefined) novas.voz = prefs.voz.trim() || null;
 
     await this.dataSource.getRepository(Aluno).update(aluno.id, {
-      preferencias: { ...atuais, ...prefs },
+      preferencias: novas,
       ...(interesses !== undefined ? perfilParaColunas({ interesses }) : {}),
     });
     return this.resumo(usuarioId);

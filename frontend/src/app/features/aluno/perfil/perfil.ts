@@ -2,11 +2,19 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Mascote, PreferenciasAluno } from '../../../core/model/painel-aluno.model';
 import { PainelAlunoService } from '../../../core/services/painel-aluno.service';
+import { VelocidadeVoz, VozService } from '../../../core/services/voz.service';
 import { AlunoContexto } from '../aluno-contexto';
 import { MASCOTES, MascoteDesenho, infoMascote } from '../../../shared/mascote/mascote';
 
 type Chave =
-  'ouvirVoz' | 'passosCurtos' | 'letrasMaiores' | 'fonteDislexia' | 'altoContraste' | 'modoCalmo';
+  | 'ouvirVoz'
+  | 'passosCurtos'
+  | 'letrasMaiores'
+  | 'fonteDislexia'
+  | 'altoContraste'
+  | 'reguaLeitura'
+  | 'tempoPasso'
+  | 'modoCalmo';
 
 
 const CORES_INTERESSE = ['verde', 'azul', 'roxo', 'laranja'];
@@ -41,7 +49,24 @@ export class AlunoPerfil {
       titulo: 'Alto contraste',
       texto: 'Texto mais escuro e bordas mais fortes',
     },
+    {
+      chave: 'reguaLeitura',
+      titulo: 'Régua de leitura',
+      texto: 'Uma faixa destaca a linha que você está lendo',
+    },
+    {
+      chave: 'tempoPasso',
+      titulo: 'Relógio nos passos',
+      texto: 'Mostra quanto tempo passou e lembra de fazer uma pausa',
+    },
     { chave: 'modoCalmo', titulo: 'Modo calmo', texto: 'Menos cores e animações' },
+  ];
+
+  readonly voz = inject(VozService);
+  readonly velocidades: { id: VelocidadeVoz; nome: string }[] = [
+    { id: 'devagar', nome: 'Devagar' },
+    { id: 'normal', nome: 'Normal' },
+    { id: 'rapida', nome: 'Rápida' },
   ];
 
   readonly adicionando = signal(false);
@@ -88,6 +113,34 @@ export class AlunoPerfil {
 
   escolherMascote(id: Mascote): void {
     this.salvar({ mascote: id });
+    const info = infoMascote(id);
+    this.testarVoz(`Oi! Agora eu sou ${info.nome === 'Coruja' ? 'a' : 'o'} ${info.nome}.`);
+  }
+
+  escolherVoz(nome: string): void {
+    this.salvar({ voz: nome || null });
+    this.testarVoz();
+  }
+
+  escolherVelocidade(v: VelocidadeVoz): void {
+    this.salvar({ velocidadeVoz: v });
+    this.testarVoz();
+  }
+
+  /** Fala com a voz, a velocidade e o tom que estao na tela agora. */
+  testarVoz(texto?: string): void {
+    const r = this.contexto.resumo();
+    if (!r) return;
+    const info = infoMascote(r.preferencias.mascote);
+    this.voz.falar(
+      texto ?? `Oi, ${r.aluno.primeiroNome}! Eu sou ${info.nome === 'Coruja' ? 'a' : 'o'} ${info.nome}. Vamos aprender juntos?`,
+      false,
+      {
+        voz: r.preferencias.voz ?? null,
+        velocidade: r.preferencias.velocidadeVoz ?? 'normal',
+        tom: info.tom,
+      },
+    );
   }
 
   adicionarInteresse(): void {

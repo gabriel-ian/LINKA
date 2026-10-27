@@ -12,6 +12,8 @@ export interface InfoMascote {
   corClara: string;
   /** Fundo da cena (cartao do Inicio). */
   corFundo: string;
+  /** Tom da voz (pitch): Dino mais agudo, Robo mais grave. */
+  tom: number;
 }
 
 /** Os mascotes que o aluno escolhe em "Meu perfil". */
@@ -24,6 +26,7 @@ export const MASCOTES: InfoMascote[] = [
     cor: '#00704d',
     corClara: '#b8d7cd',
     corFundo: '#e3f3ec',
+    tom: 1.2,
   },
   {
     id: 'coruja',
@@ -33,6 +36,7 @@ export const MASCOTES: InfoMascote[] = [
     cor: '#8a4b12',
     corClara: '#f6dcb5',
     corFundo: '#fdf1df',
+    tom: 0.95,
   },
   {
     id: 'robo',
@@ -42,6 +46,7 @@ export const MASCOTES: InfoMascote[] = [
     cor: '#1d4ed8',
     corClara: '#c7d7fb',
     corFundo: '#e6eeff',
+    tom: 0.7,
   },
 ];
 

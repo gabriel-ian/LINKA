@@ -28,7 +28,7 @@
       >
         <span class="selo azul">&gt;</span>
         <strong>Ouvir o passo de novo</strong>
-        <small>O Dino lê bem devagar</small>
+        <small>{{ contexto.oMascote() }} lê bem devagar</small>
       </button>
       @if (t.iaDisponivel) {
         <button
@@ -57,7 +57,7 @@
     </div>
 
     @if (pensando()) {
-      <p class="pensando" role="status">O Dino está pensando...</p>
+      <p class="pensando" role="status">{{ contexto.oMascote() }} está pensando...</p>
     }
     @if (erro()) {
       <p class="alerta-erro" role="alert">{{ erro() }}</p>

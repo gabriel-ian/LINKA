@@ -49,6 +49,14 @@
             }
             {{ t.passos[atual()] }}
           </p>
+          @if (comRelogio()) {
+            <p class="relogio" [class.pausa]="pausaSugerida()" role="timer" aria-live="off">
+              ⏱ {{ relogio() }} neste passo
+              @if (pausaSugerida()) {
+                <span> · Que tal uma pausa de 1 minuto?</span>
+              }
+            </p>
+          }
           @if (erro()) {
             <p class="alerta-erro" role="alert">{{ erro() }}</p>
           }
@@ -294,6 +302,14 @@
                 <small><img src="assets/aluno/relogio-p.svg" alt="" /> concluído</small>
               }
               @if (i === atual()) {
+              @if (comRelogio()) {
+                <p class="relogio" [class.pausa]="pausaSugerida()" role="timer" aria-live="off">
+                  ⏱ {{ relogio() }} neste passo
+                  @if (pausaSugerida()) {
+                    <span> · Que tal uma pausa de 1 minuto?</span>
+                  }
+                </p>
+              }
                 <div class="passo-botoes">
                   <button type="button" class="passo-bt" (click)="ouvirPasso(i)">
                     <img class="espelhar" src="assets/aluno/passo-ouvir-som.svg" alt="" />

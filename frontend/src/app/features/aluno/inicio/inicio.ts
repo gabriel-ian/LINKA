@@ -91,7 +91,7 @@ export class AlunoInicio {
   }
 
   constructor() {
-    // Com "voz do Dino", o mascote le o recado assim que a tela abre.
+    // Com "voz do mascote", ele le o recado assim que a tela abre.
     effect(() => {
       const i = this.incentivo();
       if (!i || !i.voz || this.lidosEmVoz.has(i.id)) return;

@@ -767,3 +767,23 @@ button.voltar-botao {
 .comentario-prof .link-acao {
   align-self: flex-start;
 }
+
+/* ---------- Relogio do passo ---------- */
+
+.relogio {
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 4px 0 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: var(--cor-texto);
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.relogio.pausa {
+  background: #fff7e6;
+  color: #8a4b00;
+}

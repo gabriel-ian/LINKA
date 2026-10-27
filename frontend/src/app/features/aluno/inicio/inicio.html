@@ -41,7 +41,8 @@
     </section>
 
     <p class="nota-offline">
-      Áudio dos passos e dicas do Dino precisam de internet. O resto funciona normalmente.
+      Áudio dos passos e dicas {{ contexto.mascote() === 'coruja' ? 'da' : 'do' }}
+      {{ contexto.infoMascote().nome }} precisam de internet. O resto funciona normalmente.
     </p>
   </div>
 } @else if (contexto.resumo(); as r) {

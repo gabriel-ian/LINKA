@@ -1,4 +1,5 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { VozService } from '../../core/services/voz.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
@@ -14,6 +15,7 @@ const PROF = 'assets/professor/menu-';
 @Component({
   selector: 'app-aluno-layout',
   host: {
+    '(document:pointermove)': 'moverRegua($event)',
     '[style.--cor-mascote]': 'contexto.infoMascote().cor',
     '[style.--cor-mascote-clara]': 'contexto.infoMascote().corClara',
     '[style.--cor-mascote-fundo]': 'contexto.infoMascote().corFundo',
@@ -26,12 +28,51 @@ const PROF = 'assets/professor/menu-';
       }
       <router-outlet />
     </app-painel-layout>
+    @if (regua()) {
+      <div class="regua" aria-hidden="true" [style.top.px]="reguaY()"></div>
+    }
+  `,
+  styles: `
+    /* Regua de leitura: faixa que segue o mouse ou o dedo e destaca a linha. */
+    .regua {
+      position: fixed;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: 2.6em;
+      translate: 0 -50%;
+      border-block: 2px solid color-mix(in srgb, var(--cor-mascote) 60%, transparent);
+      background: color-mix(in srgb, #fde68a 35%, transparent);
+      box-shadow: 0 0 0 100vmax rgba(15, 23, 42, 0.12);
+      pointer-events: none;
+    }
   `,
   providers: [AlunoContexto],
 })
 export class AlunoLayout {
   readonly contexto = inject(AlunoContexto);
   private router = inject(Router);
+
+  readonly regua = computed(() => !!this.contexto.resumo()?.preferencias.reguaLeitura);
+  readonly reguaY = signal(240);
+
+  moverRegua(e: PointerEvent): void {
+    if (this.regua()) this.reguaY.set(e.clientY);
+  }
+
+  constructor() {
+    // Voz e velocidade escolhidas pelo aluno; o tom e o do mascote.
+    const voz = inject(VozService);
+    effect(() => {
+      const p = this.contexto.resumo()?.preferencias;
+      voz.configurar({
+        voz: p?.voz ?? null,
+        velocidade: p?.velocidadeVoz ?? 'normal',
+        tom: this.contexto.infoMascote().tom,
+      });
+    });
+    inject(DestroyRef).onDestroy(() => voz.configurar(null));
+  }
 
   private readonly url = toSignal(
     this.router.events.pipe(

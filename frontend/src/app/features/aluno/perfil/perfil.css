@@ -248,3 +248,53 @@ h2 {
     transition: none;
   }
 }
+
+/* ---------- Voz do mascote ---------- */
+
+.voz-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+}
+
+.campo-voz {
+  display: flex;
+  flex: 1 1 240px;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.campo-voz select {
+  height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-weight: 400;
+}
+
+.velocidades {
+  display: flex;
+  gap: 6px;
+}
+
+.velocidades button {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--cor-linha);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--cor-texto);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.velocidades button.ativo {
+  border-color: var(--cor-mascote, #0e996b);
+  background: var(--cor-mascote-clara, #b8d7cd);
+  color: var(--cor-titulo);
+}

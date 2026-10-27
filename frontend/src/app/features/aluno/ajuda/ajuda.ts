@@ -26,7 +26,7 @@ interface Dica {
 })
 export class AlunoAjuda {
   private service = inject(PainelAlunoService);
-  private contexto = inject(AlunoContexto);
+  readonly contexto = inject(AlunoContexto);
   readonly voz = inject(VozService);
   private navegacao = inject(NavegacaoService);
 
@@ -69,7 +69,7 @@ export class AlunoAjuda {
 
     if (opcao === 'ouvir') {
       this.voz.falar(`Passo ${this.passo}. ${this.textoPasso()}`, true);
-      this.dica.set({ titulo: 'O Dino leu o passo devagar', texto: this.textoPasso() });
+      this.dica.set({ titulo: `${this.contexto.oMascote()} leu o passo devagar`, texto: this.textoPasso() });
       return;
     }
 
@@ -86,7 +86,7 @@ export class AlunoAjuda {
           });
           return;
         }
-        this.dica.set({ titulo: 'Dica do Dino', texto: r.texto ?? '', pergunta: r.pergunta });
+        this.dica.set({ titulo: `Dica ${this.contexto.mascote() === 'coruja' ? 'da' : 'do'} ${this.contexto.infoMascote().nome}`, texto: r.texto ?? '', pergunta: r.pergunta });
         if (this.contexto.resumo()?.preferencias.ouvirVoz)
           this.voz.falar(`${r.texto ?? ''} ${r.pergunta ?? ''}`);
       },
@@ -95,7 +95,7 @@ export class AlunoAjuda {
         this.erro.set(
           mensagemDeErro(
             e,
-            'O Dino não conseguiu responder agora. Tente de novo ou avise a professora.',
+            `${this.contexto.oMascote()} não conseguiu responder agora. Tente de novo ou avise a professora.`,
           ),
         );
       },

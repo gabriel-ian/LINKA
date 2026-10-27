@@ -28,6 +28,11 @@ export class AlunoContexto {
   /** Mascote escolhido em "Meu perfil" (cores e desenho em todas as telas). */
   readonly mascote = computed(() => this.resumo()?.preferencias.mascote ?? 'dino');
   readonly infoMascote = computed(() => infoMascote(this.mascote()));
+  /** "O Dino", "A Coruja", "O Robô" (para os textos das telas). */
+  readonly oMascote = computed(() => {
+    const m = this.infoMascote();
+    return `${m.id === 'coruja' ? 'A' : 'O'} ${m.nome}`;
+  });
 
   readonly pendentes = computed(
     () => this.resumo()?.tarefas.filter((t) => t.situacao !== 'concluida') ?? [],

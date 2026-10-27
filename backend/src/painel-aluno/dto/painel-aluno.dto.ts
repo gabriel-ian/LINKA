@@ -98,6 +98,30 @@ export class PreferenciasDto {
   @IsBoolean()
   altoContraste?: boolean;
 
+  @ApiPropertyOptional({ description: 'Regua de leitura' })
+  @IsOptional()
+  @IsBoolean()
+  reguaLeitura?: boolean;
+
+  @ApiPropertyOptional({ description: 'Relogio em cada passo' })
+  @IsOptional()
+  @IsBoolean()
+  tempoPasso?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Nome da voz do navegador (vazio = automatica)',
+    example: 'Google português do Brasil',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  voz?: string;
+
+  @ApiPropertyOptional({ enum: ['devagar', 'normal', 'rapida'] })
+  @IsOptional()
+  @IsIn(['devagar', 'normal', 'rapida'])
+  velocidadeVoz?: 'devagar' | 'normal' | 'rapida';
+
   @ApiPropertyOptional({ enum: ['dino', 'coruja', 'robo'] })
   @IsOptional()
   @IsIn(['dino', 'coruja', 'robo'])

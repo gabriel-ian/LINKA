@@ -70,6 +70,51 @@
           </ul>
         </section>
 
+        <section class="cartao" aria-labelledby="titulo-voz">
+          <h2 id="titulo-voz">Voz {{ mascote(r.preferencias.mascote).nome === 'Coruja' ? 'da' : 'do' }} {{ mascote(r.preferencias.mascote).nome }}</h2>
+          @if (voz.disponivel) {
+            <p class="explica">Escolha a voz que lê as tarefas e a velocidade da fala.</p>
+            <div class="voz-linha">
+              <label class="campo-voz">
+                <span>Voz</span>
+                <select
+                  name="voz"
+                  [value]="r.preferencias.voz ?? ''"
+                  (change)="escolherVoz($any($event.target).value)"
+                >
+                  <option value="">Automática</option>
+                  @for (v of voz.vozes(); track v.name) {
+                    <option [value]="v.name" [selected]="r.preferencias.voz === v.name">
+                      {{ v.name }}
+                    </option>
+                  }
+                </select>
+              </label>
+              <div class="velocidades" role="radiogroup" aria-label="Velocidade da fala">
+                @for (v of velocidades; track v.id) {
+                  <button
+                    type="button"
+                    role="radio"
+                    [attr.aria-checked]="(r.preferencias.velocidadeVoz ?? 'normal') === v.id"
+                    [class.ativo]="(r.preferencias.velocidadeVoz ?? 'normal') === v.id"
+                    (click)="escolherVelocidade(v.id)"
+                  >
+                    {{ v.nome }}
+                  </button>
+                }
+              </div>
+              <button type="button" class="bt bt-primario bt-p" (click)="testarVoz()">
+                🔊 Testar voz
+              </button>
+            </div>
+            @if (!voz.vozes().length) {
+              <small class="explica">Este aparelho só tem a voz automática.</small>
+            }
+          } @else {
+            <p class="explica">Este navegador não consegue ler em voz alta.</p>
+          }
+        </section>
+
         <section class="cartao">
           <h2>Meus interesses</h2>
           <p class="explica">A Linka usa seus interesses para criar exemplos nas tarefas.</p>

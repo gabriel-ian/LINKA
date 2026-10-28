@@ -13,6 +13,8 @@ services:
       MYSQL_DATABASE: bancolinka
       MYSQL_USER: linka
       MYSQL_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD}
+      # NOW() do banco no horario de Brasilia, igual ao backend.
+      TZ: America/Sao_Paulo
     volumes:
       - mysql-dados:/var/lib/mysql
       # Na primeira subida (volume vazio) cria as tabelas e os dados iniciais.

@@ -102,6 +102,45 @@ O build de produção do site (`npx ng build`) chama a API em `/api` no mesmo
 endereço; o `frontend/nginx.conf` faz esse repasse. No `npm start` (ng serve)
 a API continua em http://localhost:3000.
 
+## Deploy no Railway
+
+Três serviços num projeto do [Railway](https://railway.com), publicados a partir
+deste repositório:
+
+| Serviço | Origem | Configuração |
+| --- | --- | --- |
+| **MySQL** | template MySQL do Railway | variável `TZ=America/Sao_Paulo` |
+| **backend** | repositório, *Root Directory* `backend` | volume em `/app/uploads`, variáveis abaixo |
+| **frontend** | repositório, *Root Directory* `frontend` | domínio público, `BACKEND_URL` |
+
+Variáveis do **backend**:
+
+```
+DB_HOST=${{MySQL.MYSQLHOST}}
+DB_PORT=${{MySQL.MYSQLPORT}}
+DB_USER=${{MySQL.MYSQLUSER}}
+DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+DB_NAME=bancolinka
+JWT_SECRET=<texto longo e aleatório>
+JWT_EXPIRES_IN=1d
+FRONTEND_URL=https://<domínio do frontend>
+TRUST_PROXY=true
+TZ=America/Sao_Paulo
+RAILWAY_RUN_UID=0
+IA_URL / IA_MODELO / IA_CHAVE (ou ANTHROPIC_API_KEY)
+```
+
+`RAILWAY_RUN_UID=0` deixa o backend gravar no volume (o Railway monta o volume
+como root).
+
+Variáveis do **frontend**: `BACKEND_URL=http://${{backend.RAILWAY_PRIVATE_DOMAIN}}:3000`
+(o nginx repassa `/api` para o backend pela rede interna). A porta do site vem
+da variável `PORT`, que o Railway define sozinho.
+
+Banco: na primeira vez, rode `schema.sql`, `dados-base.sql` e `seed-admin.sql`
+no MySQL do Railway (pela URL pública do serviço MySQL). **Troque a senha das
+contas do `seed-admin.sql` depois do primeiro acesso.**
+
 ## Acessos de teste
 
 Criados pelo `seed-admin.sql`, todos com a senha `linka123`:

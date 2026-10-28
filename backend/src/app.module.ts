@@ -46,6 +46,13 @@ import { PainelFamiliaModule } from './painel-familia/painel-familia.module';
         username: config.getOrThrow<string>('DB_USER'),
         password: config.get<string>('DB_PASSWORD') ?? '',
         database: config.getOrThrow<string>('DB_NAME'),
+        // Banco na nuvem (Aiven) so aceita conexao segura. Com DB_SSL_CA
+        // (certificado do painel da Aiven) o certificado do servidor e conferido.
+        ssl: config.get<string>('DB_SSL_CA')
+          ? { ca: config.get<string>('DB_SSL_CA')!.replace(/\\n/g, '\n') }
+          : config.get<string>('DB_SSL') === 'true'
+            ? { rejectUnauthorized: false }
+            : undefined,
 
         autoLoadEntities: true,
         // Continua false de proposito: o schema e mantido no MySQL,

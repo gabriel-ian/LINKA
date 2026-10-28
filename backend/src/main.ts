@@ -23,8 +23,10 @@ async function bootstrap() {
     }),
   );
 
+  // No Render o endereco do site chega sem o https:// (ex.: linka.onrender.com).
+  const site = config.get<string>('FRONTEND_URL') ?? 'http://localhost:4200';
   app.enableCors({
-    origin: config.get<string>('FRONTEND_URL') ?? 'http://localhost:4200',
+    origin: /^https?:\/\//.test(site) ? site : `https://${site}`,
   });
 
   app.useGlobalPipes(

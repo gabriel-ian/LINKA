@@ -102,44 +102,27 @@ O build de produção do site (`npx ng build`) chama a API em `/api` no mesmo
 endereço; o `frontend/nginx.conf` faz esse repasse. No `npm start` (ng serve)
 a API continua em http://localhost:3000.
 
-## Deploy no Railway
+## Deploy (Render + Aiven)
 
-Três serviços num projeto do [Railway](https://railway.com), publicados a partir
-deste repositório:
+- **Banco:** MySQL grátis na [Aiven](https://aiven.io). Em *Advanced
+  configuration*, `default_time_zone` = `-03:00` (horário de Brasília).
+- **API e site:** [Render](https://render.com), pelo Blueprint
+  [`render.yaml`](render.yaml): `linka-api` (Docker, pasta `backend`) e `linka`
+  (site estático, pasta `frontend`; o build aponta o site para a API com
+  `frontend/scripts/definir-api.mjs`).
 
-| Serviço | Origem | Configuração |
-| --- | --- | --- |
-| **MySQL** | template MySQL do Railway | variável `TZ=America/Sao_Paulo` |
-| **backend** | repositório, *Root Directory* `backend` | volume em `/app/uploads`, variáveis abaixo |
-| **frontend** | repositório, *Root Directory* `frontend` | domínio público, `BACKEND_URL` |
+1. Na Aiven, crie o serviço MySQL (plano Free) e copie host, porta, usuário,
+   senha e o certificado (CA).
+2. No Render, *New → Blueprint*, escolha este repositório e preencha
+   `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_SSL_CA` e as variáveis da
+   IA (`IA_URL`, `IA_MODELO`, `IA_CHAVE`). O `JWT_SECRET` é gerado pelo Render.
+3. Na primeira vez, rode `schema.sql`, `dados-base.sql` e `seed-admin.sql` no
+   MySQL da Aiven. **Troque a senha das contas do `seed-admin.sql` depois do
+   primeiro acesso.**
 
-Variáveis do **backend**:
-
-```
-DB_HOST=${{MySQL.MYSQLHOST}}
-DB_PORT=${{MySQL.MYSQLPORT}}
-DB_USER=${{MySQL.MYSQLUSER}}
-DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
-DB_NAME=bancolinka
-JWT_SECRET=<texto longo e aleatório>
-JWT_EXPIRES_IN=1d
-FRONTEND_URL=https://<domínio do frontend>
-TRUST_PROXY=true
-TZ=America/Sao_Paulo
-RAILWAY_RUN_UID=0
-IA_URL / IA_MODELO / IA_CHAVE (ou ANTHROPIC_API_KEY)
-```
-
-`RAILWAY_RUN_UID=0` deixa o backend gravar no volume (o Railway monta o volume
-como root).
-
-Variáveis do **frontend**: `BACKEND_URL=http://${{backend.RAILWAY_PRIVATE_DOMAIN}}:3000`
-(o nginx repassa `/api` para o backend pela rede interna). A porta do site vem
-da variável `PORT`, que o Railway define sozinho.
-
-Banco: na primeira vez, rode `schema.sql`, `dados-base.sql` e `seed-admin.sql`
-no MySQL do Railway (pela URL pública do serviço MySQL). **Troque a senha das
-contas do `seed-admin.sql` depois do primeiro acesso.**
+No plano grátis a API "dorme" depois de 15 min sem uso (a primeira chamada
+demora ~1 min) e os arquivos enviados (fotos, laudos, desenhos) se perdem quando
+ela reinicia. Para uso real: plano pago com disco em `/app/uploads`.
 
 ## Acessos de teste
 

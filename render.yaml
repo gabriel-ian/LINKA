@@ -1,0 +1,78 @@
+# Deploy da Linka no Render (Blueprint): API (Docker) + site (estatico).
+# O banco MySQL fica na Aiven; os dados de conexao sao preenchidos no painel.
+# Passo a passo no README, secao "Deploy (Render + Aiven)".
+services:
+  - type: web
+    name: linka-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    branch: feat/ajustes-tarefas-avisos
+    healthCheckPath: /api
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: bancolinka
+      - key: DB_SSL
+        value: 'true'
+      - key: DB_SSL_CA
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: linka
+          property: host
+      # O Render fica na frente da API: o IP real do usuario vem no X-Forwarded-For.
+      - key: TRUST_PROXY
+        value: 'true'
+      - key: TZ
+        value: America/Sao_Paulo
+      - key: IA_URL
+        sync: false
+      - key: IA_MODELO
+        sync: false
+      - key: IA_CHAVE
+        sync: false
+
+  - type: web
+    name: linka
+    runtime: static
+    rootDir: frontend
+    branch: feat/ajustes-tarefas-avisos
+    buildCommand: npm ci && node scripts/definir-api.mjs && npx ng build
+    staticPublishPath: dist/frontend/browser
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: API_URL
+        fromService:
+          type: web
+          name: linka-api
+          property: host
+    headers:
+      # Service worker e index nunca em cache, senao a versao nova nao chega.
+      - path: /ngsw-worker.js
+        name: Cache-Control
+        value: no-cache
+      - path: /ngsw.json
+        name: Cache-Control
+        value: no-cache
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+    routes:
+      # Rotas do Angular (/aluno, /escola/...) caem no index.html.
+      - type: rewrite
+        source: /*
+        destination: /index.html

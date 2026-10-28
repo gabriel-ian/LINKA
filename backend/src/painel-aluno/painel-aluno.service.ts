@@ -68,6 +68,8 @@ export interface TarefaDoAluno extends TarefaJogo {
   comentarioEm: Date | null;
   /** Ultima vez que o professor editou a tarefa. */
   atualizadaEm: Date | null;
+  /** Pedidos de ajuda que a professora ja respondeu. */
+  ajudasRespondidas?: number;
 }
 
 /** Linha da consulta de tarefas do aluno, como o mysql2 devolve. */
@@ -91,6 +93,7 @@ interface LinhaBanco {
   comentario: string | null;
   comentarioEm: Date | null;
   atualizadaEm: Date | null;
+  ajudasRespondidas: number | string;
 }
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -168,7 +171,10 @@ export class PainelAlunoService {
               ts.comentario, ts.comentario_em comentarioEm,
               t.atualizada_em atualizadaEm,
               (SELECT COUNT(*) FROM tarefa_entrega_arquivo ea
-                WHERE ea.tarefa_id = t.id AND ea.aluno_id = ts.aluno_id) arquivosEnviados
+                WHERE ea.tarefa_id = t.id AND ea.aluno_id = ts.aluno_id) arquivosEnviados,
+              (SELECT COUNT(*) FROM pedido_ajuda pa
+                WHERE pa.tarefa_id = t.id AND pa.aluno_id = ts.aluno_id
+                  AND pa.resposta IS NOT NULL) ajudasRespondidas
          FROM tarefa_status ts
          JOIN tarefa t ON t.id = ts.tarefa_id
          LEFT JOIN disciplina d ON d.id = t.disciplina_id
@@ -213,6 +219,7 @@ export class PainelAlunoService {
         comentario: l.comentario,
         comentarioEm: l.comentarioEm,
         atualizadaEm: l.atualizadaEm,
+        ajudasRespondidas: Number(l.ajudasRespondidas) || 0,
       };
     });
   }
@@ -246,6 +253,10 @@ export class PainelAlunoService {
       entregue: t.respostaEm !== null || t.arquivosEnviados > 0,
       /** O professor deixou um comentario na entrega. */
       comentada: t.comentario !== null,
+      /** O recado em si, para ler direto da lista. */
+      comentario: t.comentario,
+      /** A professora respondeu um pedido de ajuda nesta tarefa. */
+      ajudaRespondida: (t.ajudasRespondidas ?? 0) > 0,
       atualizadaEm: t.atualizadaEm,
     };
   }
@@ -432,9 +443,25 @@ export class PainelAlunoService {
         arquivosEnviados: await this.entregas.listar(tarefaId, aluno.id),
         comentario: t.comentario,
         comentarioEm: t.comentarioEm,
+        /** Ajudas que a professora escreveu para os pedidos do aluno. */
+        ajudasProfessora: await this.ajudasProfessora(aluno.id, tarefaId),
         iaDisponivel: this.ia.disponivel,
       },
     };
+  }
+
+  private async ajudasProfessora(alunoId: number, tarefaId: number) {
+    const linhas: {
+      passo: number | null;
+      resposta: string;
+      respondidoEm: Date;
+    }[] = await this.dataSource.query(
+      `SELECT passo, resposta, respondido_em respondidoEm FROM pedido_ajuda
+        WHERE aluno_id = ? AND tarefa_id = ? AND resposta IS NOT NULL
+        ORDER BY respondido_em DESC`,
+      [alunoId, tarefaId],
+    );
+    return linhas;
   }
 
   /** Arquivo anexado pela professora; so de uma tarefa do proprio aluno. */
@@ -654,6 +681,7 @@ export class PainelAlunoService {
           alunoId: aluno.id,
           tarefaId,
           criadoEm: MoreThan(new Date(Date.now() - INTERVALO_PEDIDO_MS)),
+          resposta: IsNull(),
         },
       });
       if (!recente)

@@ -139,8 +139,19 @@ export interface TarefaProfessor {
   entregas: EntregaAluno[];
   /** Materiais anexados (PDF, imagem ou Word). */
   anexos: Anexo[];
-  /** Pedidos de ajuda desta tarefa (abrir a tarefa marca como vistos). */
-  pedidosAjuda: PedidoAjuda[];
+  /** Pedidos de ajuda desta tarefa: sem resposta e respondidos ha pouco. */
+  pedidosAjuda: PedidoAjudaTarefa[];
+}
+
+/** Pedido de ajuda na tela da tarefa, com a resposta da professora. */
+export interface PedidoAjudaTarefa {
+  id: number;
+  passo: number | null;
+  criadoEm: string;
+  alunoId: number;
+  aluno: string;
+  resposta: string | null;
+  respondidoEm: string | null;
 }
 
 export interface EntregaAluno {

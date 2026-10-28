@@ -888,3 +888,8 @@ button.voltar-botao {
   width: 22px;
   height: 22px;
 }
+
+.comentario-prof.ajuda-prof {
+  border-color: #fdba74;
+  background: #fff7ed;
+}

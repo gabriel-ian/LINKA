@@ -36,6 +36,7 @@ import { PerfilAprendizagemDto } from '../painel-escola/dto/cadastros.dto';
 import {
   AdaptarTarefaDto,
   ComentarEntregaDto,
+  ResponderAjudaDto,
   CopiarTarefaDto,
   CriarTarefaProfessorDto,
   EditarTarefaProfessorDto,
@@ -278,6 +279,26 @@ export class PainelProfessorController {
       id,
       alunoId,
       dto.comentario,
+    );
+  }
+
+  @Put('tarefas/:id/ajuda/:pedidoId/resposta')
+  @ApiOperation({
+    summary: 'Responder o pedido de ajuda do aluno (ele ve na tarefa)',
+  })
+  responderAjuda(
+    @UsuarioId() usuarioId: number,
+    @EscolaId() escolaId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('pedidoId', ParseIntPipe) pedidoId: number,
+    @Body() dto: ResponderAjudaDto,
+  ) {
+    return this.painel.responderAjuda(
+      usuarioId,
+      escolaId,
+      id,
+      pedidoId,
+      dto.resposta,
     );
   }
 

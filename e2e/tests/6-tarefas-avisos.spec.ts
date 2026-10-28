@@ -76,6 +76,9 @@ test.describe.serial('Tarefas e avisos', () => {
     await escreverNoEditor(page, 'Leia o capítulo 2 e responda.');
     await page.getByRole('checkbox', { name: turma2.nome }).check();
     await page.getByRole('button', { name: 'Criar para 2 turmas' }).click();
+    // Confirma antes de criar.
+    await expect(page.getByText('Criar "Leitura E2E"?')).toBeVisible();
+    await page.getByRole('button', { name: 'Sim, criar tarefa' }).click();
 
     await expect(page).toHaveURL(/\/professor\/tarefas\/\d+/);
     novo.tarefaId = Number(new URL(page.url()).pathname.split('/').pop());
@@ -198,6 +201,31 @@ test.describe.serial('Tarefas e avisos', () => {
 
     await page.getByRole('button', { name: 'Voltar' }).first().click();
     await expect(page).toHaveURL(/\/aluno\/agenda$/);
+  });
+
+  test('o aluno pede ajuda e a professora responde', async ({ page }) => {
+    const ctx = await page.context().browser()!.newContext();
+    const aluno = await ctx.newPage();
+    await entrarComo(aluno, 'Aluno', novo.aluno.email, senha);
+    await aluno.goto(`/aluno/tarefas/${novo.tarefaId}/ajuda`);
+    await aluno.getByRole('button', { name: /Avisar a professora/ }).click();
+
+    const { professor } = lerEstado();
+    await entrarComo(page, 'Professor', professor.email, professor.senha);
+    await page.goto(`/professor/tarefas/${novo.tarefaId}`);
+    const pedido = page.locator('.pedido-ajuda', { hasText: novo.aluno.nome });
+    await pedido
+      .locator('textarea[name=ajuda]')
+      .fill('Leia de novo a página 12, Lia.');
+    await pedido.getByRole('button', { name: 'Enviar ajuda' }).click();
+    await expect(page.getByText(/Ajuda enviada para Lia/)).toBeVisible();
+    await expect(pedido.getByText('Sua ajuda para Lia:')).toBeVisible();
+
+    await aluno.goto(`/aluno/tarefas/${novo.tarefaId}`);
+    await expect(
+      aluno.getByText('Leia de novo a página 12, Lia.').first(),
+    ).toBeVisible();
+    await ctx.close();
   });
 
   test('o professor abre a entrega, vê a foto e comenta', async ({ page }) => {

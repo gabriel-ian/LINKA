@@ -136,6 +136,16 @@ export class ComentarEntregaDto {
   comentario: string;
 }
 
+export class ResponderAjudaDto {
+  @ApiProperty({
+    example: 'No passo 2, comece somando as dezenas. Depois as unidades.',
+    description: 'Ajuda da professora para o aluno (ele ve na tarefa). Vazio apaga.',
+  })
+  @IsString()
+  @MaxLength(1000)
+  resposta: string;
+}
+
 export class CopiarTarefaDto {
   @ApiProperty({ type: [Number] })
   @IsArray()

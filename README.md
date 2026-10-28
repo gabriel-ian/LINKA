@@ -53,6 +53,7 @@ mysql -u root -p bancolinka < backend/sql/disciplinas-por-escola.sql
 mysql -u root -p bancolinka < backend/sql/tarefa-anexos.sql
 mysql -u root -p bancolinka < backend/sql/orientacao-ia.sql
 mysql -u root -p bancolinka < backend/sql/entregas-comentarios.sql
+mysql -u root -p bancolinka < backend/sql/ajuda-resposta.sql
 ```
 
 ### 2. Backend

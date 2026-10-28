@@ -667,6 +667,62 @@ export class PainelProfessorService {
     return { data: { comentario: texto } };
   }
 
+  /**
+   * Pedidos de ajuda da tarefa: os sem resposta (ultimos 30 dias) e os
+   * respondidos ha pouco, para a professora ver o que ja mandou.
+   */
+  private async ajudasDaTarefa(tarefaId: number) {
+    const linhas: {
+      id: number;
+      passo: number | null;
+      criadoEm: Date;
+      alunoId: number;
+      aluno: string;
+      resposta: string | null;
+      respondidoEm: Date | null;
+    }[] = await this.dataSource.query(
+      `SELECT pa.id, pa.passo, pa.criado_em criadoEm, a.id alunoId,
+              a.nome_completo aluno, pa.resposta, pa.respondido_em respondidoEm
+         FROM pedido_ajuda pa
+         JOIN aluno a ON a.id = pa.aluno_id
+        WHERE pa.tarefa_id = ?
+          AND ((pa.resposta IS NULL AND pa.criado_em >= NOW() - INTERVAL 30 DAY)
+               OR pa.respondido_em >= NOW() - INTERVAL 14 DAY)
+        ORDER BY pa.criado_em DESC LIMIT 30`,
+      [tarefaId],
+    );
+    return linhas.map((l) => ({
+      ...l,
+      id: Number(l.id),
+      alunoId: Number(l.alunoId),
+    }));
+  }
+
+  /** Ajuda escrita pela professora para o pedido do aluno. Vazio apaga. */
+  async responderAjuda(
+    usuarioId: number,
+    escolaId: number,
+    tarefaId: number,
+    pedidoId: number,
+    resposta: string,
+  ) {
+    const professor = await this.professor(usuarioId, escolaId);
+    await this.tarefaDoProfessor(professor.id, tarefaId);
+    const texto = resposta.trim() || null;
+    const r: { affectedRows?: number } = await this.dataSource.query(
+      `UPDATE pedido_ajuda
+          SET resposta = ?, respondido_em = ${texto ? 'NOW()' : 'NULL'},
+              visto_em = COALESCE(visto_em, NOW())
+        WHERE id = ? AND tarefa_id = ?`,
+      [texto, pedidoId, tarefaId],
+    );
+    if (!r.affectedRows)
+      throw new NotFoundException('Pedido de ajuda nao encontrado');
+    return {
+      data: { resposta: texto, respondidoEm: texto ? new Date() : null },
+    };
+  }
+
   /** Envia a mesma tarefa (texto, materia e prazo) para outras turmas. */
   async copiarTarefa(
     usuarioId: number,
@@ -748,8 +804,9 @@ export class PainelProfessorService {
     );
     const arquivos = await this.entregas.porAluno(tarefaId);
 
-    // Abrir a tarefa marca os pedidos de ajuda dela como vistos.
-    const pedidosAjuda = await this.pedidosAjuda(professor.id, { tarefaId });
+    // Abrir a tarefa marca os pedidos de ajuda dela como vistos (somem do
+    // sino), mas os sem resposta continuam aqui para a professora responder.
+    const pedidosAjuda = await this.ajudasDaTarefa(tarefaId);
     if (pedidosAjuda.length)
       await this.dataSource.query(
         'UPDATE pedido_ajuda SET visto_em = NOW() WHERE tarefa_id = ? AND visto_em IS NULL',

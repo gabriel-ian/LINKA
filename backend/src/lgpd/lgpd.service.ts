@@ -131,7 +131,7 @@ export class LgpdService {
         'SELECT mensagem, criado_em criadoEm, lido_em lidoEm FROM incentivo WHERE aluno_id = ?',
       ),
       pedidosDeAjuda: await q(
-        'SELECT passo, criado_em criadoEm FROM pedido_ajuda WHERE aluno_id = ?',
+        'SELECT passo, criado_em criadoEm, resposta, respondido_em respondidoEm FROM pedido_ajuda WHERE aluno_id = ?',
       ),
       lembretes: await q(
         'SELECT texto, quando FROM aluno_lembrete WHERE aluno_id = ?',

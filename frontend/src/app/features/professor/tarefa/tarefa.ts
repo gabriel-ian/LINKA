@@ -6,7 +6,11 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 import { PainelProfessorService } from '../../../core/services/painel-professor.service';
-import { EntregaAluno, TarefaProfessor } from '../../../core/model/painel-professor.model';
+import {
+  EntregaAluno,
+  PedidoAjudaTarefa,
+  TarefaProfessor,
+} from '../../../core/model/painel-professor.model';
 import { NavegacaoService } from '../../../core/services/navegacao.service';
 import { DialogoService } from '../../../core/services/dialogo.service';
 import { AnexosLista } from '../../../shared/anexos/anexos-lista';
@@ -128,6 +132,70 @@ export class ProfessorTarefa {
     this.tarefa.set(t);
     if (this.selecionado() === null && t.adaptacoes.length)
       this.selecionado.set(t.adaptacoes[0].alunoId);
+  }
+
+  /** Ajuda escrita pela professora para cada pedido do aluno. */
+  readonly textosAjuda = signal<Record<number, string>>({});
+  /** Pedido ja respondido que a professora esta mudando. */
+  readonly respondendo = signal<number | null>(null);
+  readonly respondendoAjuda = signal(false);
+  readonly sugestoesAjuda = [
+    'Leia o passo de novo com calma.',
+    'Olhe o exemplo do caderno.',
+    'Faça uma parte de cada vez.',
+    'Amanhã eu te ajudo na sala.',
+  ];
+
+  /** Texto do passo em que o aluno pediu ajuda (a versao dele). */
+  passoDoAluno(alunoId: number, passo: number): string | null {
+    const t = this.tarefa();
+    const ad = t?.adaptacoes.find((a) => a.alunoId === alunoId);
+    return ad?.passos?.[passo - 1] ?? null;
+  }
+
+  /** O que esta escrito na caixa (ou a ajuda ja enviada). */
+  textoAjuda(p: PedidoAjudaTarefa): string {
+    return this.textosAjuda()[p.id] ?? p.resposta ?? '';
+  }
+
+  mudarTextoAjuda(id: number, texto: string): void {
+    this.textosAjuda.update((m) => ({ ...m, [id]: texto }));
+  }
+
+  usarSugestaoAjuda(id: number, s: string): void {
+    const p = this.tarefa()?.pedidosAjuda.find((x) => x.id === id);
+    const atual = p ? this.textoAjuda(p).trim() : '';
+    this.mudarTextoAjuda(id, atual ? `${atual} ${s}` : s);
+  }
+
+  abrirResposta(p: PedidoAjudaTarefa): void {
+    this.mudarTextoAjuda(p.id, p.resposta ?? '');
+    this.respondendo.set(p.id);
+  }
+
+  responderAjuda(p: PedidoAjudaTarefa): void {
+    const t = this.tarefa();
+    const texto = this.textoAjuda(p).trim();
+    if (!t || !texto || this.respondendoAjuda()) return;
+    this.respondendoAjuda.set(true);
+    this.service.responderAjuda(t.id, p.id, texto).subscribe({
+      next: (res) => {
+        this.respondendoAjuda.set(false);
+        this.respondendo.set(null);
+        const atual = this.tarefa()!;
+        this.tarefa.set({
+          ...atual,
+          pedidosAjuda: atual.pedidosAjuda.map((x) =>
+            x.id === p.id ? { ...x, ...res.data } : x,
+          ),
+        });
+        this.dialogo.avisar(`Ajuda enviada para ${primeiroNome(p.aluno)}.`);
+      },
+      error: (e: HttpErrorResponse) => {
+        this.respondendoAjuda.set(false);
+        this.dialogo.avisar(mensagemDeErro(e, 'Não foi possível enviar a ajuda.'), 'erro');
+      },
+    });
   }
 
   /** Pedido de mudanca para a IA na versao do aluno escolhido. */
@@ -258,6 +326,7 @@ export class ProfessorTarefa {
 
   editar(): void {
     this.textoEdicao = (this.adaptacao()?.passos ?? []).join('\n');
+    this.pedindoMudanca.set(false);
     this.editando.set(true);
   }
 

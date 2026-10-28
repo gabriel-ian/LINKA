@@ -24,4 +24,11 @@ export class PedidoAjuda {
 
   @Column({ name: 'visto_em', type: 'datetime', nullable: true })
   vistoEm!: Date | null;
+
+  /** Resposta da professora (o aluno ve na tarefa). */
+  @Column({ type: 'text', nullable: true })
+  resposta!: string | null;
+
+  @Column({ name: 'respondido_em', type: 'datetime', nullable: true })
+  respondidoEm!: Date | null;
 }

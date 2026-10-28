@@ -340,3 +340,60 @@
 .pedido-ia .acoes {
   justify-content: flex-end;
 }
+
+/* ---------- Pedido de ajuda do aluno ---------- */
+
+.pedido-ajuda {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 2px solid #fdba74;
+  background: #fff7ed;
+}
+
+.pedido-ajuda.respondido {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.pedido-ajuda p {
+  margin: 0;
+}
+
+.pedido-topo {
+  display: flex;
+  gap: 8px;
+  color: var(--cor-titulo);
+  font-size: 16px;
+}
+
+.passo-pedido {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 15px;
+}
+
+.ajuda-enviada {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ajuda-enviada p {
+  white-space: pre-line;
+}
+
+.pedido-ajuda .link-acao {
+  align-self: flex-start;
+}
+
+.ajustar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.editar-eu {
+  margin-right: auto;
+}

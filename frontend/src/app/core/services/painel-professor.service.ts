@@ -91,6 +91,17 @@ export class PainelProfessorService {
     });
   }
 
+  responderAjuda(
+    id: number,
+    pedidoId: number,
+    resposta: string,
+  ): Observable<ApiResponse<{ resposta: string | null; respondidoEm: string | null }>> {
+    return this.http.put<ApiResponse<{ resposta: string | null; respondidoEm: string | null }>>(
+      `${this.api}/tarefas/${id}/ajuda/${pedidoId}/resposta`,
+      { resposta },
+    );
+  }
+
   comentarEntrega(
     id: number,
     alunoId: number,

@@ -66,35 +66,21 @@
     }
 
     @if (contexto.proximas().length) {
-      @if (atual()) {
-        <h2 class="secao">PRÓXIMOS DIAS</h2>
-        <section class="cartao-aluno proximos">
-          <ul class="lista">
-            @for (t of contexto.proximas(); track t.id) {
-              <li>
-                <a
-                  class="linha"
-                  [routerLink]="['/aluno/tarefas', t.id]"
-                  [attr.aria-label]="'Abrir ' + titulo(t)"
-                  ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
-                /></a>
-              </li>
-            }
-          </ul>
-        </section>
-      } @else {
-        <section class="cartao-aluno compacto" aria-labelledby="titulo-proximos">
-          <h2 id="titulo-proximos">PRÓXIMOS DIAS</h2>
-          <ul>
-            @for (t of contexto.proximas(); track t.id) {
-              <li>
-                <a [routerLink]="['/aluno/tarefas', t.id]">{{ t.titulo }}</a>
-                <span class="etiqueta" [class.roxo]="$index % 2 === 1">{{ prazo(t).texto }}</span>
-              </li>
-            }
-          </ul>
-        </section>
-      }
+      <h2 class="secao" id="titulo-proximos">PRÓXIMOS DIAS</h2>
+      <section class="cartao-aluno proximos" aria-labelledby="titulo-proximos">
+        <ul class="lista">
+          @for (t of contexto.proximas(); track t.id) {
+            <li>
+              <a
+                class="linha"
+                [routerLink]="['/aluno/tarefas', t.id]"
+                [attr.aria-label]="'Abrir ' + titulo(t)"
+                ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
+              /></a>
+            </li>
+          }
+        </ul>
+      </section>
     }
 
     @if (feitas().length) {
@@ -103,12 +89,37 @@
         <ul class="lista">
           @for (t of feitasVisiveis(); track t.id) {
             <li>
-              <a
-                class="linha"
-                [routerLink]="['/aluno/tarefas', t.id]"
-                [attr.aria-label]="'Ver ' + titulo(t)"
-                ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
-              /></a>
+              <div class="linha-feita">
+                <a
+                  class="linha"
+                  [routerLink]="['/aluno/tarefas', t.id]"
+                  [attr.aria-label]="'Ver ' + titulo(t)"
+                  ><app-item-tarefa [tarefa]="t" [abrir]="true" [detalhes]="true"
+                /></a>
+                @if (t.comentario) {
+                  <button
+                    type="button"
+                    class="ver-recado"
+                    [class.aberto]="recadoAberto() === t.id"
+                    [attr.aria-expanded]="recadoAberto() === t.id"
+                    (click)="alternarRecado(t)"
+                  >
+                    💬 {{ recadoAberto() === t.id ? 'Fechar resposta' : 'Resposta da professora' }}
+                  </button>
+                }
+              </div>
+              @if (recadoAberto() === t.id && t.comentario) {
+                <div class="recado" role="status">
+                  <strong
+                    >💬 {{ t.professor ? 'Prof. ' + t.professor.split(' ')[0] : 'A professora' }}
+                    disse:</strong
+                  >
+                  <p>{{ t.comentario }}</p>
+                  <button type="button" class="link-acao" (click)="ouvirRecado(t)">
+                    Ouvir a resposta
+                  </button>
+                </div>
+              }
               <small class="feita-em">
                 Feita em {{ t.concluidoEm | date: "dd/MM 'às' HH:mm" }}
                 @if (t.entregue) {

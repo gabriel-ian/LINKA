@@ -110,6 +110,21 @@
         </section>
       }
 
+      @for (h of t.ajudasProfessora ?? []; track $index) {
+        <section class="comentario-prof ajuda-prof" role="status">
+          <h2>🙋 A professora respondeu seu pedido de ajuda{{ h.passo ? ' no passo ' + h.passo : '' }}</h2>
+          <p>{{ h.resposta }}</p>
+          <small
+            >{{ t.professor ? 'Prof. ' + t.professor.split(' ')[0] + ' · ' : '' }}{{
+              h.respondidoEm | date: "dd/MM 'às' HH:mm"
+            }}</small
+          >
+          <button type="button" class="link-acao" (click)="voz.falar('A professora respondeu: ' + h.resposta)">
+            Ouvir a ajuda
+          </button>
+        </section>
+      }
+
       @if (!entregue() || t.arquivosEnviados?.length) {
         <app-entrega-arquivos
           [tarefaId]="t.id"
@@ -412,6 +427,21 @@
             }}</small
           >
           <button type="button" class="link-acao" (click)="ouvirComentario()">Ouvir o recado</button>
+        </section>
+      }
+
+      @for (h of t.ajudasProfessora ?? []; track $index) {
+        <section class="comentario-prof ajuda-prof" role="status">
+          <h2>🙋 A professora respondeu seu pedido de ajuda{{ h.passo ? ' no passo ' + h.passo : '' }}</h2>
+          <p>{{ h.resposta }}</p>
+          <small
+            >{{ t.professor ? 'Prof. ' + t.professor.split(' ')[0] + ' · ' : '' }}{{
+              h.respondidoEm | date: "dd/MM 'às' HH:mm"
+            }}</small
+          >
+          <button type="button" class="link-acao" (click)="voz.falar('A professora respondeu: ' + h.resposta)">
+            Ouvir a ajuda
+          </button>
         </section>
       }
 

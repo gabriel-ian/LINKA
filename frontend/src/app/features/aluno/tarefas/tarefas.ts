@@ -8,7 +8,7 @@ import { AlunoContexto } from '../aluno-contexto';
 import { ItemTarefa } from '../item-tarefa';
 import { MascoteDesenho } from '../../../shared/mascote/mascote';
 import { AdmResultado } from '../../adm/resultado/resultado';
-import { dataLonga, hojeIso, horaCurta, prazo, tituloCompleto } from '../aluno-ui';
+import { dataLonga, hojeIso, horaCurta, tituloCompleto } from '../aluno-ui';
 
 /** "Aluno - Tarefas" e "Aluno - Tarefas (tudo feito hoje)" do Figma. */
 @Component({
@@ -21,12 +21,13 @@ export class AlunoTarefas {
   readonly contexto = inject(AlunoContexto);
   readonly voz = inject(VozService);
   readonly hoje = dataLonga();
-  readonly prazo = prazo;
   readonly titulo = tituloCompleto;
 
   /** Historico das tarefas feitas (nao somem depois de concluidas). */
   readonly feitas = signal<TarefaResumoAluno[]>([]);
   readonly mostrarTodas = signal(false);
+  /** Tarefa feita com a resposta da professora aberta na lista. */
+  readonly recadoAberto = signal<number | null>(null);
   readonly feitasVisiveis = computed(() =>
     this.mostrarTodas() ? this.feitas() : this.feitas().slice(0, 8),
   );
@@ -69,6 +70,16 @@ export class AlunoTarefas {
         ? ` Você já fez ${t.passosFeitos} de ${t.totalPassos} passos.`
         : '';
     this.voz.falar(`${tituloCompleto(t)}. ${quando}${andamento}`);
+  }
+
+  alternarRecado(t: TarefaResumoAluno): void {
+    const abrir = this.recadoAberto() !== t.id;
+    this.recadoAberto.set(abrir ? t.id : null);
+    if (abrir) this.ouvirRecado(t);
+  }
+
+  ouvirRecado(t: TarefaResumoAluno): void {
+    if (t.comentario) this.voz.falar(`A professora disse: ${t.comentario}`);
   }
 
   animar(): void {

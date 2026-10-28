@@ -273,6 +273,8 @@ CREATE TABLE `pedido_ajuda` (
   `passo` tinyint unsigned DEFAULT NULL,
   `criado_em` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `visto_em` datetime DEFAULT NULL,
+  `resposta` text,
+  `respondido_em` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_pedido_ajuda_tarefa` (`tarefa_id`),
   KEY `fk_pedido_ajuda_aluno` (`aluno_id`),

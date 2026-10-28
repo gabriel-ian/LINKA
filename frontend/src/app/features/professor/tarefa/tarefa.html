@@ -75,12 +75,64 @@
     }
 
     @for (p of t.pedidosAjuda; track p.id) {
-      <p class="aviso-caixa laranja" role="status">
-        <span
-          ><strong>{{ p.aluno }}</strong> pediu ajuda{{ p.passo ? ' no passo ' + p.passo : '' }}.
-          Veja a versão adaptada dele abaixo.</span
-        >
-      </p>
+      <section class="cartao pedido-ajuda" [class.respondido]="p.resposta && respondendo() !== p.id">
+        <p class="pedido-topo">
+          <span aria-hidden="true">🙋</span>
+          <span
+            ><strong>{{ p.aluno }}</strong> pediu ajuda{{
+              p.passo ? ' no passo ' + p.passo : ''
+            }}
+            <small>· {{ p.criadoEm | date: "dd/MM 'às' HH:mm" }}</small></span
+          >
+        </p>
+        @if (p.passo && passoDoAluno(p.alunoId, p.passo); as passo) {
+          <p class="passo-pedido"><strong>Passo {{ p.passo }}:</strong> {{ passo }}</p>
+        }
+
+        @if (p.resposta && respondendo() !== p.id) {
+          <div class="ajuda-enviada">
+            <strong>Sua ajuda para {{ primeiroNome(p.aluno) }}:</strong>
+            <p>{{ p.resposta }}</p>
+            <small>Enviada em {{ p.respondidoEm | date: "dd/MM 'às' HH:mm" }}</small>
+          </div>
+          <button type="button" class="link-acao" (click)="abrirResposta(p)">Mudar a ajuda</button>
+        } @else {
+          <label class="campo-p">
+            <span>Escreva uma ajuda para {{ primeiroNome(p.aluno) }}</span>
+            <textarea
+              name="ajuda"
+              rows="3"
+              maxlength="1000"
+              [ngModel]="textoAjuda(p)"
+              (ngModelChange)="mudarTextoAjuda(p.id, $event)"
+              placeholder="Ex.: Comece pelo exemplo do caderno. Some primeiro as dezenas, depois as unidades."
+            ></textarea>
+            <small>{{ primeiroNome(p.aluno) }} vê a sua ajuda dentro da tarefa e pode ouvir.</small>
+          </label>
+          <div class="sugestoes">
+            @for (s of sugestoesAjuda; track s) {
+              <button type="button" class="chip" (click)="usarSugestaoAjuda(p.id, s)">
+                + {{ s }}
+              </button>
+            }
+          </div>
+          <div class="acoes-comentario">
+            @if (p.resposta) {
+              <button type="button" class="bt bt-secundario bt-p" (click)="respondendo.set(null)">
+                Cancelar
+              </button>
+            }
+            <button
+              type="button"
+              class="bt bt-primario bt-p"
+              [disabled]="respondendoAjuda() || !(textoAjuda(p)).trim()"
+              (click)="responderAjuda(p)"
+            >
+              {{ respondendoAjuda() ? 'Enviando...' : 'Enviar ajuda' }}
+            </button>
+          </div>
+        }
+      </section>
     }
 
     @if (gerando()) {
@@ -166,8 +218,12 @@
 
           @if (editando()) {
             <label class="campo-p">
-              Um passo por linha
-              <textarea name="passos" rows="7" [(ngModel)]="textoEdicao"></textarea>
+              {{
+                a.geradoPorIa
+                  ? 'Mude o que quiser nos passos que a IA fez. Um passo por linha.'
+                  : 'Um passo por linha'
+              }}
+              <textarea name="passos" rows="9" [(ngModel)]="textoEdicao"></textarea>
             </label>
             <div class="acoes">
               <button type="button" class="bt bt-secundario bt-p" (click)="editando.set(false)">
@@ -219,6 +275,9 @@
                     }
                   </div>
                   <div class="acoes">
+                    <button type="button" class="link-acao editar-eu" (click)="editar()">
+                      ✏️ Prefiro eu mesmo mudar os passos
+                    </button>
                     <button
                       type="button"
                       class="bt bt-secundario bt-p"
@@ -237,14 +296,24 @@
                   </div>
                 </div>
               } @else {
-                <button
-                  type="button"
-                  class="bt bt-secundario bt-p pedir-mudanca"
-                  [disabled]="gerando()"
-                  (click)="pedindoMudanca.set(true)"
-                >
-                  ✦ Pedir mudança à IA
-                </button>
+                <div class="ajustar">
+                  <button
+                    type="button"
+                    class="bt bt-secundario bt-p pedir-mudanca"
+                    [disabled]="gerando()"
+                    (click)="pedindoMudanca.set(true)"
+                  >
+                    ✦ Pedir mudança à IA
+                  </button>
+                  <button
+                    type="button"
+                    class="bt bt-secundario bt-p"
+                    [disabled]="gerando()"
+                    (click)="editar()"
+                  >
+                    ✏️ Editar eu mesmo
+                  </button>
+                </div>
               }
             }
           } @else {

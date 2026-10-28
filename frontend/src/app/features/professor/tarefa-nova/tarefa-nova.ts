@@ -216,7 +216,7 @@ export class ProfessorTarefaNova {
     this.navegacao.voltar(id ? `/professor/tarefas/${id}` : '/professor/tarefas');
   }
 
-  salvar(): void {
+  async salvar(): Promise<void> {
     const e: Partial<Record<Campo, string>> = {};
     if (!this.titulo.trim()) e.titulo = 'Dê um título para a tarefa.';
     if (!temTexto(this.descricao))
@@ -229,11 +229,38 @@ export class ProfessorTarefaNova {
     this.erros.set(e);
     if (Object.keys(e).length) return;
 
+    const id = this.editandoId();
+    if (!id && !(await this.confirmarCriacao())) return;
+
     this.salvando.set(true);
     this.erroGeral.set('');
-    const id = this.editandoId();
     if (id) this.atualizar(id);
     else this.criar();
+  }
+
+  /** Resumo do que vai ser enviado, para a professora conferir antes. */
+  private confirmarCriacao(): Promise<boolean> {
+    const dados = this.contexto.dados();
+    const turmas = (dados?.turmas ?? [])
+      .filter((t) => t.id === this.turmaId() || this.outrasTurmas().includes(t.id))
+      .map((t) => t.nome);
+    const disciplina = dados?.disciplinas.find((d) => d.id === this.disciplinaId)?.nome;
+    const [a, m, d] = this.dataEntrega.split('-');
+    const prazo = `${d}/${m}/${a}${this.horaLimite ? ' às ' + this.horaLimite : ''}`;
+    const arquivos = this.novosArquivos().length;
+    const nee = this.nee().length;
+    return this.dialogo.confirmar({
+      titulo: `Criar "${this.titulo.trim()}"?`,
+      mensagem:
+        `${disciplina ? disciplina + ' · ' : ''}${turmas.join(', ')} · entrega ${prazo}.` +
+        (arquivos ? ` Com ${arquivos === 1 ? '1 arquivo' : arquivos + ' arquivos'}.` : '') +
+        ' A tarefa vai na hora para os alunos e as famílias' +
+        (nee
+          ? `, e a Linka faz a versão adaptada para ${nee === 1 ? '1 aluno NEE' : nee + ' alunos NEE'}.`
+          : '.'),
+      confirmar: 'Sim, criar tarefa',
+      cancelar: 'Voltar e revisar',
+    });
   }
 
   private criar(): void {

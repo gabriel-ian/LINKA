@@ -205,56 +205,6 @@
   gap: 18px;
 }
 
-.compacto {
-  padding: 22px 24px 8px;
-}
-
-.compacto h2 {
-  margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.compacto ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.compacto li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 0;
-}
-
-.compacto li + li {
-  border-top: 1px solid var(--cor-linha);
-}
-
-.compacto a {
-  color: var(--cor-titulo);
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.etiqueta {
-  padding: 3px 12px;
-  border-radius: 59px;
-  background: #e8effe;
-  color: #103ba6;
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.etiqueta.roxo {
-  background: #f3e8ff;
-  color: #7c3aed;
-}
-
 @media (max-width: 1000px) {
   .cabecalho h1,
   .cabecalho.coluna h1 {
@@ -305,11 +255,6 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
-
-  .compacto li {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
 
 /* ---------- Historico das tarefas feitas ---------- */
@@ -326,4 +271,62 @@
 
 .tem-recado {
   color: var(--cor-primaria);
+}
+
+.linha-feita {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.linha-feita .linha {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.ver-recado {
+  flex: none;
+  padding: 8px 16px;
+  border: 2px solid var(--cor-primaria);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--cor-primaria);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ver-recado.aberto,
+.ver-recado:hover {
+  background: #e8effe;
+}
+
+.recado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0 0 39px;
+  padding: 14px 16px;
+  border: 2px solid #b8d4ff;
+  border-radius: 14px;
+  background: #f0f6ff;
+}
+
+.recado p {
+  margin: 0;
+  color: var(--cor-titulo);
+  font-size: 18px;
+  white-space: pre-line;
+}
+
+.recado .link-acao {
+  align-self: flex-start;
+}
+
+@media (max-width: 1000px) {
+  .recado {
+    margin-left: 0;
+  }
 }

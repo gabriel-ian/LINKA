@@ -25,6 +25,9 @@ import { horaCurta, prazo, tituloCompleto } from './aluno-ui';
           @if (!concluida() && tarefa().totalPassos) {
             <li>👣 {{ tarefa().passosFeitos }} de {{ tarefa().totalPassos }} passos</li>
           }
+          @if (tarefa().ajudaRespondida) {
+            <li class="ajuda">🙋 A professora respondeu sua ajuda</li>
+          }
         </ul>
       }
     </div>
@@ -50,6 +53,10 @@ import { horaCurta, prazo, tituloCompleto } from './aluno-ui';
       list-style: none;
       color: var(--cor-texto);
       font-size: 15px;
+    }
+    .detalhes .ajuda {
+      color: #b8420a;
+      font-weight: 700;
     }
     .abrir {
       flex: none;

@@ -56,6 +56,10 @@ export interface TarefaResumoAluno {
   entregue?: boolean;
   /** O professor deixou um comentario na entrega. */
   comentada?: boolean;
+  /** O comentario em si (para ler direto da lista). */
+  comentario?: string | null;
+  /** A professora respondeu um pedido de ajuda nesta tarefa. */
+  ajudaRespondida?: boolean;
   professor?: string | null;
   /** Ultima vez que o professor editou a tarefa. */
   atualizadaEm?: string | null;
@@ -119,6 +123,8 @@ export interface TarefaAluno extends TarefaResumoAluno {
   /** Comentario ou correcao da professora sobre a entrega. */
   comentario?: string | null;
   comentarioEm?: string | null;
+  /** O que a professora escreveu para os pedidos de ajuda do aluno. */
+  ajudasProfessora?: { passo: number | null; resposta: string; respondidoEm: string }[];
   respostaEm: string | null;
   professor: string | null;
   passos: string[];

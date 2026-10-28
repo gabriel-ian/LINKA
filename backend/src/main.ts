@@ -23,10 +23,15 @@ async function bootstrap() {
     }),
   );
 
-  // No Render o endereco do site chega sem o https:// (ex.: linka.onrender.com).
-  const site = config.get<string>('FRONTEND_URL') ?? 'http://localhost:4200';
+  // No Render o endereco do site pode chegar sem https:// e ate sem o
+  // dominio (ex.: linka-agfi): completa para https://linka-agfi.onrender.com.
+  const bruto = config.get<string>('FRONTEND_URL') ?? 'http://localhost:4200';
+  const host =
+    bruto.includes('.') || bruto.includes('localhost')
+      ? bruto
+      : `${bruto}.onrender.com`;
   app.enableCors({
-    origin: /^https?:\/\//.test(site) ? site : `https://${site}`,
+    origin: /^https?:\/\//.test(host) ? host : `https://${host}`,
   });
 
   app.useGlobalPipes(

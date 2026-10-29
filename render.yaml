@@ -7,7 +7,7 @@ services:
     runtime: docker
     rootDir: backend
     plan: free
-    branch: feat/ajustes-tarefas-avisos
+    branch: main
     healthCheckPath: /api
     envVars:
       - key: DB_HOST
@@ -49,7 +49,7 @@ services:
     name: linka
     runtime: static
     rootDir: frontend
-    branch: feat/ajustes-tarefas-avisos
+    branch: main
     buildCommand: npm ci && node scripts/definir-api.mjs && npx ng build
     staticPublishPath: dist/frontend/browser
     envVars:

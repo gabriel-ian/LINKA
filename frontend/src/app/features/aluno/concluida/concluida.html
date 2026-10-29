@@ -6,6 +6,14 @@
     }
   </header>
 
+  <section class="parabens" aria-live="polite">
+    <app-mascote class="mascote-festa" [tipo]="contexto.mascote()" />
+    <button type="button" class="balao-festa" (click)="comemorar()">
+      <span class="icone-som" aria-hidden="true"></span>
+      {{ frase() }}
+    </button>
+  </section>
+
   <app-adm-resultado
     [forte]="true"
     titulo="Você terminou a tarefa!"

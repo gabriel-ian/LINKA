@@ -14,7 +14,8 @@
 }
 
 .rodape {
-  background-image: url('/assets/adm/rodape.png');
+  /* A foto cobre a faixa sem esticar (corta as sobras em telas largas). */
+  background: url('/assets/adm/rodape.png') center / cover no-repeat;
 }
 
 .topo .logo {

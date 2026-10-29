@@ -81,6 +81,15 @@ export interface TarefaDoFilho extends TarefaResumoAluno {
   comentarioEm: string | null;
 }
 
+/** A tarefa aberta pela familia (so leitura). */
+export interface TarefaAbertaFilho extends TarefaDoFilho {
+  enunciadoHtml: string | null;
+  passos: string[];
+  materiais: string[];
+  resposta: string | null;
+  anexos: Anexo[];
+}
+
 export interface TarefasDoFilho {
   filho: Filho;
   atrasadas: TarefaDoFilho[];
@@ -117,9 +126,7 @@ export interface NovoIncentivo {
   voz: boolean;
 }
 
+/** A familia so muda os avisos; nome, e-mail e telefone quem muda e a escola. */
 export interface PerfilFamilia {
-  nomeCompleto?: string;
-  email?: string;
-  telefone?: string;
   preferencias?: Partial<PreferenciasFamilia>;
 }

@@ -63,3 +63,25 @@
   font-size: 15px;
   font-weight: 500;
 }
+
+/* ---------- Vincular aluno ja cadastrado ---------- */
+
+.linha-vincular td {
+  background: #f5f8ff;
+}
+
+.vincular {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+}
+
+.vincular label {
+  display: flex;
+  flex: 1 1 260px;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}

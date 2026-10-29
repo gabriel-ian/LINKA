@@ -54,47 +54,21 @@
       </section>
 
       <div class="direita">
-        <form class="bloco cartao-cfg" (submit)="$event.preventDefault(); salvarDados()">
-          <h2 class="titulo-cfg">Dados do responsável</h2>
-          <label class="campo-cfg">
-            <span>Nome completo</span>
-            <input
-              class="campo"
-              name="nome"
-              autocomplete="name"
-              maxlength="255"
-              [(ngModel)]="nome"
-            />
-          </label>
-          <label class="campo-cfg">
-            <span>E-mail</span>
-            <input
-              class="campo"
-              type="email"
-              name="email"
-              autocomplete="email"
-              [(ngModel)]="email"
-            />
-          </label>
-          <label class="campo-cfg">
-            <span>Telefone</span>
-            <input
-              class="campo"
-              type="tel"
-              name="telefone"
-              autocomplete="tel"
-              maxlength="20"
-              placeholder="(46) 99912-3456"
-              [(ngModel)]="telefone"
-            />
-          </label>
-          @if (mensagem()) {
-            <p class="ok-msg" role="status">{{ mensagem() }}</p>
-          }
-          <button type="submit" class="botao primario largo" [disabled]="salvando()">
-            {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
-          </button>
-        </form>
+        <section class="bloco cartao-cfg" aria-labelledby="titulo-dados">
+          <h2 class="titulo-cfg" id="titulo-dados">Dados do responsável</h2>
+          <dl class="dados-so-ver">
+            <dt>Nome completo</dt>
+            <dd>{{ d.responsavel.nome }}</dd>
+            <dt>E-mail</dt>
+            <dd>{{ d.responsavel.email || '—' }}</dd>
+            <dt>Telefone</dt>
+            <dd>{{ d.responsavel.telefone || '—' }}</dd>
+          </dl>
+          <p class="nota">
+            🔒 Por segurança, só a escola muda nome, e-mail e telefone. Se algo estiver errado, fale
+            com a secretaria.
+          </p>
+        </section>
 
         <section class="bloco cartao-cfg" aria-labelledby="titulo-filhos">
           <h2 class="titulo-cfg" id="titulo-filhos">Filhos vinculados</h2>

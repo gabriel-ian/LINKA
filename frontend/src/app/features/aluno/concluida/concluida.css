@@ -112,3 +112,71 @@
     padding: 10px 14px;
   }
 }
+
+/* ---------- Mascote comemorando ---------- */
+
+.parabens {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 18px;
+}
+
+.mascote-festa {
+  flex: none;
+  width: 110px;
+  height: 110px;
+  animation: pular 0.9s ease-in-out 3;
+}
+
+@keyframes pular {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  40% {
+    translate: 0 -14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascote-festa {
+    animation: none;
+  }
+}
+
+.balao-festa {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border: 2px solid var(--cor-mascote, #00704d);
+  border-radius: 20px 20px 20px 4px;
+  background: var(--cor-mascote-fundo, #e6f7f2);
+  color: var(--cor-titulo);
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.balao-festa .icone-som {
+  flex: none;
+  width: 20px;
+  height: 18px;
+  background: var(--cor-mascote, #00704d);
+  mask: url('/assets/aluno/icone-ouvir.svg') center / contain no-repeat;
+}
+
+@media (max-width: 600px) {
+  .mascote-festa {
+    width: 80px;
+    height: 80px;
+  }
+
+  .balao-festa {
+    font-size: 18px;
+  }
+}

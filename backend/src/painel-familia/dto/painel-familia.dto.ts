@@ -2,7 +2,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
-  IsEmail,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -44,25 +43,8 @@ export class PreferenciasFamiliaDto {
   horario?: string;
 }
 
+/** Nome, e-mail e telefone nao entram: so a escola muda esses dados. */
 export class PerfilFamiliaDto {
-  @ApiPropertyOptional({ example: 'Maria Oliveira' })
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(255)
-  nomeCompleto?: string;
-
-  @ApiPropertyOptional({ example: 'maria.oliveira@email.com' })
-  @IsOptional()
-  @IsEmail()
-  email?: string;
-
-  @ApiPropertyOptional({ example: '(46) 99912-3456' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(20)
-  telefone?: string;
-
   @ApiPropertyOptional({ type: PreferenciasFamiliaDto })
   @IsOptional()
   @ValidateNested()

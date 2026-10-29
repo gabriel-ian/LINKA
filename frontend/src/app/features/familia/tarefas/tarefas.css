@@ -143,3 +143,83 @@
 .comentario-prof small {
   font-size: 12px;
 }
+
+/* ---------- Tarefa aberta so para ver ---------- */
+
+.linha-tarefa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 12px;
+}
+
+.linha-tarefa app-item-tarefa {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.ver-tarefa {
+  flex: none;
+  padding: 6px 14px;
+  font-size: 14px;
+}
+
+.tarefa-aberta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 1px solid #c7d7fe;
+  border-radius: 12px;
+  background: #f5f8ff;
+}
+
+.tarefa-aberta h3 {
+  margin: 8px 0 0;
+  font-size: 15px;
+}
+
+.tarefa-aberta p {
+  margin: 0;
+}
+
+.so-ver {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.passos-filho {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passos-filho li {
+  display: flex;
+  gap: 8px;
+}
+
+.passos-filho li > span:first-child {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.passos-filho li.feito > span:first-child {
+  background: #d1fae5;
+  color: #047857;
+}

@@ -91,7 +91,10 @@ export class AlunoLayout {
       titulo: r?.aluno.nome ?? 'Aluno',
       perfil: 'Aluno(a)',
       perfilRota: '/aluno/perfil',
-      infos: r?.aluno.turma ? [{ icone: 'turma', texto: r.aluno.turma }] : [],
+      infos: [
+        ...(r?.aluno.escola ? [{ icone: 'escola' as const, texto: r.aluno.escola }] : []),
+        ...(r?.aluno.turma ? [{ icone: 'turma' as const, texto: r.aluno.turma }] : []),
+      ],
       fala: this.contexto.semConexao()
         ? 'Sem internet agora - mas suas missões estão salvas.'
         : this.contexto.fala() || (r ? `Oi ${r.aluno.primeiroNome}! Bora conquistar o dia?` : ''),

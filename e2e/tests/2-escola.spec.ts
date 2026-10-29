@@ -17,6 +17,21 @@ test.describe('Escola', () => {
     await page.locator('input[name=telefone]').fill('(41) 99999-0000');
     await page.locator('button[type=submit]').click();
     await expect(page.getByText('Família cadastrada!')).toBeVisible();
+
+    // Vincula um aluno que ja estava cadastrado sem familia.
+    const { alunoSemTurma } = lerEstado();
+    await page.goto('/escola/familias');
+    await page.locator('.pagina input').first().fill('Rita Responsável E2E');
+    const linha = page.locator('tr', { hasText: 'Rita Responsável E2E' });
+    await linha.getByRole('button', { name: 'Vincular aluno' }).click();
+    await page
+      .locator('.linha-vincular select')
+      .selectOption({ label: `${alunoSemTurma.nome} - sem turma` });
+    await page.getByRole('button', { name: 'Vincular a Rita' }).click();
+    await expect(
+      page.getByText(`${alunoSemTurma.nome} vinculado(a) a Rita Responsável E2E.`),
+    ).toBeVisible();
+    await expect(linha.getByText('Carla')).toBeVisible();
   });
 
   test('adiciona o aluno sem turma à turma, dentro do limite de vagas', async ({

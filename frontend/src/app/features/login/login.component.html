@@ -53,7 +53,14 @@
           [attr.aria-label]="mostrarSenha ? 'Esconder senha' : 'Mostrar senha'"
           (click)="mostrarSenha = !mostrarSenha"
         >
-          <img src="assets/entrada/icone-olho.svg" alt="" />
+          <img
+            [src]="
+              mostrarSenha
+                ? 'assets/entrada/icone-olho.svg'
+                : 'assets/entrada/icone-olho-fechado.svg'
+            "
+            alt=""
+          />
         </button>
       </span>
     </label>

@@ -195,3 +195,20 @@
 .link-acao.perigo {
   color: var(--cor-erro);
 }
+
+.dados-so-ver {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.dados-so-ver dt {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.dados-so-ver dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

@@ -304,6 +304,17 @@ test.describe.serial('Tarefas e avisos', () => {
     ).toBeVisible();
     await item.getByRole('button', { name: /Ver o que Lia enviou/ }).click();
     await expect(item.getByText('caderno.jpg')).toBeVisible();
+
+    // Abre a tarefa so para ver: o enunciado aparece, sem botoes de fazer.
+    await item.getByRole('button', { name: 'Ver tarefa' }).click();
+    await expect(item.getByText(/Só para acompanhar/)).toBeVisible();
+    await expect(item.getByText('Leia o capítulo 2 e responda.')).toBeVisible();
+    await expect(item.getByRole('button', { name: /Concluir passo/ })).toHaveCount(0);
+
+    // Nome, e-mail e telefone a familia so ve (quem muda e a escola).
+    await page.goto('/familia/configuracoes');
+    await expect(page.getByText(/só a escola muda nome, e-mail e telefone/)).toBeVisible();
+    await expect(page.locator('input[name=email]')).toHaveCount(0);
   });
 
   test('trocar de turma leva as tarefas da turma nova', async () => {

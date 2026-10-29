@@ -71,6 +71,14 @@
                     [queryParams]="{ responsavelId: f.id }"
                     >+ Filho(a)</a
                   >
+                  <button
+                    type="button"
+                    class="link-acao"
+                    [attr.aria-expanded]="vinculando() === f.id"
+                    (click)="abrirVinculo(f.id)"
+                  >
+                    Vincular aluno
+                  </button>
                   @if (f.email) {
                     <button type="button" class="link-acao" (click)="novaSenha(f)">
                       Nova senha
@@ -79,6 +87,55 @@
                 </span>
               </td>
             </tr>
+            @if (vinculando() === f.id) {
+              <tr class="linha-vincular">
+                <td colspan="4">
+                  <div class="vincular">
+                    @if (semFamilia() === null) {
+                      <span>Carregando alunos...</span>
+                    } @else if (!semFamilia()!.length) {
+                      <span>Todos os alunos já têm família vinculada.</span>
+                      <button type="button" class="link-acao" (click)="vinculando.set(null)">
+                        Fechar
+                      </button>
+                    } @else {
+                      <label>
+                        <span>Aluno já cadastrado, sem família:</span>
+                        <select
+                          class="campo"
+                          [value]="alunoEscolhido() ?? ''"
+                          (change)="alunoEscolhido.set(+$any($event.target).value || null)"
+                        >
+                          <option value="">Escolha o aluno</option>
+                          @for (a of semFamilia(); track a.id) {
+                            <option [value]="a.id">
+                              {{ a.nome }}{{ a.turma ? ' - ' + a.turma : ' - sem turma' }}
+                            </option>
+                          }
+                        </select>
+                      </label>
+                      <button
+                        type="button"
+                        class="btn btn-secundario"
+                        (click)="vinculando.set(null)"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primario"
+                        [disabled]="!alunoEscolhido() || salvandoVinculo()"
+                        (click)="vincular(f)"
+                      >
+                        {{
+                          salvandoVinculo() ? 'Vinculando...' : 'Vincular a ' + f.nome.split(' ')[0]
+                        }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
           } @empty {
             <tr>
               <td colspan="4" class="vazio">Nenhuma família encontrada.</td>

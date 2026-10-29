@@ -8,6 +8,7 @@ import { SenhaProvisoria } from '../../../shared/senha/senha-provisoria';
 import { iniciaisPessoa } from '../escola-ui';
 import { DialogoService } from '../../../core/services/dialogo.service';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { mensagemDeErro } from '../../../core/util/mensagem-erro';
 
 const POR_PAGINA = 10;
 
@@ -28,6 +29,49 @@ export class EscolaFamilias {
   readonly senha = signal<(SenhaGerada & { nome: string }) | null>(null);
   readonly pagina = signal(0);
   private readonly busca = new Subject<string>();
+  private termo = '';
+
+  /** Familia em que a escola esta vinculando um aluno ja cadastrado. */
+  readonly vinculando = signal<number | null>(null);
+  readonly semFamilia = signal<{ id: number; nome: string; turma: string | null }[] | null>(null);
+  readonly alunoEscolhido = signal<number | null>(null);
+  readonly salvandoVinculo = signal(false);
+
+  abrirVinculo(familiaId: number): void {
+    if (this.vinculando() === familiaId) {
+      this.vinculando.set(null);
+      return;
+    }
+    this.vinculando.set(familiaId);
+    this.alunoEscolhido.set(null);
+    this.semFamilia.set(null);
+    this.service.alunosSemFamilia().subscribe({
+      next: (res) => this.semFamilia.set(res.data),
+      error: () => {
+        this.vinculando.set(null);
+        this.dialogo.avisar('Não foi possível carregar os alunos.', 'erro');
+      },
+    });
+  }
+
+  vincular(f: Familia): void {
+    const alunoId = this.alunoEscolhido();
+    if (!alunoId || this.salvandoVinculo()) return;
+    const aluno = this.semFamilia()?.find((a) => a.id === alunoId);
+    this.salvandoVinculo.set(true);
+    this.service.vincularFamilia(alunoId, { responsavelId: f.id }).subscribe({
+      next: () => {
+        this.salvandoVinculo.set(false);
+        this.vinculando.set(null);
+        this.dialogo.avisar(`${aluno?.nome ?? 'Aluno'} vinculado(a) a ${f.nome}.`);
+        this.busca.next(this.termo);
+      },
+      error: (e) => {
+        this.salvandoVinculo.set(false);
+        this.dialogo.avisar(mensagemDeErro(e, 'Não foi possível vincular o aluno.'), 'erro');
+      },
+    });
+  }
 
   readonly totalPaginas = computed(() =>
     Math.max(1, Math.ceil((this.familias()?.length ?? 0) / POR_PAGINA)),
@@ -54,6 +98,7 @@ export class EscolaFamilias {
   }
 
   buscar(termo: string): void {
+    this.termo = termo;
     this.busca.next(termo);
   }
 

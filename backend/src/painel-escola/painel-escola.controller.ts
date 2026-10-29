@@ -241,6 +241,14 @@ export class PainelEscolaController {
     return this.painel.listarAlunos(escolaId);
   }
 
+  @Get('alunos/sem-familia')
+  @ApiOperation({
+    summary: 'Alunos ativos sem familia vinculada (para vincular a uma familia)',
+  })
+  alunosSemFamilia(@EscolaId() escolaId: number) {
+    return this.painel.alunosSemFamilia(escolaId);
+  }
+
   @Get('alunos/:id')
   @ApiOperation({ summary: 'Perfil do aluno' })
   aluno(@EscolaId() escolaId: number, @Param('id', ParseIntPipe) id: number) {

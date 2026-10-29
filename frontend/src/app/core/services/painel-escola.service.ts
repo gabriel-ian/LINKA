@@ -165,6 +165,15 @@ export class PainelEscolaService {
     return this.http.patch(`${this.api}/professores/${id}`, { ativo });
   }
 
+  /** Alunos ativos que ainda nao tem familia vinculada. */
+  alunosSemFamilia(): Observable<
+    ApiResponse<{ id: number; nome: string; turma: string | null }[]>
+  > {
+    return this.http.get<ApiResponse<{ id: number; nome: string; turma: string | null }[]>>(
+      `${this.api}/alunos/sem-familia`,
+    );
+  }
+
   alunos(): Observable<ApiResponse<AlunoResumo[]>> {
     return this.http.get<ApiResponse<AlunoResumo[]>>(`${this.api}/alunos`);
   }

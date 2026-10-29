@@ -1,7 +1,11 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TarefaDoFilho, TarefasDoFilho } from '../../../core/model/painel-familia.model';
+import {
+  TarefaAbertaFilho,
+  TarefaDoFilho,
+  TarefasDoFilho,
+} from '../../../core/model/painel-familia.model';
 import { PainelFamiliaService } from '../../../core/services/painel-familia.service';
 import { ItemTarefa } from '../../aluno/item-tarefa';
 import { FamiliaContexto } from '../familia-contexto';
@@ -28,6 +32,29 @@ export class FamiliaTarefas {
   readonly aba = signal<Aba>('aFazer');
   /** Tarefa com os arquivos abertos. */
   readonly arquivosAbertos = signal<number | null>(null);
+  /** Tarefa aberta so para ver (enunciado, passos e materiais). */
+  readonly aberta = signal<TarefaAbertaFilho | null>(null);
+  readonly carregandoTarefa = signal<number | null>(null);
+  readonly baixarAnexo = (tarefaId: number) => (a: Anexo) =>
+    this.service.baixarAnexo(this.contexto.filhoId()!, tarefaId, a.id);
+
+  abrir(tarefaId: number): void {
+    if (this.aberta()?.id === tarefaId) {
+      this.aberta.set(null);
+      return;
+    }
+    this.carregandoTarefa.set(tarefaId);
+    this.service.tarefa(this.contexto.filhoId()!, tarefaId).subscribe({
+      next: (res) => {
+        this.carregandoTarefa.set(null);
+        this.aberta.set(res.data);
+      },
+      error: () => {
+        this.carregandoTarefa.set(null);
+        this.erro.set('Não foi possível abrir a tarefa.');
+      },
+    });
+  }
   readonly baixarEntrega = (tarefaId: number) => (a: Anexo) =>
     this.service.baixarEntrega(this.contexto.filhoId()!, tarefaId, a.id);
 

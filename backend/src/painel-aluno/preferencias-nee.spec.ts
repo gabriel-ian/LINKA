@@ -1,4 +1,4 @@
-import { preferenciasSugeridas } from './preferencias-nee';
+import { ajudasSugeridas, preferenciasSugeridas } from './preferencias-nee';
 
 describe('preferenciasSugeridas', () => {
   it('liga a letra e a regua de leitura para dislexia', () => {
@@ -29,5 +29,18 @@ describe('preferenciasSugeridas', () => {
   it('sem diagnostico nao muda nada', () => {
     expect(preferenciasSugeridas([])).toEqual({});
     expect(preferenciasSugeridas(['Outro'])).toEqual({});
+  });
+});
+
+describe('ajudasSugeridas', () => {
+  it('desligar volta cada ajuda sugerida ao padrao', () => {
+    expect(ajudasSugeridas(['Dislexia'])).toEqual({
+      ligado: { ouvirVoz: true, fonteDislexia: true, reguaLeitura: true },
+      desligado: { ouvirVoz: true, fonteDislexia: false, reguaLeitura: false },
+    });
+  });
+
+  it('sem nada sugerido nao mostra o interruptor', () => {
+    expect(ajudasSugeridas([])).toBeNull();
   });
 });

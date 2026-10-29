@@ -15,7 +15,6 @@ type Chave =
   | 'tempoPasso'
   | 'modoCalmo';
 
-
 const CORES_INTERESSE = ['verde', 'azul', 'roxo', 'laranja'];
 
 /** "Aluno - Meu perfil" do Figma. Cada mudanca e salva na hora. */
@@ -66,6 +65,37 @@ export class AlunoPerfil {
     { valor: 2, nome: 'Maior', amostra: 22 },
     { valor: 3, nome: 'Enorme', amostra: 26 },
   ];
+
+  /** Nomes das ajudas sugeridas, para o aluno saber o que o interruptor liga. */
+  nomesSugeridas(ligado: Partial<PreferenciasAluno>): string[] {
+    const nomes: string[] = [];
+    for (const [chave, valor] of Object.entries(ligado)) {
+      if (chave === 'letrasMaiores') continue;
+      if (chave === 'tamanhoLetra')
+        nomes.push(`Letra ${this.tamanhos.find((t) => t.valor === valor)?.nome.toLowerCase()}`);
+      else if (chave === 'ouvirVoz' && valor === false) nomes.push('Sem leitura em voz alta');
+      else {
+        const o = this.opcoes.find((x) => x.chave === chave);
+        if (o) nomes.push(o.titulo);
+      }
+    }
+    return nomes;
+  }
+
+  /** Todas as ajudas sugeridas estao como a escola indicou. */
+  sugeridasLigadas(): boolean {
+    const r = this.contexto.resumo();
+    const ligado = r?.ajudasSugeridas?.ligado;
+    if (!r || !ligado) return false;
+    return Object.entries(ligado).every(
+      ([c, v]) => (r.preferencias as unknown as Record<string, unknown>)[c] === v,
+    );
+  }
+
+  alternarSugeridas(): void {
+    const aj = this.contexto.resumo()?.ajudasSugeridas;
+    if (aj) this.salvar(this.sugeridasLigadas() ? aj.desligado : aj.ligado);
+  }
 
   escolherTamanho(valor: 0 | 1 | 2 | 3): void {
     this.salvar({ tamanhoLetra: valor, letrasMaiores: valor > 0 });
@@ -142,7 +172,8 @@ export class AlunoPerfil {
     if (!r) return;
     const info = infoMascote(r.preferencias.mascote);
     this.voz.falar(
-      texto ?? `Oi, ${r.aluno.primeiroNome}! Eu sou ${info.nome === 'Coruja' ? 'a' : 'o'} ${info.nome}. Vamos aprender juntos?`,
+      texto ??
+        `Oi, ${r.aluno.primeiroNome}! Eu sou ${info.nome === 'Coruja' ? 'a' : 'o'} ${info.nome}. Vamos aprender juntos?`,
       false,
       {
         voz: r.preferencias.voz ?? null,

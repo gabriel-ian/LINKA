@@ -40,7 +40,67 @@
           <ul class="bloco lista">
             @for (t of g.itens; track t.id) {
               <li>
-                <app-item-tarefa [tarefa]="t" />
+                <div class="linha-tarefa">
+                  <app-item-tarefa [tarefa]="t" />
+                  <button
+                    type="button"
+                    class="botao secundario ver-tarefa"
+                    [attr.aria-expanded]="aberta()?.id === t.id"
+                    (click)="abrir(t.id)"
+                  >
+                    {{ aberta()?.id === t.id ? 'Fechar' : '👁 Ver tarefa' }}
+                  </button>
+                </div>
+                @if (carregandoTarefa() === t.id) {
+                  <small class="detalhe">Abrindo a tarefa...</small>
+                }
+                @if (aberta(); as a) {
+                  @if (a.id === t.id) {
+                    <div
+                      class="tarefa-aberta"
+                      role="region"
+                      [attr.aria-label]="'Tarefa ' + a.titulo"
+                    >
+                      <p class="so-ver">
+                        👁 Só para acompanhar: quem faz a tarefa é {{ d.filho.nome.split(' ')[0] }}.
+                      </p>
+                      <h3>O que a professora pediu</h3>
+                      @if (a.enunciadoHtml) {
+                        <div class="texto-rico" [innerHTML]="a.enunciadoHtml"></div>
+                      } @else {
+                        <p>{{ a.titulo }}</p>
+                      }
+                      @if (a.materiais.length) {
+                        <h3>Materiais</h3>
+                        <p>{{ a.materiais.join(', ') }}</p>
+                      }
+                      @if (a.passos.length > 1) {
+                        <h3>Passos de {{ d.filho.nome.split(' ')[0] }}</h3>
+                        <ol class="passos-filho">
+                          @for (p of a.passos; track $index) {
+                            <li [class.feito]="$index < a.passosFeitos">
+                              <span aria-hidden="true">{{
+                                $index < a.passosFeitos ? '✓' : $index + 1
+                              }}</span>
+                              {{ p }}
+                              @if ($index < a.passosFeitos) {
+                                <span class="sr-only">(feito)</span>
+                              }
+                            </li>
+                          }
+                        </ol>
+                      }
+                      @if (a.anexos.length) {
+                        <h3>Arquivos da professora</h3>
+                        <app-anexos-lista [anexos]="a.anexos" [baixar]="baixarAnexo(a.id)" />
+                      }
+                      @if (a.resposta) {
+                        <h3>Resposta de {{ d.filho.nome.split(' ')[0] }}</h3>
+                        <div class="texto-rico" [innerHTML]="a.resposta"></div>
+                      }
+                    </div>
+                  }
+                }
                 @if (detalhe(t)) {
                   <small class="detalhe">{{ detalhe(t) }}</small>
                 }
@@ -73,7 +133,10 @@
                 @if (t.comentario) {
                   <div class="comentario-prof">
                     <strong
-                      >💬 Comentário {{ t.professor ? 'da Prof. ' + t.professor.split(' ')[0] : 'do professor' }}</strong
+                      >💬 Comentário
+                      {{
+                        t.professor ? 'da Prof. ' + t.professor.split(' ')[0] : 'do professor'
+                      }}</strong
                     >
                     <p>{{ t.comentario }}</p>
                     <small>{{ t.comentarioEm | date: "dd/MM 'às' HH:mm" }}</small>

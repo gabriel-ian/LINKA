@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { DataSource, Not } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Responsavel } from '../responsavel/responsavel.entity';
 import { Usuario } from '../usuario/usuario.entity';
 import {
@@ -25,6 +25,7 @@ import { semanasDoMes } from '../painel-professor/painel-professor.service';
 import { sequenciaAtual } from '../painel-aluno/gamificacao';
 import { Incentivo } from './incentivo.entity';
 import { EntregaArquivoService } from '../tarefa-anexo/entrega-arquivo.service';
+import { TarefaAnexoService } from '../tarefa-anexo/tarefa-anexo.service';
 import { resumoSemanal } from './resumo-semanal';
 import { LgpdService, TERMO_VERSAO } from '../lgpd/lgpd.service';
 import { PREFERENCIAS_PADRAO, preferenciasDe } from './preferencias';
@@ -74,6 +75,7 @@ export class PainelFamiliaService {
     private readonly aluno: PainelAlunoService,
     private readonly lgpd: LgpdService,
     private readonly entregas: EntregaArquivoService,
+    private readonly anexos: TarefaAnexoService,
   ) {}
 
   // ------------------------------------------------------------ acesso
@@ -372,6 +374,48 @@ export class PainelFamiliaService {
   }
 
   /** Foto ou documento que o filho enviou da tarefa. */
+  /**
+   * A tarefa como o filho ve (enunciado, passos da versao dele, materiais),
+   * so para a familia acompanhar: nada aqui muda a tarefa.
+   */
+  async tarefa(usuarioId: number, alunoId: number, tarefaId: number) {
+    const { filho } = await this.filho(usuarioId, alunoId);
+    const t = (await this.aluno.tarefasDoAluno(alunoId)).find(
+      (x) => x.id === tarefaId,
+    );
+    if (!t) throw new NotFoundException('Tarefa nao encontrada');
+    return {
+      data: {
+        filho,
+        ...this.aluno.resumoTarefa(t),
+        enunciadoHtml: t.descricao ? limparHtml(t.descricao) : null,
+        passos: t.passos,
+        materiais: t.materiais,
+        professor: t.professor,
+        resposta: t.resposta,
+        respostaEm: t.respostaEm,
+        anexos: await this.anexos.listar(tarefaId),
+        arquivos: await this.entregas.listar(tarefaId, alunoId),
+        comentario: t.comentario,
+        comentarioEm: t.comentarioEm,
+      },
+    };
+  }
+
+  /** Material que a professora anexou, de uma tarefa do filho. */
+  async anexoParaBaixar(
+    usuarioId: number,
+    alunoId: number,
+    tarefaId: number,
+    anexoId: number,
+  ) {
+    await this.filho(usuarioId, alunoId);
+    const tarefas = await this.aluno.tarefasDoAluno(alunoId);
+    if (!tarefas.some((x) => x.id === tarefaId))
+      throw new NotFoundException('Tarefa nao encontrada');
+    return this.anexos.paraBaixar(tarefaId, anexoId);
+  }
+
   async entregaParaBaixar(
     usuarioId: number,
     alunoId: number,
@@ -572,35 +616,20 @@ export class PainelFamiliaService {
     };
   }
 
-  /** "Familia - Configuracoes": dados do responsavel e avisos escolhidos. */
+  /**
+   * "Familia - Configuracoes": so os avisos escolhidos. Nome, e-mail e
+   * telefone a familia apenas ve; quem muda e a escola.
+   */
   async salvarPerfil(usuarioId: number, dto: PerfilFamiliaDto) {
     const r = await this.responsavel(usuarioId);
-    await this.dataSource.transaction(async (manager) => {
-      if (dto.email !== undefined && r.usuarioId) {
-        const email = dto.email.trim().toLowerCase();
-        const outro = await manager
-          .getRepository(Usuario)
-          .findOne({ where: { email, id: Not(r.usuarioId) } });
-        if (outro)
-          throw new BadRequestException('Ja existe um usuario com este email');
-        await manager.getRepository(Usuario).update(r.usuarioId, { email });
-      }
-      await manager.getRepository(Responsavel).update(r.id, {
-        ...(dto.nomeCompleto !== undefined && {
-          nomeCompleto: dto.nomeCompleto.trim(),
-        }),
-        ...(dto.telefone !== undefined && {
-          telefone: dto.telefone?.trim() || null,
-        }),
-        ...(dto.preferencias !== undefined && {
-          preferencias: {
-            ...PREFERENCIAS_PADRAO,
-            ...(r.preferencias ?? {}),
-            ...dto.preferencias,
-          },
-        }),
+    if (dto.preferencias !== undefined)
+      await this.dataSource.getRepository(Responsavel).update(r.id, {
+        preferencias: {
+          ...PREFERENCIAS_PADRAO,
+          ...(r.preferencias ?? {}),
+          ...dto.preferencias,
+        },
       });
-    });
     return this.contexto(usuarioId);
   }
 }

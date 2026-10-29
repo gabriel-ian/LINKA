@@ -1,4 +1,4 @@
-import { PreferenciasAluno } from '../aluno/aluno.entity';
+import { PREFERENCIAS_PADRAO, PreferenciasAluno } from '../aluno/aluno.entity';
 
 /** Ajudas que cada diagnostico liga de inicio (o aluno pode mudar no perfil). */
 const POR_DIAGNOSTICO: [RegExp, Partial<PreferenciasAluno>][] = [
@@ -33,4 +33,21 @@ export function preferenciasSugeridas(
         if (chave !== 'ouvirVoz' || sugeridas.ouvirVoz !== false)
           Object.assign(sugeridas, { [chave]: valor });
   return sugeridas;
+}
+
+/**
+ * As ajudas do diagnostico como um interruptor no perfil: `ligado` aplica as
+ * sugeridas e `desligado` volta cada uma ao padrao. Null sem nada sugerido.
+ */
+export function ajudasSugeridas(diagnosticos: string[]): {
+  ligado: Partial<PreferenciasAluno>;
+  desligado: Partial<PreferenciasAluno>;
+} | null {
+  const ligado = preferenciasSugeridas(diagnosticos);
+  const chaves = Object.keys(ligado) as (keyof PreferenciasAluno)[];
+  if (!chaves.length) return null;
+  const desligado = Object.fromEntries(
+    chaves.map((c) => [c, PREFERENCIAS_PADRAO[c]]),
+  ) as Partial<PreferenciasAluno>;
+  return { ligado, desligado };
 }

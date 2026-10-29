@@ -222,6 +222,22 @@ export class PainelEscolaService {
     };
   }
 
+  /** Alunos cadastrados sem familia: a escola vincula pela lista de familias. */
+  async alunosSemFamilia(escolaId: number) {
+    const linhas: { id: number; nome: string; turma: string | null }[] =
+      await this.dataSource.query(
+        `SELECT a.id, a.nome_completo nome,
+                (SELECT t.nome FROM matricula m JOIN turma t ON t.id = m.turma_id
+                  WHERE m.aluno_id = a.id LIMIT 1) turma
+           FROM aluno a
+          WHERE a.escola_id = ? AND a.ativo = 1
+            AND NOT EXISTS (SELECT 1 FROM aluno_responsavel ar WHERE ar.aluno_id = a.id)
+          ORDER BY a.nome_completo`,
+        [escolaId],
+      );
+    return { data: linhas.map((l) => ({ ...l, id: Number(l.id) })) };
+  }
+
   async detalharAluno(escolaId: number, alunoId: number) {
     const mes = mesDe(mesAtual());
     const semana = semanaDe(new Date());

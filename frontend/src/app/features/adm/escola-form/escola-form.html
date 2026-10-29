@@ -153,7 +153,14 @@
                   [attr.aria-pressed]="mostrarSenha"
                   (click)="mostrarSenha = !mostrarSenha"
                 >
-                  <img src="assets/entrada/icone-olho.svg" alt="" />
+                  <img
+                    [src]="
+                      mostrarSenha
+                        ? 'assets/entrada/icone-olho.svg'
+                        : 'assets/entrada/icone-olho-fechado.svg'
+                    "
+                    alt=""
+                  />
                 </button>
               </span>
               @if (erro('senha')) {
@@ -177,7 +184,14 @@
                   [attr.aria-pressed]="mostrarConfirmar"
                   (click)="mostrarConfirmar = !mostrarConfirmar"
                 >
-                  <img src="assets/entrada/icone-olho.svg" alt="" />
+                  <img
+                    [src]="
+                      mostrarConfirmar
+                        ? 'assets/entrada/icone-olho.svg'
+                        : 'assets/entrada/icone-olho-fechado.svg'
+                    "
+                    alt=""
+                  />
                 </button>
               </span>
               @if (erro('confirmar')) {

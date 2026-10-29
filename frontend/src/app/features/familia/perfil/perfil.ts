@@ -30,8 +30,9 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
               <dt>Telefone</dt>
               <dd>{{ d.responsavel.telefone || '—' }}</dd>
             </dl>
+            <p class="nota-escola">🔒 Para mudar nome, e-mail ou telefone, fale com a escola.</p>
             <a class="link-acao" routerLink="/familia/configuracoes"
-              >Mudar telefone, avisos e dados (LGPD) em Configurações</a
+              >Avisos e dados (LGPD) em Configurações</a
             >
           </section>
 

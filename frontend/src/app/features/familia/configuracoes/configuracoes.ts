@@ -1,5 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PreferenciasFamilia } from '../../../core/model/painel-familia.model';
 import { PainelFamiliaService } from '../../../core/services/painel-familia.service';
@@ -13,7 +12,7 @@ type Chave = Exclude<keyof PreferenciasFamilia, 'horario'>;
 /** "Familia - Configuracoes" do Figma. */
 @Component({
   selector: 'app-familia-configuracoes',
-  imports: [FormsModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './configuracoes.html',
   styleUrls: ['../familia-comum.css', './configuracoes.css'],
 })
@@ -54,28 +53,11 @@ export class FamiliaConfiguracoes {
 
   readonly horarios = ['8h às 12h', '12h às 14h', '14h às 18h', '18h às 21h'];
 
-  readonly nome = signal('');
-  readonly email = signal('');
-  readonly telefone = signal('');
   readonly salvando = signal(false);
-  readonly mensagem = signal('');
   readonly erro = signal('');
   readonly pedirVinculo = signal(false);
   /** Mensagem por filho na secao "Seus dados (LGPD)". */
   readonly avisoDados = signal<Record<number, string>>({});
-
-  constructor() {
-    // Preenche o formulario quando os dados chegam (uma vez).
-    let preenchido = false;
-    effect(() => {
-      const r = this.contexto.dados()?.responsavel;
-      if (!r || preenchido) return;
-      preenchido = true;
-      this.nome.set(r.nome);
-      this.email.set(r.email ?? '');
-      this.telefone.set(r.telefone ?? '');
-    });
-  }
 
   baixarDados(filhoId: number, nome: string): void {
     this.service.dadosDoFilho(filhoId).subscribe({
@@ -134,35 +116,5 @@ export class FamiliaConfiguracoes {
         this.erro.set(mensagemDeErro(e, 'Não foi possível salvar a preferência.'));
       },
     });
-  }
-
-  salvarDados(): void {
-    if (this.salvando()) return;
-    const nome = this.nome().trim();
-    const email = this.email().trim();
-    if (!nome) {
-      this.erro.set('Informe o nome completo.');
-      return;
-    }
-    this.salvando.set(true);
-    this.erro.set('');
-    this.mensagem.set('');
-    this.service
-      .salvarPerfil({
-        nomeCompleto: nome,
-        telefone: this.telefone().trim(),
-        ...(email ? { email } : {}),
-      })
-      .subscribe({
-        next: (res) => {
-          this.salvando.set(false);
-          this.contexto.dados.set(res.data);
-          this.mensagem.set('Dados salvos.');
-        },
-        error: (e) => {
-          this.salvando.set(false);
-          this.erro.set(mensagemDeErro(e, 'Não foi possível salvar os dados.'));
-        },
-      });
   }
 }

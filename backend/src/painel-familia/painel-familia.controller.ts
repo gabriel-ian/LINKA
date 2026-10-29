@@ -99,6 +99,36 @@ export class PainelFamiliaController {
     return this.painel.tarefas(usuarioId, id);
   }
 
+  @Get('filhos/:id/tarefas/:tarefaId')
+  @ApiOperation({ summary: 'Ver a tarefa do filho (so leitura)' })
+  tarefa(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('tarefaId', ParseIntPipe) tarefaId: number,
+  ) {
+    return this.painel.tarefa(usuarioId, id, tarefaId);
+  }
+
+  @Get('filhos/:id/tarefas/:tarefaId/anexos/:anexoId')
+  @ApiOperation({ summary: 'Baixar o material que a professora anexou' })
+  async baixarAnexo(
+    @UsuarioId() usuarioId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('tarefaId', ParseIntPipe) tarefaId: number,
+    @Param('anexoId', ParseIntPipe) anexoId: number,
+  ) {
+    const a = await this.painel.anexoParaBaixar(
+      usuarioId,
+      id,
+      tarefaId,
+      anexoId,
+    );
+    return new StreamableFile(createReadStream(a.caminho), {
+      type: a.mime,
+      disposition: a.disposicao,
+    });
+  }
+
   @Get('filhos/:id/tarefas/:tarefaId/entrega/:arquivoId')
   @ApiOperation({ summary: 'Ver a foto ou documento que o filho enviou' })
   async baixarEntrega(

@@ -9,37 +9,63 @@ import { horaCurta, prazo, tituloCompleto } from './aluno-ui';
 @Component({
   selector: 'app-item-tarefa',
   template: `
-    <img class="marca" [src]="icone()" alt="" width="26" height="26" />
-    <div class="texto">
-      <p [class.feita]="concluida()">{{ titulo() }}</p>
-      <span class="etiqueta" [class]="'etiqueta ' + etiqueta().cor">{{ etiqueta().texto }}</span>
-      @if (detalhes()) {
-        <ul class="detalhes">
-          <li>📅 {{ entrega() }}</li>
-          @if (tarefa().disciplina) {
-            <li>📘 {{ tarefa().disciplina }}</li>
-          }
-          @if (tarefa().professor) {
-            <li>👩‍🏫 Prof. {{ tarefa().professor!.split(' ')[0] }}</li>
-          }
-          @if (!concluida() && tarefa().totalPassos) {
-            <li>👣 {{ tarefa().passosFeitos }} de {{ tarefa().totalPassos }} passos</li>
-          }
-          @if (tarefa().ajudaRespondida) {
-            <li class="ajuda">🙋 A professora respondeu sua ajuda</li>
-          }
-        </ul>
+    <div class="caixa">
+      <img class="marca" [src]="icone()" alt="" width="26" height="26" />
+      <div class="texto">
+        <p [class.feita]="concluida()">{{ titulo() }}</p>
+        <span class="etiqueta" [class]="'etiqueta ' + etiqueta().cor">{{ etiqueta().texto }}</span>
+        @if (detalhes()) {
+          <ul class="detalhes">
+            <li>📅 {{ entrega() }}</li>
+            @if (tarefa().disciplina) {
+              <li>📘 {{ tarefa().disciplina }}</li>
+            }
+            @if (tarefa().professor) {
+              <li>👩‍🏫 Prof. {{ tarefa().professor!.split(' ')[0] }}</li>
+            }
+            @if (!concluida() && tarefa().totalPassos) {
+              <li>👣 {{ tarefa().passosFeitos }} de {{ tarefa().totalPassos }} passos</li>
+            }
+            @if (tarefa().ajudaRespondida) {
+              <li class="ajuda">🙋 A professora respondeu sua ajuda</li>
+            }
+          </ul>
+        }
+      </div>
+      @if (abrir()) {
+        <span class="abrir" aria-hidden="true">{{ concluida() ? 'Ver' : 'Abrir' }} ›</span>
       }
     </div>
-    @if (abrir()) {
-      <span class="abrir" aria-hidden="true">{{ concluida() ? 'Ver' : 'Abrir' }} ›</span>
-    }
   `,
   styles: `
     :host {
+      display: block;
+      container-type: inline-size;
+    }
+    .caixa {
       display: flex;
       align-items: flex-start;
       gap: 13px;
+    }
+    /* Cartao estreito (ex.: Inicio): detalhes um embaixo do outro e o botao
+       Abrir na linha de baixo, sem espremer o texto. */
+    @container (max-width: 440px) {
+      .caixa {
+        flex-wrap: wrap;
+        gap: 10px 13px;
+      }
+      .texto {
+        flex: 1 1 calc(100% - 39px);
+      }
+      .detalhes {
+        flex-direction: column;
+        gap: 3px;
+        margin-top: 2px;
+      }
+      .abrir {
+        margin-left: 39px;
+        align-self: flex-start;
+      }
     }
     .marca {
       flex: none;
@@ -127,13 +153,23 @@ export class ItemTarefa {
     const t = this.tarefa();
     if (!t.dataEntrega) return 'Sem data de entrega';
     const d = new Date(`${t.dataEntrega}T12:00:00`);
-    const dia = d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' });
+    const dia = d.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+    });
     return `Entrega: ${dia}${t.horaLimite ? ` às ${horaCurta(t.horaLimite)}` : ''}`;
   });
 
   readonly concluida = computed(() => this.tarefa().situacao === 'concluida');
-  readonly etiqueta = computed(() => prazo(this.tarefa()));
-  readonly titulo = computed(() => tituloCompleto(this.tarefa()));
+  // Com os detalhes, a materia ja aparece na linha do 📘: nao repete no
+  // titulo nem na etiqueta.
+  readonly etiqueta = computed(() =>
+    prazo(this.detalhes() ? { ...this.tarefa(), disciplina: null } : this.tarefa()),
+  );
+  readonly titulo = computed(() =>
+    this.detalhes() ? this.tarefa().titulo : tituloCompleto(this.tarefa()),
+  );
   readonly icone = computed(() =>
     this.concluida()
       ? 'assets/aluno/circulo-feito.svg'

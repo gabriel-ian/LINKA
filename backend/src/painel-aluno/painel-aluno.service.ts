@@ -41,7 +41,7 @@ import {
   sequenciaAtual,
 } from './gamificacao';
 import { AjudaDto, LembreteDto, PreferenciasDto } from './dto/painel-aluno.dto';
-import { preferenciasSugeridas } from './preferencias-nee';
+import { ajudasSugeridas, preferenciasSugeridas } from './preferencias-nee';
 import { apagarDesenho, desenhoExiste, gravarDesenho } from './desenho';
 
 export type SituacaoTarefa = 'pendente' | 'em-andamento' | 'concluida';
@@ -281,6 +281,10 @@ export class PainelAlunoService {
   /** Moldura + Inicio + Minhas tarefas. */
   async resumo(usuarioId: number) {
     const { aluno, turma } = await this.alunoDoUsuario(usuarioId);
+    const [escola]: { nome: string }[] = await this.dataSource.query(
+      'SELECT nome FROM escola WHERE id = ?',
+      [aluno.escolaId],
+    );
     const tarefas = await this.tarefasDoAluno(aluno.id);
     const hoje = new Date();
     const semana = semanaDe(hoje);
@@ -310,6 +314,7 @@ export class PainelAlunoService {
           primeiroNome: aluno.nomeCompleto.split(' ')[0],
           iniciais: iniciais(aluno.nomeCompleto),
           turma: turma?.nome ?? null,
+          escola: escola?.nome ?? null,
           idade: aluno.data_nascimento
             ? Math.floor(
                 (hoje.getTime() -
@@ -319,6 +324,8 @@ export class PainelAlunoService {
             : null,
         },
         preferencias: await this.preferenciasDe(aluno),
+        /** Ajudas indicadas pelo diagnostico (interruptor no perfil). */
+        ajudasSugeridas: ajudasSugeridas(await this.diagnosticos(aluno.id)),
         interesses: listaInteresses(aluno.interesses),
         ...this.placar(tarefas, hoje),
         semana: taxaConclusao(

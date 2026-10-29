@@ -343,3 +343,27 @@ h2 {
   font-weight: 800;
   line-height: 1;
 }
+
+/* ---------- Ajudas indicadas pelo diagnostico ---------- */
+
+.ajudas-sugeridas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 2px solid var(--cor-mascote, #1d4ed8);
+  border-radius: 14px;
+  background: var(--cor-mascote-fundo, #eff6ff);
+}
+
+.ajudas-sugeridas > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ajudas-sugeridas small {
+  color: var(--cor-texto);
+}

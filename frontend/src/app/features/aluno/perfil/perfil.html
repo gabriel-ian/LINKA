@@ -48,6 +48,28 @@
       <div class="direita">
         <section class="cartao">
           <h2>Como eu gosto de aprender</h2>
+          @if (r.ajudasSugeridas; as aj) {
+            <div class="ajudas-sugeridas">
+              <div>
+                <strong id="op-sugeridas">✨ Ajudas que a escola indicou para você</strong>
+                <small>{{ nomesSugeridas(aj.ligado).join(' · ') }}</small>
+                <small
+                  >Ligue ou desligue todas de uma vez. Você também pode mudar cada uma aqui
+                  embaixo.</small
+                >
+              </div>
+              <button
+                type="button"
+                role="switch"
+                class="chave"
+                [attr.aria-checked]="sugeridasLigadas()"
+                aria-labelledby="op-sugeridas"
+                (click)="alternarSugeridas()"
+              >
+                <span></span>
+              </button>
+            </div>
+          }
           <div class="tamanho-letra">
             <strong id="rotulo-tamanho">Tamanho da letra</strong>
             <div class="tamanhos" role="radiogroup" aria-labelledby="rotulo-tamanho">
@@ -88,7 +110,10 @@
         </section>
 
         <section class="cartao" aria-labelledby="titulo-voz">
-          <h2 id="titulo-voz">Voz {{ mascote(r.preferencias.mascote).nome === 'Coruja' ? 'da' : 'do' }} {{ mascote(r.preferencias.mascote).nome }}</h2>
+          <h2 id="titulo-voz">
+            Voz {{ mascote(r.preferencias.mascote).nome === 'Coruja' ? 'da' : 'do' }}
+            {{ mascote(r.preferencias.mascote).nome }}
+          </h2>
           @if (voz.disponivel) {
             <p class="explica">Escolha a voz que lê as tarefas e a velocidade da fala.</p>
             <div class="voz-linha">

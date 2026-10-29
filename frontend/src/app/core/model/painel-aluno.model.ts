@@ -72,9 +72,15 @@ export interface ResumoAluno extends Placar {
     primeiroNome: string;
     iniciais: string;
     turma: string | null;
+    escola?: string | null;
     idade: number | null;
   };
   preferencias: PreferenciasAluno;
+  /** Ajudas indicadas pelo diagnostico: ligar aplica, desligar volta ao padrao. */
+  ajudasSugeridas?: {
+    ligado: Partial<PreferenciasAluno>;
+    desligado: Partial<PreferenciasAluno>;
+  } | null;
   interesses: string[];
   /** % de tarefas feitas na semana (null sem tarefa vencida). */
   semana: number | null;

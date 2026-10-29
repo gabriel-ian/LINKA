@@ -10,6 +10,7 @@ import {
   PainelFamilia,
   PerfilFamilia,
   RelatorioFamilia,
+  TarefaAbertaFilho,
   TarefasDoFilho,
 } from '../model/painel-familia.model';
 
@@ -56,6 +57,20 @@ export class PainelFamiliaService {
 
   tarefas(filhoId: number): Observable<ApiResponse<TarefasDoFilho>> {
     return this.http.get<ApiResponse<TarefasDoFilho>>(`${this.api}/filhos/${filhoId}/tarefas`);
+  }
+
+  /** A tarefa como o filho ve, so para acompanhar. */
+  tarefa(filhoId: number, tarefaId: number): Observable<ApiResponse<TarefaAbertaFilho>> {
+    return this.http.get<ApiResponse<TarefaAbertaFilho>>(
+      `${this.api}/filhos/${filhoId}/tarefas/${tarefaId}`,
+    );
+  }
+
+  /** Material que a professora anexou na tarefa. */
+  baixarAnexo(filhoId: number, tarefaId: number, anexoId: number): Observable<Blob> {
+    return this.http.get(`${this.api}/filhos/${filhoId}/tarefas/${tarefaId}/anexos/${anexoId}`, {
+      responseType: 'blob',
+    });
   }
 
   /** Foto ou documento que o filho enviou da tarefa. */
